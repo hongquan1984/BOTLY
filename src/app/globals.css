@@ -129,10 +129,36 @@ select option {
   backdrop-filter: blur(12px);
 }
 
-/* Mobile sticky CTA spacing */
+/* Mobile layout consistency */
 @media (max-width: 639px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
   main {
-    padding-bottom: 5rem;
+    padding-bottom: 5.75rem;
+  }
+}
+
+/* Full-width section card grids on small screens */
+.section-grid {
+  display: grid;
+  width: 100%;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .section-grid {
+    gap: 1.25rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-grid.section-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

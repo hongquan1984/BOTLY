@@ -65,8 +65,8 @@ export function AutomationShowcase() {
         description="Từ bình luận Facebook đến chăm sóc sau bán — mỗi bước được AI và workflow xử lý liên tục."
       />
 
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <Button onClick={startRun} disabled={running}>
+      <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center">
+        <Button fullWidth className="sm:w-auto" onClick={startRun} disabled={running}>
           {running ? (
             <>
               <Pause className="h-4 w-4" />
@@ -79,26 +79,22 @@ export function AutomationShowcase() {
             </>
           )}
         </Button>
-        <Button variant="secondary" onClick={reset}>
+        <Button fullWidth className="sm:w-auto" variant="secondary" onClick={reset}>
           <RotateCcw className="h-4 w-4" />
           Đặt lại
         </Button>
       </div>
 
-      <div className="mt-10 overflow-x-auto pb-4">
-        <ol className="mx-auto flex min-w-max gap-3 px-1 lg:grid lg:min-w-0 lg:grid-cols-5 lg:gap-4">
+      <div className="mt-10 w-full">
+        <ol className="mx-auto grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
           {salesAutomationFlow.map((step, i) => {
             const isActive = active === i;
             const isDone = active > i;
             return (
-              <li
-                key={step.id}
-                id={`flow-step-${i}`}
-                className="w-[16rem] shrink-0 lg:w-auto"
-              >
+              <li key={step.id} id={`flow-step-${i}`} className="w-full min-w-0">
                 <motion.div
                   className={cn(
-                    "h-full rounded-2xl border p-4 transition-all duration-300",
+                    "flex h-full w-full flex-col rounded-2xl border p-4 transition-all duration-300 sm:p-5",
                     isActive &&
                       "border-cyan-400/50 bg-cyan-400/10 shadow-lg shadow-cyan-500/10",
                     isDone && !isActive && "border-emerald-400/25 bg-emerald-400/5",
@@ -108,7 +104,7 @@ export function AutomationShowcase() {
                     reduce
                       ? undefined
                       : isActive
-                        ? { scale: 1.02 }
+                        ? { scale: 1.01 }
                         : { scale: 1 }
                   }
                 >
@@ -123,12 +119,11 @@ export function AutomationShowcase() {
                     >
                       {step.id}
                     </span>
-                    {i < salesAutomationFlow.length - 1 ? (
-                      <span className="hidden text-xs text-slate-600 lg:inline">→</span>
-                    ) : null}
                   </div>
-                  <h3 className="text-sm font-semibold text-slate-100">{step.title}</h3>
-                  <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
+                  <h3 className="text-sm font-semibold text-slate-100 sm:text-[0.95rem]">
+                    {step.title}
+                  </h3>
+                  <p className="mt-1.5 text-xs leading-relaxed text-slate-400 sm:text-sm">
                     {step.detail}
                   </p>
                 </motion.div>

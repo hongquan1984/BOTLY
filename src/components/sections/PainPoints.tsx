@@ -31,12 +31,12 @@ export function PainPoints() {
         description="Những điểm nghẽn phổ biến khiến chi phí vận hành tăng và cơ hội bán hàng bị bỏ lỡ."
       />
 
-      <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="section-grid section-grid-3 mt-10 sm:mt-12">
         {painPoints.map((item, i) => {
           const Icon = iconMap[item.icon] ?? Repeat;
           return (
-            <ScrollReveal key={item.id} delay={i * 0.05}>
-              <Card hover className="h-full p-5 sm:p-6">
+            <ScrollReveal key={item.id} delay={i * 0.05} className="w-full">
+              <Card hover className="h-full">
                 <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-rose-400/20 bg-rose-400/10 text-rose-300">
                   <Icon className="h-5 w-5" aria-hidden />
                 </div>

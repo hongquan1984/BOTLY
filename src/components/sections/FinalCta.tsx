@@ -43,20 +43,20 @@ export function FinalCta() {
 
   return (
     <Section id="contact" muted>
-      <div className="grid items-start gap-10 lg:grid-cols-2">
-        <div>
+      <div className="grid w-full items-start gap-8 lg:grid-cols-2 lg:gap-10">
+        <div className="w-full text-center lg:text-left">
           <p className="text-sm font-semibold uppercase tracking-wider text-cyan-300">
             Bắt đầu ngay
           </p>
-          <h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-slate-50 sm:text-4xl">
+          <h2 className="mt-3 text-balance text-[1.65rem] font-bold leading-tight tracking-tight text-slate-50 sm:text-4xl">
             Sẵn sàng tự động hóa doanh nghiệp của bạn?
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-slate-400">
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base lg:mx-0">
             Hãy bắt đầu từ một quy trình nhỏ. Chúng tôi sẽ phân tích và đề xuất
             giải pháp AI phù hợp với nhu cầu, ngân sách và hệ thống hiện tại của
             doanh nghiệp.
           </p>
-          <ul className="mt-6 space-y-2 text-sm text-slate-300">
+          <ul className="mx-auto mt-6 max-w-md space-y-2 text-left text-sm text-slate-300 lg:mx-0 lg:max-w-none">
             <li>• Tư vấn miễn phí, không ràng buộc</li>
             <li>• Có thể yêu cầu demo trước khi triển khai</li>
             <li>• Không cần kiến thức kỹ thuật để bắt đầu</li>
@@ -65,7 +65,7 @@ export function FinalCta() {
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="rounded-2xl border border-white/10 bg-[#050816]/60 p-5 sm:p-6"
+          className="w-full rounded-2xl border border-white/10 bg-[#050816]/60 p-5 sm:p-6"
           noValidate
         >
           <div className="grid gap-3 sm:grid-cols-2">

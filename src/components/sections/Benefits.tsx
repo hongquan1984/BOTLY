@@ -32,36 +32,36 @@ export function Benefits() {
         description="Tập trung vào kết quả vận hành: nhanh hơn, ít sai hơn, và đội ngũ làm việc có giá trị hơn."
       />
 
-      <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="section-grid section-grid-3 mt-10 sm:mt-12">
         {benefits.map((item, i) => {
           const Icon = benefitIcons[i] ?? Zap;
           return (
-            <ScrollReveal key={item.title} delay={i * 0.04}>
-              <Card hover className="h-full p-5">
-                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 text-cyan-300">
+            <ScrollReveal key={item.title} delay={i * 0.04} className="w-full">
+              <Card hover className="h-full text-center sm:text-left">
+                <div className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 text-cyan-300">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-base font-semibold text-slate-50">{item.title}</h3>
-                <p className="mt-2 text-sm text-slate-400">{item.description}</p>
+                <h3 className="text-base font-semibold text-slate-50 sm:text-lg">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-400">{item.description}</p>
               </Card>
             </ScrollReveal>
           );
         })}
       </div>
 
-      <p className="mx-auto mt-12 max-w-3xl text-center text-xs leading-relaxed text-slate-500">
+      <p className="mx-auto mt-10 max-w-3xl px-1 text-center text-xs leading-relaxed text-slate-500 sm:mt-12">
         Các con số dưới đây là mục tiêu tham khảo, kết quả thực tế phụ thuộc vào
         quy trình và mức độ triển khai.
       </p>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-6">
+      <div className="mt-6 grid w-full grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {benefitCounters.map((c, i) => (
-          <ScrollReveal key={c.label} delay={i * 0.03}>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-center">
+          <ScrollReveal key={c.label} delay={i * 0.03} className="w-full">
+            <div className="flex h-full min-h-[6.5rem] flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-center sm:min-h-[7rem] sm:p-5">
               <p className="text-2xl font-bold text-cyan-300 sm:text-3xl">
                 <AnimatedCounter value={c.value} suffix={c.suffix} />
               </p>
-              <p className="mt-1 text-[11px] leading-snug text-slate-400">{c.label}</p>
+              <p className="mt-1.5 text-[11px] leading-snug text-slate-400 sm:text-xs">{c.label}</p>
             </div>
           </ScrollReveal>
         ))}

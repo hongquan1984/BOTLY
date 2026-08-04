@@ -18,7 +18,7 @@ export function Section({
     <section
       id={id}
       className={cn(
-        "relative scroll-mt-24 py-16 sm:py-20 lg:py-24",
+        "relative scroll-mt-28 py-14 sm:scroll-mt-32 sm:py-20 lg:py-24",
         muted ? "bg-[#0A1020]/60" : "bg-transparent",
         className
       )}

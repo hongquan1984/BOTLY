@@ -37,16 +37,16 @@ export function Services() {
         description="Từ livestream, chăm sóc khách hàng đến workflow nội bộ — thiết kế theo quy trình doanh nghiệp của bạn."
       />
 
-      <div className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="section-grid section-grid-3 mt-10 sm:mt-12">
         {services.map((service, i) => {
           const Icon = iconMap[service.icon] ?? Sparkles;
           const isActive = active === service.id;
           return (
-            <ScrollReveal key={service.id} delay={i * 0.04}>
+            <ScrollReveal key={service.id} delay={i * 0.04} className="w-full">
               <Card
                 hover
                 className={cn(
-                  "flex h-full cursor-pointer flex-col p-5 sm:p-6",
+                  "flex h-full cursor-pointer flex-col",
                   isActive && "border-cyan-400/35 bg-cyan-400/[0.06]"
                 )}
               >

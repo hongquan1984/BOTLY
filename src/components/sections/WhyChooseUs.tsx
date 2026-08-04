@@ -37,16 +37,16 @@ export function WhyChooseUs() {
         description="Ưu tiên ROI, tích hợp hiện trạng và triển khai theo giai đoạn có kiểm soát."
       />
 
-      <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="section-grid section-grid-3 mt-10 sm:mt-12">
         {whyChooseUs.map((item, i) => {
           const Icon = iconMap[item.icon] ?? Shield;
           return (
-            <ScrollReveal key={item.title} delay={i * 0.03}>
-              <Card hover className="h-full p-5">
-                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-400/10 text-violet-300">
+            <ScrollReveal key={item.title} delay={i * 0.03} className="w-full">
+              <Card hover className="h-full text-center sm:text-left">
+                <div className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-400/10 text-violet-300">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-base font-semibold text-slate-50">{item.title}</h3>
+                <h3 className="text-base font-semibold text-slate-50 sm:text-lg">{item.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-slate-400">
                   {item.description}
                 </p>

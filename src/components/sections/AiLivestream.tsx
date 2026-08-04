@@ -71,9 +71,9 @@ export function AiLivestream() {
         description="Hệ thống AI Livestream giúp doanh nghiệp duy trì nội dung bán hàng, giới thiệu sản phẩm và tương tác với người xem trong thời gian dài mà không phụ thuộc hoàn toàn vào đội ngũ host."
       />
 
-      <div className="mt-12 grid items-start gap-8 lg:grid-cols-2">
-        <ScrollReveal>
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#050816] shadow-2xl shadow-violet-500/10">
+      <div className="mt-10 grid w-full items-start gap-6 sm:mt-12 sm:gap-8 lg:grid-cols-2">
+        <ScrollReveal className="w-full">
+          <div className="w-full overflow-hidden rounded-2xl border border-white/10 bg-[#050816] shadow-2xl shadow-violet-500/10">
             {/* Live header */}
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
               <div className="flex items-center gap-2">
@@ -180,19 +180,19 @@ export function AiLivestream() {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal delay={0.1}>
-          <div>
-            <h3 className="text-xl font-semibold text-slate-50">
+        <ScrollReveal className="w-full" delay={0.1}>
+          <div className="w-full">
+            <h3 className="text-center text-xl font-semibold text-slate-50 lg:text-left">
               Lợi ích cho doanh nghiệp
             </h3>
-            <ul className="mt-5 grid gap-2.5 sm:grid-cols-2">
+            <ul className="mt-5 grid w-full grid-cols-1 gap-2.5 sm:grid-cols-2">
               {benefits.map((b) => (
                 <li
                   key={b}
-                  className="flex items-start gap-2.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-slate-300"
+                  className="flex w-full items-start gap-2.5 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-3 text-sm text-slate-300"
                 >
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-cyan-400" />
-                  {b}
+                  <span className="min-w-0 flex-1 leading-relaxed">{b}</span>
                 </li>
               ))}
             </ul>

@@ -22,13 +22,13 @@ export function Testimonials() {
         description="Các nhận xét dưới đây là placeholder minh họa — sẽ được thay bằng feedback thật khi có dữ liệu."
       />
 
-      <div className="mx-auto mt-10 max-w-3xl">
-        <figure className="relative rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-          <Quote className="absolute right-6 top-6 h-10 w-10 text-cyan-400/15" />
-          <blockquote className="text-lg leading-relaxed text-slate-100 sm:text-xl">
+      <div className="mx-auto mt-10 w-full max-w-3xl">
+        <figure className="relative w-full rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-center sm:p-8 sm:text-left">
+          <Quote className="absolute right-4 top-4 h-8 w-8 text-cyan-400/15 sm:right-6 sm:top-6 sm:h-10 sm:w-10" />
+          <blockquote className="text-base leading-relaxed text-slate-100 sm:text-xl">
             “{item.quote}”
           </blockquote>
-          <figcaption className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <figcaption className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-between">
             <div>
               <p className="text-sm font-semibold text-slate-200">{item.role}</p>
               <p className="text-xs text-amber-200/80">{item.note}</p>
@@ -38,7 +38,7 @@ export function Testimonials() {
                 type="button"
                 onClick={prev}
                 aria-label="Nhận xét trước"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -46,7 +46,7 @@ export function Testimonials() {
                 type="button"
                 onClick={next}
                 aria-label="Nhận xét sau"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>

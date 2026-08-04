@@ -23,7 +23,7 @@ function FlowColumn({
   return (
     <div
       className={cn(
-        "rounded-2xl border p-5 sm:p-6",
+        "h-full w-full rounded-2xl border p-5 sm:p-6",
         isAfter
           ? "border-cyan-400/25 bg-gradient-to-b from-cyan-500/10 to-transparent"
           : "border-white/10 bg-white/[0.03]"
@@ -98,15 +98,15 @@ export function Solution() {
         description="Thay chuỗi thao tác thủ công bằng luồng AI kết nối từ quảng cáo đến báo cáo."
       />
 
-      <div className="mt-12 grid gap-5 lg:grid-cols-2">
-        <ScrollReveal>
+      <div className="mt-10 grid w-full gap-5 sm:mt-12 lg:grid-cols-2">
+        <ScrollReveal className="w-full">
           <FlowColumn
             title="Trước khi tự động hóa"
             steps={beforeAutomation}
             variant="before"
           />
         </ScrollReveal>
-        <ScrollReveal delay={0.1}>
+        <ScrollReveal className="w-full" delay={0.1}>
           <FlowColumn
             title="Sau khi tự động hóa"
             steps={afterAutomation}

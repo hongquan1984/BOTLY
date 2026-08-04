@@ -11,7 +11,7 @@ export function Faq() {
         title="Câu hỏi thường gặp"
         description="Những thắc mắc phổ biến trước khi bắt đầu hành trình AI Automation."
       />
-      <div className="mx-auto mt-10 max-w-3xl">
+      <div className="mx-auto mt-10 w-full max-w-3xl">
         <Accordion items={[...faqs]} />
       </div>
     </Section>

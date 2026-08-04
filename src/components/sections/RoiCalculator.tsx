@@ -47,8 +47,8 @@ export function RoiCalculator() {
         description="Công cụ tham khảo giúp hình dung số giờ và chi phí có thể tối ưu khi tự động hóa đúng tác vụ."
       />
 
-      <div className="mt-12 grid gap-6 lg:grid-cols-2">
-        <div className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+      <div className="mt-10 grid w-full gap-5 sm:mt-12 lg:grid-cols-2 lg:gap-6">
+        <div className="w-full space-y-5 rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
           <Field
             label="Số nhân viên làm việc thủ công"
             value={employees}
@@ -96,7 +96,7 @@ export function RoiCalculator() {
           />
         </div>
 
-        <div className="flex flex-col rounded-2xl border border-cyan-400/25 bg-gradient-to-b from-cyan-500/10 to-transparent p-5 sm:p-6">
+        <div className="flex w-full flex-col rounded-2xl border border-cyan-400/25 bg-gradient-to-b from-cyan-500/10 to-transparent p-5 sm:p-6">
           <h3 className="text-lg font-semibold text-slate-50">Kết quả ước tính</h3>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             <ResultCard

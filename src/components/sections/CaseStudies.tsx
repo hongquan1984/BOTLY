@@ -15,10 +15,10 @@ export function CaseStudies() {
         description="Các case study dưới đây mang tính minh họa để giúp bạn hình dung giá trị — chưa phải dữ liệu khách hàng thật."
       />
 
-      <div className="mt-12 grid gap-5 lg:grid-cols-3">
+      <div className="section-grid section-grid-3 mt-10 sm:mt-12">
         {caseStudies.map((cs, i) => (
-          <ScrollReveal key={cs.id} delay={i * 0.06}>
-            <Card hover className="flex h-full flex-col p-5 sm:p-6">
+          <ScrollReveal key={cs.id} delay={i * 0.06} className="w-full">
+            <Card hover className="flex h-full flex-col">
               <Badge className="mb-3 w-fit border-amber-400/20 bg-amber-400/10 text-amber-200">
                 {cs.badge}
               </Badge>

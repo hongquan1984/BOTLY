@@ -66,32 +66,32 @@ export function Hero() {
       </div>
 
       <Container className="relative">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-10">
-          <div>
-            <Badge>
+        <div className="grid w-full items-center gap-10 lg:grid-cols-2 lg:gap-10">
+          <div className="mx-auto w-full max-w-xl text-center lg:mx-0 lg:max-w-none lg:text-left">
+            <Badge className="mx-auto lg:mx-0">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300" />
               AI Automation cho SMB
             </Badge>
 
-            <h1 className="mt-5 text-balance text-4xl font-bold tracking-tight text-slate-50 sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
+            <h1 className="mt-5 text-balance text-[1.85rem] font-bold leading-tight tracking-tight text-slate-50 sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
               Biến doanh nghiệp của bạn thành hệ thống vận hành bằng{" "}
               <span className="bg-gradient-to-r from-cyan-300 via-blue-400 to-violet-400 bg-clip-text text-transparent">
                 AI
               </span>
             </h1>
 
-            <p className="mt-5 text-lg font-medium text-slate-200 sm:text-xl">
+            <p className="mt-5 text-base font-medium text-slate-200 sm:text-xl">
               Tự động hóa marketing, chăm sóc khách hàng, livestream, bán hàng,
               báo cáo và quy trình nội bộ.
             </p>
 
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-400">
+            <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base lg:mx-0">
               Chúng tôi xây dựng hệ thống AI Automation theo đúng quy trình
               doanh nghiệp, giúp giảm việc thủ công, tiết kiệm chi phí và vận
               hành hiệu quả 24/7.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
               <Button size="lg" fullWidth className="sm:w-auto" onClick={() => scrollToId("contact")}>
                 Nhận tư vấn miễn phí
                 <ArrowRight className="h-4 w-4" />
@@ -108,13 +108,13 @@ export function Hero() {
               </Button>
             </div>
 
-            <ul className="mt-8 space-y-2.5">
+            <ul className="mt-8 inline-flex w-full flex-col items-center gap-2.5 sm:items-start sm:inline-flex lg:items-start">
               {[
                 "Không cần kiến thức kỹ thuật",
                 "Tích hợp với hệ thống hiện tại",
                 "Có bản demo trước khi triển khai",
               ].map((item) => (
-                <li key={item} className="flex items-center gap-2.5 text-sm text-slate-300">
+                <li key={item} className="flex w-full max-w-sm items-center justify-center gap-2.5 text-sm text-slate-300 lg:max-w-none lg:justify-start">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-cyan-400" />
                   {item}
                 </li>
@@ -123,7 +123,7 @@ export function Hero() {
           </div>
 
           {/* Dashboard visual */}
-          <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
+          <div className="relative mx-auto w-full max-w-lg lg:mx-0 lg:max-w-none">
             {/* Orbit nodes */}
             <div className="absolute inset-0 hidden sm:block" aria-hidden>
               {heroNodes.map((node, i) => (

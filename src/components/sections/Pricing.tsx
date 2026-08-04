@@ -18,12 +18,12 @@ export function Pricing() {
         description="Chi phí phụ thuộc vào số lượng quy trình, nền tảng tích hợp và độ phức tạp của hệ thống."
       />
 
-      <div className="mt-12 grid gap-5 lg:grid-cols-3">
+      <div className="section-grid section-grid-3 mt-10 sm:mt-12">
         {pricingPlans.map((plan, i) => (
-          <ScrollReveal key={plan.id} delay={i * 0.06}>
+          <ScrollReveal key={plan.id} delay={i * 0.06} className="w-full">
             <Card
               className={cn(
-                "relative flex h-full flex-col p-6",
+                "relative flex h-full flex-col",
                 plan.highlighted &&
                   "border-cyan-400/40 bg-gradient-to-b from-cyan-500/10 to-transparent shadow-xl shadow-cyan-500/10"
               )}

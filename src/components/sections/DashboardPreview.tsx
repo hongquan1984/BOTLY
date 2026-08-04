@@ -21,24 +21,24 @@ export function DashboardPreview() {
       />
 
       <ScrollReveal className="mt-12">
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#070b16] p-4 shadow-2xl sm:p-6">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <div>
+        <div className="w-full overflow-hidden rounded-2xl border border-white/10 bg-[#070b16] p-4 shadow-2xl sm:p-6">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <div className="text-center sm:text-left">
               <p className="text-sm font-semibold text-slate-100">
                 Botly Operations Dashboard
               </p>
               <p className="text-xs text-slate-500">Dữ liệu demo · không phải production</p>
             </div>
-            <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-300">
+            <span className="mx-auto w-fit rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-300 sm:mx-0">
               Live preview
             </span>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid w-full grid-cols-2 gap-3 lg:grid-cols-4">
             {dashboardStats.map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-xl border border-white/10 bg-white/[0.03] p-3.5"
+                className="rounded-xl border border-white/10 bg-white/[0.03] p-3.5 text-center sm:p-4 sm:text-left"
               >
                 <p className="text-[11px] text-slate-400">{stat.label}</p>
                 <p className="mt-1 text-xl font-bold text-slate-50">{stat.value}</p>
