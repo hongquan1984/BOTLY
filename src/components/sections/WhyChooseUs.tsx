@@ -32,7 +32,7 @@ export function WhyChooseUs() {
   return (
     <Section id="why-us">
       <SectionHeading
-        eyebrow="Why AIFlow"
+        eyebrow="Why Botly"
         title="Không chỉ cài phần mềm. Chúng tôi thiết kế một hệ thống phù hợp với doanh nghiệp."
         description="Ưu tiên ROI, tích hợp hiện trạng và triển khai theo giai đoạn có kiểm soát."
       />

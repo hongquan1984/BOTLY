@@ -167,7 +167,7 @@ export function Hero() {
               <div className="mb-4 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-cyan-300">
-                    AI Control Center
+                    Botly Control Center
                   </p>
                   <p className="text-sm text-slate-400">Dashboard vận hành realtime</p>
                 </div>

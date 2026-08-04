@@ -21,27 +21,38 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
     default:
-      "AIFlow Automation – Giải pháp AI Automation và AI Livestream cho doanh nghiệp",
+      "Botly – Giải pháp AI Automation và AI Livestream cho doanh nghiệp",
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
   keywords: [...siteConfig.keywords],
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
+  icons: {
+    icon: [{ url: "/logo.png", type: "image/png" }],
+    apple: [{ url: "/logo.png" }],
+  },
   openGraph: {
     type: "website",
     locale: siteConfig.locale,
     url: siteConfig.url,
     siteName: siteConfig.name,
-    title:
-      "AIFlow Automation – Giải pháp AI Automation và AI Livestream cho doanh nghiệp",
+    title: "Botly – Giải pháp AI Automation và AI Livestream cho doanh nghiệp",
     description: siteConfig.description,
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Botly.vn",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "AIFlow Automation – Giải pháp AI Automation và AI Livestream cho doanh nghiệp",
+    title: "Botly – Giải pháp AI Automation và AI Livestream cho doanh nghiệp",
     description: siteConfig.description,
+    images: ["/logo.png"],
   },
   robots: {
     index: true,

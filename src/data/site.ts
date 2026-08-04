@@ -1,13 +1,13 @@
 export const siteConfig = {
-  name: "AIFlow Automation",
-  shortName: "AIFlow",
+  name: "Botly",
+  shortName: "Botly",
   tagline: "Tự động hóa doanh nghiệp bằng AI để giảm chi phí, tăng năng suất và vận hành 24/7.",
   description:
     "Xây dựng hệ thống AI Automation, AI Livestream, chatbot, marketing automation và công cụ tự động hóa giúp doanh nghiệp giảm chi phí, tăng năng suất và vận hành hiệu quả.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://aiflow.example.com",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://aiflow-automation.vercel.app",
   locale: "vi_VN",
   contact: {
-    email: "lienhe@aiflow.example.com",
+    email: "lienhe@botly.vn",
     phone: "0900 000 000",
     phoneHref: "tel:0900000000",
     zalo: "https://zalo.me/0900000000",

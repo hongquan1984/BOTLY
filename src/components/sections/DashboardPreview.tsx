@@ -25,7 +25,7 @@ export function DashboardPreview() {
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-100">
-                AIFlow Operations Dashboard
+                Botly Operations Dashboard
               </p>
               <p className="text-xs text-slate-500">Dữ liệu demo · không phải production</p>
             </div>
