@@ -14,13 +14,13 @@ export function Logo({
       className={cn("inline-flex items-center gap-3", className)}
       aria-label="Botly - Trang chủ"
     >
-      <span className="relative block h-11 w-[7.5rem] overflow-hidden rounded-2xl border border-white/10 bg-[#050c20] shadow-[0_0_16px_rgba(34,211,238,0.2)] sm:h-12 sm:w-[8.5rem] sm:rounded-2xl lg:h-14 lg:w-[10rem] lg:rounded-3xl">
+      <span className="relative block h-11 w-[8rem] overflow-hidden rounded-2xl border border-white/10 bg-black/40 shadow-[0_0_16px_rgba(34,211,238,0.18)] sm:h-12 sm:w-[9.25rem] lg:h-14 lg:w-[11rem] lg:rounded-3xl">
         <Image
           src="/logo.png"
           alt="Botly.vn"
           fill
           priority
-          sizes="(max-width: 640px) 120px, (max-width: 1024px) 136px, 160px"
+          sizes="(max-width: 640px) 128px, (max-width: 1024px) 148px, 176px"
           className="object-contain object-center p-1.5 sm:p-2"
         />
       </span>
