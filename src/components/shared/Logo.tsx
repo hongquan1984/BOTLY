@@ -14,14 +14,15 @@ export function Logo({
       className={cn("inline-flex items-center gap-3", className)}
       aria-label="Botly - Trang chủ"
     >
-      <span className="relative block h-12 w-[11.5rem] sm:h-14 sm:w-[14rem] lg:h-16 lg:w-[16rem]">
+      {/* Aspect ~2.68 (182×68) — wordmark botly.vn */}
+      <span className="relative block h-11 w-[7.5rem] sm:h-12 sm:w-[8.5rem] lg:h-14 lg:w-[10rem]">
         <Image
           src="/logo.png"
           alt="Botly.vn"
           fill
           priority
-          sizes="(max-width: 640px) 184px, (max-width: 1024px) 224px, 256px"
-          className="object-contain object-left drop-shadow-[0_0_18px_rgba(34,211,238,0.45)]"
+          sizes="(max-width: 640px) 120px, (max-width: 1024px) 136px, 160px"
+          className="object-contain object-left"
         />
       </span>
       {showText ? (
