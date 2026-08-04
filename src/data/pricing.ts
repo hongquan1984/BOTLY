@@ -1,0 +1,47 @@
+export const pricingPlans = [
+  {
+    id: "starter",
+    name: "Starter",
+    description: "Phù hợp doanh nghiệp muốn tự động hóa một quy trình trọng yếu.",
+    features: [
+      "Một quy trình automation",
+      "Tích hợp cơ bản",
+      "Dashboard đơn giản",
+      "Hỗ trợ triển khai",
+      "Đào tạo sử dụng cơ bản",
+    ],
+    highlighted: false,
+    cta: "Nhận báo giá",
+  },
+  {
+    id: "growth",
+    name: "Growth",
+    description: "Cho đội ngũ sales & marketing cần nhiều workflow và báo cáo nâng cao.",
+    features: [
+      "Nhiều workflow",
+      "CRM integration",
+      "AI chatbot",
+      "Marketing automation",
+      "Báo cáo nâng cao",
+      "Hỗ trợ tối ưu định kỳ",
+    ],
+    highlighted: true,
+    cta: "Nhận báo giá",
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    description: "Hệ thống AI riêng, nhiều phòng ban và yêu cầu tùy chỉnh cao.",
+    features: [
+      "AI System riêng",
+      "Nhiều phòng ban",
+      "API riêng",
+      "Quyền truy cập nâng cao",
+      "Hạ tầng tùy chỉnh",
+      "Hỗ trợ ưu tiên",
+      "SLA và bảo mật nâng cao",
+    ],
+    highlighted: false,
+    cta: "Nhận báo giá",
+  },
+] as const;
