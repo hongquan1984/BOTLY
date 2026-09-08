@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArticlePage } from "@/components/wellness/ArticlePage";
 import { getArticle, wellnessArticles } from "@/data/wellness-articles";
-import { findPublishedArticle, translatedArticlePath } from "@/lib/published-articles";
+import { findPublishedArticle, listPublishedArticles, translatedArticlePath } from "@/lib/published-articles";
 import { PublishedArticlePage } from "@/components/wellness/PublishedArticlePage";
 import { articlePath } from "@/lib/article-publishing";
 export const dynamic = 'force-dynamic';
@@ -20,5 +20,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   if (legacy) return <ArticlePage article={legacy} />;
   const article = await findPublishedArticle('en', slug);
   if (!article) notFound();
-  return <PublishedArticlePage article={article} translationPath={await translatedArticlePath(article)} />;
+  const [translationPath, relatedArticles] = await Promise.all([
+    translatedArticlePath(article),
+    listPublishedArticles('en', undefined, 12)
+  ]);
+  return <PublishedArticlePage article={article} translationPath={translationPath} relatedArticles={relatedArticles} />;
 }

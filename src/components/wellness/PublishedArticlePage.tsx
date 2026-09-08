@@ -3,9 +3,10 @@ import type { PublishedArticle } from '@/lib/published-articles';
 import { portals } from '@/data/wellness-portals';
 import { WellnessShell } from './WellnessShell';
 import { TrustMeterWidget, QuickRecipeWidget, FactChecksWidget, FaqsWidget, SafetyQuizWidget } from './ArticleWidgets';
+import { RelatedArticlesSection } from './RelatedArticlesSection';
 
-export function PublishedArticlePage({ article: a, translationPath }: {
-  article: PublishedArticle; translationPath: string | null;
+export function PublishedArticlePage({ article: a, translationPath, relatedArticles = [] }: {
+  article: PublishedArticle; translationPath: string | null; relatedArticles?: PublishedArticle[];
 }) {
   const vi = a.locale === 'vi';
   const base = vi ? '/vi/song-khoe' : '/en/wellness';
@@ -120,6 +121,9 @@ export function PublishedArticlePage({ article: a, translationPath }: {
           </a>
         </div>
       )}
+
+      {/* Related Articles Section */}
+      <RelatedArticlesSection currentSlug={a.slug} locale={a.locale} articles={relatedArticles} />
     </article></main>
   </WellnessShell>;
 }
