@@ -8,6 +8,8 @@ import { listPublishedArticles } from "@/lib/published-articles";
 import { articlePath } from "@/lib/article-publishing";
 import { ArticleCard } from "./ArticleCard";
 import { VideoCard, type VideoItem } from "./VideoCard";
+import { BiomedicalHeroHub } from "./BiomedicalHeroHub";
+import { FeaturedToolConsole } from "./FeaturedToolConsole";
 
 export async function PortalHub({ locale, portal }: { locale: WellnessLocale; portal: Portal }) {
   const vi = locale === "vi";
@@ -50,13 +52,23 @@ export async function PortalHub({ locale, portal }: { locale: WellnessLocale; po
   return (
     <WellnessShell locale={locale}>
       <main>
-        {/* Portal Hero Banner */}
+        {/* Portal Hero Banner - High-Tech Biomedical Verification Hub */}
         <section className={`portal-hero tone-${portal.tone}`}>
-          <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-14 lg:grid-cols-[1fr_.75fr] lg:px-8">
+          <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-14 lg:grid-cols-[1.1fr_.9fr] lg:px-8">
             <div>
-              <p className="section-kicker">BOTLY · {portal.name.toUpperCase()}</p>
-              <h1 className="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl">{portal.tagline}</h1>
-              <p className="mt-4 text-base leading-relaxed text-[#4e665d] sm:text-lg">{portal.description}</p>
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-600/20 bg-white/90 px-3.5 py-1.5 text-xs font-extrabold uppercase tracking-wider text-emerald-900 shadow-sm backdrop-blur-md">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>BOTLY · {portal.name.toUpperCase()} · EVIDENCE-BASED</span>
+              </div>
+
+              <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-5xl lg:text-[3.25rem] text-[#18302b] leading-[1.1]">
+                {portal.tagline}
+              </h1>
+
+              <p className="mt-4 text-base leading-relaxed text-[#4e665d] sm:text-lg max-w-xl">
+                {portal.description}
+              </p>
+
               <div className="mt-7 flex flex-wrap gap-4">
                 <Link href={portal.featuredTool.href} className="wellness-button">
                   {vi ? "Bắt đầu ngay" : "Start here"}
@@ -70,10 +82,27 @@ export async function PortalHub({ locale, portal }: { locale: WellnessLocale; po
                   {vi ? "Xem kho bài viết" : "Explore guides"}
                 </Link>
               </div>
+
+              {/* Trust Signals Row */}
+              <div className="mt-8 pt-6 border-t border-[#d8e4d8] grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-semibold text-[#4e665d]">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">✓</span>
+                  <span>{vi ? "Đối chiếu PubMed & RCTs" : "PubMed & RCTs Verified"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">✓</span>
+                  <span>{vi ? "Mô phỏng y sinh 3D" : "3D Molecular Simulation"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">✓</span>
+                  <span>{vi ? "Cảnh báo an toàn liều" : "Safety & Dosage Alerts"}</span>
+                </div>
+              </div>
             </div>
-            <div className="portal-mascot">
-              <Image src={portal.mascot} alt={`${portal.mascotName}, ${portal.name} mascot`} width={520} height={620} priority />
-              <span>{vi ? `Xin chào, mình là ${portal.mascotName}!` : `Hi, I'm ${portal.mascotName}!`}</span>
+
+            {/* Right: Biomedical Evidence Hub */}
+            <div className="w-full">
+              <BiomedicalHeroHub portalId={portal.id} locale={locale} />
             </div>
           </div>
         </section>
@@ -81,19 +110,10 @@ export async function PortalHub({ locale, portal }: { locale: WellnessLocale; po
         {/* 01: Featured Tool & Tools Grid */}
         <section className="mx-auto max-w-7xl px-5 py-18 lg:px-8">
           <p className="section-kicker">01 — {vi ? "CÔNG CỤ NỔI BẬT" : "FEATURED TOOL"}</p>
-          <div className={`featured-tool tone-${portal.tone}`}>
-            <div>
-              <span className="tool-icon"><Sparkles /></span>
-              <h2>{portal.featuredTool.title}</h2>
-              <p>{portal.featuredTool.description}</p>
-              <Link href={portal.featuredTool.href} className="wellness-button mt-6">
-                {vi ? "Mở công cụ" : "Open the tool"}
-                <ArrowRight />
-              </Link>
-            </div>
-            <Image src={portal.mascot} alt="" width={260} height={320} />
+          <div className="mt-4">
+            <FeaturedToolConsole portal={portal} locale={locale} />
           </div>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
             {portal.tools.map(tool => (
               <Link key={tool.title} href={tool.href} className="friendly-tool-box">
                 <span>✦</span>
@@ -111,7 +131,7 @@ export async function PortalHub({ locale, portal }: { locale: WellnessLocale; po
             <div className="section-row">
               <div>
                 <p className="section-kicker">02 — {vi ? "VIDEO ĐỒNG HÀNH" : "COMPANION REELS"}</p>
-                <h2 className="section-title">{vi ? `Xem cùng ${portal.mascotName}` : `Watch with ${portal.mascotName}`}</h2>
+                <h2 className="section-title">{vi ? "Video Y Sinh Trực Quan" : "Visual Biomedical Reels"}</h2>
               </div>
               <span className="text-xs font-semibold text-[#526d62]">
                 {vi ? "Video ngắn Facebook Reels, giải thích trực quan cơ chế sinh học" : "Short Facebook Reels with clear molecular insights"}
