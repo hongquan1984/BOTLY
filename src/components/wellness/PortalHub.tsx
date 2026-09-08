@@ -7,6 +7,7 @@ import { WellnessShell } from "./WellnessShell";
 import { listPublishedArticles } from "@/lib/published-articles";
 import { articlePath } from "@/lib/article-publishing";
 import { ArticleCard } from "./ArticleCard";
+import { VideoCard, type VideoItem } from "./VideoCard";
 
 export async function PortalHub({ locale, portal }: { locale: WellnessLocale; portal: Portal }) {
   const vi = locale === "vi";
@@ -18,14 +19,33 @@ export async function PortalHub({ locale, portal }: { locale: WellnessLocale; po
     articles = await listPublishedArticles(locale, undefined, 6);
   }
 
-  const videos = [
-    ...articles.filter(a => a.wellness_articles.facebook_url).slice(0, 3).map(a => ({
+  // Map articles that have Facebook reels
+  const dbVideos: VideoItem[] = articles
+    .filter(a => a.wellness_articles?.facebook_url)
+    .map(a => ({
       title: a.title,
-      duration: 'Facebook Reel',
+      duration: "Facebook Reel",
       href: a.wellness_articles.facebook_url!,
-    })),
-    ...portal.videos
-  ].slice(0, 3);
+      thumbnail: a.wellness_articles.cover_image_url || "/articles/pineapple-cucumber-liver/cover.jpg",
+      articleSlug: a.slug,
+      categoryName: portal.name,
+    }));
+
+  // Prioritize curated portal videos, then fill with unique db videos
+  const candidateVideos = [...portal.videos, ...dbVideos];
+  const videos: VideoItem[] = [];
+  const seenThumbnails = new Set<string>();
+
+  for (const v of candidateVideos) {
+    const thumb = v.thumbnail || "";
+    if (thumb && seenThumbnails.has(thumb)) continue;
+    if (thumb) seenThumbnails.add(thumb);
+    videos.push({
+      ...v,
+      categoryName: portal.name,
+    });
+    if (videos.length >= 3) break;
+  }
 
   return (
     <WellnessShell locale={locale}>
@@ -90,36 +110,22 @@ export async function PortalHub({ locale, portal }: { locale: WellnessLocale; po
           <div className="mx-auto max-w-7xl px-5 py-18 lg:px-8">
             <div className="section-row">
               <div>
-                <p className="section-kicker">02 — VIDEO ĐỒNG HÀNH</p>
+                <p className="section-kicker">02 — {vi ? "VIDEO ĐỒNG HÀNH" : "COMPANION REELS"}</p>
                 <h2 className="section-title">{vi ? `Xem cùng ${portal.mascotName}` : `Watch with ${portal.mascotName}`}</h2>
               </div>
-              <span className="text-xs font-semibold text-[#526d62]">{vi ? "Video ngắn Facebook Reels, giải thích dễ hiểu" : "Short Facebook Reels, clear insights"}</span>
+              <span className="text-xs font-semibold text-[#526d62]">
+                {vi ? "Video ngắn Facebook Reels, giải thích trực quan cơ chế sinh học" : "Short Facebook Reels with clear molecular insights"}
+              </span>
             </div>
             <div className="mt-9 grid gap-5 md:grid-cols-3">
-              {videos.map(video => {
-                const card = (
-                  <>
-                    <div className={`video-art tone-${portal.tone}`}>
-                      <Image src={portal.mascot} alt="" width={190} height={220} />
-                      <span className="video-play"><Play /></span>
-                      <b>{video.duration}</b>
-                    </div>
-                    <div className="p-5">
-                      <span className="text-[10px] font-extrabold tracking-[.16em] text-[#74867e]">{portal.name.toUpperCase()} VIDEO</span>
-                      <h3 className="mt-2 text-base font-bold leading-snug text-[#18302b]">{video.title}</h3>
-                    </div>
-                  </>
-                );
-                return video.href ? (
-                  <a key={video.title} href={video.href} target="_blank" rel="noreferrer" className="video-card">
-                    {card}
-                  </a>
-                ) : (
-                  <article key={video.title} className="video-card">
-                    {card}
-                  </article>
-                );
-              })}
+              {videos.map(video => (
+                <VideoCard
+                  key={video.title}
+                  video={video}
+                  locale={locale}
+                  categoryName={portal.name}
+                />
+              ))}
             </div>
           </div>
         </section>
