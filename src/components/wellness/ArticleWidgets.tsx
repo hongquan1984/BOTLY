@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { CheckCircle2, XCircle, AlertTriangle, Copy, Check, ShieldCheck, HelpCircle, Flame, Sparkles, RefreshCw, Send } from 'lucide-react';
 import type { TrustMeter, QuickRecipe, FactCheckItem, FaqItem, SafetyQuiz } from '@/lib/published-articles';
+import { trackClientEvent } from '@/components/analytics/AnalyticsTracker';
 
 export function TrustMeterWidget({ data, locale }: { data: TrustMeter; locale: 'en' | 'vi' }) {
   const vi = locale === 'vi';
@@ -217,7 +218,17 @@ export function SafetyQuizWidget({
   });
 
   const handleSelect = (qId: string, optIdx: number) => {
-    setSelectedAnswers(prev => ({ ...prev, [qId]: optIdx }));
+    setSelectedAnswers(prev => {
+      const next = { ...prev, [qId]: optIdx };
+      if (Object.keys(next).length === quiz.questions.length && Object.keys(prev).length < quiz.questions.length) {
+        trackClientEvent('quiz_completed', {
+          articleSlug,
+          locale,
+          metadata: { questions_count: quiz.questions.length }
+        });
+      }
+      return next;
+    });
   };
 
   const handleReset = () => {
@@ -241,6 +252,11 @@ export function SafetyQuizWidget({
         }),
       });
       setSubmittedEmail(true);
+      trackClientEvent('lead_submit', {
+        articleSlug,
+        locale,
+        metadata: { source: `safety_quiz_${articleSlug || 'wellness'}` }
+      });
     } catch {
       // ignore
     } finally {
