@@ -62,6 +62,18 @@ Sao chép `.env.example` → `.env.local` nếu cần:
 |------|--------|
 | `NEXT_PUBLIC_SITE_URL` | URL production (metadata, sitemap) |
 | `NEXT_PUBLIC_LEAD_API_URL` | (Tuỳ chọn) API nhận form lead |
+| `NEXT_PUBLIC_SUPABASE_URL` | (Tuỳ chọn) URL project Supabase cho tài khoản Wellness |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | (Tuỳ chọn) Publishable/anon key dùng cho magic link và RLS |
+| `SUPABASE_SERVICE_ROLE_KEY` | (Server only) Ghi đăng ký newsletter; tuyệt đối không thêm `NEXT_PUBLIC_` |
+
+### Bật cloud sync và newsletter
+
+1. Tạo project Supabase.
+2. Chạy SQL trong `supabase/migrations/001_wellness.sql` bằng SQL Editor.
+3. Điền ba biến Supabase vào `.env.local` hoặc cấu hình hosting.
+4. Thêm callback URLs `/en/wellness/auth/callback` và `/vi/song-khoe/auth/callback` trong Supabase Auth.
+
+Khi chưa cấu hình Supabase, Wellness Planner vẫn lưu và hoạt động hoàn toàn trên thiết bị.
 
 Form liên hệ hiện **mock submit** (console + toast). Nối backend tại:
 

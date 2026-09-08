@@ -20,12 +20,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default:
-      "Botly – Giải pháp AI Automation và AI Livestream cho doanh nghiệp",
+    default: "Botly Wellness – Eat better. Feel calmer. Live mindfully.",
     template: `%s | ${siteConfig.name}`,
   },
-  description: siteConfig.description,
-  keywords: [...siteConfig.keywords],
+  description: "Practical wellness tools for healthy eating, sustainable weight goals, stress management and meditation.",
+  keywords: ["wellness", "healthy eating", "weight management", "stress management", "meditation", "mindfulness"],
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
   icons: {
@@ -34,11 +33,11 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: siteConfig.locale,
+    locale: "en_US",
     url: siteConfig.url,
     siteName: siteConfig.name,
-    title: "Botly – Giải pháp AI Automation và AI Livestream cho doanh nghiệp",
-    description: siteConfig.description,
+    title: "Botly Wellness – Small steps for everyday wellbeing",
+    description: "Healthy eating, stress care and meditation tools for everyday life.",
     images: [
       {
         url: "/logo.png",
@@ -50,8 +49,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Botly – Giải pháp AI Automation và AI Livestream cho doanh nghiệp",
-    description: siteConfig.description,
+    title: "Botly Wellness – Small steps for everyday wellbeing",
+    description: "Healthy eating, stress care and meditation tools for everyday life.",
     images: ["/logo.png"],
   },
   robots: {
@@ -64,7 +63,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050816",
+  themeColor: "#f7f8f2",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -76,7 +75,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className="dark">
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

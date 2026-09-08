@@ -10,6 +10,8 @@ export function useLocalStorage<T>(key: string, initial: T) {
     try {
       const raw = localStorage.getItem(key);
       if (raw != null) {
+        // Hydrate the persisted client value after mount.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setValue(JSON.parse(raw) as T);
       }
     } catch {

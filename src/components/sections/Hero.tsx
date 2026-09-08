@@ -18,6 +18,8 @@ export function Hero() {
   const reduce = mounted && !!reduceMotion;
 
   useEffect(() => {
+    // Client-only motion preference is intentionally applied after hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

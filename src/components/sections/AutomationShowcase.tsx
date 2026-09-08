@@ -17,7 +17,6 @@ export function AutomationShowcase() {
   useEffect(() => {
     if (!running || reduce) return;
     if (active >= salesAutomationFlow.length - 1) {
-      setRunning(false);
       return;
     }
     const t = setTimeout(() => setActive((a) => a + 1), 900);

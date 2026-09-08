@@ -20,6 +20,8 @@ export function AnimatedCounter({
   useEffect(() => {
     if (!inView) return;
     if (reduce) {
+      // Resolve the animation immediately for reduced-motion users.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplay(value);
       return;
     }
