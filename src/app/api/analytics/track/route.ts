@@ -35,8 +35,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'Not configured' }, { status: 503 });
     }
 
-    // Non-blocking fire-and-forget insert into Supabase
-    fetch(`${url}/rest/v1/analytics_events`, {
+    // Await database insert so Vercel Serverless function does not terminate early
+    const insertRes = await fetch(`${url}/rest/v1/analytics_events`, {
       method: 'POST',
       headers: {
         apikey: serviceKey,
@@ -54,9 +54,13 @@ export async function POST(request: Request) {
         metadata: typeof metadata === 'object' && metadata !== null ? metadata : {},
         created_at: new Date().toISOString()
       })
-    }).catch(err => {
-      console.error('Analytics event insert failure:', err);
     });
+
+    if (!insertRes.ok) {
+      const errText = await insertRes.text().catch(() => '');
+      console.error('Analytics event insert failure:', insertRes.status, errText);
+      return NextResponse.json({ ok: false, error: 'Database insert failure' }, { status: 502 });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {

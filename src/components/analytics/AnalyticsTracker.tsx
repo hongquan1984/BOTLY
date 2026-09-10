@@ -31,21 +31,23 @@ export function trackClientEvent(
     metadata: details.metadata || {}
   };
 
-  try {
-    if (typeof navigator.sendBeacon === 'function') {
-      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-      navigator.sendBeacon('/api/analytics/track', blob);
-    } else {
-      fetch('/api/analytics/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        keepalive: true
-      }).catch(() => {});
-    }
-  } catch {
-    // Fail silently in client
-  }
+  const body = JSON.stringify(payload);
+
+  // Send to /api/event-ping first (resistant to ad-blockers and privacy shields)
+  fetch('/api/event-ping', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+    keepalive: true
+  }).catch(() => {
+    // Fallback to /api/analytics/track if needed
+    fetch('/api/analytics/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+      keepalive: true
+    }).catch(() => {});
+  });
 }
 
 function extractSlugFromPath(path: string): string | undefined {
@@ -63,12 +65,8 @@ export function AnalyticsTracker() {
 
     lastTrackedPath.current = pathname;
 
-    // Small delay to ensure document title & referrer are stable
-    const timer = setTimeout(() => {
-      trackClientEvent('page_view');
-    }, 150);
-
-    return () => clearTimeout(timer);
+    // Track immediately without artificial timeout delays
+    trackClientEvent('page_view');
   }, [pathname]);
 
   return null;
