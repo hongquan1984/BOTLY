@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   CheckCircle2, XCircle, AlertTriangle, Copy, Check, ShieldCheck, HelpCircle,
   Flame, Sparkles, RefreshCw, Send, Moon, ArrowRight, HeartPulse, Download,
@@ -635,6 +635,22 @@ export function WinddownProtocolWidget({ data, locale }: { data: WinddownProtoco
   const vi = locale === 'vi';
   const [copied, setCopied] = useState(false);
 
+  // Interactive Breathing Slider State: 4s Inhale, 4s Hold, 8s Exhale (Total 16s)
+  const [isBreathing, setIsBreathing] = useState(false);
+  const [breathSecond, setBreathSecond] = useState(0);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isBreathing) {
+      timer = setInterval(() => {
+        setBreathSecond(prev => (prev + 1) % 16);
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isBreathing]);
+
   const handleCopy = () => {
     if (!data) return;
     const text = [
@@ -650,6 +666,39 @@ export function WinddownProtocolWidget({ data, locale }: { data: WinddownProtoco
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  // Calculate breathing phase parameters
+  let phaseText = vi ? '🌿 Sẵn sàng bắt đầu nhịp thở' : '🌿 Ready to start breathing cycle';
+  let descText = vi ? 'Nhìn theo số đếm to ở giữa thanh trượt để đồng bộ nhịp tim' : 'Follow the large centered countdown number to synchronize your heart rate';
+  let barWidth = '0%';
+  let barColorClass = 'bg-amber-400';
+  let remainSec = 0;
+  let phaseBadge = vi ? 'CHỜ BẮT ĐẦU' : 'STANDBY';
+
+  if (isBreathing) {
+    if (breathSecond < 4) {
+      remainSec = 4 - breathSecond;
+      phaseText = vi ? '🌬️ HÍT VÀO CHẬM RÃI...' : '🌬️ SLOW INHALE...';
+      phaseBadge = vi ? 'HÍT VÀO' : 'INHALE';
+      descText = vi ? 'Hít vào êm dịu bằng mũi, cảm nhận cơ hoành nở ra' : 'Inhale smoothly through nose, feeling abdomen expand';
+      barWidth = `${((breathSecond + 1) / 4) * 100}%`;
+      barColorClass = 'bg-gradient-to-r from-amber-400 to-amber-300';
+    } else if (breathSecond < 8) {
+      remainSec = 8 - breathSecond;
+      phaseText = vi ? '⏸️ GIỮ YÊN HƠI THỞ...' : '⏸️ GENTLE HOLD...';
+      phaseBadge = vi ? 'GIỮ YÊN' : 'HOLD';
+      descText = vi ? 'Thả lỏng toàn thân, giữ hơi tĩnh lặng trong lồng ngực' : 'Relax your muscles, rest quietly in fullness';
+      barWidth = '100%';
+      barColorClass = 'bg-gradient-to-r from-purple-500 to-pink-400 animate-pulse';
+    } else {
+      remainSec = 16 - breathSecond;
+      phaseText = vi ? '💨 THỞ RA THẬT ÊM...' : '💨 EXTENDED EXHALE...';
+      phaseBadge = vi ? 'THỞ RA' : 'EXHALE';
+      descText = vi ? 'Thở ra chậm rãi qua kẽ môi, trút bỏ mọi áp lực ra ngoài' : 'Exhale softly through relaxed lips, releasing all tension';
+      barWidth = `${(remainSec / 8) * 100}%`;
+      barColorClass = 'bg-gradient-to-r from-emerald-500 to-teal-300';
+    }
+  }
 
   return (
     <div className="my-10 overflow-hidden rounded-3xl border-2 border-indigo-900/20 bg-white shadow-xl shadow-slate-900/5">
@@ -700,6 +749,60 @@ export function WinddownProtocolWidget({ data, locale }: { data: WinddownProtoco
                 <p className="text-sm text-slate-800 leading-relaxed font-medium pt-0.5">{step}</p>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Interactive Paced Breathing Slider (Hít 4s - Giữ 4s - Thở 8s) with Big Centered Number */}
+        <div className="mt-8 overflow-hidden rounded-2xl border border-indigo-200/80 bg-gradient-to-br from-indigo-50/60 via-purple-50/30 to-slate-50 p-5 shadow-sm">
+          <div className="text-center pb-2">
+            <span className="text-sm font-bold uppercase tracking-wider text-indigo-950">
+              {phaseText}
+            </span>
+            <p className="text-xs text-stone-500 mt-0.5">{descText}</p>
+          </div>
+
+          <div className="my-3">
+            {/* Big Slider Track with Large Centered Number */}
+            <div className="relative h-14 w-full overflow-hidden rounded-2xl bg-slate-200/80 p-1 border-2 border-slate-300/80 flex items-center shadow-inner">
+              <div
+                className={`h-full rounded-xl transition-all duration-1000 ease-linear shadow-sm ${barColorClass}`}
+                style={{ width: barWidth }}
+              />
+              {/* BIG CENTERED NUMBER & BADGE */}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center gap-2 z-10">
+                <span className="text-3xl font-black tracking-tight text-slate-900 drop-shadow-sm">
+                  {isBreathing ? remainSec : 0}
+                </span>
+                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-white/90 text-slate-800 border border-slate-200 shadow-sm">
+                  {phaseBadge}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => {
+                if (isBreathing) {
+                  setIsBreathing(false);
+                } else {
+                  setBreathSecond(0);
+                  setIsBreathing(true);
+                }
+              }}
+              className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition shadow-sm cursor-pointer ${
+                isBreathing
+                  ? 'bg-stone-800 text-amber-200 hover:bg-stone-700'
+                  : 'bg-indigo-600 text-white hover:bg-indigo-700'
+              }`}
+            >
+              <span>{isBreathing ? '❚❚' : '▶'}</span>
+              <span>{isBreathing ? (vi ? 'Tạm dừng' : 'Pause') : (vi ? 'Bắt đầu thở theo thanh trượt' : 'Start breathing with slider')}</span>
+            </button>
+            <span className="text-[11px] text-stone-500">
+              {vi ? '✨ Làm 2–3 chu kỳ để hạ nhịp tim trước khi ngủ' : '✨ Practice 2–3 cycles to calm heart rate'}
+            </span>
           </div>
         </div>
 
@@ -757,7 +860,7 @@ export function MindTrapsWidget({ items, locale }: { items: MindTrapItem[]; loca
                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
                   {vi ? 'Bẫy suy nghĩ lúc nửa đêm (The Trap)' : 'Midnight Mental Trap'}
                 </span>
-                <p className="mt-1 text-sm font-semibold text-amber-950 leading-snug">"{item.trap}"</p>
+                <p className="mt-1 text-sm font-semibold text-amber-950 leading-snug">&ldquo;{item.trap}&rdquo;</p>
               </div>
             </div>
 
