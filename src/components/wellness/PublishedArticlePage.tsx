@@ -25,55 +25,97 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
   return <WellnessShell locale={a.locale}>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} />
     <main><article>
-      <header className={`tone-${portal.tone}`}><div className="mx-auto max-w-5xl px-5 py-16">
-        <Link href={`${base}/${portal.slug}`} className="text-sm font-semibold">← {portal.name}</Link>
-        <p className="section-kicker mt-8">{a.eyebrow || portal.name}</p>
-        <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-6xl">{a.title}</h1>
-        <p className="mt-6 text-lg leading-8">{a.description}</p>
-        <div className="mt-6 flex flex-wrap gap-4 text-sm">
-          <span>{vi ? 'Đăng ngày' : 'Published'}: {date(a.published_at)}</span>
-          {a.reading_minutes && <span>{a.reading_minutes} {vi ? 'phút đọc' : 'min read'}</span>}
-          {a.reviewed_at && <span>{vi ? 'Đã rà soát' : 'Reviewed'}: {date(a.reviewed_at)}</span>}
-          {translationPath && <Link href={translationPath} className="underline">{vi ? 'Read in English' : 'Đọc tiếng Việt'}</Link>}
-        </div>
-      </div></header>
+      {/* 🌙 Immersive Bedtime Onboarding Sanctuary for Healing Articles */}
+      {a.somatic_signals && a.winddown_protocol ? (
+        <section className="relative min-h-[calc(100vh-4.5rem)] bg-gradient-to-b from-[#060911] via-[#0a0f1d] to-[#0f172a] px-4 py-8 sm:px-6 lg:px-8 flex flex-col justify-center items-center">
+          <div className="w-full max-w-3xl mx-auto">
+            {/* Ambient Top Bar */}
+            <div className="mb-4 flex items-center justify-between text-xs text-indigo-300/80">
+              <Link href={`${base}/${portal.slug}`} className="hover:text-white transition flex items-center gap-1.5 font-medium">
+                <span>← {portal.name}</span>
+              </Link>
+              {translationPath && (
+                <Link href={translationPath} className="rounded-full bg-indigo-950/70 px-3 py-1 text-xs text-slate-300 border border-indigo-800/40 hover:text-white transition">
+                  {vi ? 'English version' : 'Bản Tiếng Việt'} 🌐
+                </Link>
+              )}
+            </div>
+
+            {/* Title & Theme Banner */}
+            <div className="text-center mb-6">
+              <span className="inline-block rounded-full bg-amber-400/10 px-3 py-0.5 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300 border border-amber-400/20">
+                {a.eyebrow || (vi ? 'HẠ CÁNH THỂ CẢM ĐÊM MUỘN' : 'BEDTIME SOMATIC GROUNDING')}
+              </span>
+              <h1 className="mt-3 text-2xl font-black text-white sm:text-4xl tracking-tight leading-snug">
+                {a.title}
+              </h1>
+              <p className="mt-2 text-xs text-slate-400 sm:text-sm max-w-xl mx-auto line-clamp-2">
+                {a.description}
+              </p>
+            </div>
+
+            {/* The 5-Step Interactive Bedtime Onboarding Stepper */}
+            <MindfulOnboardingWizard
+              somaticSignals={a.somatic_signals}
+              winddownProtocol={a.winddown_protocol}
+              mindTraps={a.mind_traps}
+              somaticQuiz={a.somatic_quiz}
+              locale={a.locale}
+            />
+
+            {/* Soothing Scroll-down hint */}
+            <div className="mt-6 text-center">
+              <a
+                href="#full-article"
+                className="inline-flex items-center gap-2 rounded-full border border-indigo-800/50 bg-indigo-950/40 px-5 py-2 text-xs font-semibold text-slate-400 hover:text-amber-200 hover:border-amber-400/40 transition"
+              >
+                <span>{vi ? 'Hoặc cuộn xuống đọc bài phân tích y sinh & xem video' : 'Or scroll down to read in-depth science & video'}</span>
+                <span>↓</span>
+              </a>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <header className={`tone-${portal.tone}`}><div className="mx-auto max-w-5xl px-5 py-16">
+          <Link href={`${base}/${portal.slug}`} className="text-sm font-semibold">← {portal.name}</Link>
+          <p className="section-kicker mt-8">{a.eyebrow || portal.name}</p>
+          <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-6xl">{a.title}</h1>
+          <p className="mt-6 text-lg leading-8">{a.description}</p>
+          <div className="mt-6 flex flex-wrap gap-4 text-sm">
+            <span>{vi ? 'Đăng ngày' : 'Published'}: {date(a.published_at)}</span>
+            {a.reading_minutes && <span>{a.reading_minutes} {vi ? 'phút đọc' : 'min read'}</span>}
+            {a.reviewed_at && <span>{vi ? 'Đã rà soát' : 'Reviewed'}: {date(a.reviewed_at)}</span>}
+            {translationPath && <Link href={translationPath} className="underline">{vi ? 'Read in English' : 'Đọc tiếng Việt'}</Link>}
+          </div>
+        </div></header>
+      )}
 
       <div className="mx-auto max-w-6xl px-5 py-12 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="wellness-prose min-w-0">
-            {a.wellness_articles.cover_image_url && <figure className="mb-8">
-              {/* Remote publisher URLs are displayed directly, never fetched by the image optimizer. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={a.wellness_articles.cover_image_url} alt={a.cover_image_alt} className="w-full rounded-3xl" loading="lazy" referrerPolicy="no-referrer" />
-            </figure>}
-            {a.wellness_articles.facebook_url && <p className="mb-8"><a href={a.wellness_articles.facebook_url} target="_blank" rel="noopener noreferrer" className="wellness-button">{vi ? 'Xem video đi kèm trên Facebook' : 'Watch the accompanying video on Facebook'} ↗</a></p>}
             {/* Check if healing category with somatic signals */}
             {a.somatic_signals && a.winddown_protocol ? (
-              <>
-                {/* 🌙 The 5-Step Interactive Bedtime Onboarding Stepper */}
-                <MindfulOnboardingWizard
-                  somaticSignals={a.somatic_signals}
-                  winddownProtocol={a.winddown_protocol}
-                  mindTraps={a.mind_traps}
-                  somaticQuiz={a.somatic_quiz}
-                  locale={a.locale}
-                />
+              <div id="full-article" className="space-y-8 scroll-mt-10">
+                {a.wellness_articles.cover_image_url && <figure className="mb-8">
+                  {/* Remote publisher URLs are displayed directly, never fetched by the image optimizer. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={a.wellness_articles.cover_image_url} alt={a.cover_image_alt} className="w-full rounded-3xl" loading="lazy" referrerPolicy="no-referrer" />
+                </figure>}
+                {a.wellness_articles.facebook_url && <p className="mb-8"><a href={a.wellness_articles.facebook_url} target="_blank" rel="noopener noreferrer" className="wellness-button">{vi ? 'Xem video đi kèm trên Facebook' : 'Watch the accompanying video on Facebook'} ↗</a></p>}
 
-                {/* In-depth scientific analysis divider and content */}
-                <div id="full-article" className="mt-14 pt-10 border-t border-slate-200">
-                  <div className="flex items-center gap-3 mb-6">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-950 text-xl text-amber-300 shadow">
-                      📖
-                    </span>
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-indigo-900/70">
-                        {vi ? 'CHIỀU SÂU KHOA HỌC' : 'IN-DEPTH SCIENCE'}
-                      </p>
-                      <h2 className="text-2xl font-bold text-slate-900 m-0">
-                        {vi ? 'Bài Phân Tích Chuyên Sâu & Giải Mã 2h Sáng' : 'Scientific Analysis & Midnight Deconstruction'}
-                      </h2>
-                    </div>
+                <div className="flex items-center gap-3 pb-4 border-b border-stone-200">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-950 text-xl text-amber-300 shadow">
+                    📖
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-indigo-900/70">
+                      {vi ? 'CHIỀU SÂU KHOA HỌC' : 'IN-DEPTH SCIENCE'}
+                    </p>
+                    <h2 className="text-2xl font-bold text-slate-900 m-0">
+                      {vi ? 'Bài Phân Tích Chuyên Sâu & Giải Mã 2h Sáng' : 'Scientific Analysis & Midnight Deconstruction'}
+                    </h2>
                   </div>
+                </div>
 
                   {a.takeaway && <div className="takeaway"><span>{vi ? 'Ý chính' : 'The takeaway'}</span><p>{a.takeaway}</p></div>}
 
@@ -92,7 +134,6 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
                     <FaqsWidget items={a.midnight_faqs} locale={a.locale} isMidnight={true} />
                   ) : null}
                 </div>
-              </>
             ) : (
               <>
                 {a.trust_meter && <TrustMeterWidget data={a.trust_meter} locale={a.locale} />}
@@ -204,7 +245,7 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
             <span>{vi ? 'Trắc nghiệm an toàn (15s)' : 'Safety Quiz (15s)'}</span>
           </a>
         </div>
-      ) : a.somatic_quiz ? (
+      ) : a.somatic_quiz && !a.somatic_signals ? (
         <div className="fixed bottom-6 right-5 z-40 lg:hidden">
           <a
             href="#somatic-quiz"
