@@ -2,7 +2,10 @@ import Link from 'next/link';
 import type { PublishedArticle } from '@/lib/published-articles';
 import { portals } from '@/data/wellness-portals';
 import { WellnessShell } from './WellnessShell';
-import { TrustMeterWidget, QuickRecipeWidget, FactChecksWidget, FaqsWidget, SafetyQuizWidget } from './ArticleWidgets';
+import {
+  TrustMeterWidget, QuickRecipeWidget, FactChecksWidget, FaqsWidget, SafetyQuizWidget,
+  SomaticSignalsWidget, WinddownProtocolWidget, MindTrapsWidget, SomaticQuizWidget
+} from './ArticleWidgets';
 import { RelatedArticlesSection } from './RelatedArticlesSection';
 
 export function PublishedArticlePage({ article: a, translationPath, relatedArticles = [] }: {
@@ -45,12 +48,26 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
             {a.wellness_articles.facebook_url && <p className="mb-8"><a href={a.wellness_articles.facebook_url} target="_blank" rel="noopener noreferrer" className="wellness-button">{vi ? 'Xem video đi kèm trên Facebook' : 'Watch the accompanying video on Facebook'} ↗</a></p>}
             {a.trust_meter && <TrustMeterWidget data={a.trust_meter} locale={a.locale} />}
             {a.takeaway && <div className="takeaway"><span>{vi ? 'Ý chính' : 'The takeaway'}</span><p>{a.takeaway}</p></div>}
+
+            {/* Somatic Signals Widget */}
+            {a.somatic_signals && <SomaticSignalsWidget data={a.somatic_signals} locale={a.locale} />}
+
+            {/* Winddown Protocol Widget */}
+            {a.winddown_protocol && <WinddownProtocolWidget data={a.winddown_protocol} locale={a.locale} />}
+
             {a.quick_recipe && <QuickRecipeWidget data={a.quick_recipe} locale={a.locale} />}
 
             {/* Inline Safety Quiz in Article Flow (especially for mobile) */}
             {a.safety_quiz && (
               <div id="safety-quiz" className="lg:hidden scroll-mt-24">
                 <SafetyQuizWidget quiz={a.safety_quiz} locale={a.locale} articleSlug={a.slug} mode="inline" />
+              </div>
+            )}
+
+            {/* Inline Somatic Quiz in Article Flow for Mobile */}
+            {a.somatic_quiz && (
+              <div id="somatic-quiz" className="lg:hidden scroll-mt-24">
+                <SomaticQuizWidget quiz={a.somatic_quiz} locale={a.locale} articleSlug={a.slug} mode="inline" />
               </div>
             )}
 
@@ -71,8 +88,25 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
               </div>
             )}
 
+            {/* Inline Somatic Quiz for Desktop in the reading flow */}
+            {a.somatic_quiz && (
+              <div className="hidden lg:block">
+                <SomaticQuizWidget quiz={a.somatic_quiz} locale={a.locale} articleSlug={a.slug} mode="inline" />
+              </div>
+            )}
+
+            {/* Mind Traps Widget */}
+            {a.mind_traps?.length ? <MindTrapsWidget items={a.mind_traps} locale={a.locale} /> : null}
+
             {a.fact_checks?.length ? <FactChecksWidget items={a.fact_checks} locale={a.locale} /> : null}
-            {a.faqs?.length ? <FaqsWidget items={a.faqs} locale={a.locale} /> : null}
+
+            {/* FAQs or Midnight FAQs */}
+            {a.midnight_faqs?.length ? (
+              <FaqsWidget items={a.midnight_faqs} locale={a.locale} isMidnight={true} />
+            ) : a.faqs?.length ? (
+              <FaqsWidget items={a.faqs} locale={a.locale} isMidnight={a.wellness_articles.category_id === 'healing'} />
+            ) : null}
+
             {a.sources.length > 0 && <section className="sources"><h2>{vi ? 'Nguồn tham khảo' : 'Sources'}</h2>
               {a.sources.map((s, i) => <a key={i} href={s.url} target="_blank" rel="noopener noreferrer">{s.label} ↗</a>)}
             </section>}
@@ -84,6 +118,9 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
             <div className="sticky top-24 space-y-6">
               {a.safety_quiz && (
                 <SafetyQuizWidget quiz={a.safety_quiz} locale={a.locale} articleSlug={a.slug} mode="sidebar" />
+              )}
+              {a.somatic_quiz && (
+                <SomaticQuizWidget quiz={a.somatic_quiz} locale={a.locale} articleSlug={a.slug} mode="sidebar" />
               )}
               {a.tool && (
                 <div className="rounded-3xl bg-[#eaf0e5] p-6 border border-[#d6e2d5]">
@@ -101,13 +138,35 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
                   </Link>
                 </div>
               )}
+              {a.wellness_articles.category_id === 'healing' && !a.tool && (
+                <div className="rounded-3xl bg-gradient-to-br from-[#131b2e] to-[#0f172a] p-6 border border-indigo-900/40 text-slate-100 shadow-sm">
+                  <p className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+                    SOULSCAPE WORLD
+                  </p>
+                  <h4 className="mt-2 text-base font-bold text-white">
+                    {vi ? 'Không gian chữa lành đêm muộn' : 'Late-Night Healing Sanctuary'}
+                  </h4>
+                  <p className="mt-1.5 text-xs text-slate-300 leading-relaxed">
+                    {vi ? 'Thiền định & thấu cảm cảm xúc không áp lực chuỗi ngày.' : 'Emotion-focused meditation without streak pressure.'}
+                  </p>
+                  <a
+                    href="https://soulscapeworld.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-500"
+                  >
+                    <span>{vi ? 'Khám phá Soulscape' : 'Explore Soulscape'}</span>
+                    <span>↗</span>
+                  </a>
+                </div>
+              )}
             </div>
           </aside>
         </div>
       </div>
 
       {/* Floating Quick Action for Mobile / Small Screens */}
-      {a.safety_quiz && (
+      {a.safety_quiz ? (
         <div className="fixed bottom-6 right-5 z-40 lg:hidden">
           <a
             href="#safety-quiz"
@@ -120,10 +179,23 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
             <span>{vi ? 'Trắc nghiệm an toàn (15s)' : 'Safety Quiz (15s)'}</span>
           </a>
         </div>
-      )}
+      ) : a.somatic_quiz ? (
+        <div className="fixed bottom-6 right-5 z-40 lg:hidden">
+          <a
+            href="#somatic-quiz"
+            className="flex items-center gap-2 rounded-full bg-[#0f172a] px-4 py-3 text-xs font-bold text-white shadow-2xl shadow-black/40 border border-indigo-400/40 transition active:scale-95"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
+            </span>
+            <span>{vi ? 'Trắc nghiệm thể cảm (15s)' : 'Somatic Check (15s)'}</span>
+          </a>
+        </div>
+      ) : null}
 
       {/* Related Articles Section */}
-      <RelatedArticlesSection currentSlug={a.slug} locale={a.locale} articles={relatedArticles} />
+      <RelatedArticlesSection currentSlug={a.slug} locale={a.locale} articles={relatedArticles} categoryId={a.wellness_articles.category_id} />
     </article></main>
   </WellnessShell>;
 }

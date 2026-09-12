@@ -20,9 +20,14 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   if (legacy) return <ArticlePage article={legacy} />;
   const article = await findPublishedArticle('vi', slug);
   if (!article) notFound();
-  const [translationPath, relatedArticles] = await Promise.all([
+  const categoryId = article.wellness_articles?.category_id;
+  const [translationPath, categoryArticles, allArticles] = await Promise.all([
     translatedArticlePath(article),
+    categoryId ? listPublishedArticles('vi', categoryId, 12) : Promise.resolve([]),
     listPublishedArticles('vi', undefined, 12)
   ]);
+  const sameCat = categoryArticles.filter(a => a.slug !== article.slug);
+  const otherCat = allArticles.filter(a => a.slug !== article.slug && (!categoryId || a.wellness_articles.category_id !== categoryId));
+  const relatedArticles = [...sameCat, ...otherCat].slice(0, 10);
   return <PublishedArticlePage article={article} translationPath={translationPath} relatedArticles={relatedArticles} />;
 }

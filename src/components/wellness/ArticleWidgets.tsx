@@ -1,8 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle2, XCircle, AlertTriangle, Copy, Check, ShieldCheck, HelpCircle, Flame, Sparkles, RefreshCw, Send } from 'lucide-react';
-import type { TrustMeter, QuickRecipe, FactCheckItem, FaqItem, SafetyQuiz } from '@/lib/published-articles';
+import {
+  CheckCircle2, XCircle, AlertTriangle, Copy, Check, ShieldCheck, HelpCircle,
+  Flame, Sparkles, RefreshCw, Send, Moon, ArrowRight, HeartPulse, Download,
+  ExternalLink, Bed
+} from 'lucide-react';
+import type {
+  TrustMeter, QuickRecipe, FactCheckItem, FaqItem, SafetyQuiz,
+  SomaticSignals, WinddownProtocol, MindTrapItem, SomaticQuiz, SomaticQuizQuestion
+} from '@/lib/published-articles';
 import { trackClientEvent } from '@/components/analytics/AnalyticsTracker';
 
 export function TrustMeterWidget({ data, locale }: { data: TrustMeter; locale: 'en' | 'vi' }) {
@@ -475,18 +482,28 @@ export function FactChecksWidget({ items, locale }: { items: FactCheckItem[]; lo
   );
 }
 
-export function FaqsWidget({ items, locale }: { items: FaqItem[]; locale: 'en' | 'vi' }) {
+export function FaqsWidget({ items, locale, isMidnight }: { items: FaqItem[]; locale: 'en' | 'vi'; isMidnight?: boolean }) {
   const vi = locale === 'vi';
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   if (!items?.length) return null;
 
   return (
-    <div className="my-10 rounded-3xl border border-[#d6e2d5] bg-[#f9faf7] p-6 lg:p-8">
-      <div className="mb-6 flex items-center gap-2">
-        <HelpCircle className="h-5 w-5 text-[#355248]" />
-        <h3 className="text-xl font-bold text-[#18302b]">
-          {vi ? 'Giải đáp các thắc mắc thường gặp' : 'Frequently Asked Questions'}
+    <div className={`my-10 rounded-3xl border p-6 lg:p-8 ${
+      isMidnight
+        ? 'border-indigo-900/30 bg-gradient-to-br from-[#0f172a] via-[#162036] to-[#0f172a] text-slate-100'
+        : 'border-[#d6e2d5] bg-[#f9faf7]'
+    }`}>
+      <div className="mb-6 flex items-center gap-2.5">
+        {isMidnight ? (
+          <Moon className="h-5 w-5 text-indigo-400" />
+        ) : (
+          <HelpCircle className="h-5 w-5 text-[#355248]" />
+        )}
+        <h3 className={`text-xl font-bold ${isMidnight ? 'text-white' : 'text-[#18302b]'}`}>
+          {isMidnight
+            ? (vi ? 'Hỏi đáp đêm muộn (Midnight FAQs)' : 'Midnight FAQs: Calming Your Racing Thoughts')
+            : (vi ? 'Giải đáp các thắc mắc thường gặp' : 'Frequently Asked Questions')}
         </h3>
       </div>
 
@@ -494,16 +511,35 @@ export function FaqsWidget({ items, locale }: { items: FaqItem[]; locale: 'en' |
         {items.map((item, i) => {
           const isOpen = openIndex === i;
           return (
-            <div key={i} className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
+            <div
+              key={i}
+              className={`overflow-hidden rounded-2xl border ${
+                isMidnight
+                  ? 'border-slate-700/60 bg-slate-800/50'
+                  : 'border-stone-200 bg-white'
+              }`}
+            >
               <button
                 onClick={() => setOpenIndex(isOpen ? null : i)}
-                className="flex w-full items-center justify-between p-4 text-left font-semibold text-[#18302b] hover:bg-stone-50"
+                className={`flex w-full items-center justify-between p-4 text-left font-semibold cursor-pointer ${
+                  isMidnight
+                    ? 'text-slate-100 hover:bg-slate-700/40'
+                    : 'text-[#18302b] hover:bg-stone-50'
+                }`}
               >
                 <span>{item.question}</span>
-                <span className="ml-3 shrink-0 text-stone-400 font-bold">{isOpen ? '−' : '+'}</span>
+                <span className={`ml-3 shrink-0 font-bold ${isMidnight ? 'text-indigo-400' : 'text-stone-400'}`}>
+                  {isOpen ? '−' : '+'}
+                </span>
               </button>
               {isOpen && (
-                <div className="border-t border-stone-100 bg-[#fdfdfc] p-4 text-sm leading-relaxed text-[#40564e]">
+                <div
+                  className={`border-t p-4 text-sm leading-relaxed ${
+                    isMidnight
+                      ? 'border-slate-700/50 bg-slate-900/40 text-slate-300'
+                      : 'border-stone-100 bg-[#fdfdfc] text-[#40564e]'
+                  }`}
+                >
                   {item.answer}
                 </div>
               )}
@@ -514,3 +550,478 @@ export function FaqsWidget({ items, locale }: { items: FaqItem[]; locale: 'en' |
     </div>
   );
 }
+
+export function SomaticSignalsWidget({ data, locale }: { data: SomaticSignals; locale: 'en' | 'vi' }) {
+  const vi = locale === 'vi';
+  return (
+    <div className="my-8 overflow-hidden rounded-3xl border border-slate-700/60 bg-gradient-to-br from-[#0f172a] via-[#162036] to-[#0d1527] p-6 text-slate-100 shadow-xl shadow-slate-950/20 sm:p-8">
+      {/* Header */}
+      <div className="flex items-center gap-3.5">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 shadow-inner">
+          <HeartPulse className="h-6 w-6 text-indigo-300" />
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+            {vi ? 'Hộp Tín Hiệu Cơ Thể & Tác Nhân' : 'Somatic Signals & Triggers'}
+          </p>
+          <h3 className="text-lg font-bold text-white sm:text-xl">
+            {vi ? 'Lắng nghe phản ứng của cơ thể trong đêm muộn' : 'Listen to Your Body’s Midnight Signals'}
+          </h3>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        {/* Body Signals */}
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/40 p-5 backdrop-blur-sm">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal-300">
+            <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
+            <span>{vi ? 'Tín hiệu thể chất (Body Signals)' : 'Physical Sensations (Body Signals)'}</span>
+          </div>
+          <div className="mt-3.5 flex flex-wrap gap-2">
+            {data.body_signals.map((sig, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center rounded-xl border border-teal-500/30 bg-teal-950/40 px-3 py-1.5 text-xs font-medium text-teal-200"
+              >
+                {sig}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Triggers */}
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/40 p-5 backdrop-blur-sm">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-300">
+            <AlertTriangle className="h-3.5 w-3.5 text-amber-400" />
+            <span>{vi ? 'Tác nhân kích hoạt (Midnight Triggers)' : 'Midnight Triggers'}</span>
+          </div>
+          <div className="mt-3.5 flex flex-wrap gap-2">
+            {data.triggers.map((trig, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center rounded-xl border border-amber-500/30 bg-amber-950/40 px-3 py-1.5 text-xs font-medium text-amber-200"
+              >
+                {trig}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Transmutation Pathway */}
+      {data.transmutation && (
+        <div className="mt-6 rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/50 via-slate-900/60 to-purple-950/50 p-4.5 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
+                {vi ? 'Chuyển hóa cảm xúc & Hạ nhiệt thần kinh' : 'Emotional Transmutation Pathway'}
+              </p>
+              <p className="mt-1 text-sm font-semibold text-white sm:text-base">
+                {data.transmutation}
+              </p>
+            </div>
+            <span className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-semibold text-indigo-300 border border-indigo-400/30">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>{vi ? 'Đối giao cảm' : 'Parasympathetic'}</span>
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function WinddownProtocolWidget({ data, locale }: { data: WinddownProtocol; locale: 'en' | 'vi' }) {
+  const vi = locale === 'vi';
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (!data) return;
+    const text = [
+      `🌙 ${data.badge || (vi ? 'NGHI THỨC HẠ CÁNH TRÊN NỆM (3 PHÚT)' : '3-MINUTE BEDTIME SOMATIC RESET')}`,
+      data.objective ? `\n🎯 ${vi ? 'Mục tiêu' : 'Objective'}: ${data.objective}` : '',
+      `\n--- ${vi ? 'CÁC BƯỚC THỰC HIỆN NGAY TRÊN NỆM' : 'BEDSIDE PROTOCOL STEPS'} ---`,
+      ...(data.steps?.map((s, idx) => `${idx + 1}. ${s}`) || []),
+      data.donts?.length ? `\n--- ${vi ? '3 ĐIỀU CẤM KỴ ĐÊM MUỘN (DON\'TS)' : '3 CRITICAL MIDNIGHT DON\'TS'} ---\n${data.donts.map(d => `✕ ${d}`).join('\n')}` : '',
+      `\nNguồn: Soulscape • Mindful Haven / Botly.vn`
+    ].filter(Boolean).join('\n');
+
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="my-10 overflow-hidden rounded-3xl border-2 border-indigo-900/20 bg-white shadow-xl shadow-slate-900/5">
+      {/* Header bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#131b2e] px-6 py-4 text-white">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-300">
+            <Moon className="h-4 w-4" />
+          </span>
+          <span className="text-sm font-bold uppercase tracking-wider text-indigo-200">
+            {data.badge || (vi ? 'NGHI THỨC HẠ CÁNH TRÊN NỆM (3 PHÚT)' : '3-MINUTE BEDTIME SOMATIC RESET')}
+          </span>
+        </div>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1 text-xs font-semibold text-white transition hover:bg-white/20 active:scale-95 cursor-pointer"
+        >
+          {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+          {copied ? (vi ? 'Đã sao chép vào ghi chú' : 'Copied to clipboard') : (vi ? 'Sao chép 1-Click' : '1-Click Copy')}
+        </button>
+      </div>
+
+      <div className="p-6 lg:p-8">
+        {/* Objective */}
+        {data.objective && (
+          <div className="mb-6 rounded-2xl bg-indigo-50/70 border border-indigo-100 p-4 text-xs sm:text-sm text-indigo-950 font-medium leading-relaxed">
+            <span className="font-bold text-indigo-900">
+              {vi ? '🎯 Mục tiêu thể cảm: ' : '🎯 Somatic Objective: '}
+            </span>
+            {data.objective}
+          </div>
+        )}
+
+        {/* Steps */}
+        <div className="space-y-3">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[#355248]">
+            {vi ? 'Các bước thực hiện ngay trên giường' : 'Bedside Protocol Steps'}
+          </h4>
+          <div className="space-y-3">
+            {data.steps.map((step, idx) => (
+              <div
+                key={idx}
+                className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-[#f8fafc] p-4 transition hover:bg-white hover:shadow-sm"
+              >
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0f172a] text-xs font-bold text-indigo-200">
+                  {idx + 1}
+                </span>
+                <p className="text-sm text-slate-800 leading-relaxed font-medium pt-0.5">{step}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Donts */}
+        {data.donts?.length ? (
+          <div className="mt-8 rounded-2xl border border-rose-200/80 bg-rose-50/60 p-5">
+            <div className="flex items-center gap-2 text-xs font-bold text-rose-900">
+              <AlertTriangle className="h-4 w-4 text-rose-600" />
+              <span>{vi ? '3 ĐIỀU CẤM KỴ ĐÊM MUỘN (DON’TS)' : '3 CRITICAL MIDNIGHT DON’TS'}</span>
+            </div>
+            <ul className="mt-3 space-y-2 text-xs sm:text-sm text-rose-900 font-medium">
+              {data.donts.map((d, i) => (
+                <li key={i} className="flex items-start gap-2.5">
+                  <span className="font-bold text-rose-600">✕</span>
+                  <span>{d}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+export function MindTrapsWidget({ items, locale }: { items: MindTrapItem[]; locale: 'en' | 'vi' }) {
+  const vi = locale === 'vi';
+  if (!items?.length) return null;
+
+  return (
+    <div className="my-10">
+      <div className="mb-6 flex items-center gap-2.5">
+        <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-purple-100 text-purple-700">
+          <Sparkles className="h-4 w-4" />
+        </span>
+        <div>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-purple-700">
+            {vi ? 'Giải mã nhận thức' : 'Cognitive Reframing'}
+          </span>
+          <h3 className="text-xl font-bold text-[#18302b]">
+            {vi ? 'Bóc mẽ bẫy suy nghĩ đêm muộn: Ảo giác vs. Sự thật' : 'Midnight Mind Traps: Distortion vs. Reality'}
+          </h3>
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {items.map((item, i) => (
+          <div key={i} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between">
+            {/* Trap */}
+            <div className="bg-amber-50/70 p-5 border-b border-amber-100 flex items-start gap-3">
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-200/70 text-amber-800 text-xs font-bold mt-0.5">
+                ✕
+              </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
+                  {vi ? 'Bẫy suy nghĩ lúc nửa đêm (The Trap)' : 'Midnight Mental Trap'}
+                </span>
+                <p className="mt-1 text-sm font-semibold text-amber-950 leading-snug">"{item.trap}"</p>
+              </div>
+            </div>
+
+            {/* Reality */}
+            <div className="bg-emerald-50/50 p-5 flex-1 flex items-start gap-3">
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-200/70 text-emerald-800 text-xs font-bold mt-0.5">
+                ✓
+              </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                  {vi ? 'Sự thật chữa lành & Khoa học (The Reality)' : 'Healing Reality & Neuroscience'}
+                </span>
+                <p className="mt-1 text-sm text-slate-800 leading-relaxed font-medium">{item.reality}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function SomaticQuizWidget({
+  quiz,
+  locale,
+  articleSlug,
+  mode = 'inline',
+}: {
+  quiz: SomaticQuiz;
+  locale: 'en' | 'vi';
+  articleSlug?: string;
+  mode?: 'inline' | 'sidebar';
+}) {
+  const vi = locale === 'vi';
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
+
+  const defaultQuestions: SomaticQuizQuestion[] = vi
+    ? [
+        {
+          id: 'q1_tension_area',
+          question: 'Khu vực nào trên cơ thể bạn đang cảm thấy gồng cứng hoặc căng tức nhất lúc này?',
+          options: [
+            { label: 'Nặng ngực, hơi thở nông hoặc nghẹn ở cổ họng', sprout: 'Mầm Lo Lắng (Worry Sprout)' },
+            { label: 'Gồng cứng cổ vai gáy, siết chặt quai hàm vô thức', sprout: 'Mầm Kiệt Sức (Burnout Sprout)' },
+            { label: 'Bồn chồn ở chân, muốn cựa quậy trở mình liên tục', sprout: 'Mầm Bồn Chồn (Restless Sprout)' },
+            { label: 'Đầu óc căng ong ong, mắt khô rát vì ánh sáng màn hình', sprout: 'Mầm Quá Tải (Overload Sprout)' },
+          ],
+        },
+        {
+          id: 'q2_racing_thought',
+          question: 'Dòng suy nghĩ nào đang chiếm lĩnh và quẩn quanh trong tâm trí bạn nhiều nhất?',
+          options: [
+            { label: 'Bi kịch hóa ngày mai: Lo sợ mệt mỏi và hỏng việc', sprout: 'Mầm Lo Lắng (Worry Sprout)' },
+            { label: 'Tua đi tua lại những chuyện áp lực, sai lầm ban ngày', sprout: 'Mầm Kiệt Sức (Burnout Sprout)' },
+            { label: 'Cảm giác tiếc nuối thời gian, khao khát tự do nên cố thức lướt mạng', sprout: 'Mầm Thao Thức (Night Owl Sprout)' },
+          ],
+        },
+        {
+          id: 'q3_frequency',
+          question: 'Tần suất bạn gặp phải trạng thái thao thức đêm muộn này như thế nào?',
+          options: [
+            { label: 'Thỉnh thoảng vào những ngày chịu nhiều áp lực công việc' },
+            { label: 'Gần như mỗi đêm trong khung giờ 1h - 3h sáng' },
+            { label: 'Chỉ đêm nay, như một vị khách bất chợt ghé thăm' },
+          ],
+        },
+      ]
+    : [
+        {
+          id: 'q1_tension_area',
+          question: 'Where in your body are you feeling the most tension right now?',
+          options: [
+            { label: 'Chest tightness, shallow breath or throat lump', sprout: 'Worry Sprout' },
+            { label: 'Stiff neck and shoulders, clenched jaw', sprout: 'Burnout Sprout' },
+            { label: 'Restless legs, constant urge to toss and turn', sprout: 'Restless Sprout' },
+            { label: 'Racing head pressure, dry eyes from screens', sprout: 'Overload Sprout' },
+          ],
+        },
+        {
+          id: 'q2_racing_thought',
+          question: 'What thought loop is dominating your midnight mind?',
+          options: [
+            { label: 'Catastrophizing tomorrow: fearing exhaustion and ruined plans', sprout: 'Worry Sprout' },
+            { label: 'Replaying daytime conflicts, regrets and conversations', sprout: 'Burnout Sprout' },
+            { label: 'Craving autonomy, endlessly scrolling to reclaim stolen time', sprout: 'Night Owl Sprout' },
+          ],
+        },
+        {
+          id: 'q3_frequency',
+          question: 'How frequently does this midnight sleeplessness visit you?',
+          options: [
+            { label: 'Occasionally on high-stress work days' },
+            { label: 'Almost every night between 1 AM and 3 AM' },
+            { label: 'Just tonight, like an uninvited visitor' },
+          ],
+        },
+      ];
+
+  const questions = (quiz.questions && quiz.questions.length > 0) ? quiz.questions : defaultQuestions;
+  const totalQuestions = questions.length;
+  const answeredCount = Object.keys(selectedAnswers).length;
+  const isCompleted = answeredCount === totalQuestions;
+
+  // Determine Sprout companion
+  let identifiedSprout = quiz.recommended_sprout || (vi ? 'Mầm Lo Lắng (Worry Sprout)' : 'Worry Sprout');
+  const opt1 = questions[0]?.options[selectedAnswers['q1_tension_area'] ?? 0];
+  const opt2 = questions[1]?.options[selectedAnswers['q2_racing_thought'] ?? 0];
+  if (opt1?.sprout) {
+    identifiedSprout = opt1.sprout;
+  } else if (opt2?.sprout) {
+    identifiedSprout = opt2.sprout;
+  }
+
+  const soundscape = quiz.recommended_soundscape || (vi ? 'Mưa Rơi Đêm Muộn & Chuông Gió Êm Đềm' : 'Gentle Midnight Rain & Soft Windchimes');
+
+  const handleSelect = (qId: string, optIdx: number) => {
+    setSelectedAnswers(prev => {
+      const next = { ...prev, [qId]: optIdx };
+      if (Object.keys(next).length === questions.length && Object.keys(prev).length < questions.length) {
+        trackClientEvent('quiz_completed', {
+          articleSlug,
+          locale,
+          metadata: { quiz_type: 'somatic_screener', questions_count: questions.length }
+        });
+      }
+      return next;
+    });
+  };
+
+  const handleReset = () => {
+    setSelectedAnswers({});
+  };
+
+  const isSidebar = mode === 'sidebar';
+
+  return (
+    <div className={`overflow-hidden rounded-3xl border ${
+      isSidebar
+        ? 'border-indigo-800/40 bg-gradient-to-b from-[#111a2e] to-[#0b1120] text-slate-100 p-5 shadow-lg'
+        : 'my-10 border-2 border-indigo-700/30 bg-gradient-to-br from-[#0f172a] via-[#17233d] to-[#0d1527] p-6 lg:p-8 text-slate-100 shadow-xl shadow-indigo-950/20'
+    }`}>
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 shadow-sm">
+            <Moon className="h-4 w-4" />
+          </span>
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-400">
+              {vi ? 'Trắc nghiệm thể cảm 15s' : '15s Somatic Check'}
+            </span>
+            <h4 className={`${isSidebar ? 'text-sm font-bold' : 'text-lg font-bold'} text-white`}>
+              {quiz.title || (vi ? 'Nhận diện cảm giác & Chú Mầm đêm nay' : 'Check Your Midnight Sensation')}
+            </h4>
+          </div>
+        </div>
+        {answeredCount > 0 && (
+          <button onClick={handleReset} title={vi ? 'Làm lại' : 'Reset'} className="text-slate-400 hover:text-white cursor-pointer">
+            <RefreshCw className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
+      {quiz.subtitle && (
+        <p className="mt-2 text-xs leading-relaxed text-slate-300">{quiz.subtitle}</p>
+      )}
+
+      {/* Progress */}
+      <div className="mt-4 flex items-center justify-between text-xs text-indigo-300 font-semibold">
+        <span>{vi ? `Tiến độ: ${answeredCount}/${totalQuestions} câu` : `Progress: ${answeredCount}/${totalQuestions}`}</span>
+        <span>{Math.round((answeredCount / totalQuestions) * 100)}%</span>
+      </div>
+      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+        <div
+          className="h-full bg-indigo-400 transition-all duration-300"
+          style={{ width: `${(answeredCount / totalQuestions) * 100}%` }}
+        />
+      </div>
+
+      {/* Step 1: Questions */}
+      {!isCompleted ? (
+        <div className="mt-5 space-y-4">
+          {questions.map((q, qIndex) => {
+            const currentSelected = selectedAnswers[q.id];
+
+            return (
+              <div key={q.id} className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-4 shadow-sm backdrop-blur-sm">
+                <p className="text-xs font-bold text-slate-100">
+                  <span className="mr-1.5 text-indigo-400">#{qIndex + 1}.</span> {q.question}
+                </p>
+                <div className="mt-2.5 space-y-1.5">
+                  {q.options.map((opt, optIndex) => {
+                    const isSelected = currentSelected === optIndex;
+                    return (
+                      <button
+                        key={optIndex}
+                        type="button"
+                        onClick={() => handleSelect(q.id, optIndex)}
+                        className={`w-full rounded-xl p-2.5 text-left text-xs font-medium transition flex items-center justify-between border cursor-pointer ${
+                          isSelected
+                            ? 'border-indigo-400 bg-indigo-950/60 text-white shadow-sm font-semibold'
+                            : 'border-slate-700/50 bg-slate-900/30 text-slate-300 hover:bg-slate-800/50 hover:text-white'
+                        }`}
+                      >
+                        <span>{opt.label}</span>
+                        {isSelected && <Check className="h-3.5 w-3.5 text-indigo-300 shrink-0 ml-2" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Step 2: Sprout Companion Result & Soulscape Funnel */
+        <div className="mt-6 space-y-4">
+          {/* Sprout Result Card */}
+          <div className="rounded-2xl border border-indigo-500/40 bg-gradient-to-br from-indigo-950/80 via-slate-900/90 to-purple-950/70 p-5 text-white">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-indigo-300 shrink-0" />
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-300">
+                {vi ? 'CHÚ MẦM CẢM XÚC ĐỒNG HÀNH ĐÊM NAY' : 'YOUR MIDNIGHT COMPANION SPROUT'}
+              </p>
+            </div>
+
+            <div className="mt-3 flex items-baseline gap-2">
+              <h5 className="text-lg font-bold text-white sm:text-xl">{identifiedSprout}</h5>
+            </div>
+
+            <p className="mt-2 text-xs leading-relaxed text-slate-300">
+              {vi
+                ? 'Cảm xúc không phải là sự yếu đuối — chúng chỉ là những vị khách ghé thăm cần một không gian êm dịu để hạ cánh.'
+                : 'Emotions are not flaws — they are gentle visitors asking for a softer place to land.'}
+            </p>
+
+            {/* Recommended Soundscape */}
+            <div className="mt-4 rounded-xl border border-indigo-400/20 bg-indigo-950/50 p-3">
+              <p className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider">
+                {vi ? '🎧 Âm thanh gợi ý để hạ cánh giấc ngủ:' : '🎧 Recommended Bedtime Soundscape:'}
+              </p>
+              <p className="mt-1 text-xs font-semibold text-slate-100">{soundscape}</p>
+            </div>
+
+            {/* App CTA Buttons */}
+            <div className="mt-5 space-y-2.5">
+              <a
+                href={quiz.app_store_url || 'https://soulscapeworld.com'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-950/50 transition hover:from-indigo-600 hover:to-purple-700 active:scale-95"
+              >
+                <span>{vi ? 'Bắt đầu hạ cánh trên Soulscape' : 'Start Wind-down on Soulscape'}</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+
+              <p className="text-center text-[10px] text-indigo-300/80 font-medium">
+                {vi ? '☁ Zero Streak Guilt — Ứng dụng thiền không áp lực chuỗi ngày' : '☁ Zero Streak Guilt — Meditation without streak pressure'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+

@@ -49,6 +49,44 @@ export type SafetyQuiz = {
   contraindicated_verdict?: string;
 };
 
+export type SomaticSignals = {
+  body_signals: string[];
+  triggers: string[];
+  transmutation: string;
+};
+
+export type WinddownProtocol = {
+  badge?: string;
+  objective?: string;
+  steps: string[];
+  donts: string[];
+};
+
+export type MindTrapItem = {
+  trap: string;
+  reality: string;
+};
+
+export type SomaticQuizQuestion = {
+  id: string;
+  question: string;
+  options: {
+    label: string;
+    sprout?: string;
+    note?: string;
+  }[];
+};
+
+export type SomaticQuiz = {
+  title?: string;
+  subtitle?: string;
+  recommended_sprout?: string;
+  recommended_soundscape?: string;
+  app_store_url?: string;
+  play_store_url?: string;
+  questions?: SomaticQuizQuestion[];
+};
+
 export type PublishedArticle = {
   article_id: string; locale: WellnessLocale; slug: string; title: string;
   description: string; eyebrow: string; takeaway: string;
@@ -63,6 +101,11 @@ export type PublishedArticle = {
   fact_checks?: FactCheckItem[] | null;
   faqs?: FaqItem[] | null;
   safety_quiz?: SafetyQuiz | null;
+  somatic_signals?: SomaticSignals | null;
+  winddown_protocol?: WinddownProtocol | null;
+  mind_traps?: MindTrapItem[] | null;
+  somatic_quiz?: SomaticQuiz | null;
+  midnight_faqs?: FaqItem[] | null;
   published_at: string; updated_at: string;
   wellness_articles: { category_id: PortalId; facebook_url: string | null; cover_image_url: string | null };
 };

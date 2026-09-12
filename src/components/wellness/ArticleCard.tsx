@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { PublishedArticle } from '@/lib/published-articles';
 import { articlePath } from '@/lib/article-publishing';
-import { ArrowRight, Clock, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, Clock, ShieldCheck, Sparkles, Moon } from 'lucide-react';
 
 export function ArticleCard({
   article,
@@ -45,15 +45,22 @@ export function ArticleCard({
           </span>
         </div>
 
-        {/* Trust Meter Score Badge */}
-        {score && (
+        {/* Trust Meter Score or Somatic Reset Badge */}
+        {score ? (
           <div className="absolute bottom-3.5 right-3.5">
             <span className="inline-flex items-center gap-1 rounded-full bg-[#18302b]/90 px-2.5 py-1 text-[11px] font-bold text-white shadow-md backdrop-blur-sm border border-emerald-500/30">
               <ShieldCheck className="h-3 w-3 text-emerald-400" />
               {score.toFixed(1)} / 10 {vi ? 'Tin cậy' : 'Trust'}
             </span>
           </div>
-        )}
+        ) : article.winddown_protocol ? (
+          <div className="absolute bottom-3.5 right-3.5">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#0f172a]/90 px-2.5 py-1 text-[11px] font-bold text-indigo-200 shadow-md backdrop-blur-sm border border-indigo-400/40">
+              <Moon className="h-3 w-3 text-indigo-300" />
+              {vi ? 'Hạ cánh giấc ngủ' : 'Bedtime Reset'}
+            </span>
+          </div>
+        ) : null}
       </div>
 
       {/* Content */}

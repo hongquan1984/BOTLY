@@ -6,14 +6,42 @@ import { ArrowRight, BookOpen } from 'lucide-react';
 export function RelatedArticlesSection({
   currentSlug,
   locale,
-  articles
+  articles,
+  categoryId,
 }: {
   currentSlug: string;
   locale: 'vi' | 'en';
   articles: PublishedArticle[];
+  categoryId?: string;
 }) {
   const vi = locale === 'vi';
-  const allGuidesUrl = vi ? '/vi/song-khoe/huong-dan' : '/en/wellness/guides';
+
+  // Determine category-specific URLs and copy
+  let kicker = vi ? 'BÀI VIẾT KHOA HỌC ĐỒNG HÀNH' : 'RELATED SCIENTIFIC ARTICLES';
+  let title = vi ? 'Các Bài Viết Y Sinh Khác Bạn Nên Đọc' : 'Explore More Molecular Analyses & Remedy Checks';
+  let desc = vi
+    ? 'Mổ xẻ cơ chế tế bào, phân tích dược lý học thực vật và trắc nghiệm an toàn thực chứng.'
+    : 'Cellular mechanics, phytochemical evaluations, and clinical safety screenings.';
+  let categoryUrl = vi ? '/vi/song-khoe/huong-dan' : '/en/wellness/guides';
+  let buttonLabel = vi ? 'Xem Toàn Bộ Kho Bài Viết Y Sinh Học' : 'Explore The Complete Scientific Article Library';
+
+  if (categoryId === 'healing') {
+    kicker = vi ? 'CẨM NANG CHỮA LÀNH & HẠ CÁNH ĐÊM MUỘN' : 'MIDNIGHT HEALING & WIND-DOWN GUIDES';
+    title = vi ? 'Các Bài Viết Thể Cảm & Giấc Ngủ Khác Bạn Nên Đọc' : 'Explore More Somatic & Bedtime Guides';
+    desc = vi
+      ? 'Giải mã khoa học thần kinh, thấu cảm tâm lý và nghi thức hạ nhiệt hệ thần kinh lúc nửa đêm.'
+      : 'Neuroscience validation, somatic resets, and gentle bedtime companions.';
+    categoryUrl = vi ? '/vi/song-khoe/chua-lanh' : '/en/wellness/healing';
+    buttonLabel = vi ? 'Xem Toàn Bộ Chuyên Mục Chữa Lành' : 'Explore All Healing Guides';
+  } else if (categoryId === 'weight') {
+    kicker = vi ? 'CẨM NANG KIỂM SOÁT CÂN NẶNG KHOA HỌC' : 'WEIGHT MANAGEMENT GUIDES';
+    title = vi ? 'Các Bài Viết Chuyển Hóa & Dinh Dưỡng Khác' : 'Explore More Metabolic & Nutrition Guides';
+    desc = vi
+      ? 'Phân tích khoa học trao đổi chất, cân bằng insulin và chiến lược dinh dưỡng chuẩn y khoa.'
+      : 'Metabolic science, insulin sensitivity, and evidence-based nutritional strategies.';
+    categoryUrl = vi ? '/vi/song-khoe/giam-can' : '/en/wellness/weight-management';
+    buttonLabel = vi ? 'Xem Toàn Bộ Bài Viết Giảm Cân' : 'Explore All Weight Management Guides';
+  }
 
   // Filter out current article and take up to 10
   const related = articles.filter(a => a.slug !== currentSlug).slice(0, 10);
@@ -28,23 +56,21 @@ export function RelatedArticlesSection({
           <div>
             <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-emerald-800">
               <BookOpen className="h-4 w-4 text-emerald-600" />
-              <span>{vi ? 'BÀI VIẾT KHOA HỌC ĐỒNG HÀNH' : 'RELATED SCIENTIFIC ARTICLES'}</span>
+              <span>{kicker}</span>
             </div>
             <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#18302b] sm:text-3xl">
-              {vi ? 'Các Bài Viết Y Sinh Khác Bạn Nên Đọc' : 'Explore More Molecular Analyses & Remedy Checks'}
+              {title}
             </h2>
             <p className="mt-1 text-sm text-[#4e665d]">
-              {vi
-                ? 'Mổ xẻ cơ chế tế bào, phân tích dược lý học thực vật và trắc nghiệm an toàn thực chứng.'
-                : 'Cellular mechanics, phytochemical evaluations, and clinical safety screenings.'}
+              {desc}
             </p>
           </div>
 
           <Link
-            href={allGuidesUrl}
+            href={categoryUrl}
             className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 hover:text-emerald-950 hover:underline transition-colors shrink-0"
           >
-            <span>{vi ? 'Xem tất cả bài viết' : 'View all articles'}</span>
+            <span>{vi ? 'Xem tất cả' : 'View all'}</span>
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -59,10 +85,10 @@ export function RelatedArticlesSection({
         {/* Big Bottom Action */}
         <div className="mt-12 text-center">
           <Link
-            href={allGuidesUrl}
+            href={categoryUrl}
             className="inline-flex items-center gap-2.5 rounded-2xl bg-[#18302b] px-8 py-4 text-sm font-bold text-white shadow-xl shadow-[#18302b]/15 hover:bg-emerald-900 transition-all hover:-translate-y-0.5"
           >
-            <span>{vi ? 'Xem Toàn Bộ Kho Bài Viết Y Sinh Học' : 'Explore The Complete Scientific Article Library'}</span>
+            <span>{buttonLabel}</span>
             <ArrowRight className="h-4 w-4 text-emerald-400" />
           </Link>
         </div>

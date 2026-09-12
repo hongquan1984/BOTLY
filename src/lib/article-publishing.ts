@@ -62,6 +62,44 @@ export const safetyQuizSchema = z.object({
   contraindicated_verdict: text(500).optional(),
 }).strict();
 
+export const somaticSignalsSchema = z.object({
+  body_signals: z.array(text(200)).min(1).max(20),
+  triggers: z.array(text(200)).min(1).max(20),
+  transmutation: text(500),
+}).strict();
+
+export const winddownProtocolSchema = z.object({
+  badge: z.string().max(120).optional(),
+  objective: text(500).optional(),
+  steps: z.array(text(1000)).min(1).max(10),
+  donts: z.array(text(500)).min(1).max(10),
+}).strict();
+
+export const mindTrapItemSchema = z.object({
+  trap: text(1000),
+  reality: text(2000),
+}).strict();
+
+export const somaticQuizQuestionSchema = z.object({
+  id: text(50),
+  question: text(300),
+  options: z.array(z.object({
+    label: text(200),
+    sprout: z.string().max(100).optional(),
+    note: z.string().max(500).optional(),
+  })).min(2).max(5),
+}).strict();
+
+export const somaticQuizSchema = z.object({
+  title: text(240).optional(),
+  subtitle: text(500).optional(),
+  recommended_sprout: text(200).optional(),
+  recommended_soundscape: text(200).optional(),
+  app_store_url: httpsUrl.optional(),
+  play_store_url: httpsUrl.optional(),
+  questions: z.array(somaticQuizQuestionSchema).max(5).optional(),
+}).strict();
+
 export const translationSchema = z.object({
   locale: z.enum(['en', 'vi']),
   slug: text(180).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
@@ -87,6 +125,11 @@ export const translationSchema = z.object({
   fact_checks: z.array(factCheckItemSchema).max(20).nullable().optional(),
   faqs: z.array(faqItemSchema).max(30).nullable().optional(),
   safety_quiz: safetyQuizSchema.nullable().optional(),
+  somatic_signals: somaticSignalsSchema.nullable().optional(),
+  winddown_protocol: winddownProtocolSchema.nullable().optional(),
+  mind_traps: z.array(mindTrapItemSchema).max(20).nullable().optional(),
+  somatic_quiz: somaticQuizSchema.nullable().optional(),
+  midnight_faqs: z.array(faqItemSchema).max(30).nullable().optional(),
   status: z.enum(['draft', 'published', 'archived']).optional(),
   published_at: timestamp.optional(),
 }).strict();
