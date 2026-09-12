@@ -6,6 +6,7 @@ import {
   TrustMeterWidget, QuickRecipeWidget, FactChecksWidget, FaqsWidget, SafetyQuizWidget,
   SomaticSignalsWidget, WinddownProtocolWidget, MindTrapsWidget, SomaticQuizWidget
 } from './ArticleWidgets';
+import { MindfulOnboardingWizard } from './MindfulOnboardingWizard';
 import { RelatedArticlesSection } from './RelatedArticlesSection';
 
 export function PublishedArticlePage({ article: a, translationPath, relatedArticles = [] }: {
@@ -46,66 +47,90 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
               <img src={a.wellness_articles.cover_image_url} alt={a.cover_image_alt} className="w-full rounded-3xl" loading="lazy" referrerPolicy="no-referrer" />
             </figure>}
             {a.wellness_articles.facebook_url && <p className="mb-8"><a href={a.wellness_articles.facebook_url} target="_blank" rel="noopener noreferrer" className="wellness-button">{vi ? 'Xem video đi kèm trên Facebook' : 'Watch the accompanying video on Facebook'} ↗</a></p>}
-            {a.trust_meter && <TrustMeterWidget data={a.trust_meter} locale={a.locale} />}
-            {a.takeaway && <div className="takeaway"><span>{vi ? 'Ý chính' : 'The takeaway'}</span><p>{a.takeaway}</p></div>}
+            {/* Check if healing category with somatic signals */}
+            {a.somatic_signals && a.winddown_protocol ? (
+              <>
+                {/* 🌙 The 5-Step Interactive Bedtime Onboarding Stepper */}
+                <MindfulOnboardingWizard
+                  somaticSignals={a.somatic_signals}
+                  winddownProtocol={a.winddown_protocol}
+                  mindTraps={a.mind_traps}
+                  somaticQuiz={a.somatic_quiz}
+                  locale={a.locale}
+                />
 
-            {/* Somatic Signals Widget */}
-            {a.somatic_signals && <SomaticSignalsWidget data={a.somatic_signals} locale={a.locale} />}
+                {/* In-depth scientific analysis divider and content */}
+                <div id="full-article" className="mt-14 pt-10 border-t border-slate-200">
+                  <div className="flex items-center gap-3 mb-6">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-950 text-xl text-amber-300 shadow">
+                      📖
+                    </span>
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-indigo-900/70">
+                        {vi ? 'CHIỀU SÂU KHOA HỌC' : 'IN-DEPTH SCIENCE'}
+                      </p>
+                      <h2 className="text-2xl font-bold text-slate-900 m-0">
+                        {vi ? 'Bài Phân Tích Chuyên Sâu & Giải Mã 2h Sáng' : 'Scientific Analysis & Midnight Deconstruction'}
+                      </h2>
+                    </div>
+                  </div>
 
-            {/* Winddown Protocol Widget */}
-            {a.winddown_protocol && <WinddownProtocolWidget data={a.winddown_protocol} locale={a.locale} />}
+                  {a.takeaway && <div className="takeaway"><span>{vi ? 'Ý chính' : 'The takeaway'}</span><p>{a.takeaway}</p></div>}
 
-            {a.quick_recipe && <QuickRecipeWidget data={a.quick_recipe} locale={a.locale} />}
+                  {a.sections.map((section, i) => <section key={i}><h2>{section.title}</h2>
+                    {section.paragraphs.map((p, j) => <p key={j}>{p}</p>)}
+                    {section.image_url && <figure className="my-6">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={section.image_url} alt={section.image_alt || section.title} className="w-full rounded-2xl shadow-sm border border-stone-150" loading="lazy" referrerPolicy="no-referrer" />
+                      {section.image_alt && <figcaption className="mt-2 text-center text-xs text-stone-500 font-medium">{section.image_alt}</figcaption>}
+                    </figure>}
+                    {section.bullets?.length ? <ul>{section.bullets.map((b, j) => <li key={j}>{b}</li>)}</ul> : null}
+                  </section>)}
 
-            {/* Inline Safety Quiz in Article Flow (especially for mobile) */}
-            {a.safety_quiz && (
-              <div id="safety-quiz" className="lg:hidden scroll-mt-24">
-                <SafetyQuizWidget quiz={a.safety_quiz} locale={a.locale} articleSlug={a.slug} mode="inline" />
-              </div>
+                  {/* Midnight FAQs */}
+                  {a.midnight_faqs?.length ? (
+                    <FaqsWidget items={a.midnight_faqs} locale={a.locale} isMidnight={true} />
+                  ) : null}
+                </div>
+              </>
+            ) : (
+              <>
+                {a.trust_meter && <TrustMeterWidget data={a.trust_meter} locale={a.locale} />}
+                {a.takeaway && <div className="takeaway"><span>{vi ? 'Ý chính' : 'The takeaway'}</span><p>{a.takeaway}</p></div>}
+
+                {a.quick_recipe && <QuickRecipeWidget data={a.quick_recipe} locale={a.locale} />}
+
+                {/* Inline Safety Quiz in Article Flow (especially for mobile) */}
+                {a.safety_quiz && (
+                  <div id="safety-quiz" className="lg:hidden scroll-mt-24">
+                    <SafetyQuizWidget quiz={a.safety_quiz} locale={a.locale} articleSlug={a.slug} mode="inline" />
+                  </div>
+                )}
+
+                {a.sections.map((section, i) => <section key={i}><h2>{section.title}</h2>
+                  {section.paragraphs.map((p, j) => <p key={j}>{p}</p>)}
+                  {section.image_url && <figure className="my-6">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={section.image_url} alt={section.image_alt || section.title} className="w-full rounded-2xl shadow-sm border border-stone-150" loading="lazy" referrerPolicy="no-referrer" />
+                    {section.image_alt && <figcaption className="mt-2 text-center text-xs text-stone-500 font-medium">{section.image_alt}</figcaption>}
+                  </figure>}
+                  {section.bullets?.length ? <ul>{section.bullets.map((b, j) => <li key={j}>{b}</li>)}</ul> : null}
+                </section>)}
+
+                {/* Inline Safety Quiz for Desktop in the reading flow */}
+                {a.safety_quiz && (
+                  <div className="hidden lg:block">
+                    <SafetyQuizWidget quiz={a.safety_quiz} locale={a.locale} articleSlug={a.slug} mode="inline" />
+                  </div>
+                )}
+
+                {a.fact_checks?.length ? <FactChecksWidget items={a.fact_checks} locale={a.locale} /> : null}
+
+                {a.faqs?.length ? (
+                  <FaqsWidget items={a.faqs} locale={a.locale} isMidnight={false} />
+                ) : null}
+              </>
             )}
-
-            {/* Inline Somatic Quiz in Article Flow for Mobile */}
-            {a.somatic_quiz && (
-              <div id="somatic-quiz" className="lg:hidden scroll-mt-24">
-                <SomaticQuizWidget quiz={a.somatic_quiz} locale={a.locale} articleSlug={a.slug} mode="inline" />
-              </div>
-            )}
-
-            {a.sections.map((section, i) => <section key={i}><h2>{section.title}</h2>
-              {section.paragraphs.map((p, j) => <p key={j}>{p}</p>)}
-              {section.image_url && <figure className="my-6">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={section.image_url} alt={section.image_alt || section.title} className="w-full rounded-2xl shadow-sm border border-stone-150" loading="lazy" referrerPolicy="no-referrer" />
-                {section.image_alt && <figcaption className="mt-2 text-center text-xs text-stone-500 font-medium">{section.image_alt}</figcaption>}
-              </figure>}
-              {section.bullets?.length ? <ul>{section.bullets.map((b, j) => <li key={j}>{b}</li>)}</ul> : null}
-            </section>)}
-
-            {/* Inline Safety Quiz for Desktop in the reading flow */}
-            {a.safety_quiz && (
-              <div className="hidden lg:block">
-                <SafetyQuizWidget quiz={a.safety_quiz} locale={a.locale} articleSlug={a.slug} mode="inline" />
-              </div>
-            )}
-
-            {/* Inline Somatic Quiz for Desktop in the reading flow */}
-            {a.somatic_quiz && (
-              <div className="hidden lg:block">
-                <SomaticQuizWidget quiz={a.somatic_quiz} locale={a.locale} articleSlug={a.slug} mode="inline" />
-              </div>
-            )}
-
-            {/* Mind Traps Widget */}
-            {a.mind_traps?.length ? <MindTrapsWidget items={a.mind_traps} locale={a.locale} /> : null}
-
-            {a.fact_checks?.length ? <FactChecksWidget items={a.fact_checks} locale={a.locale} /> : null}
-
-            {/* FAQs or Midnight FAQs */}
-            {a.midnight_faqs?.length ? (
-              <FaqsWidget items={a.midnight_faqs} locale={a.locale} isMidnight={true} />
-            ) : a.faqs?.length ? (
-              <FaqsWidget items={a.faqs} locale={a.locale} isMidnight={a.wellness_articles.category_id === 'healing'} />
-            ) : null}
 
             {a.sources.length > 0 && <section className="sources"><h2>{vi ? 'Nguồn tham khảo' : 'Sources'}</h2>
               {a.sources.map((s, i) => <a key={i} href={s.url} target="_blank" rel="noopener noreferrer">{s.label} ↗</a>)}
