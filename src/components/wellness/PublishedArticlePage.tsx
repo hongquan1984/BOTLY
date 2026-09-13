@@ -1,4 +1,8 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
+import { BookOpen, Moon, ChevronDown, ChevronUp } from 'lucide-react';
 import type { PublishedArticle } from '@/lib/published-articles';
 import { portals } from '@/data/wellness-portals';
 import { WellnessShell } from './WellnessShell';
@@ -22,6 +26,17 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
     description: a.description, datePublished: a.published_at, dateModified: a.updated_at,
     inLanguage: a.locale, image: a.wellness_articles.cover_image_url ?? undefined,
     author: { '@type': 'Organization', name: 'Botly Wellness' } };
+
+  // State to toggle full detailed article for healing/somatic articles
+  const [showFullArticle, setShowFullArticle] = useState(false);
+
+  const handleExpandArticle = () => {
+    setShowFullArticle(true);
+    setTimeout(() => {
+      document.getElementById('full-article')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   return <WellnessShell locale={a.locale}>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} />
     <main><article>
@@ -29,11 +44,40 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
       {a.somatic_signals && a.winddown_protocol ? (
         <section className="relative min-h-[calc(100vh-4.5rem)] bg-gradient-to-b from-[#060911] via-[#0a0f1d] to-[#0f172a] px-4 py-8 sm:px-6 lg:px-8 flex flex-col justify-center items-center">
           <div className="w-full max-w-3xl mx-auto">
-            {/* Ambient Top Bar */}
-            <div className="mb-4 flex items-center justify-between text-xs text-indigo-300/80">
-              <Link href={`${base}/${portal.slug}`} className="hover:text-white transition flex items-center gap-1.5 font-medium">
+            {/* Ambient Top Bar with Mode Switcher */}
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <Link href={`${base}/${portal.slug}`} className="text-indigo-300/80 hover:text-white transition flex items-center gap-1.5 font-medium">
                 <span>← {portal.name}</span>
               </Link>
+
+              {/* View Mode Switcher */}
+              <div className="inline-flex rounded-full bg-indigo-950/80 p-1 border border-indigo-800/40">
+                <button
+                  type="button"
+                  onClick={() => setShowFullArticle(false)}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition cursor-pointer ${
+                    !showFullArticle
+                      ? 'bg-amber-400 text-slate-950 shadow'
+                      : 'text-indigo-300 hover:text-white'
+                  }`}
+                >
+                  <Moon className="h-3 w-3" />
+                  <span>{vi ? 'Hạ cánh 30s' : 'Wind-down 30s'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExpandArticle}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition cursor-pointer ${
+                    showFullArticle
+                      ? 'bg-indigo-600 text-white shadow'
+                      : 'text-indigo-300 hover:text-white'
+                  }`}
+                >
+                  <BookOpen className="h-3 w-3" />
+                  <span>{vi ? 'Bài đọc chuyên sâu' : 'In-depth Science'}</span>
+                </button>
+              </div>
+
               {translationPath && (
                 <Link href={translationPath} className="rounded-full bg-indigo-950/70 px-3 py-1 text-xs text-slate-300 border border-indigo-800/40 hover:text-white transition">
                   {vi ? 'English version' : 'Bản Tiếng Việt'} 🌐
@@ -61,17 +105,32 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
               mindTraps={a.mind_traps}
               somaticQuiz={a.somatic_quiz}
               locale={a.locale}
+              articleSlug={a.slug}
+              onExpandArticle={handleExpandArticle}
             />
 
-            {/* Soothing Scroll-down hint */}
+            {/* Collapsible Article Indicator / Action Hint */}
             <div className="mt-6 text-center">
-              <a
-                href="#full-article"
-                className="inline-flex items-center gap-2 rounded-full border border-indigo-800/50 bg-indigo-950/40 px-5 py-2 text-xs font-semibold text-slate-400 hover:text-amber-200 hover:border-amber-400/40 transition"
-              >
-                <span>{vi ? 'Hoặc cuộn xuống đọc bài phân tích y sinh & xem video' : 'Or scroll down to read in-depth science & video'}</span>
-                <span>↓</span>
-              </a>
+              {!showFullArticle ? (
+                <button
+                  type="button"
+                  onClick={handleExpandArticle}
+                  className="inline-flex items-center gap-2 rounded-full border border-indigo-700/60 bg-indigo-950/60 px-6 py-2.5 text-xs font-semibold text-amber-200 hover:bg-indigo-900/60 hover:border-amber-400/50 transition cursor-pointer shadow-lg"
+                >
+                  <BookOpen className="h-3.5 w-3.5 text-amber-300" />
+                  <span>{vi ? 'Xem bài phân tích y sinh & Video minh họa' : 'Read in-depth science & Video'}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-amber-300" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowFullArticle(false)}
+                  className="inline-flex items-center gap-2 rounded-full border border-indigo-800/40 bg-indigo-950/40 px-5 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 transition cursor-pointer"
+                >
+                  <ChevronUp className="h-3.5 w-3.5" />
+                  <span>{vi ? 'Thu gọn bài đọc để tập trung hạ cánh' : 'Collapse article to focus on wind-down'}</span>
+                </button>
+              )}
             </div>
           </div>
         </section>
@@ -96,44 +155,83 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
             {/* Check if healing category with somatic signals */}
             {a.somatic_signals && a.winddown_protocol ? (
               <div id="full-article" className="space-y-8 scroll-mt-10">
-                {a.wellness_articles.cover_image_url && <figure className="mb-8">
-                  {/* Remote publisher URLs are displayed directly, never fetched by the image optimizer. */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={a.wellness_articles.cover_image_url} alt={a.cover_image_alt} className="w-full rounded-3xl" loading="lazy" referrerPolicy="no-referrer" />
-                </figure>}
-                {a.wellness_articles.facebook_url && <p className="mb-8"><a href={a.wellness_articles.facebook_url} target="_blank" rel="noopener noreferrer" className="wellness-button">{vi ? 'Xem video đi kèm trên Facebook' : 'Watch the accompanying video on Facebook'} ↗</a></p>}
-
-                <div className="flex items-center gap-3 pb-4 border-b border-stone-200">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-950 text-xl text-amber-300 shadow">
-                    📖
-                  </span>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-indigo-900/70">
-                      {vi ? 'CHIỀU SÂU KHOA HỌC' : 'IN-DEPTH SCIENCE'}
+                {!showFullArticle ? (
+                  <div className="rounded-3xl border border-indigo-900/40 bg-gradient-to-br from-[#0b1020] via-[#10172a] to-[#0f172a] p-6 sm:p-8 text-center shadow-xl">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-950 text-2xl text-amber-300 border border-indigo-800/60 shadow">
+                      📖
+                    </div>
+                    <h3 className="mt-4 text-xl font-bold text-white sm:text-2xl">
+                      {vi ? 'Bài Phân Tích Y Sinh Chuyên Sâu' : 'In-depth Biomedical Analysis'}
+                    </h3>
+                    <p className="mt-2 text-xs text-slate-300 sm:text-sm max-w-xl mx-auto leading-relaxed">
+                      {vi
+                        ? 'Khám phá cơ chế khoa học thần kinh 2h sáng (Amygdala, Prefrontal Cortex & Cortisol) kèm video minh họa Facebook Reel tương ứng.'
+                        : 'Explore 2 AM neuroscience mechanisms (Amygdala, Prefrontal Cortex & Cortisol) with the accompanying Facebook Reel video.'}
                     </p>
-                    <h2 className="text-2xl font-bold text-slate-900 m-0">
-                      {vi ? 'Bài Phân Tích Chuyên Sâu & Giải Mã 2h Sáng' : 'Scientific Analysis & Midnight Deconstruction'}
-                    </h2>
+                    <button
+                      type="button"
+                      onClick={() => setShowFullArticle(true)}
+                      className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-6 py-3 text-xs font-bold text-slate-950 shadow-lg shadow-amber-400/20 hover:bg-amber-300 active:scale-95 transition cursor-pointer"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      <span>{vi ? 'Mở rộng bài phân tích y sinh & Video minh họa' : 'Expand In-Depth Science & Video'}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-8 animate-in fade-in duration-300">
+                    <div className="flex items-center justify-between pb-4 border-b border-stone-200">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-950 text-xl text-amber-300 shadow">
+                          📖
+                        </span>
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-wider text-indigo-900/70">
+                            {vi ? 'CHIỀU SÂU KHOA HỌC' : 'IN-DEPTH SCIENCE'}
+                          </p>
+                          <h2 className="text-2xl font-bold text-slate-900 m-0">
+                            {vi ? 'Bài Phân Tích Chuyên Sâu & Giải Mã 2h Sáng' : 'Scientific Analysis & Midnight Deconstruction'}
+                          </h2>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowFullArticle(false);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="rounded-full border border-stone-300 px-3.5 py-1.5 text-xs font-semibold text-stone-600 hover:bg-stone-100 transition cursor-pointer"
+                      >
+                        {vi ? '▴ Thu gọn bài đọc' : '▴ Collapse'}
+                      </button>
+                    </div>
 
-                  {a.takeaway && <div className="takeaway"><span>{vi ? 'Ý chính' : 'The takeaway'}</span><p>{a.takeaway}</p></div>}
-
-                  {a.sections.map((section, i) => <section key={i}><h2>{section.title}</h2>
-                    {section.paragraphs.map((p, j) => <p key={j}>{p}</p>)}
-                    {section.image_url && <figure className="my-6">
+                    {a.wellness_articles.cover_image_url && <figure className="mb-8">
+                      {/* Remote publisher URLs are displayed directly, never fetched by the image optimizer. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={section.image_url} alt={section.image_alt || section.title} className="w-full rounded-2xl shadow-sm border border-stone-150" loading="lazy" referrerPolicy="no-referrer" />
-                      {section.image_alt && <figcaption className="mt-2 text-center text-xs text-stone-500 font-medium">{section.image_alt}</figcaption>}
+                      <img src={a.wellness_articles.cover_image_url} alt={a.cover_image_alt} className="w-full rounded-3xl" loading="lazy" referrerPolicy="no-referrer" />
                     </figure>}
-                    {section.bullets?.length ? <ul>{section.bullets.map((b, j) => <li key={j}>{b}</li>)}</ul> : null}
-                  </section>)}
+                    {a.wellness_articles.facebook_url && <p className="mb-8"><a href={a.wellness_articles.facebook_url} target="_blank" rel="noopener noreferrer" className="wellness-button">{vi ? 'Xem video đi kèm trên Facebook' : 'Watch the accompanying video on Facebook'} ↗</a></p>}
 
-                  {/* Midnight FAQs */}
-                  {a.midnight_faqs?.length ? (
-                    <FaqsWidget items={a.midnight_faqs} locale={a.locale} isMidnight={true} />
-                  ) : null}
-                </div>
+                    {a.takeaway && <div className="takeaway"><span>{vi ? 'Ý chính' : 'The takeaway'}</span><p>{a.takeaway}</p></div>}
+
+                    {a.sections.map((section, i) => <section key={i}><h2>{section.title}</h2>
+                      {section.paragraphs.map((p, j) => <p key={j}>{p}</p>)}
+                      {section.image_url && <figure className="my-6">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={section.image_url} alt={section.image_alt || section.title} className="w-full rounded-2xl shadow-sm border border-stone-150" loading="lazy" referrerPolicy="no-referrer" />
+                        {section.image_alt && <figcaption className="mt-2 text-center text-xs text-stone-500 font-medium">{section.image_alt}</figcaption>}
+                      </figure>}
+                      {section.bullets?.length ? <ul>{section.bullets.map((b, j) => <li key={j}>{b}</li>)}</ul> : null}
+                    </section>)}
+
+                    {/* Midnight FAQs */}
+                    {a.midnight_faqs?.length ? (
+                      <FaqsWidget items={a.midnight_faqs} locale={a.locale} isMidnight={true} />
+                    ) : null}
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 {a.trust_meter && <TrustMeterWidget data={a.trust_meter} locale={a.locale} />}

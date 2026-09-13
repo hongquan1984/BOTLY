@@ -33,8 +33,13 @@ interface SummaryData {
   today_page_views: number;
   total_quiz_completions: number;
   today_quiz_completions: number;
+  total_app_clicks?: number;
+  today_app_clicks?: number;
+  app_clicks_ios?: number;
+  app_clicks_android?: number;
   total_subscribers: number;
   quiz_subscribers: number;
+  somatic_subscribers?: number;
   home_subscribers: number;
   today_subscribers: number;
   overall_conversion_rate: number;
@@ -45,6 +50,7 @@ interface DailyRecord {
   page_views: number;
   quiz_completions: number;
   leads: number;
+  app_clicks?: number;
 }
 
 interface ArticleRecord {
@@ -53,6 +59,7 @@ interface ArticleRecord {
   locale: string;
   views: number;
   quiz_completions: number;
+  app_clicks?: number;
   leads: number;
   quiz_rate: number;
   conversion_rate: number;
@@ -86,6 +93,8 @@ interface RecentQuizRecord {
     verdict?: string;
     completion_seconds?: number;
     questions_count?: number;
+    sprout?: string;
+    quiz_type?: string;
   };
   created_at: string;
 }
@@ -149,7 +158,9 @@ export default function AdminAnalyticsPage() {
           ? true
           : filterSource === 'quiz'
           ? sub.source.startsWith('safety_quiz_')
-          : !sub.source.startsWith('safety_quiz_');
+          : filterSource === 'somatic'
+          ? sub.source.startsWith('somatic_haven_')
+          : !sub.source.startsWith('safety_quiz_') && !sub.source.startsWith('somatic_haven_');
 
       const matchLocale = filterLocale === 'all' ? true : sub.locale === filterLocale;
 
@@ -305,8 +316,8 @@ export default function AdminAnalyticsPage() {
           </div>
         )}
 
-        {/* 4 Summary KPI Cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* 5 Summary KPI Cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {/* Card 1: Pageviews */}
           <div className="rounded-3xl border border-emerald-900/50 bg-gradient-to-b from-[#132320] to-[#0f1b18] p-5 shadow-lg shadow-black/20">
             <div className="flex items-center justify-between text-emerald-400">
@@ -324,7 +335,7 @@ export default function AdminAnalyticsPage() {
               </span>
             </div>
             <p className="mt-2 text-xs text-emerald-200/50">
-              Toàn bộ bài viết y sinh học & công cụ tính năng trong {selectedDays} ngày
+              Toàn bộ bài viết y sinh học & cẩm nang trong {selectedDays} ngày
             </p>
           </div>
 
@@ -345,11 +356,34 @@ export default function AdminAnalyticsPage() {
               </span>
             </div>
             <p className="mt-2 text-xs text-amber-200/50">
-              Độc giả trả lời hoàn tất 3 câu trắc nghiệm an toàn 15 giây
+              Độc giả hoàn tất trắc nghiệm an toàn hoặc trắc nghiệm thể cảm
             </p>
           </div>
 
-          {/* Card 3: Email Leads */}
+          {/* Card 3: App Download Clicks */}
+          <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-b from-[#1b1429] to-[#120d1c] p-5 shadow-lg shadow-black/20">
+            <div className="flex items-center justify-between text-purple-300">
+              <span className="text-xs font-semibold uppercase tracking-wider text-purple-300/70">Click Nút Tải App</span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-900/40 text-purple-300">
+                <Download className="h-5 w-5" />
+              </div>
+            </div>
+            <div className="mt-3">
+              <span className="text-3xl font-extrabold text-white tracking-tight">
+                {data?.summary?.total_app_clicks?.toLocaleString('vi-VN') || 0}
+              </span>
+              <span className="ml-2 text-xs font-medium text-purple-300 bg-purple-950/80 border border-purple-800/40 px-2 py-0.5 rounded-md">
+                +{data?.summary?.today_app_clicks || 0} hôm nay
+              </span>
+            </div>
+            <div className="mt-2 flex items-center gap-3 text-xs text-purple-200/70 font-medium">
+              <span> {data?.summary?.app_clicks_ios || 0} iOS</span>
+              <span>•</span>
+              <span>▶ {data?.summary?.app_clicks_android || 0} Android</span>
+            </div>
+          </div>
+
+          {/* Card 4: Email Leads */}
           <div className="rounded-3xl border border-teal-900/40 bg-gradient-to-b from-[#132322] to-[#0e1b1a] p-5 shadow-lg shadow-black/20">
             <div className="flex items-center justify-between text-teal-300">
               <span className="text-xs font-semibold uppercase tracking-wider text-teal-300/70">Email Thu Thập (Leads)</span>
@@ -362,18 +396,18 @@ export default function AdminAnalyticsPage() {
                 {data?.summary?.total_subscribers?.toLocaleString('vi-VN') || 0}
               </span>
               <span className="ml-2 text-xs font-medium text-teal-300 bg-teal-950/80 border border-teal-800/40 px-2 py-0.5 rounded-md">
-                {data?.summary?.quiz_subscribers || 0} từ Quiz
+                +{data?.summary?.today_subscribers || 0} hôm nay
               </span>
             </div>
-            <p className="mt-2 text-xs text-teal-200/50">
-              Khách hàng tiềm năng để lại email nhận cẩm nang & lộ trình
+            <p className="mt-2 text-xs text-teal-200/60">
+              Quiz: {data?.summary?.quiz_subscribers || 0} • Chữa lành: {data?.summary?.somatic_subscribers || 0}
             </p>
           </div>
 
-          {/* Card 4: Quiz-to-Lead Conversion Rate */}
+          {/* Card 5: Quiz-to-Lead Conversion Rate */}
           <div className="rounded-3xl border border-indigo-900/40 bg-gradient-to-b from-[#171926] to-[#10121d] p-5 shadow-lg shadow-black/20">
             <div className="flex items-center justify-between text-indigo-300">
-              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-300/70">Tỷ Lệ Tương Tác Quiz</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-300/70">Tỷ Lệ Tương Tác</span>
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-900/40 text-indigo-300">
                 <TrendingUp className="h-5 w-5" />
               </div>
@@ -518,7 +552,8 @@ export default function AdminAnalyticsPage() {
                   className="rounded-xl border border-emerald-900/60 bg-[#0c1815] px-3 py-2 text-emerald-300 focus:outline-none"
                 >
                   <option value="all">Tất cả nguồn</option>
-                  <option value="quiz">Từ Quiz bài viết</option>
+                  <option value="quiz">Từ Quiz bài thuốc</option>
+                  <option value="somatic">🌙 Từ Cẩm nang Chữa lành (Mindful Haven)</option>
                   <option value="newsletter">Từ Newsletter trang chủ</option>
                 </select>
 
@@ -552,7 +587,12 @@ export default function AdminAnalyticsPage() {
                   {filteredSubscribers.length > 0 ? (
                     filteredSubscribers.map((sub, idx) => {
                       const isQuiz = sub.source.startsWith('safety_quiz_');
-                      const cleanSource = isQuiz ? sub.source.replace('safety_quiz_', '') : sub.source;
+                      const isSomatic = sub.source.startsWith('somatic_haven_');
+                      const cleanSource = isQuiz
+                        ? sub.source.replace('safety_quiz_', '')
+                        : isSomatic
+                        ? sub.source.replace('somatic_haven_', '')
+                        : sub.source;
 
                       return (
                         <tr key={sub.id} className="hover:bg-emerald-950/20 transition-colors">
@@ -573,6 +613,20 @@ export default function AdminAnalyticsPage() {
                                   href={sub.locale === 'vi' ? `/vi/song-khoe/huong-dan/${cleanSource}` : `/en/wellness/guides/${cleanSource}`}
                                   target="_blank"
                                   className="text-emerald-300 hover:underline hover:text-white truncate max-w-xs inline-flex items-center gap-1"
+                                >
+                                  {cleanSource}
+                                  <ExternalLink className="h-3 w-3 opacity-60" />
+                                </Link>
+                              </div>
+                            ) : isSomatic ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="inline-flex items-center rounded-md bg-purple-950/60 border border-purple-800/40 px-2 py-0.5 text-[11px] font-medium text-purple-300">
+                                  🌙 Chữa lành
+                                </span>
+                                <Link
+                                  href={sub.locale === 'vi' ? `/vi/song-khoe/huong-dan/${cleanSource}` : `/en/wellness/guides/${cleanSource}`}
+                                  target="_blank"
+                                  className="text-indigo-300 hover:underline hover:text-white truncate max-w-xs inline-flex items-center gap-1"
                                 >
                                   {cleanSource}
                                   <ExternalLink className="h-3 w-3 opacity-60" />
@@ -629,6 +683,7 @@ export default function AdminAnalyticsPage() {
                     <th className="py-3 px-4 text-center">Ngôn Ngữ</th>
                     <th className="py-3 px-4 text-right">Lượt Xem</th>
                     <th className="py-3 px-4 text-right">Làm Quiz</th>
+                    <th className="py-3 px-4 text-right">Click Tải App</th>
                     <th className="py-3 px-4 text-right">Email Thu Được</th>
                     <th className="py-3 px-4 text-right">Tỷ Lệ Quiz (%)</th>
                     <th className="py-3 px-4 text-center">Liên Kết</th>
@@ -655,6 +710,7 @@ export default function AdminAnalyticsPage() {
                           </td>
                           <td className="py-3.5 px-4 text-right font-bold text-white">{art.views}</td>
                           <td className="py-3.5 px-4 text-right font-bold text-amber-300">{art.quiz_completions}</td>
+                          <td className="py-3.5 px-4 text-right font-bold text-purple-300">{art.app_clicks || 0}</td>
                           <td className="py-3.5 px-4 text-right font-bold text-teal-300">{art.leads}</td>
                           <td className="py-3.5 px-4 text-right font-mono text-emerald-400">
                             {art.quiz_rate}%
@@ -673,7 +729,7 @@ export default function AdminAnalyticsPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={7} className="py-8 text-center text-sm text-emerald-400/50">
+                      <td colSpan={8} className="py-8 text-center text-sm text-emerald-400/50">
                         Chưa có dữ liệu bài viết
                       </td>
                     </tr>
@@ -695,7 +751,11 @@ export default function AdminAnalyticsPage() {
             <div className="space-y-3">
               {data?.recent_quizzes && data.recent_quizzes.length > 0 ? (
                 data.recent_quizzes.map((quizItem, idx) => {
-                  const isSafe = quizItem.metadata?.verdict !== 'contraindicated';
+                  const verdict = quizItem.metadata?.verdict;
+                  const isContra = verdict === 'contraindicated';
+                  const isCaution = verdict === 'caution';
+                  const sprout = quizItem.metadata?.sprout;
+
                   return (
                     <div
                       key={idx}
@@ -704,19 +764,22 @@ export default function AdminAnalyticsPage() {
                       <div className="flex items-center gap-3">
                         <span
                           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl font-bold ${
-                            isSafe
-                              ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/40'
-                              : 'bg-rose-950 text-rose-400 border border-rose-800/40'
+                            isContra
+                              ? 'bg-rose-950 text-rose-400 border border-rose-800/40'
+                              : isCaution
+                              ? 'bg-amber-950 text-amber-400 border border-amber-800/40'
+                              : 'bg-emerald-950 text-emerald-400 border border-emerald-800/40'
                           }`}
                         >
-                          {isSafe ? '✓' : '!'}
+                          {isContra ? '!' : isCaution ? '⚠' : '✓'}
                         </span>
                         <div>
                           <p className="font-semibold text-white text-sm">
                             {quizItem.article_slug || quizItem.path}
                           </p>
                           <p className="text-emerald-400/60 mt-0.5">
-                            Phán quyết: {isSafe ? 'Phù hợp an toàn' : 'Có yếu tố chống chỉ định'}
+                            Phán quyết: {isContra ? 'Có yếu tố chống chỉ định' : isCaution ? 'Cần thận trọng & giảm liều' : 'Phù hợp an toàn'}
+                            {sprout && <span className="ml-2 text-indigo-300">• Đồng hành: {sprout}</span>}
                             {quizItem.metadata?.completion_seconds && (
                               <span className="ml-2 font-mono">({quizItem.metadata.completion_seconds}s)</span>
                             )}

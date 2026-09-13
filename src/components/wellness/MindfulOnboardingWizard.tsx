@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Sparkles, Moon, HeartPulse, ArrowRight, ArrowLeft, Volume2, VolumeX,
-  Play, Pause, RotateCcw, Bed, ShieldAlert, CheckCircle2, Award
+  Play, Pause, RotateCcw, Bed, ShieldAlert, CheckCircle2, Award, Mail, Send
 } from 'lucide-react';
 import type {
   SomaticSignals, WinddownProtocol, MindTrapItem, SomaticQuiz
@@ -16,6 +16,8 @@ interface MindfulOnboardingWizardProps {
   mindTraps?: MindTrapItem[] | null;
   somaticQuiz?: SomaticQuiz | null;
   locale: 'en' | 'vi';
+  articleSlug?: string;
+  onExpandArticle?: () => void;
 }
 
 export function MindfulOnboardingWizard({
@@ -23,7 +25,9 @@ export function MindfulOnboardingWizard({
   winddownProtocol,
   mindTraps,
   somaticQuiz,
-  locale
+  locale,
+  articleSlug,
+  onExpandArticle
 }: MindfulOnboardingWizardProps) {
   const vi = locale === 'vi';
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -41,6 +45,45 @@ export function MindfulOnboardingWizard({
 
   // Flip card state for Mind Traps
   const [cardFlipped, setCardFlipped] = useState(false);
+
+  // Email lead capture state (Step 5)
+  const [leadEmail, setLeadEmail] = useState('');
+  const [leadSubmitting, setLeadSubmitting] = useState(false);
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [leadError, setLeadError] = useState<string | null>(null);
+
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leadEmail || !leadEmail.includes('@') || leadSubmitting) return;
+    setLeadSubmitting(true);
+    setLeadError(null);
+    try {
+      const source = `somatic_haven_${articleSlug || 'healing'}`;
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: leadEmail,
+          locale,
+          source
+        })
+      });
+      if (!res.ok) throw new Error('Subscription failed');
+      setLeadSubmitted(true);
+      trackClientEvent('lead_submit', {
+        articleSlug,
+        locale,
+        metadata: {
+          source,
+          sprout: somaticQuiz?.recommended_sprout
+        }
+      });
+    } catch {
+      setLeadError(vi ? 'Có lỗi xảy ra, vui lòng thử lại.' : 'An error occurred, please try again.');
+    } finally {
+      setLeadSubmitting(false);
+    }
+  };
 
   // Track breathing interval
   useEffect(() => {
@@ -578,8 +621,8 @@ export function MindfulOnboardingWizard({
                 href={somaticQuiz?.app_store_url || 'https://apps.apple.com/us/app/soulscape-emotion-poke-diary/id6769265902'}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackClientEvent('onboarding_app_download_click', { locale, metadata: { store: 'app_store' } })}
-                className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white py-3 text-xs font-bold text-slate-900 shadow-md transition hover:bg-slate-100"
+                onClick={() => trackClientEvent('onboarding_app_download_click', { articleSlug, locale, metadata: { store: 'app_store' } })}
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white py-3 text-xs font-bold text-slate-900 shadow-md transition hover:bg-slate-100 active:scale-95"
               >
                 <span className="text-sm"></span>
                 <span>App Store (iOS)</span>
@@ -588,12 +631,54 @@ export function MindfulOnboardingWizard({
                 href={somaticQuiz?.play_store_url || 'https://play.google.com/store/apps/details?id=app.soulscape.world'}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackClientEvent('onboarding_app_download_click', { locale, metadata: { store: 'google_play' } })}
-                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-800/80 py-3 text-xs font-bold text-white shadow-md transition hover:bg-slate-700"
+                onClick={() => trackClientEvent('onboarding_app_download_click', { articleSlug, locale, metadata: { store: 'google_play' } })}
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-800/80 py-3 text-xs font-bold text-white shadow-md transition hover:bg-slate-700 active:scale-95"
               >
                 <span>▶</span>
                 <span>Google Play (Android)</span>
               </a>
+            </div>
+
+            {/* Somatic Bedside Protocol Email Lead Capture */}
+            <div className="mx-auto max-w-md rounded-2xl border border-amber-400/30 bg-gradient-to-b from-[#131b2e] to-[#0c1220] p-5 text-left shadow-lg">
+              <div className="flex items-center gap-2 text-amber-300">
+                <Mail className="h-4 w-4" />
+                <h4 className="text-xs font-bold uppercase tracking-wider">
+                  {vi ? 'Cẩm Nang Đêm Muộn (PDF 3 Phút)' : 'Midnight Somatic Guide (3-Min PDF)'}
+                </h4>
+              </div>
+              <p className="mt-1.5 text-xs text-slate-300 leading-relaxed">
+                {vi
+                  ? 'Nhận trọn bộ Nghi thức hạ cánh 3 bước & Lộ trình làm dịu thần kinh 5 ngày gửi trực tiếp về email để mở đọc ngay trên giường khi thức giấc 2h sáng.'
+                  : 'Receive the full 3-step bedside winddown protocol & 5-day calming roadmap sent straight to your inbox to open in bed at 2 AM.'}
+              </p>
+
+              {leadSubmitted ? (
+                <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-950/70 border border-emerald-500/40 px-3.5 py-2.5 text-xs font-medium text-emerald-300">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                  <span>{vi ? '✨ Đã ghi nhận! Cẩm nang sẽ được gửi đến email của bạn.' : '✨ Saved! The guide will be sent to your email.'}</span>
+                </div>
+              ) : (
+                <form onSubmit={handleLeadSubmit} className="mt-3 flex flex-col gap-2 sm:flex-row">
+                  <input
+                    type="email"
+                    value={leadEmail}
+                    onChange={(e) => setLeadEmail(e.target.value)}
+                    placeholder={vi ? 'Nhập email của bạn...' : 'Enter your email...'}
+                    required
+                    className="flex-1 rounded-xl border border-slate-700 bg-slate-900/90 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                  />
+                  <button
+                    type="submit"
+                    disabled={leadSubmitting}
+                    className="flex items-center justify-center gap-1.5 rounded-xl bg-amber-400 px-4 py-2.5 text-xs font-bold text-slate-950 hover:bg-amber-300 active:scale-95 transition disabled:opacity-50 cursor-pointer shrink-0"
+                  >
+                    <span>{leadSubmitting ? (vi ? 'Đang gửi...' : 'Sending...') : (vi ? 'Nhận PDF' : 'Get PDF')}</span>
+                    <Send className="h-3.5 w-3.5" />
+                  </button>
+                </form>
+              )}
+              {leadError && <p className="mt-2 text-[11px] text-rose-400">{leadError}</p>}
             </div>
 
             {/* Reset / Explore options */}
@@ -609,7 +694,8 @@ export function MindfulOnboardingWizard({
               <span>•</span>
               <a
                 href="#full-article"
-                className="hover:text-amber-300 transition"
+                onClick={() => onExpandArticle?.()}
+                className="hover:text-amber-300 transition cursor-pointer"
               >
                 {vi ? '📖 Đọc bài phân tích chuyên sâu bên dưới' : '📖 Read in-depth article below'}
               </a>

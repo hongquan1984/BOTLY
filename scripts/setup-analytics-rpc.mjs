@@ -42,7 +42,8 @@ async function main() {
           to_char(d, 'YYYY-MM-DD') AS day,
           coalesce(count(e.id) FILTER (WHERE e.event_type = 'page_view'), 0) AS page_views,
           coalesce(count(e.id) FILTER (WHERE e.event_type = 'quiz_completed'), 0) AS quiz_completions,
-          coalesce(count(e.id) FILTER (WHERE e.event_type = 'lead_submit'), 0) AS lead_submits
+          coalesce(count(e.id) FILTER (WHERE e.event_type = 'lead_submit'), 0) AS lead_submits,
+          coalesce(count(e.id) FILTER (WHERE e.event_type = 'onboarding_app_download_click'), 0) AS app_clicks
         FROM generate_series(date_trunc('day', v_start_date), date_trunc('day', now()), '1 day'::interval) d
         LEFT JOIN events_filtered e ON to_char(e.created_at, 'YYYY-MM-DD') = to_char(d, 'YYYY-MM-DD')
         GROUP BY d
@@ -61,7 +62,8 @@ async function main() {
           de.day,
           de.page_views,
           de.quiz_completions,
-          greatest(de.lead_submits, coalesce(dl.new_subscribers, 0)) AS leads
+          greatest(de.lead_submits, coalesce(dl.new_subscribers, 0)) AS leads,
+          de.app_clicks
         FROM daily_events de
         LEFT JOIN daily_leads dl ON dl.day = de.day
         ORDER BY de.day ASC
@@ -72,7 +74,8 @@ async function main() {
           coalesce(max(t.title), e.article_slug) AS title,
           coalesce(max(t.locale), 'vi') AS locale,
           count(e.id) FILTER (WHERE e.event_type = 'page_view') AS views,
-          count(e.id) FILTER (WHERE e.event_type = 'quiz_completed') AS quiz_completions
+          count(e.id) FILTER (WHERE e.event_type = 'quiz_completed') AS quiz_completions,
+          count(e.id) FILTER (WHERE e.event_type = 'onboarding_app_download_click') AS app_clicks
         FROM events_filtered e
         LEFT JOIN public.wellness_article_translations t ON t.slug = e.article_slug
         WHERE e.article_slug IS NOT NULL AND e.article_slug <> ''
@@ -81,11 +84,15 @@ async function main() {
       ),
       article_leads AS (
         SELECT
-          replace(source, 'safety_quiz_', '') AS slug,
+          CASE
+            WHEN source LIKE 'safety_quiz_%' THEN replace(source, 'safety_quiz_', '')
+            WHEN source LIKE 'somatic_haven_%' THEN replace(source, 'somatic_haven_', '')
+            ELSE source
+          END AS slug,
           count(*) AS lead_count
         FROM public.newsletter_subscribers
-        WHERE source LIKE 'safety_quiz_%'
-        GROUP BY source
+        WHERE source LIKE 'safety_quiz_%' OR source LIKE 'somatic_haven_%'
+        GROUP BY 1
       ),
       articles_final AS (
         SELECT
@@ -94,6 +101,7 @@ async function main() {
           a.locale,
           a.views,
           a.quiz_completions,
+          a.app_clicks,
           coalesce(al.lead_count, 0) AS leads,
           CASE WHEN a.views > 0 THEN round((a.quiz_completions::numeric / a.views::numeric) * 100, 1) ELSE 0 END AS quiz_rate,
           CASE WHEN a.quiz_completions > 0 THEN round((coalesce(al.lead_count, 0)::numeric / a.quiz_completions::numeric) * 100, 1) ELSE 0 END AS conversion_rate
@@ -139,13 +147,18 @@ async function main() {
           'today_page_views', (SELECT coalesce(page_views, 0) FROM daily_merged WHERE day = to_char(now(), 'YYYY-MM-DD')),
           'total_quiz_completions', (SELECT coalesce(sum(quiz_completions), 0) FROM daily_merged),
           'today_quiz_completions', (SELECT coalesce(quiz_completions, 0) FROM daily_merged WHERE day = to_char(now(), 'YYYY-MM-DD')),
+          'total_app_clicks', (SELECT coalesce(count(*), 0) FROM events_filtered WHERE event_type = 'onboarding_app_download_click'),
+          'today_app_clicks', (SELECT coalesce(count(*), 0) FROM events_filtered WHERE event_type = 'onboarding_app_download_click' AND created_at >= date_trunc('day', now())),
+          'app_clicks_ios', (SELECT coalesce(count(*), 0) FROM events_filtered WHERE event_type = 'onboarding_app_download_click' AND (metadata->>'store' = 'app_store' OR metadata->>'store' = 'ios')),
+          'app_clicks_android', (SELECT coalesce(count(*), 0) FROM events_filtered WHERE event_type = 'onboarding_app_download_click' AND (metadata->>'store' = 'google_play' OR metadata->>'store' = 'android')),
           'total_subscribers', (SELECT count(*) FROM public.newsletter_subscribers),
           'quiz_subscribers', (SELECT count(*) FROM public.newsletter_subscribers WHERE source LIKE 'safety_quiz_%'),
-          'home_subscribers', (SELECT count(*) FROM public.newsletter_subscribers WHERE source NOT LIKE 'safety_quiz_%'),
+          'somatic_subscribers', (SELECT count(*) FROM public.newsletter_subscribers WHERE source LIKE 'somatic_haven_%'),
+          'home_subscribers', (SELECT count(*) FROM public.newsletter_subscribers WHERE source NOT LIKE 'safety_quiz_%' AND source NOT LIKE 'somatic_haven_%'),
           'today_subscribers', (SELECT count(*) FROM public.newsletter_subscribers WHERE consented_at >= date_trunc('day', now())),
           'overall_conversion_rate', (
             SELECT CASE
-              WHEN sum(quiz_completions) > 0 THEN round(((SELECT count(*) FROM public.newsletter_subscribers WHERE source LIKE 'safety_quiz_%')::numeric / sum(quiz_completions)::numeric) * 100, 1)
+              WHEN sum(quiz_completions) > 0 THEN round(((SELECT count(*) FROM public.newsletter_subscribers WHERE source LIKE 'safety_quiz_%' OR source LIKE 'somatic_haven_%')::numeric / sum(quiz_completions)::numeric) * 100, 1)
               ELSE 0
             END
             FROM daily_merged

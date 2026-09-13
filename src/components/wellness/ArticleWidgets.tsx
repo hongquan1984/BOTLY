@@ -228,10 +228,25 @@ export function SafetyQuizWidget({
     setSelectedAnswers(prev => {
       const next = { ...prev, [qId]: optIdx };
       if (Object.keys(next).length === quiz.questions.length && Object.keys(prev).length < quiz.questions.length) {
+        let isContra = false;
+        let hasWarn = false;
+        quiz.questions.forEach((q) => {
+          const sIdx = next[q.id];
+          if (sIdx !== undefined) {
+            const opt = q.options[sIdx];
+            if (opt?.is_contraindicated) isContra = true;
+            if (opt?.warning) hasWarn = true;
+          }
+        });
+        const verdict = isContra ? 'contraindicated' : hasWarn ? 'caution' : 'safe';
+
         trackClientEvent('quiz_completed', {
           articleSlug,
           locale,
-          metadata: { questions_count: quiz.questions.length }
+          metadata: {
+            questions_count: quiz.questions.length,
+            verdict
+          }
         });
       }
       return next;
@@ -980,10 +995,21 @@ export function SomaticQuizWidget({
     setSelectedAnswers(prev => {
       const next = { ...prev, [qId]: optIdx };
       if (Object.keys(next).length === questions.length && Object.keys(prev).length < questions.length) {
+        let sprout = identifiedSprout;
+        const o1 = questions[0]?.options[next['q1_tension_area'] ?? 0];
+        const o2 = questions[1]?.options[next['q2_racing_thought'] ?? 0];
+        if (o1?.sprout) sprout = o1.sprout;
+        else if (o2?.sprout) sprout = o2.sprout;
+
         trackClientEvent('quiz_completed', {
           articleSlug,
           locale,
-          metadata: { quiz_type: 'somatic_screener', questions_count: questions.length }
+          metadata: {
+            quiz_type: 'somatic_screener',
+            questions_count: questions.length,
+            sprout,
+            verdict: 'safe'
+          }
         });
       }
       return next;
