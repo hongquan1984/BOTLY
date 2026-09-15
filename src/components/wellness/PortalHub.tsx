@@ -10,6 +10,7 @@ import { ArticleCard } from "./ArticleCard";
 import { VideoCard, type VideoItem } from "./VideoCard";
 import { BiomedicalHeroHub } from "./BiomedicalHeroHub";
 import { FeaturedToolConsole } from "./FeaturedToolConsole";
+import { HealingSanctuaryHub } from "./HealingSanctuaryHub";
 
 export async function PortalHub({ locale, portal }: { locale: WellnessLocale; portal: Portal }) {
   const vi = locale === "vi";
@@ -47,6 +48,19 @@ export async function PortalHub({ locale, portal }: { locale: WellnessLocale; po
       categoryName: portal.name,
     });
     if (videos.length >= 3) break;
+  }
+
+  if (portal.id === "healing") {
+    return (
+      <WellnessShell locale={locale}>
+        <HealingSanctuaryHub
+          locale={locale}
+          portal={portal}
+          articles={articles}
+          videos={videos}
+        />
+      </WellnessShell>
+    );
   }
 
   return (
