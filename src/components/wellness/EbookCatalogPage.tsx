@@ -155,6 +155,9 @@ export function EbookCatalogPage({ locale }: { locale: WellnessLocale }) {
                         alt={title}
                         className="h-full w-full object-cover transition duration-500 hover:scale-105"
                         loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = "/ebooks/blood-sugar/lentils-rice-hero.png";
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs font-bold">
