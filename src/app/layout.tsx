@@ -4,6 +4,7 @@ import { siteConfig } from "@/data/site";
 import { JsonLd } from "@/components/sections/JsonLd";
 import { ToastProvider } from "@/components/layout/ToastProvider";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
+import { MonetagInPagePush } from "@/components/monetag/MonetagInPagePush";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,6 +21,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
+  verification: {
+    google: "fgxRfdqGUzMGmQFxW1WEhlBOLYyUFZanclS2lVBY1VI",
+    other: {
+      "google-site-verification": "fgxRfdqGUzMGmQFxW1WEhlBOLYyUFZanclS2lVBY1VI",
+      "mylead-verification": "4d9b36e2182769ce219a6ab4f8104424",
+    },
+  },
   title: {
     default: "Botly Wellness – Eat better. Feel calmer. Live mindfully.",
     template: `%s | ${siteConfig.name}`,
@@ -82,6 +90,7 @@ export default function RootLayout({
       >
         <JsonLd />
         <AnalyticsTracker />
+        <MonetagInPagePush />
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

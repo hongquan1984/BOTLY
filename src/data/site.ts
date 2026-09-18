@@ -1,10 +1,13 @@
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.botly.vn";
+const siteUrl = rawSiteUrl.replace(/^https?:\/\/botly\.vn(?:\/|$)/i, "https://www.botly.vn").replace(/\/$/, "");
+
 export const siteConfig = {
   name: "Botly",
   shortName: "Botly",
   tagline: "Tự động hóa doanh nghiệp bằng AI để giảm chi phí, tăng năng suất và vận hành 24/7.",
   description:
     "Xây dựng hệ thống AI Automation, AI Livestream, chatbot, marketing automation và công cụ tự động hóa giúp doanh nghiệp giảm chi phí, tăng năng suất và vận hành hiệu quả.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://aiflow-automation.vercel.app",
+  url: siteUrl,
   locale: "vi_VN",
   contact: {
     email: "lienhe@botly.vn",

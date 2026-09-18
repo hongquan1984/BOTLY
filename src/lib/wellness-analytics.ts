@@ -1,4 +1,10 @@
-export type WellnessEvent = "tool_started" | "tool_completed" | "guide_opened" | "newsletter_submitted";
+export type WellnessEvent =
+  | "tool_started"
+  | "tool_completed"
+  | "guide_opened"
+  | "newsletter_submitted"
+  | "ebook_downloaded"
+  | "ebook_download_unlocked";
 
 export function trackWellness(event: WellnessEvent, properties: Record<string, string | number | boolean> = {}) {
   if (typeof window === "undefined") return;

@@ -226,8 +226,38 @@ export function SafetyQuizWidget({
 
   const handleSelect = (qId: string, optIdx: number) => {
     setSelectedAnswers(prev => {
+      const isFirstAnswer = Object.keys(prev).length === 0;
       const next = { ...prev, [qId]: optIdx };
-      if (Object.keys(next).length === quiz.questions.length && Object.keys(prev).length < quiz.questions.length) {
+      const nextCount = Object.keys(next).length;
+      const prevCount = Object.keys(prev).length;
+
+      // Track when user first starts the quiz
+      if (isFirstAnswer) {
+        trackClientEvent('quiz_started', {
+          articleSlug,
+          locale,
+          metadata: {
+            quiz_type: 'safety_quiz',
+            first_question_id: qId,
+            total_questions: quiz.questions.length
+          }
+        });
+      } else if (nextCount > prevCount && nextCount < quiz.questions.length) {
+        // Track each in-between question step
+        trackClientEvent('quiz_step_progress', {
+          articleSlug,
+          locale,
+          metadata: {
+            quiz_type: 'safety_quiz',
+            step: nextCount,
+            total_questions: quiz.questions.length,
+            question_id: qId
+          }
+        });
+      }
+
+      // Track quiz completion when all questions answered
+      if (nextCount === quiz.questions.length && prevCount < quiz.questions.length) {
         let isContra = false;
         let hasWarn = false;
         quiz.questions.forEach((q) => {
@@ -244,6 +274,7 @@ export function SafetyQuizWidget({
           articleSlug,
           locale,
           metadata: {
+            quiz_type: 'safety_quiz',
             questions_count: quiz.questions.length,
             verdict
           }
@@ -993,8 +1024,37 @@ export function SomaticQuizWidget({
 
   const handleSelect = (qId: string, optIdx: number) => {
     setSelectedAnswers(prev => {
+      const isFirstAnswer = Object.keys(prev).length === 0;
       const next = { ...prev, [qId]: optIdx };
-      if (Object.keys(next).length === questions.length && Object.keys(prev).length < questions.length) {
+      const nextCount = Object.keys(next).length;
+      const prevCount = Object.keys(prev).length;
+
+      // Track when user first starts the somatic quiz
+      if (isFirstAnswer) {
+        trackClientEvent('quiz_started', {
+          articleSlug,
+          locale,
+          metadata: {
+            quiz_type: 'somatic_screener',
+            first_question_id: qId,
+            total_questions: questions.length
+          }
+        });
+      } else if (nextCount > prevCount && nextCount < questions.length) {
+        // Track intermediate steps
+        trackClientEvent('quiz_step_progress', {
+          articleSlug,
+          locale,
+          metadata: {
+            quiz_type: 'somatic_screener',
+            step: nextCount,
+            total_questions: questions.length,
+            question_id: qId
+          }
+        });
+      }
+
+      if (nextCount === questions.length && prevCount < questions.length) {
         let sprout = identifiedSprout;
         const o1 = questions[0]?.options[next['q1_tension_area'] ?? 0];
         const o2 = questions[1]?.options[next['q2_racing_thought'] ?? 0];

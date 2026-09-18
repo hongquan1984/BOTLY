@@ -148,13 +148,46 @@ export function HealingSanctuaryHub({
 
   const handleSelectOption = (questionId: 'q1' | 'q2' | 'q3', value: string) => {
     setQuizAnswers(prev => ({ ...prev, [questionId]: value }));
+
+    // Track initial start when answering Q1
+    if (quizStep === 1) {
+      trackClientEvent('quiz_started', {
+        locale,
+        metadata: {
+          source: 'healing_hub_screener',
+          quiz_type: 'somatic_screener',
+          question_id: questionId,
+          value,
+          total_questions: 3
+        }
+      });
+    } else if (quizStep < 3) {
+      // Track intermediate steps (Q2)
+      trackClientEvent('quiz_step_progress', {
+        locale,
+        metadata: {
+          source: 'healing_hub_screener',
+          quiz_type: 'somatic_screener',
+          step: quizStep,
+          question_id: questionId,
+          value,
+          total_questions: 3
+        }
+      });
+    }
+
     if (quizStep < 3) {
       setQuizStep(prev => prev + 1);
     } else {
       setQuizStep(4); // completed
       trackClientEvent('quiz_completed', {
         locale,
-        metadata: { source: 'healing_hub_screener', answers: { ...quizAnswers, [questionId]: value } }
+        metadata: {
+          source: 'healing_hub_screener',
+          quiz_type: 'somatic_screener',
+          answers: { ...quizAnswers, [questionId]: value },
+          total_questions: 3
+        }
       });
     }
   };

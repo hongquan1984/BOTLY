@@ -1,11 +1,48 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Activity, Check, Pause, Play, RotateCcw, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Activity, BookOpen, Check, Download, Pause, Play, RotateCcw, Sparkles } from "lucide-react";
 import type { WellnessLocale } from "@/data/wellness";
 import { trackWellness } from "@/lib/wellness-analytics";
 
 const combinations = [
+  {
+    ingredients: ["rice", "lentils"],
+    en: "Lentils + White Rice",
+    vi: "Đậu lăng + Cơm trắng",
+    whyEn: "Replacing 50% of rice carbohydrate with cooked lentils significantly blunted post-meal blood glucose rise (Human crossover RCT).",
+    whyVi: "Thay 50% tinh bột cơm bằng đậu lăng nấu chín giúp giảm đáng kể đỉnh đường huyết sau ăn (Thử nghiệm lâm sàng có đối chứng trên người).",
+    evidenceBadge: "RCT Verified",
+    guideSlug: "lentils-rice-blood-sugar",
+  },
+  {
+    ingredients: ["oats", "berries"],
+    en: "Oats + Berries",
+    vi: "Yến mạch + Quả mọng",
+    whyEn: "Viscous oat beta-glucan slows starch absorption; berry polyphenols help flatten early glucose spikes.",
+    whyVi: "Chất xơ hòa tan beta-glucan làm chậm hấp thu đường; anthocyanin trong quả mọng giúp làm dịu đỉnh glucose ban đầu.",
+    evidenceBadge: "Clinical Review",
+    guideSlug: "oats-berries-blood-sugar",
+  },
+  {
+    ingredients: ["onion", "honey"],
+    en: "Onion + Honey",
+    vi: "Hành tây + Mật ong",
+    whyEn: "Myth-check: Honey is predominantly free sugars (glucose & fructose). No evidence onions offset this glycemic load.",
+    whyVi: "Kiểm chứng: Mật ong là đường tự do. Chưa có thử nghiệm lâm sàng nào chứng minh hành tây có thể hóa giải lượng đường này.",
+    evidenceBadge: "Myth-Check",
+    guideSlug: "onion-honey-blood-sugar",
+  },
+  {
+    ingredients: ["beans", "toast"],
+    en: "Beans + Whole Toast",
+    vi: "Đậu hầm + Bánh mì nướng",
+    whyEn: "Pulse protein & fibre matrix slows systemic carbohydrate absorption from bread, moderating insulin responses.",
+    whyVi: "Mạng lưới đạm và chất xơ từ các loại đậu làm chậm quá trình tiêu hóa tinh bột bánh mì, hạ thấp phản ứng insulin.",
+    evidenceBadge: "Acute Trial",
+    guideSlug: "beans-toast-blood-sugar",
+  },
   { ingredients: ["oats", "yogurt", "banana"], en: "Oats, yogurt & banana", vi: "Yến mạch, sữa chua và chuối", whyEn: "Fiber, protein and an easy source of fruit.", whyVi: "Chất xơ, đạm và một phần trái cây dễ chuẩn bị." },
   { ingredients: ["eggs", "spinach", "rice"], en: "Egg, greens & rice bowl", vi: "Cơm, trứng và rau xanh", whyEn: "A practical mix of protein, vegetables and carbohydrate.", whyVi: "Kết hợp thực tế giữa đạm, rau và tinh bột." },
   { ingredients: ["tofu", "tomato", "rice"], en: "Tofu, tomato & rice", vi: "Đậu phụ, cà chua và cơm", whyEn: "Plant protein with vegetables and a satisfying staple.", whyVi: "Đạm thực vật, rau và món tinh bột tạo cảm giác no." },
@@ -72,11 +109,115 @@ export function MeditationTool({ locale }: { locale: WellnessLocale }) {
 
 export function FoodCombinationTool({ locale }: { locale: WellnessLocale }) {
   const vi = locale === "vi";
-  const options = [["oats", "Yến mạch", "Oats"], ["yogurt", "Sữa chua", "Yogurt"], ["banana", "Chuối", "Banana"], ["eggs", "Trứng", "Eggs"], ["spinach", "Rau xanh", "Greens"], ["rice", "Cơm", "Rice"], ["tofu", "Đậu phụ", "Tofu"], ["tomato", "Cà chua", "Tomato"], ["chicken", "Thịt gà", "Chicken"], ["broccoli", "Bông cải", "Broccoli"], ["sweet-potato", "Khoai lang", "Sweet potato"]];
-  const [selected, setSelected] = useState<string[]>(["oats", "banana"]);
-  const results = combinations.filter(c => c.ingredients.some(i => selected.includes(i))).sort((a,b) => b.ingredients.filter(i => selected.includes(i)).length - a.ingredients.filter(i => selected.includes(i)).length).slice(0,3);
+  const guidePath = (slug: string) => {
+    if (vi) {
+      if (slug === "lentils-rice-blood-sugar") return "/vi/song-khoe/huong-dan/dau-lang-va-com-duong-huyet";
+      if (slug === "oats-berries-blood-sugar") return "/vi/song-khoe/huong-dan/yen-mach-va-qua-mong-duong-huyet";
+      if (slug === "onion-honey-blood-sugar") return "/vi/song-khoe/huong-dan/hanh-tay-va-mat-ong-duong-huyet";
+      if (slug === "beans-toast-blood-sugar") return "/vi/song-khoe/huong-dan/dau-va-banh-mi-duong-huyet";
+      return "/vi/song-khoe/ebooks/duong-huyet";
+    }
+    return `/en/wellness/guides/${slug}`;
+  };
+
+  const options = [
+    ["rice", "Cơm", "Rice"],
+    ["lentils", "Đậu lăng", "Lentils"],
+    ["oats", "Yến mạch", "Oats"],
+    ["berries", "Quả mọng", "Berries"],
+    ["beans", "Đậu hầm", "Beans"],
+    ["toast", "Bánh mì", "Toast"],
+    ["onion", "Hành tây", "Onion"],
+    ["honey", "Mật ong", "Honey"],
+    ["yogurt", "Sữa chua", "Yogurt"],
+    ["banana", "Chuối", "Banana"],
+    ["eggs", "Trứng", "Eggs"],
+    ["spinach", "Rau xanh", "Greens"],
+    ["tofu", "Đậu phụ", "Tofu"],
+    ["tomato", "Cà chua", "Tomato"],
+    ["chicken", "Thịt gà", "Chicken"],
+    ["broccoli", "Bông cải", "Broccoli"],
+    ["sweet-potato", "Khoai lang", "Sweet potato"]
+  ];
+
+  const [selected, setSelected] = useState<string[]>(["rice", "lentils"]);
+  const results = combinations.filter(c => c.ingredients.some(i => selected.includes(i))).sort((a,b) => b.ingredients.filter(i => selected.includes(i)).length - a.ingredients.filter(i => selected.includes(i)).length).slice(0, 4);
   const toggle = (id: string) => { setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]); trackWellness("tool_started", { tool: "food-combinations", locale }); };
-  return <div className="tool-panel"><div className="mb-6"><h3>{vi ? "Bạn đang có nguyên liệu gì?" : "What ingredients do you have?"}</h3><p>{vi ? "Chọn ít nhất một nguyên liệu để tìm kết hợp cân bằng." : "Pick at least one ingredient to find a balanced combination."}</p></div><div className="flex flex-wrap gap-2">{options.map(([id, viName, enName]) => <button key={id} onClick={() => toggle(id)} className={`rounded-full border px-4 py-2 text-sm font-semibold ${selected.includes(id) ? "border-[#18302b] bg-[#18302b] text-white" : "border-[#18302b]/10 bg-white"}`}>{vi ? viName : enName}</button>)}</div><div className="mt-7 grid gap-3 md:grid-cols-3">{results.map(result => <div key={result.en} className="rounded-2xl bg-white p-5"><span className="text-xl">🥗</span><h4 className="mt-5 font-semibold">{vi ? result.vi : result.en}</h4><p className="mt-2 text-sm leading-6">{vi ? result.whyVi : result.whyEn}</p></div>)}</div><p className="mt-5 text-xs leading-5 text-[#667970]">{vi ? "Gợi ý mang tính giáo dục, chưa tính khẩu phần, dị ứng hoặc nhu cầu y tế cá nhân." : "Educational ideas only; portions, allergies and individual medical needs are not assessed."}</p></div>;
+
+  return (
+    <div className="tool-panel">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3>{vi ? "Bạn đang có nguyên liệu gì?" : "What ingredients do you have?"}</h3>
+          <p>{vi ? "Chọn nguyên liệu để kiểm chứng kết hợp dinh dưỡng và đường huyết." : "Pick ingredients to test nutritional balance and blood sugar impact."}</p>
+        </div>
+        <Link
+          href={vi ? "/vi/song-khoe/ebooks/duong-huyet" : "/en/wellness/ebooks/blood-sugar-pairings"}
+          className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3.5 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-200 transition shrink-0"
+        >
+          <BookOpen className="h-3.5 w-3.5" />
+          <span>{vi ? "Tải Cẩm Nang Ebook PDF" : "Get Blood Sugar Ebook (PDF)"}</span>
+        </Link>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {options.map(([id, viName, enName]) => (
+          <button
+            key={id}
+            onClick={() => toggle(id)}
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition cursor-pointer ${selected.includes(id) ? "border-[#18302b] bg-[#18302b] text-white" : "border-[#18302b]/15 bg-white text-slate-700 hover:bg-slate-50"}`}
+          >
+            {vi ? viName : enName}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-7 grid gap-4 sm:grid-cols-2">
+        {results.map(result => (
+          <div key={result.en} className="flex flex-col justify-between rounded-2xl bg-white p-5 border border-slate-200 shadow-sm">
+            <div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xl">🥗</span>
+                {"evidenceBadge" in result && result.evidenceBadge && (
+                  <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
+                    {result.evidenceBadge}
+                  </span>
+                )}
+              </div>
+              <h4 className="mt-3 font-bold text-base text-slate-900">{vi ? result.vi : result.en}</h4>
+              <p className="mt-2 text-xs sm:text-sm leading-relaxed text-slate-600">{vi ? result.whyVi : result.whyEn}</p>
+            </div>
+
+            {"guideSlug" in result && result.guideSlug && (
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <Link
+                  href={guidePath(result.guideSlug as string)}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 hover:underline"
+                >
+                  <span>{vi ? "Xem nghiên cứu lâm sàng" : "Read clinical research"} →</span>
+                </Link>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 rounded-2xl bg-[#f2f7f1] p-4 border border-emerald-800/15 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p className="text-xs text-[#526b62] leading-relaxed">
+          {vi
+            ? "Bốn cặp thực phẩm y sinh đã được xuất bản thành cẩm nang Ebook 11 trang miễn phí có đầy đủ tài liệu PubMed."
+            : "Four everyday pairs are compiled in our free 11-page evidence handbook with complete PubMed citations."}
+        </p>
+        <Link
+          href={vi ? "/vi/song-khoe/ebooks/duong-huyet" : "/en/wellness/ebooks/blood-sugar-pairings"}
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[#18302b] px-4 py-2 text-xs font-bold text-white hover:bg-[#27483a] transition shrink-0"
+        >
+          <Download className="h-3.5 w-3.5 text-amber-300" />
+          <span>{vi ? "Tải Ebook PDF (5.6 MB)" : "Download PDF (5.6 MB)"}</span>
+        </Link>
+      </div>
+    </div>
+  );
 }
 
 export function RemedyChecker({ locale }: { locale: WellnessLocale }) {

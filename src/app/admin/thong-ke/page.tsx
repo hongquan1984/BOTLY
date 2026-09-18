@@ -31,8 +31,13 @@ import {
 interface SummaryData {
   total_page_views: number;
   today_page_views: number;
+  total_quiz_starts?: number;
+  today_quiz_starts?: number;
   total_quiz_completions: number;
   today_quiz_completions: number;
+  total_quiz_in_progress?: number;
+  quiz_drop_off_rate?: number;
+  quiz_completion_rate?: number;
   total_app_clicks?: number;
   today_app_clicks?: number;
   app_clicks_ios?: number;
@@ -48,7 +53,9 @@ interface SummaryData {
 interface DailyRecord {
   day: string;
   page_views: number;
+  quiz_starts?: number;
   quiz_completions: number;
+  quiz_drop_offs?: number;
   leads: number;
   app_clicks?: number;
 }
@@ -58,11 +65,25 @@ interface ArticleRecord {
   title: string;
   locale: string;
   views: number;
+  quiz_starts?: number;
   quiz_completions: number;
+  quiz_drop_offs?: number;
+  quiz_drop_off_rate?: number;
   app_clicks?: number;
   leads: number;
   quiz_rate: number;
   conversion_rate: number;
+}
+
+interface StaticPageRecord {
+  path: string;
+  title: string;
+  locale: string;
+  views: number;
+  quiz_starts: number;
+  quiz_completions: number;
+  quiz_drop_offs: number;
+  app_clicks: number;
 }
 
 interface SubscriberRecord {
@@ -89,12 +110,16 @@ interface RecentQuizRecord {
   article_slug: string;
   locale: string;
   path: string;
+  event_type?: string;
   metadata: {
     verdict?: string;
     completion_seconds?: number;
     questions_count?: number;
+    total_questions?: number;
+    step?: number;
     sprout?: string;
     quiz_type?: string;
+    source?: string;
   };
   created_at: string;
 }
@@ -103,6 +128,7 @@ interface AnalyticsPayload {
   summary: SummaryData;
   daily: DailyRecord[];
   articles: ArticleRecord[];
+  static_pages?: StaticPageRecord[];
   subscribers: SubscriberRecord[];
   devices: DeviceRecord[];
   referrers: ReferrerRecord[];
@@ -114,7 +140,7 @@ export default function AdminAnalyticsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDays, setSelectedDays] = useState<number>(7);
-  const [activeTab, setActiveTab] = useState<'subscribers' | 'articles' | 'quizzes' | 'devices'>('subscribers');
+  const [activeTab, setActiveTab] = useState<'subscribers' | 'articles' | 'static_pages' | 'quizzes' | 'devices'>('subscribers');
 
   // Search and filters for subscribers
   const [searchEmail, setSearchEmail] = useState<string>('');
@@ -339,25 +365,32 @@ export default function AdminAnalyticsPage() {
             </p>
           </div>
 
-          {/* Card 2: Quizzes Completed */}
+          {/* Card 2: Quizzes Funnel (Starts, Drop-offs, Completions) */}
           <div className="rounded-3xl border border-amber-900/40 bg-gradient-to-b from-[#211d14] to-[#17140d] p-5 shadow-lg shadow-black/20">
             <div className="flex items-center justify-between text-amber-400">
-              <span className="text-xs font-semibold uppercase tracking-wider text-amber-300/70">Số Lượt Làm Quiz</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-amber-300/70">Tương Tác Quiz</span>
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-900/40 text-amber-300">
                 <CheckCircle2 className="h-5 w-5" />
               </div>
             </div>
             <div className="mt-3">
               <span className="text-3xl font-extrabold text-white tracking-tight">
-                {data?.summary?.total_quiz_completions?.toLocaleString('vi-VN') || 0}
+                {(data?.summary?.total_quiz_starts && data.summary.total_quiz_starts > 0 ? data.summary.total_quiz_starts : data?.summary?.total_quiz_completions || 0).toLocaleString('vi-VN')}
               </span>
               <span className="ml-2 text-xs font-medium text-amber-300 bg-amber-950/80 border border-amber-800/40 px-2 py-0.5 rounded-md">
-                +{data?.summary?.today_quiz_completions || 0} hôm nay
+                +{data?.summary?.today_quiz_starts || data?.summary?.today_quiz_completions || 0} hôm nay
               </span>
             </div>
-            <p className="mt-2 text-xs text-amber-200/50">
-              Độc giả hoàn tất trắc nghiệm an toàn hoặc trắc nghiệm thể cảm
-            </p>
+            <div className="mt-2 flex flex-col gap-1 text-xs">
+              <div className="flex items-center justify-between text-emerald-300 font-medium">
+                <span>✓ Xong 100%:</span>
+                <span className="font-bold">{data?.summary?.total_quiz_completions || 0} lượt</span>
+              </div>
+              <div className="flex items-center justify-between text-amber-400/90 font-medium">
+                <span>⏳ Bỏ dở giữa chừng:</span>
+                <span className="font-bold">{data?.summary?.total_quiz_in_progress || 0} ({data?.summary?.quiz_drop_off_rate || 0}%)</span>
+              </div>
+            </div>
           </div>
 
           {/* Card 3: App Download Clicks */}
@@ -509,7 +542,8 @@ export default function AdminAnalyticsPage() {
           <nav className="flex space-x-2 sm:space-x-8 overflow-x-auto pb-px">
             {[
               { id: 'subscribers', label: `💌 Danh Sách Email (${data?.subscribers?.length || 0})` },
-              { id: 'articles', label: `📊 Hiệu Quả Từng Bài Viết (${data?.articles?.length || 0})` },
+              { id: 'articles', label: `📊 Bài Viết (${data?.articles?.length || 0})` },
+              { id: 'static_pages', label: `🌐 Trang Tĩnh & Hubs Toàn Trang (${data?.static_pages?.length || 0})` },
               { id: 'quizzes', label: `🧪 Nhật Ký Quiz Gần Đây (${data?.recent_quizzes?.length || 0})` },
               { id: 'devices', label: `📱 Thiết Bị & Nguồn Đến` }
             ].map(tab => (
@@ -670,9 +704,9 @@ export default function AdminAnalyticsPage() {
         {/* TAB 2: ARTICLE PERFORMANCE */}
         {activeTab === 'articles' && (
           <div className="mt-6 rounded-3xl border border-emerald-900/40 bg-[#111f1c] p-5 shadow-xl shadow-black/20">
-            <h3 className="text-base font-bold text-white mb-1">Hiệu Quả Từng Bài Viết Y Sinh</h3>
+            <h3 className="text-base font-bold text-white mb-1">Hiệu Quả Từng Bài Viết Y Sinh & Chữa Lành</h3>
             <p className="text-xs text-emerald-300/60 mb-4">
-              Xếp hạng theo lượt xem, số người tham gia trắc nghiệm và số lượng khách hàng tiềm năng thu được
+              Xếp hạng theo lượt xem, tỷ lệ bắt đầu làm quiz, bỏ dở giữa chừng (dang dở), hoàn tất 100% và chuyển đổi tải app / email
             </p>
 
             <div className="overflow-x-auto">
@@ -682,10 +716,12 @@ export default function AdminAnalyticsPage() {
                     <th className="py-3 px-4">Tên Bài Viết & Slug</th>
                     <th className="py-3 px-4 text-center">Ngôn Ngữ</th>
                     <th className="py-3 px-4 text-right">Lượt Xem</th>
-                    <th className="py-3 px-4 text-right">Làm Quiz</th>
+                    <th className="py-3 px-4 text-right">Bắt Đầu Quiz</th>
+                    <th className="py-3 px-4 text-right">Xong 100%</th>
+                    <th className="py-3 px-4 text-right">Dang Dở</th>
                     <th className="py-3 px-4 text-right">Click Tải App</th>
                     <th className="py-3 px-4 text-right">Email Thu Được</th>
-                    <th className="py-3 px-4 text-right">Tỷ Lệ Quiz (%)</th>
+                    <th className="py-3 px-4 text-right">Tỷ Lệ Bỏ Dở</th>
                     <th className="py-3 px-4 text-center">Liên Kết</th>
                   </tr>
                 </thead>
@@ -696,6 +732,8 @@ export default function AdminAnalyticsPage() {
                         art.locale === 'vi'
                           ? `/vi/song-khoe/huong-dan/${art.article_slug}`
                           : `/en/wellness/guides/${art.article_slug}`;
+                      const starts = art.quiz_starts && art.quiz_starts > 0 ? art.quiz_starts : art.quiz_completions;
+                      const dropOffs = art.quiz_drop_offs || 0;
 
                       return (
                         <tr key={idx} className="hover:bg-emerald-950/20 transition-colors">
@@ -709,11 +747,19 @@ export default function AdminAnalyticsPage() {
                             </span>
                           </td>
                           <td className="py-3.5 px-4 text-right font-bold text-white">{art.views}</td>
-                          <td className="py-3.5 px-4 text-right font-bold text-amber-300">{art.quiz_completions}</td>
+                          <td className="py-3.5 px-4 text-right font-bold text-indigo-300">{starts}</td>
+                          <td className="py-3.5 px-4 text-right font-bold text-emerald-300">{art.quiz_completions}</td>
+                          <td className="py-3.5 px-4 text-right font-bold text-amber-400">
+                            {dropOffs > 0 ? `${dropOffs}` : '0'}
+                          </td>
                           <td className="py-3.5 px-4 text-right font-bold text-purple-300">{art.app_clicks || 0}</td>
                           <td className="py-3.5 px-4 text-right font-bold text-teal-300">{art.leads}</td>
-                          <td className="py-3.5 px-4 text-right font-mono text-emerald-400">
-                            {art.quiz_rate}%
+                          <td className="py-3.5 px-4 text-right font-mono text-xs">
+                            {dropOffs > 0 ? (
+                              <span className="text-amber-400 font-semibold">{art.quiz_drop_off_rate ?? 0}%</span>
+                            ) : (
+                              <span className="text-emerald-400/70">0%</span>
+                            )}
                           </td>
                           <td className="py-3.5 px-4 text-center">
                             <Link
@@ -729,8 +775,72 @@ export default function AdminAnalyticsPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={8} className="py-8 text-center text-sm text-emerald-400/50">
+                      <td colSpan={10} className="py-8 text-center text-sm text-emerald-400/50">
                         Chưa có dữ liệu bài viết
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: STATIC PAGES & HUBS */}
+        {activeTab === 'static_pages' && (
+          <div className="mt-6 rounded-3xl border border-emerald-900/40 bg-[#111f1c] p-5 shadow-xl shadow-black/20">
+            <h3 className="text-base font-bold text-white mb-1">Lưu Lượng & Tương Tác Các Trang Tĩnh Toàn Trang Web</h3>
+            <p className="text-xs text-emerald-300/60 mb-4">
+              Theo dõi lượt truy cập, bắt đầu trắc nghiệm, bỏ dở và click tải app trên Trang chủ, Hub Chữa Lành, Công cụ y sinh...
+            </p>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-emerald-900/40 text-xs font-semibold uppercase tracking-wider text-emerald-300/70">
+                    <th className="py-3 px-4">Tên Trang & Đường Dẫn</th>
+                    <th className="py-3 px-4 text-center">Ngôn Ngữ</th>
+                    <th className="py-3 px-4 text-right">Lượt Xem Toàn Bộ</th>
+                    <th className="py-3 px-4 text-right">Bắt Đầu Quiz</th>
+                    <th className="py-3 px-4 text-right">Xong 100%</th>
+                    <th className="py-3 px-4 text-right">Dang Dở</th>
+                    <th className="py-3 px-4 text-right">Click Tải App</th>
+                    <th className="py-3 px-4 text-center">Liên Kết</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-emerald-900/30">
+                  {data?.static_pages && data.static_pages.length > 0 ? (
+                    data.static_pages.map((sp, idx) => (
+                      <tr key={idx} className="hover:bg-emerald-950/20 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <p className="font-semibold text-white">{sp.title}</p>
+                          <p className="text-xs text-emerald-400/50 font-mono truncate max-w-sm">{sp.path}</p>
+                        </td>
+                        <td className="py-3.5 px-4 text-center">
+                          <span className="rounded-md bg-[#0c1815] border border-emerald-900/60 px-2 py-0.5 text-xs font-mono uppercase text-emerald-400">
+                            {sp.locale}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-bold text-white">{sp.views}</td>
+                        <td className="py-3.5 px-4 text-right font-bold text-indigo-300">{sp.quiz_starts}</td>
+                        <td className="py-3.5 px-4 text-right font-bold text-emerald-300">{sp.quiz_completions}</td>
+                        <td className="py-3.5 px-4 text-right font-bold text-amber-400">{sp.quiz_drop_offs}</td>
+                        <td className="py-3.5 px-4 text-right font-bold text-purple-300">{sp.app_clicks}</td>
+                        <td className="py-3.5 px-4 text-center">
+                          <Link
+                            href={sp.path}
+                            target="_blank"
+                            className="inline-flex items-center gap-1 rounded-lg border border-emerald-800/40 bg-emerald-950/50 px-2.5 py-1 text-xs text-emerald-300 hover:bg-emerald-900 hover:text-white transition-all"
+                          >
+                            Xem <ExternalLink className="h-3 w-3" />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center text-sm text-emerald-400/50">
+                        Chưa có dữ liệu trang tĩnh
                       </td>
                     </tr>
                   )}
@@ -764,24 +874,41 @@ export default function AdminAnalyticsPage() {
                       <div className="flex items-center gap-3">
                         <span
                           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl font-bold ${
-                            isContra
+                            quizItem.event_type === 'quiz_started'
+                              ? 'bg-indigo-950 text-indigo-400 border border-indigo-800/50'
+                              : isContra
                               ? 'bg-rose-950 text-rose-400 border border-rose-800/40'
                               : isCaution
                               ? 'bg-amber-950 text-amber-400 border border-amber-800/40'
                               : 'bg-emerald-950 text-emerald-400 border border-emerald-800/40'
                           }`}
                         >
-                          {isContra ? '!' : isCaution ? '⚠' : '✓'}
+                          {quizItem.event_type === 'quiz_started' ? '▶' : isContra ? '!' : isCaution ? '⚠' : '✓'}
                         </span>
                         <div>
-                          <p className="font-semibold text-white text-sm">
-                            {quizItem.article_slug || quizItem.path}
-                          </p>
-                          <p className="text-emerald-400/60 mt-0.5">
-                            Phán quyết: {isContra ? 'Có yếu tố chống chỉ định' : isCaution ? 'Cần thận trọng & giảm liều' : 'Phù hợp an toàn'}
-                            {sprout && <span className="ml-2 text-indigo-300">• Đồng hành: {sprout}</span>}
-                            {quizItem.metadata?.completion_seconds && (
-                              <span className="ml-2 font-mono">({quizItem.metadata.completion_seconds}s)</span>
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-white text-sm">
+                              {quizItem.article_slug || quizItem.path}
+                            </p>
+                            <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase ${
+                              quizItem.event_type === 'quiz_started'
+                                ? 'bg-indigo-950/80 border border-indigo-700/60 text-indigo-300'
+                                : 'bg-emerald-950/80 border border-emerald-700/60 text-emerald-300'
+                            }`}>
+                              {quizItem.event_type === 'quiz_started' ? 'Bắt đầu làm' : 'Hoàn thành 100%'}
+                            </span>
+                          </div>
+                          <p className="text-emerald-400/60 mt-0.5 text-xs">
+                            {quizItem.event_type === 'quiz_started' ? (
+                              <span>Độc giả vừa bấm làm câu hỏi đầu tiên • Loại quiz: <span className="text-indigo-300 font-mono">{quizItem.metadata?.quiz_type || 'safety_quiz'}</span></span>
+                            ) : (
+                              <>
+                                Phán quyết: {isContra ? 'Có yếu tố chống chỉ định' : isCaution ? 'Cần thận trọng & giảm liều' : 'Phù hợp an toàn'}
+                                {sprout && <span className="ml-2 text-indigo-300">• Đồng hành: {sprout}</span>}
+                                {quizItem.metadata?.completion_seconds && (
+                                  <span className="ml-2 font-mono">({quizItem.metadata.completion_seconds}s)</span>
+                                )}
+                              </>
                             )}
                           </p>
                         </div>

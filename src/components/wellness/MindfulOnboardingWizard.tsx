@@ -160,7 +160,28 @@ export function MindfulOnboardingWizard({
 
   const goToStep = (step: number) => {
     setCurrentStep(step);
-    trackClientEvent('onboarding_step_view', { locale, metadata: { step } });
+    trackClientEvent('onboarding_step_view', { articleSlug, locale, metadata: { step } });
+    if (step > 1 && step < 5) {
+      trackClientEvent('quiz_step_progress', {
+        articleSlug,
+        locale,
+        metadata: {
+          quiz_type: 'mindful_onboarding',
+          step,
+          total_steps: 5
+        }
+      });
+    } else if (step === 5) {
+      trackClientEvent('quiz_completed', {
+        articleSlug,
+        locale,
+        metadata: {
+          quiz_type: 'mindful_onboarding',
+          completed: true,
+          total_steps: 5
+        }
+      });
+    }
     if (step === 3 && !isBreathing) {
       setBreathSecond(0);
       setIsBreathing(true);
@@ -293,7 +314,17 @@ export function MindfulOnboardingWizard({
                     type="button"
                     onClick={() => {
                       setSelectedSignal(sig);
-                      trackClientEvent('onboarding_signal_selected', { locale, metadata: { signal: sig } });
+                      trackClientEvent('onboarding_signal_selected', { articleSlug, locale, metadata: { signal: sig } });
+                      trackClientEvent('quiz_started', {
+                        articleSlug,
+                        locale,
+                        metadata: {
+                          quiz_type: 'mindful_onboarding',
+                          signal: sig,
+                          step: 1,
+                          total_steps: 5
+                        }
+                      });
                     }}
                     className={`flex items-center gap-3 rounded-2xl border p-4 text-left text-sm font-semibold transition cursor-pointer ${
                       isSelected
