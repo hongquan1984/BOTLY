@@ -25,7 +25,8 @@ import {
   Unlock,
   EyeOff,
   Flame,
-  FileSpreadsheet
+  FileSpreadsheet,
+  BookOpen
 } from 'lucide-react';
 
 interface SummaryData {
@@ -38,6 +39,12 @@ interface SummaryData {
   total_quiz_in_progress?: number;
   quiz_drop_off_rate?: number;
   quiz_completion_rate?: number;
+  total_ebook_downloads?: number;
+  today_ebook_downloads?: number;
+  ebook_direct_downloads?: number;
+  ebook_unlock_downloads?: number;
+  ebook_subscribers?: number;
+  today_ebook_subscribers?: number;
   total_app_clicks?: number;
   today_app_clicks?: number;
   app_clicks_ios?: number;
@@ -58,6 +65,7 @@ interface DailyRecord {
   quiz_drop_offs?: number;
   leads: number;
   app_clicks?: number;
+  ebook_downloads?: number;
 }
 
 interface ArticleRecord {
@@ -84,6 +92,30 @@ interface StaticPageRecord {
   quiz_completions: number;
   quiz_drop_offs: number;
   app_clicks: number;
+}
+
+interface EbookBreakdownRecord {
+  ebook_id: string;
+  volume: string;
+  title: string;
+  status: string;
+  views: number;
+  total_downloads: number;
+  direct_downloads: number;
+  unlock_downloads: number;
+  subscribers: number;
+  download_rate: number;
+}
+
+interface RecentEbookRecord {
+  id: string;
+  ebook_id: string;
+  title: string;
+  method: string;
+  source: string;
+  locale: string;
+  device_type: string;
+  created_at: string;
 }
 
 interface SubscriberRecord {
@@ -129,6 +161,8 @@ interface AnalyticsPayload {
   daily: DailyRecord[];
   articles: ArticleRecord[];
   static_pages?: StaticPageRecord[];
+  ebooks?: EbookBreakdownRecord[];
+  recent_ebooks?: RecentEbookRecord[];
   subscribers: SubscriberRecord[];
   devices: DeviceRecord[];
   referrers: ReferrerRecord[];
@@ -140,7 +174,7 @@ export default function AdminAnalyticsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDays, setSelectedDays] = useState<number>(7);
-  const [activeTab, setActiveTab] = useState<'subscribers' | 'articles' | 'static_pages' | 'quizzes' | 'devices'>('subscribers');
+  const [activeTab, setActiveTab] = useState<'subscribers' | 'ebooks' | 'articles' | 'static_pages' | 'quizzes' | 'devices'>('subscribers');
 
   // Search and filters for subscribers
   const [searchEmail, setSearchEmail] = useState<string>('');
@@ -186,7 +220,9 @@ export default function AdminAnalyticsPage() {
           ? sub.source.startsWith('safety_quiz_')
           : filterSource === 'somatic'
           ? sub.source.startsWith('somatic_haven_')
-          : !sub.source.startsWith('safety_quiz_') && !sub.source.startsWith('somatic_haven_');
+          : filterSource === 'ebook'
+          ? sub.source.includes('ebook')
+          : !sub.source.startsWith('safety_quiz_') && !sub.source.startsWith('somatic_haven_') && !sub.source.includes('ebook');
 
       const matchLocale = filterLocale === 'all' ? true : sub.locale === filterLocale;
 
@@ -342,8 +378,8 @@ export default function AdminAnalyticsPage() {
           </div>
         )}
 
-        {/* 5 Summary KPI Cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {/* 6 Summary KPI Cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {/* Card 1: Pageviews */}
           <div className="rounded-3xl border border-emerald-900/50 bg-gradient-to-b from-[#132320] to-[#0f1b18] p-5 shadow-lg shadow-black/20">
             <div className="flex items-center justify-between text-emerald-400">
@@ -387,13 +423,41 @@ export default function AdminAnalyticsPage() {
                 <span className="font-bold">{data?.summary?.total_quiz_completions || 0} lượt</span>
               </div>
               <div className="flex items-center justify-between text-amber-400/90 font-medium">
-                <span>⏳ Bỏ dở giữa chừng:</span>
+                <span>⏳ Bỏ dở:</span>
                 <span className="font-bold">{data?.summary?.total_quiz_in_progress || 0} ({data?.summary?.quiz_drop_off_rate || 0}%)</span>
               </div>
             </div>
           </div>
 
-          {/* Card 3: App Download Clicks */}
+          {/* Card 3: Ebook Downloads */}
+          <div className="rounded-3xl border border-emerald-800/50 bg-gradient-to-b from-[#142821] to-[#0c1a15] p-5 shadow-lg shadow-black/20">
+            <div className="flex items-center justify-between text-emerald-300">
+              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300/70">Tải Ebook</span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-900/40 text-amber-300">
+                <BookOpen className="h-5 w-5 text-amber-300" />
+              </div>
+            </div>
+            <div className="mt-3">
+              <span className="text-3xl font-extrabold text-white tracking-tight">
+                {(data?.summary?.total_ebook_downloads || 0).toLocaleString('vi-VN')}
+              </span>
+              <span className="ml-2 text-xs font-medium text-amber-300 bg-amber-950/80 border border-amber-800/40 px-2 py-0.5 rounded-md">
+                +{data?.summary?.today_ebook_downloads || 0} hôm nay
+              </span>
+            </div>
+            <div className="mt-2 flex flex-col gap-1 text-xs">
+              <div className="flex items-center justify-between text-emerald-300 font-medium">
+                <span>✓ Trực tiếp:</span>
+                <span className="font-bold">{data?.summary?.ebook_direct_downloads || 0} lượt</span>
+              </div>
+              <div className="flex items-center justify-between text-teal-300 font-medium">
+                <span>📥 Qua email:</span>
+                <span className="font-bold">{data?.summary?.ebook_unlock_downloads || 0} ({data?.summary?.ebook_subscribers || 0} leads)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 4: App Download Clicks */}
           <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-b from-[#1b1429] to-[#120d1c] p-5 shadow-lg shadow-black/20">
             <div className="flex items-center justify-between text-purple-300">
               <span className="text-xs font-semibold uppercase tracking-wider text-purple-300/70">Click Nút Tải App</span>
@@ -416,7 +480,7 @@ export default function AdminAnalyticsPage() {
             </div>
           </div>
 
-          {/* Card 4: Email Leads */}
+          {/* Card 5: Email Leads */}
           <div className="rounded-3xl border border-teal-900/40 bg-gradient-to-b from-[#132322] to-[#0e1b1a] p-5 shadow-lg shadow-black/20">
             <div className="flex items-center justify-between text-teal-300">
               <span className="text-xs font-semibold uppercase tracking-wider text-teal-300/70">Email Thu Thập (Leads)</span>
@@ -433,7 +497,7 @@ export default function AdminAnalyticsPage() {
               </span>
             </div>
             <p className="mt-2 text-xs text-teal-200/60">
-              Quiz: {data?.summary?.quiz_subscribers || 0} • Chữa lành: {data?.summary?.somatic_subscribers || 0}
+              Quiz: {data?.summary?.quiz_subscribers || 0} • Ebook: {data?.summary?.ebook_subscribers || 0} • Haven: {data?.summary?.somatic_subscribers || 0}
             </p>
           </div>
 
@@ -542,6 +606,7 @@ export default function AdminAnalyticsPage() {
           <nav className="flex space-x-2 sm:space-x-8 overflow-x-auto pb-px">
             {[
               { id: 'subscribers', label: `💌 Danh Sách Email (${data?.subscribers?.length || 0})` },
+              { id: 'ebooks', label: `📚 Cẩm Nang Ebook (${data?.summary?.total_ebook_downloads || 0} lượt tải)` },
               { id: 'articles', label: `📊 Bài Viết (${data?.articles?.length || 0})` },
               { id: 'static_pages', label: `🌐 Trang Tĩnh & Hubs Toàn Trang (${data?.static_pages?.length || 0})` },
               { id: 'quizzes', label: `🧪 Nhật Ký Quiz Gần Đây (${data?.recent_quizzes?.length || 0})` },
@@ -571,7 +636,7 @@ export default function AdminAnalyticsPage() {
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-400/60" />
                 <input
                   type="text"
-                  placeholder="Tìm kiếm theo email, tên bài viết..."
+                  placeholder="Tìm kiếm theo email, tên bài viết, cẩm nang..."
                   value={searchEmail}
                   onChange={e => setSearchEmail(e.target.value)}
                   className="w-full rounded-xl border border-emerald-900/60 bg-[#0c1815] py-2 pl-10 pr-4 text-sm text-white placeholder-emerald-400/40 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
@@ -586,6 +651,7 @@ export default function AdminAnalyticsPage() {
                   className="rounded-xl border border-emerald-900/60 bg-[#0c1815] px-3 py-2 text-emerald-300 focus:outline-none"
                 >
                   <option value="all">Tất cả nguồn</option>
+                  <option value="ebook">📚 Từ Cẩm nang Ebook (PDF Leads)</option>
                   <option value="quiz">Từ Quiz bài thuốc</option>
                   <option value="somatic">🌙 Từ Cẩm nang Chữa lành (Mindful Haven)</option>
                   <option value="newsletter">Từ Newsletter trang chủ</option>
@@ -622,6 +688,7 @@ export default function AdminAnalyticsPage() {
                     filteredSubscribers.map((sub, idx) => {
                       const isQuiz = sub.source.startsWith('safety_quiz_');
                       const isSomatic = sub.source.startsWith('somatic_haven_');
+                      const isEbook = sub.source.includes('ebook');
                       const cleanSource = isQuiz
                         ? sub.source.replace('safety_quiz_', '')
                         : isSomatic
@@ -666,6 +733,21 @@ export default function AdminAnalyticsPage() {
                                   <ExternalLink className="h-3 w-3 opacity-60" />
                                 </Link>
                               </div>
+                            ) : isEbook ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="inline-flex items-center rounded-md bg-emerald-950/80 border border-emerald-700/60 px-2 py-0.5 text-[11px] font-medium text-amber-300">
+                                  📚 Ebook Lead
+                                </span>
+                                <span className="text-emerald-300 font-medium truncate max-w-xs">
+                                  {sub.source === 'ebook_blood_sugar_pairings'
+                                    ? 'Vol 1: Đường Huyết'
+                                    : sub.source.includes('antioxidant')
+                                    ? 'Vol 2: Chống Oxy Hóa'
+                                    : sub.source === 'ebook_library_master'
+                                    ? 'Thư Viện Ebook Tổng'
+                                    : sub.source}
+                                </span>
+                              </div>
                             ) : (
                               <span className="inline-flex items-center rounded-md bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
                                 {cleanSource}
@@ -697,6 +779,255 @@ export default function AdminAnalyticsPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: EBOOK PERFORMANCE & DOWNLOADS */}
+        {activeTab === 'ebooks' && (
+          <div className="mt-6 space-y-6">
+            {/* Top Stat Banner */}
+            <div className="rounded-3xl border border-emerald-900/40 bg-gradient-to-br from-[#12241e] via-[#0f1d18] to-[#0a1512] p-6 shadow-xl shadow-black/20">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-emerald-950 border border-emerald-700/60 px-3 py-1 text-xs font-bold text-amber-300">
+                    <BookOpen className="h-3.5 w-3.5 text-amber-300" />
+                    <span>HEALTHCLUES · THỐNG KÊ CẨM NANG &amp; EBOOK Y SINH</span>
+                  </div>
+                  <h3 className="mt-2 text-xl font-bold text-white">
+                    Hiệu Quả Tải Sách &amp; Thu Thập Leads Từ Ebook
+                  </h3>
+                  <p className="mt-1 text-xs text-emerald-200/70 max-w-2xl">
+                    Thống kê lượt truy cập thư viện, số lượt đọc trực tiếp, tải file PDF về máy và số lượng độc giả để lại email nhận sách từ các chiến dịch Facebook Reels và bài viết.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link
+                    href="/vi/song-khoe/ebooks"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-md"
+                  >
+                    <BookOpen className="h-4 w-4 text-amber-300" />
+                    <span>Xem Thư Viện Web (VI)</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
+                  <Link
+                    href="/en/wellness/ebooks"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 rounded-xl border border-emerald-800/60 bg-[#13251f] px-3.5 py-2.5 text-xs font-semibold text-emerald-300 hover:text-white hover:bg-emerald-900/40 transition"
+                  >
+                    <span>Web (EN)</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* 4 Mini Cards */}
+              <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-emerald-900/40">
+                <div className="rounded-2xl border border-emerald-900/60 bg-[#0d1c17]/80 p-3.5">
+                  <span className="text-[11px] font-semibold text-emerald-400/80">Tổng Lượt Tải Toàn Sách</span>
+                  <div className="mt-1 text-2xl font-black text-white">
+                    {(data?.summary?.total_ebook_downloads || 0).toLocaleString('vi-VN')}
+                  </div>
+                  <span className="text-[10px] text-amber-300">+{data?.summary?.today_ebook_downloads || 0} hôm nay</span>
+                </div>
+                <div className="rounded-2xl border border-emerald-900/60 bg-[#0d1c17]/80 p-3.5">
+                  <span className="text-[11px] font-semibold text-emerald-400/80">Tải File PDF Trực Tiếp</span>
+                  <div className="mt-1 text-2xl font-black text-emerald-300">
+                    {(data?.summary?.ebook_direct_downloads || 0).toLocaleString('vi-VN')}
+                  </div>
+                  <span className="text-[10px] text-emerald-400/60">Không cần điền form</span>
+                </div>
+                <div className="rounded-2xl border border-emerald-900/60 bg-[#0d1c17]/80 p-3.5">
+                  <span className="text-[11px] font-semibold text-emerald-400/80">Email Mở Khóa (Leads)</span>
+                  <div className="mt-1 text-2xl font-black text-amber-300">
+                    {(data?.summary?.ebook_subscribers || 0).toLocaleString('vi-VN')}
+                  </div>
+                  <span className="text-[10px] text-teal-300">Đã lưu vào danh sách newsletter</span>
+                </div>
+                <div className="rounded-2xl border border-emerald-900/60 bg-[#0d1c17]/80 p-3.5">
+                  <span className="text-[11px] font-semibold text-emerald-400/80">Tỷ Lệ Để Lại Email</span>
+                  <div className="mt-1 text-2xl font-black text-teal-300">
+                    {data?.summary?.total_ebook_downloads && data.summary.total_ebook_downloads > 0
+                      ? Math.round(((data.summary.ebook_subscribers || 0) / data.summary.total_ebook_downloads) * 100)
+                      : 0}%
+                  </div>
+                  <span className="text-[10px] text-emerald-400/60">Leads / Tổng lượt tải</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Table 1: Ebook Breakdown */}
+            <div className="rounded-3xl border border-emerald-900/40 bg-[#111f1c] p-5 shadow-xl shadow-black/20">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-base font-bold text-white">Thống Kê Chi Tiết Từng Cuốn Cẩm Nang</h4>
+                  <p className="text-xs text-emerald-300/60">Hiệu quả phân phối của từng tập trong kiến trúc HealthClues Food Pairing Engine</p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-emerald-900/40 text-xs font-semibold uppercase tracking-wider text-emerald-300/70">
+                      <th className="py-3 px-4">Tập &amp; Tên Cẩm Nang</th>
+                      <th className="py-3 px-4 text-center">Trạng Thái</th>
+                      <th className="py-3 px-4 text-right">Lượt Xem Trang</th>
+                      <th className="py-3 px-4 text-right">Tổng Lượt Tải</th>
+                      <th className="py-3 px-4 text-right">Tải Trực Tiếp</th>
+                      <th className="py-3 px-4 text-right">Email Mở Khóa</th>
+                      <th className="py-3 px-4 text-right">Tỷ Lệ Tải</th>
+                      <th className="py-3 px-4 text-center">Xem Trang</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-emerald-900/30">
+                    {data?.ebooks && data.ebooks.length > 0 ? (
+                      data.ebooks.map((eb) => {
+                        const isLive = eb.status === 'available';
+                        const href =
+                          eb.ebook_id === 'blood-sugar'
+                            ? '/vi/song-khoe/ebooks/duong-huyet'
+                            : eb.ebook_id === 'antioxidants'
+                            ? '/vi/song-khoe/ebooks/chat-chong-oxy-hoa'
+                            : '/vi/song-khoe/ebooks';
+
+                        return (
+                          <tr key={eb.ebook_id} className="hover:bg-emerald-950/20 transition-colors">
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-center gap-2.5">
+                                <span className="rounded-lg bg-emerald-950 border border-emerald-800/60 px-2 py-1 text-[11px] font-extrabold text-amber-300">
+                                  {eb.volume}
+                                </span>
+                                <div>
+                                  <span className="font-semibold text-white">{eb.title}</span>
+                                  <span className="block text-[11px] text-emerald-400/50">{eb.ebook_id}</span>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              {isLive ? (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950 border border-emerald-600/40 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
+                                  <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                                  Đã phát hành
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center rounded-full bg-amber-950/60 border border-amber-800/40 px-2.5 py-0.5 text-xs font-medium text-amber-300">
+                                  Đang biên soạn
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-right font-medium text-emerald-300">
+                              {eb.views.toLocaleString('vi-VN')}
+                            </td>
+                            <td className="py-3.5 px-4 text-right font-bold text-white">
+                              {eb.total_downloads.toLocaleString('vi-VN')}
+                            </td>
+                            <td className="py-3.5 px-4 text-right text-emerald-400/90 text-xs">
+                              {eb.direct_downloads}
+                            </td>
+                            <td className="py-3.5 px-4 text-right text-amber-300 font-medium text-xs">
+                              {eb.unlock_downloads || eb.subscribers}
+                            </td>
+                            <td className="py-3.5 px-4 text-right font-semibold text-teal-300 text-xs">
+                              {eb.download_rate}%
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <Link
+                                href={href}
+                                target="_blank"
+                                className="inline-flex items-center gap-1 rounded-lg border border-emerald-900/60 bg-[#0c1815] px-2.5 py-1 text-xs font-medium text-emerald-300 hover:text-white hover:bg-emerald-900/40 transition"
+                              >
+                                <span>Mở xem</span>
+                                <ExternalLink className="h-3 w-3 opacity-60" />
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan={8} className="py-8 text-center text-sm text-emerald-400/50">
+                          Chưa có dữ liệu thống kê từng cuốn cẩm nang.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Table 2: Recent Ebook Activity Log */}
+            <div className="rounded-3xl border border-emerald-900/40 bg-[#111f1c] p-5 shadow-xl shadow-black/20">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-base font-bold text-white">Nhật Ký Tải &amp; Mở Khóa Ebook Thời Gian Thực</h4>
+                  <p className="text-xs text-emerald-300/60">50 lượt tải gần nhất trên toàn bộ website</p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-emerald-900/40 text-xs font-semibold uppercase tracking-wider text-emerald-300/70">
+                      <th className="py-3 px-4">Thời Gian</th>
+                      <th className="py-3 px-4">Cẩm Nang</th>
+                      <th className="py-3 px-4 text-center">Hình Thức Tải</th>
+                      <th className="py-3 px-4">Nguồn Xuất Phát</th>
+                      <th className="py-3 px-4 text-center">Ngôn Ngữ</th>
+                      <th className="py-3 px-4 text-center">Thiết Bị</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-emerald-900/30">
+                    {data?.recent_ebooks && data.recent_ebooks.length > 0 ? (
+                      data.recent_ebooks.map((re) => {
+                        const isUnlock = re.method === 'unlocked';
+
+                        return (
+                          <tr key={re.id} className="hover:bg-emerald-950/20 transition-colors">
+                            <td className="py-3 px-4 text-xs text-emerald-300/60 whitespace-nowrap">
+                              {new Date(re.created_at).toLocaleString('vi-VN')}
+                            </td>
+                            <td className="py-3 px-4 font-medium text-white">
+                              {re.title}
+                            </td>
+                            <td className="py-3 px-4 text-center">
+                              {isUnlock ? (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-teal-950 border border-teal-700/60 px-2.5 py-0.5 text-xs font-semibold text-teal-300">
+                                  <Mail className="h-3 w-3" />
+                                  Đăng ký Email
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950 border border-emerald-700/60 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
+                                  <Download className="h-3 w-3" />
+                                  Tải trực tiếp
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-xs text-emerald-400/80 font-mono">
+                              {re.source}
+                            </td>
+                            <td className="py-3 px-4 text-center">
+                              <span className="rounded-md bg-[#0c1815] border border-emerald-900/60 px-2 py-0.5 text-xs font-mono uppercase text-emerald-400">
+                                {re.locale || 'vi'}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-center text-xs text-emerald-300/70">
+                              {re.device_type === 'mobile' ? '📱 Mobile' : re.device_type === 'tablet' ? '📟 Tablet' : '💻 Desktop'}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="py-8 text-center text-sm text-emerald-400/50">
+                          Chưa có lượt tải ebook nào được ghi nhận gần đây.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}

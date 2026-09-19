@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import type { WellnessLocale } from "@/data/wellness";
 import { wellnessEbooks, type WellnessEbook } from "@/data/wellness-ebooks";
+import { trackWellness } from "@/lib/wellness-analytics";
 import { WellnessShell } from "./WellnessShell";
 import { EbookLeadCapture } from "./EbookLeadCapture";
 
@@ -216,6 +217,14 @@ export function EbookCatalogPage({ locale }: { locale: WellnessLocale }) {
                           <a
                             href={b.pdfUrl}
                             download
+                            onClick={() => {
+                              trackWellness("ebook_download", {
+                                ebook: b.id,
+                                method: "direct",
+                                source: "catalog_card",
+                                locale,
+                              });
+                            }}
                             className="w-full inline-flex justify-center items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold text-slate-700 hover:bg-slate-50 transition"
                           >
                             <Download className="h-3.5 w-3.5 text-emerald-700" />

@@ -18,6 +18,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import type { WellnessLocale } from "@/data/wellness";
+import { trackWellness } from "@/lib/wellness-analytics";
 import { WellnessShell } from "./WellnessShell";
 import { EbookLeadCapture } from "./EbookLeadCapture";
 
@@ -180,6 +181,14 @@ export function AntioxidantEbookHub({ locale }: { locale: WellnessLocale }) {
                 <a
                   href="/ebooks/antioxidants/healthclues-antioxidant-guide.pdf"
                   download
+                  onClick={() => {
+                    trackWellness("ebook_download", {
+                      ebook: "antioxidants",
+                      method: "direct",
+                      source: "antioxidant_hub_header",
+                      locale,
+                    });
+                  }}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 hover:text-emerald-950 underline"
                 >
                   <Download className="h-3.5 w-3.5" />

@@ -18,6 +18,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import type { WellnessLocale } from "@/data/wellness";
+import { trackWellness } from "@/lib/wellness-analytics";
 import { WellnessShell } from "./WellnessShell";
 import { EbookLeadCapture } from "./EbookLeadCapture";
 
@@ -212,6 +213,14 @@ export function BloodSugarEbookHub({ locale }: { locale: WellnessLocale }) {
                   <a
                     href="/ebooks/blood-sugar/healthclues-blood-sugar-guide.pdf"
                     download
+                    onClick={() => {
+                      trackWellness("ebook_download", {
+                        ebook: "blood-sugar",
+                        method: "direct",
+                        source: "blood_sugar_hub_viewer",
+                        locale,
+                      });
+                    }}
                     className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 hover:bg-emerald-200 transition"
                   >
                     <Download className="h-3.5 w-3.5" />

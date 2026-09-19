@@ -12,7 +12,7 @@ const client = new Client({
 
 async function main() {
   await client.connect();
-  console.log('Creating get_admin_analytics RPC function in Postgres...');
+  console.log('Creating upgraded get_admin_analytics RPC function in Postgres with Ebook analytics...');
 
   await client.query(`
     CREATE OR REPLACE FUNCTION public.get_admin_analytics(p_days integer DEFAULT 30)
@@ -44,7 +44,8 @@ async function main() {
           coalesce(count(e.id) FILTER (WHERE e.event_type = 'quiz_started'), 0) AS quiz_starts,
           coalesce(count(e.id) FILTER (WHERE e.event_type = 'quiz_completed'), 0) AS quiz_completions,
           coalesce(count(e.id) FILTER (WHERE e.event_type = 'lead_submit'), 0) AS lead_submits,
-          coalesce(count(e.id) FILTER (WHERE e.event_type = 'onboarding_app_download_click'), 0) AS app_clicks
+          coalesce(count(e.id) FILTER (WHERE e.event_type = 'onboarding_app_download_click'), 0) AS app_clicks,
+          coalesce(count(e.id) FILTER (WHERE e.event_type IN ('ebook_download', 'ebook_downloaded', 'ebook_download_unlocked')), 0) AS ebook_downloads
         FROM generate_series(date_trunc('day', v_start_date), date_trunc('day', now()), '1 day'::interval) d
         LEFT JOIN events_filtered e ON to_char(e.created_at, 'YYYY-MM-DD') = to_char(d, 'YYYY-MM-DD')
         GROUP BY d
@@ -66,7 +67,8 @@ async function main() {
           de.quiz_completions,
           greatest(de.quiz_starts - de.quiz_completions, 0) AS quiz_drop_offs,
           greatest(de.lead_submits, coalesce(dl.new_subscribers, 0)) AS leads,
-          de.app_clicks
+          de.app_clicks,
+          de.ebook_downloads
         FROM daily_events de
         LEFT JOIN daily_leads dl ON dl.day = de.day
         ORDER BY de.day ASC
@@ -129,6 +131,12 @@ async function main() {
             WHEN e.path = '/vi/song-khoe/huong-dan' THEN 'Kho Cẩm Nang Hướng Dẫn (VI)'
             WHEN e.path = '/en/wellness' THEN 'Trang Chủ Sống Khỏe (EN)'
             WHEN e.path = '/vi/song-khoe' THEN 'Trang Chủ Sống Khỏe (VI)'
+            WHEN e.path = '/en/wellness/ebooks' THEN 'Thư Viện Cẩm Nang Ebook (EN)'
+            WHEN e.path = '/vi/song-khoe/ebooks' THEN 'Thư Viện Cẩm Nang Ebook (VI)'
+            WHEN e.path = '/en/wellness/ebooks/blood-sugar-pairings' THEN 'Ebook Vol 01 - Blood Sugar (EN)'
+            WHEN e.path = '/vi/song-khoe/ebooks/duong-huyet' THEN 'Ebook Vol 01 - Đường Huyết (VI)'
+            WHEN e.path = '/en/wellness/ebooks/antioxidants' THEN 'Ebook Vol 02 - Antioxidants (EN)'
+            WHEN e.path = '/vi/song-khoe/ebooks/chat-chong-oxy-hoa' THEN 'Ebook Vol 02 - Chất Chống Oxy Hóa (VI)'
             WHEN e.path = '/en/business' THEN 'Cổng Khách Hàng Doanh Nghiệp (EN)'
             WHEN e.path = '/vi/doanh-nghiep' THEN 'Cổng Khách Hàng Doanh Nghiệp (VI)'
             WHEN e.path = '/en/wellness/health-tips' THEN 'Mẹo Sống Khỏe & Lối Sống (EN)'
@@ -145,6 +153,99 @@ async function main() {
         WHERE e.article_slug IS NULL OR e.article_slug = ''
         GROUP BY e.path
         ORDER BY views DESC
+      ),
+      ebook_breakdown AS (
+        SELECT
+          eb.id AS ebook_id,
+          eb.volume,
+          eb.title,
+          eb.status,
+          coalesce(v.views, 0) AS views,
+          coalesce(d.total_downloads, 0) AS total_downloads,
+          coalesce(d.direct_downloads, 0) AS direct_downloads,
+          coalesce(d.unlock_downloads, 0) AS unlock_downloads,
+          coalesce(s.subscribers, 0) AS subscribers,
+          CASE
+            WHEN coalesce(v.views, 0) > 0 THEN round((coalesce(d.total_downloads, 0)::numeric / v.views::numeric) * 100, 1)
+            ELSE 0
+          END AS download_rate
+        FROM (
+          VALUES
+            ('blood-sugar', 'VOL. 01', 'Đường Huyết & Bữa Ăn Hàng Ngày', 'available'),
+            ('antioxidants', 'VOL. 02', 'Chất Chống Oxy Hóa Trên Đĩa Ăn', 'available'),
+            ('weight-management', 'VOL. 03', 'Kết Hợp Thực Phẩm Cho Quản Lý Cân Nặng', 'in_development'),
+            ('better-sleep', 'VOL. 04', 'Kết Hợp Bữa Tối Cho Giấc Ngủ Sâu', 'in_development'),
+            ('gout-support', 'VOL. 05', 'Thực Phẩm & Bệnh Gút: Bằng Chứng Y Sinh', 'in_development'),
+            ('liver-health', 'VOL. 06', 'Dinh Dưỡng Cho Lá Gan: Vượt Qua Lời Đồn', 'in_development'),
+            ('catalog_master', 'ALL', 'Thư Viện Cẩm Nang Ebook Tổng (Catalog)', 'available')
+        ) AS eb(id, volume, title, status)
+        LEFT JOIN (
+          SELECT
+            CASE
+              WHEN path LIKE '%duong-huyet%' OR path LIKE '%blood-sugar%' THEN 'blood-sugar'
+              WHEN path LIKE '%chat-chong-oxy-hoa%' OR path LIKE '%antioxidants%' THEN 'antioxidants'
+              WHEN path LIKE '%/ebooks%' OR path LIKE '%/song-khoe/ebooks%' THEN 'catalog_master'
+              ELSE 'other'
+            END AS target_id,
+            count(*) AS views
+          FROM events_filtered
+          WHERE event_type = 'page_view' AND (path LIKE '%/ebooks%' OR path LIKE '%duong-huyet%' OR path LIKE '%blood-sugar%' OR path LIKE '%chat-chong-oxy-hoa%' OR path LIKE '%antioxidants%')
+          GROUP BY 1
+        ) v ON v.target_id = eb.id
+        LEFT JOIN (
+          SELECT
+            CASE
+              WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') IN ('blood-sugar', 'blood-sugar-pairings') THEN 'blood-sugar'
+              WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') IN ('antioxidants', 'antioxidants-on-the-plate') THEN 'antioxidants'
+              WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') = 'weight-management' THEN 'weight-management'
+              WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') = 'better-sleep' THEN 'better-sleep'
+              WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') = 'gout-support' THEN 'gout-support'
+              WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') = 'liver-health' THEN 'liver-health'
+              ELSE 'catalog_master'
+            END AS target_id,
+            count(*) AS total_downloads,
+            count(*) FILTER (WHERE coalesce(metadata->>'method', '') != 'unlocked' AND event_type != 'ebook_download_unlocked') AS direct_downloads,
+            count(*) FILTER (WHERE coalesce(metadata->>'method', '') = 'unlocked' OR event_type = 'ebook_download_unlocked') AS unlock_downloads
+          FROM events_filtered
+          WHERE event_type IN ('ebook_download', 'ebook_downloaded', 'ebook_download_unlocked')
+          GROUP BY 1
+        ) d ON d.target_id = eb.id
+        LEFT JOIN (
+          SELECT
+            CASE
+              WHEN source LIKE '%blood_sugar%' OR source LIKE '%duong-huyet%' THEN 'blood-sugar'
+              WHEN source LIKE '%antioxidant%' OR source LIKE '%oxy_hoa%' THEN 'antioxidants'
+              ELSE 'catalog_master'
+            END AS target_id,
+            count(*) AS subscribers
+          FROM public.newsletter_subscribers
+          WHERE source LIKE '%ebook%'
+          GROUP BY 1
+        ) s ON s.target_id = eb.id
+        ORDER BY eb.volume ASC
+      ),
+      recent_ebook_downloads AS (
+        SELECT
+          id,
+          coalesce(metadata->>'ebook', metadata->>'ebook_id', 'all') AS ebook_id,
+          CASE
+            WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') IN ('blood-sugar', 'blood-sugar-pairings') THEN 'VOL. 01 · Đường Huyết & Bữa Ăn Hàng Ngày'
+            WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') IN ('antioxidants', 'antioxidants-on-the-plate') THEN 'VOL. 02 · Chất Chống Oxy Hóa'
+            WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') = 'weight-management' THEN 'VOL. 03 · Quản Lý Cân Nặng'
+            WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') = 'better-sleep' THEN 'VOL. 04 · Giấc Ngủ Sâu'
+            WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') = 'gout-support' THEN 'VOL. 05 · Bệnh Gút & Axit Uric'
+            WHEN coalesce(metadata->>'ebook', metadata->>'ebook_id', '') = 'liver-health' THEN 'VOL. 06 · Sức Khỏe Lá Gan'
+            ELSE coalesce(metadata->>'title', path, 'Cẩm nang Ebook')
+          END AS title,
+          coalesce(metadata->>'method', 'direct') AS method,
+          coalesce(metadata->>'source', 'web') AS source,
+          locale,
+          device_type,
+          created_at
+        FROM events_filtered
+        WHERE event_type IN ('ebook_download', 'ebook_downloaded', 'ebook_download_unlocked')
+        ORDER BY created_at DESC
+        LIMIT 50
       ),
       device_stats AS (
         SELECT
@@ -186,6 +287,10 @@ async function main() {
           (SELECT coalesce(quiz_starts, 0) FROM daily_merged WHERE day = to_char(now(), 'YYYY-MM-DD')) AS today_quiz_starts,
           (SELECT coalesce(sum(quiz_completions), 0) FROM daily_merged) AS total_quiz_completions,
           (SELECT coalesce(quiz_completions, 0) FROM daily_merged WHERE day = to_char(now(), 'YYYY-MM-DD')) AS today_quiz_completions,
+          (SELECT coalesce(sum(ebook_downloads), 0) FROM daily_merged) AS total_ebook_downloads,
+          (SELECT coalesce(ebook_downloads, 0) FROM daily_merged WHERE day = to_char(now(), 'YYYY-MM-DD')) AS today_ebook_downloads,
+          (SELECT coalesce(count(*), 0) FROM events_filtered WHERE event_type IN ('ebook_download', 'ebook_downloaded') AND coalesce(metadata->>'method', '') != 'unlocked') AS ebook_direct_downloads,
+          (SELECT coalesce(count(*), 0) FROM events_filtered WHERE event_type = 'ebook_download_unlocked' OR coalesce(metadata->>'method', '') = 'unlocked') AS ebook_unlock_downloads,
           (SELECT coalesce(count(*), 0) FROM events_filtered WHERE event_type = 'onboarding_app_download_click') AS total_app_clicks,
           (SELECT coalesce(count(*), 0) FROM events_filtered WHERE event_type = 'onboarding_app_download_click' AND created_at >= date_trunc('day', now())) AS today_app_clicks,
           (SELECT coalesce(count(*), 0) FROM events_filtered WHERE event_type = 'onboarding_app_download_click' AND (metadata->>'store' = 'app_store' OR metadata->>'store' = 'ios')) AS app_clicks_ios,
@@ -193,7 +298,8 @@ async function main() {
           (SELECT count(*) FROM public.newsletter_subscribers) AS total_subscribers,
           (SELECT count(*) FROM public.newsletter_subscribers WHERE source LIKE 'safety_quiz_%') AS quiz_subscribers,
           (SELECT count(*) FROM public.newsletter_subscribers WHERE source LIKE 'somatic_haven_%') AS somatic_subscribers,
-          (SELECT count(*) FROM public.newsletter_subscribers WHERE source NOT LIKE 'safety_quiz_%' AND source NOT LIKE 'somatic_haven_%') AS home_subscribers,
+          (SELECT count(*) FROM public.newsletter_subscribers WHERE source LIKE '%ebook%') AS ebook_subscribers,
+          (SELECT count(*) FROM public.newsletter_subscribers WHERE source NOT LIKE 'safety_quiz_%' AND source NOT LIKE 'somatic_haven_%' AND source NOT LIKE '%ebook%') AS home_subscribers,
           (SELECT count(*) FROM public.newsletter_subscribers WHERE consented_at >= date_trunc('day', now())) AS today_subscribers
       )
       SELECT jsonb_build_object(
@@ -207,6 +313,11 @@ async function main() {
           'total_quiz_in_progress', greatest(sc.total_quiz_starts - sc.total_quiz_completions, 0),
           'quiz_drop_off_rate', CASE WHEN sc.total_quiz_starts > 0 THEN round((greatest(sc.total_quiz_starts - sc.total_quiz_completions, 0)::numeric / sc.total_quiz_starts::numeric) * 100, 1) ELSE 0 END,
           'quiz_completion_rate', CASE WHEN sc.total_quiz_starts > 0 THEN round((sc.total_quiz_completions::numeric / sc.total_quiz_starts::numeric) * 100, 1) ELSE 0 END,
+          'total_ebook_downloads', sc.total_ebook_downloads,
+          'today_ebook_downloads', sc.today_ebook_downloads,
+          'ebook_direct_downloads', sc.ebook_direct_downloads,
+          'ebook_unlock_downloads', sc.ebook_unlock_downloads,
+          'ebook_subscribers', sc.ebook_subscribers,
           'total_app_clicks', sc.total_app_clicks,
           'today_app_clicks', sc.today_app_clicks,
           'app_clicks_ios', sc.app_clicks_ios,
@@ -227,6 +338,8 @@ async function main() {
         'daily', (SELECT coalesce(jsonb_agg(to_jsonb(dm)), '[]'::jsonb) FROM daily_merged dm),
         'articles', (SELECT coalesce(jsonb_agg(to_jsonb(af)), '[]'::jsonb) FROM articles_final af),
         'static_pages', (SELECT coalesce(jsonb_agg(to_jsonb(sp)), '[]'::jsonb) FROM static_page_stats sp),
+        'ebooks', (SELECT coalesce(jsonb_agg(to_jsonb(eb)), '[]'::jsonb) FROM ebook_breakdown eb),
+        'recent_ebooks', (SELECT coalesce(jsonb_agg(to_jsonb(re)), '[]'::jsonb) FROM recent_ebook_downloads re),
         'subscribers', (SELECT coalesce(jsonb_agg(to_jsonb(sd)), '[]'::jsonb) FROM subscribers_data sd),
         'devices', (SELECT coalesce(jsonb_agg(to_jsonb(ds)), '[]'::jsonb) FROM device_stats ds),
         'referrers', (SELECT coalesce(jsonb_agg(to_jsonb(rs)), '[]'::jsonb) FROM referrer_stats rs),
@@ -241,13 +354,13 @@ async function main() {
     GRANT EXECUTE ON FUNCTION public.get_admin_analytics(integer) TO service_role, anon;
   `);
 
-  console.log('RPC created. Testing get_admin_analytics()...');
+  console.log('Upgraded RPC created. Testing get_admin_analytics()...');
   const testRes = await client.query('SELECT public.get_admin_analytics(7) as data;');
   const data = testRes.rows[0].data;
-  console.log('Summary:', data.summary);
-  console.log('Days count:', data.daily?.length);
-  console.log('Articles count:', data.articles?.length);
-  console.log('Subscribers count:', data.subscribers?.length);
+  console.log('Summary with Ebooks:', data.summary);
+  console.log('Ebook breakdown count:', data.ebooks?.length);
+  console.log('Ebook list:', data.ebooks);
+  console.log('Recent ebooks count:', data.recent_ebooks?.length);
 
   await client.end();
 }

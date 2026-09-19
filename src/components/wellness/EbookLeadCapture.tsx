@@ -48,6 +48,7 @@ export function EbookLeadCapture({
       setStatus("done");
       trackWellness("newsletter_submitted", { source, locale });
       trackWellness("ebook_download_unlocked", { ebook: ebookId, locale });
+      trackWellness("ebook_download", { ebook: ebookId, method: "unlocked", source, locale });
 
       // Automatically trigger PDF download
       const link = document.createElement("a");
@@ -63,6 +64,7 @@ export function EbookLeadCapture({
 
   const handleDirectDownload = () => {
     trackWellness("ebook_downloaded", { source, locale, ebook: ebookId, method: "direct" });
+    trackWellness("ebook_download", { source, locale, ebook: ebookId, method: "direct" });
   };
 
   if (status === "done") {
