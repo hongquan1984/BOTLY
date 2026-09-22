@@ -206,22 +206,49 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
                       </button>
                     </div>
 
-                    {a.wellness_articles.cover_image_url && <figure className="mb-8">
-                      {/* Remote publisher URLs are displayed directly, never fetched by the image optimizer. */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={a.wellness_articles.cover_image_url} alt={a.cover_image_alt} className="w-full rounded-3xl" loading="lazy" referrerPolicy="no-referrer" />
-                    </figure>}
+                    {a.wellness_articles.cover_image_url && (
+                      <figure className="mb-8 overflow-hidden rounded-3xl border border-stone-200/80 shadow-md bg-stone-100">
+                        {/* Remote publisher URLs are displayed directly, never fetched by the image optimizer. */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={a.wellness_articles.cover_image_url}
+                          alt={a.cover_image_alt || a.title}
+                          className="w-full object-cover max-h-[460px] rounded-3xl"
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                        {a.cover_image_alt && (
+                          <figcaption className="p-3 text-center text-xs text-stone-500 font-medium bg-stone-50/80 border-t border-stone-150">
+                            {a.cover_image_alt}
+                          </figcaption>
+                        )}
+                      </figure>
+                    )}
                     {a.wellness_articles.facebook_url && <p className="mb-8"><a href={a.wellness_articles.facebook_url} target="_blank" rel="noopener noreferrer" className="wellness-button">{vi ? 'Xem video đi kèm trên Facebook' : 'Watch the accompanying video on Facebook'} ↗</a></p>}
 
                     {a.takeaway && <div className="takeaway"><span>{vi ? 'Ý chính' : 'The takeaway'}</span><p>{a.takeaway}</p></div>}
 
                     {a.sections.map((section, i) => <section key={i}><h2>{section.title}</h2>
                       {section.paragraphs.map((p, j) => <p key={j}>{p}</p>)}
-                      {section.image_url && <figure className="my-6">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={section.image_url} alt={section.image_alt || section.title} className="w-full rounded-2xl shadow-sm border border-stone-150" loading="lazy" referrerPolicy="no-referrer" />
-                        {section.image_alt && <figcaption className="mt-2 text-center text-xs text-stone-500 font-medium">{section.image_alt}</figcaption>}
-                      </figure>}
+                      {section.image_url && (
+                        <figure className="my-6 overflow-hidden rounded-2xl border border-stone-150 shadow-sm bg-stone-50">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={section.image_url}
+                            alt={section.image_alt || section.title}
+                            className="w-full object-cover max-h-[420px] rounded-2xl"
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                          {section.image_alt && <figcaption className="p-2.5 text-center text-xs text-stone-500 font-medium bg-stone-50/80 border-t border-stone-150">{section.image_alt}</figcaption>}
+                        </figure>
+                      )}
                       {section.bullets?.length ? <ul>{section.bullets.map((b, j) => <li key={j}>{b}</li>)}</ul> : null}
                     </section>)}
 
@@ -234,6 +261,40 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
               </div>
             ) : (
               <>
+                {a.wellness_articles?.cover_image_url && (
+                  <figure className="mb-8 overflow-hidden rounded-3xl border border-stone-200/80 shadow-md bg-stone-100">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={a.wellness_articles.cover_image_url}
+                      alt={a.cover_image_alt || a.title}
+                      className="w-full object-cover max-h-[460px] rounded-3xl"
+                      loading="eager"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                    {a.cover_image_alt && (
+                      <figcaption className="p-3 text-center text-xs text-stone-500 font-medium bg-stone-50/80 border-t border-stone-150">
+                        {a.cover_image_alt}
+                      </figcaption>
+                    )}
+                  </figure>
+                )}
+
+                {a.wellness_articles?.facebook_url && (
+                  <p className="mb-8">
+                    <a
+                      href={a.wellness_articles.facebook_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="wellness-button"
+                    >
+                      {vi ? 'Xem video đi kèm trên Facebook' : 'Watch the accompanying video on Facebook'} ↗
+                    </a>
+                  </p>
+                )}
+
                 {a.trust_meter && <TrustMeterWidget data={a.trust_meter} locale={a.locale} />}
                 {a.takeaway && <div className="takeaway"><span>{vi ? 'Ý chính' : 'The takeaway'}</span><p>{a.takeaway}</p></div>}
 
@@ -248,11 +309,22 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
 
                 {a.sections.map((section, i) => <section key={i}><h2>{section.title}</h2>
                   {section.paragraphs.map((p, j) => <p key={j}>{p}</p>)}
-                  {section.image_url && <figure className="my-6">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={section.image_url} alt={section.image_alt || section.title} className="w-full rounded-2xl shadow-sm border border-stone-150" loading="lazy" referrerPolicy="no-referrer" />
-                    {section.image_alt && <figcaption className="mt-2 text-center text-xs text-stone-500 font-medium">{section.image_alt}</figcaption>}
-                  </figure>}
+                  {section.image_url && (
+                    <figure className="my-6 overflow-hidden rounded-2xl border border-stone-150 shadow-sm bg-stone-50">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={section.image_url}
+                        alt={section.image_alt || section.title}
+                        className="w-full object-cover max-h-[420px] rounded-2xl"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                      {section.image_alt && <figcaption className="p-2.5 text-center text-xs text-stone-500 font-medium bg-stone-50/80 border-t border-stone-150">{section.image_alt}</figcaption>}
+                    </figure>
+                  )}
                   {section.bullets?.length ? <ul>{section.bullets.map((b, j) => <li key={j}>{b}</li>)}</ul> : null}
                 </section>)}
 
