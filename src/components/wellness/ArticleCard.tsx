@@ -12,7 +12,7 @@ export function ArticleCard({
 }) {
   const vi = locale === 'vi';
   const href = articlePath(locale, article.slug);
-  const coverImg = article.wellness_articles?.cover_image_url || '/logo.png';
+  const coverImg = article.wellness_articles?.cover_image_url || '/og-image.jpg';
   const score = article.trust_meter?.score;
 
   const categoryName = {
