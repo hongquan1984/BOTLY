@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QRCode from 'qrcode';
-import { Sparkles, Moon, ShieldCheck, Heart, Volume2, ArrowRight, Smartphone, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Sparkles, ArrowRight, Smartphone, RefreshCw } from 'lucide-react';
 import { trackClientEvent } from '@/components/analytics/AnalyticsTracker';
 
 const APP_STORE_URL = 'https://apps.apple.com/vn/app/soulscape-meditation-emotion/id6769265902';
@@ -15,9 +15,7 @@ export function SmartAppDownloadLanding() {
   const [redirecting, setRedirecting] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [targetUrl, setTargetUrl] = useState<string>('');
-  const [secondsLeft, setSecondsLeft] = useState(2);
 
-  // Synchronously track events and trigger smart redirect
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -31,8 +29,8 @@ export function SmartAppDownloadLanding() {
     const utmMedium = searchParams.get('utm_medium') || '';
     const utmCampaign = searchParams.get('utm_campaign') || '';
 
-    // Generate local QR code for desktop users (pointing to current mobile smart link)
-    const currentSmartLink = window.location.origin + '/tai-app' + (utmSource ? `?utm_source=${utmSource}&utm_medium=${utmMedium}&utm_campaign=${utmCampaign}` : '');
+    // Generate local QR code for desktop visitors (scannable by phone camera)
+    const currentSmartLink = window.location.origin + '/app' + (utmSource ? `?utm_source=${utmSource}&utm_medium=${utmMedium}&utm_campaign=${utmCampaign}` : '');
     QRCode.toDataURL(currentSmartLink, {
       width: 260,
       margin: 2,
@@ -47,13 +45,11 @@ export function SmartAppDownloadLanding() {
       setTargetUrl(APP_STORE_URL);
       if (!noRedirect) {
         setRedirecting(true);
-        // Track the click / redirect event immediately
         trackAppClick('app_store', 'ios', 'auto_redirect');
 
-        // Execute smooth redirect after small delay so analytics beacon network request fires reliably
         const timer = setTimeout(() => {
           window.location.replace(APP_STORE_URL);
-        }, 800);
+        }, 750);
         return () => clearTimeout(timer);
       }
     } else if (isAndroid) {
@@ -61,12 +57,11 @@ export function SmartAppDownloadLanding() {
       setTargetUrl(PLAY_STORE_URL);
       if (!noRedirect) {
         setRedirecting(true);
-        // Track the click / redirect event immediately
         trackAppClick('google_play', 'android', 'auto_redirect');
 
         const timer = setTimeout(() => {
           window.location.replace(PLAY_STORE_URL);
-        }, 800);
+        }, 750);
         return () => clearTimeout(timer);
       }
     } else {
@@ -74,7 +69,6 @@ export function SmartAppDownloadLanding() {
     }
   }, []);
 
-  // Helper to reliably track click events to both analytics endpoints
   const trackAppClick = (store: 'app_store' | 'google_play', devicePlatform: string, method: string) => {
     const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const metadata = {
@@ -89,7 +83,7 @@ export function SmartAppDownloadLanding() {
     };
 
     trackClientEvent('onboarding_app_download_click', {
-      locale: 'vi',
+      locale: 'en',
       metadata
     });
   };
@@ -119,12 +113,12 @@ export function SmartAppDownloadLanding() {
             </span>
           </Link>
           <div className="flex items-center gap-3 text-xs">
-            <Link href="/vi/song-khoe" className="text-slate-400 hover:text-white transition">
-              ← Về Sống Khỏe
+            <Link href="/en/wellness" className="text-slate-400 hover:text-white transition">
+              ← Botly Wellness
             </Link>
             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-400 border border-emerald-500/20">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              100% Miễn phí
+              100% Free Download
             </span>
           </div>
         </div>
@@ -139,20 +133,20 @@ export function SmartAppDownloadLanding() {
               <RefreshCw className="h-8 w-8 text-amber-300 animate-spin" />
             </div>
             <span className="inline-block rounded-full bg-amber-400/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-300 border border-amber-400/20 mb-2">
-              {platform === 'ios' ? ' Thiết bị iOS / Apple' : '▶ Thiết bị Android'}
+              {platform === 'ios' ? ' iOS Device Detected' : '▶ Android Device Detected'}
             </span>
             <h2 className="text-xl font-bold text-white mb-2">
-              {platform === 'ios' ? 'Đang mở App Store...' : 'Đang mở Google Play Store...'}
+              {platform === 'ios' ? 'Opening App Store...' : 'Opening Google Play Store...'}
             </h2>
             <p className="text-xs text-slate-400 leading-relaxed mb-5">
-              Hệ thống đang tự động chuyển hướng đến trang tải ứng dụng chính thức.
+              Redirecting you to the official app store download page.
             </p>
             <a
               href={targetUrl}
               onClick={() => handleManualClick(platform === 'ios' ? 'app_store' : 'google_play')}
               className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-400 px-6 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-amber-400/20 hover:bg-amber-300 active:scale-95 transition"
             >
-              <span>{platform === 'ios' ? 'Bấm Vào Đây Để Mở App Store Ngay' : 'Bấm Vào Đây Để Mở Google Play Ngay'}</span>
+              <span>{platform === 'ios' ? 'Tap Here to Open App Store' : 'Tap Here to Open Google Play'}</span>
               <ArrowRight className="h-4 w-4" />
             </a>
           </div>
@@ -176,10 +170,10 @@ export function SmartAppDownloadLanding() {
                 <div className="p-4 text-center">
                   <div className="flex items-center justify-center gap-1 text-amber-300 text-sm mb-1">
                     {'★★★★★'}
-                    <span className="text-xs font-bold text-white ml-1.5">4.9 / 5.0</span>
+                    <span className="text-xs font-bold text-white ml-1.5">4.9 / 5.0 Rating</span>
                   </div>
                   <p className="text-[11px] font-medium text-slate-400">
-                    Hơn 10,000+ người đã tìm lại giấc ngủ sâu & cân bằng cảm xúc
+                    Over 10,000+ people resting easier and reclaiming peaceful sleep
                   </p>
                 </div>
               </div>
@@ -190,7 +184,7 @@ export function SmartAppDownloadLanding() {
           <div className="lg:col-span-7 flex flex-col text-left">
             <div className="inline-flex items-center gap-2 rounded-full bg-indigo-950/80 px-3.5 py-1.5 text-xs font-bold text-amber-300 border border-indigo-800/60 w-fit mb-4">
               <Sparkles className="h-3.5 w-3.5" />
-              <span>ỨNG DỤNG ĐỒNG HÀNH SỨC KHỎE TINH THẦN ĐÊM MUỘN</span>
+              <span>BEDTIME SOMATIC GROUNDING & SLEEP COMPANION</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-[1.15] mb-4">
@@ -201,7 +195,7 @@ export function SmartAppDownloadLanding() {
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-6">
-              Không còn áp lực chuỗi ngày (Zero Streak Guilt). Xoa dịu hệ thần kinh lúc 2h sáng bằng âm thanh ngủ tần số sinh học 432Hz, nghi thức hạ cánh thể cảm và người bạn mầm cây Sprout thấu hiểu.
+              Zero streak guilt. Soften 2 AM nervous system alarms with restorative 432Hz sleep soundscapes, guided bedtime resets, and an empathetic Sprout companion.
             </p>
 
             {/* Feature Highlights Pill Grid */}
@@ -211,8 +205,8 @@ export function SmartAppDownloadLanding() {
                   🎵
                 </span>
                 <div>
-                  <h4 className="text-xs font-bold text-white">Âm Thanh 432Hz & Tiếng Ồn Trắng</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Ru dịu sóng não vào trạng thái thư giãn sâu.</p>
+                  <h4 className="text-xs font-bold text-white">432Hz Soundscapes & Pink Noise</h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Gentle acoustic frequencies to lull active minds into deep rest.</p>
                 </div>
               </div>
 
@@ -221,8 +215,8 @@ export function SmartAppDownloadLanding() {
                   🌱
                 </span>
                 <div>
-                  <h4 className="text-xs font-bold text-white">Nuôi Dưỡng Mầm Cảm Xúc</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Không đứt chuỗi, chấp nhận mọi cảm xúc.</p>
+                  <h4 className="text-xs font-bold text-white">Nurture Your Emotional Sprout</h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Zero streak guilt. Every feeling is a welcome guest.</p>
                 </div>
               </div>
 
@@ -231,8 +225,8 @@ export function SmartAppDownloadLanding() {
                   🫁
                 </span>
                 <div>
-                  <h4 className="text-xs font-bold text-white">Hạ Cánh Thể Cảm 3 Phút</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Bài tập thở 4-4-8 đồng bộ nhịp tim tức thì.</p>
+                  <h4 className="text-xs font-bold text-white">3-Minute Bedside Reset</h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Paced 4-4-8 breathing slider to down-regulate heart rate.</p>
                 </div>
               </div>
 
@@ -241,8 +235,8 @@ export function SmartAppDownloadLanding() {
                   🌙
                 </span>
                 <div>
-                  <h4 className="text-xs font-bold text-white">Hẹn Giờ Tắt Nhạc 8 Tiếng</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Chạy nền êm ái cả khi khóa màn hình.</p>
+                  <h4 className="text-xs font-bold text-white">8-Hour Continuous Sleep Timer</h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Smooth background audio playback even when phone locks.</p>
                 </div>
               </div>
             </div>
@@ -263,7 +257,7 @@ export function SmartAppDownloadLanding() {
               >
                 <span className="text-2xl leading-none"></span>
                 <div className="text-left">
-                  <p className="text-[10px] font-bold uppercase tracking-wider opacity-75">Tải trên</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider opacity-75">Download on the</p>
                   <p className="text-sm font-black leading-tight">App Store (iOS)</p>
                 </div>
               </a>
@@ -282,7 +276,7 @@ export function SmartAppDownloadLanding() {
               >
                 <span className="text-xl text-emerald-400 leading-none">▶</span>
                 <div className="text-left">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tải trên</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">GET IT ON</p>
                   <p className="text-sm font-black leading-tight">Google Play (Android)</p>
                 </div>
               </a>
@@ -293,15 +287,15 @@ export function SmartAppDownloadLanding() {
               <div className="flex items-center gap-5 rounded-3xl border border-indigo-900/50 bg-[#0a101f]/90 p-4 shadow-xl max-w-md">
                 <div className="relative shrink-0 rounded-2xl bg-white p-2 shadow-inner">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={qrDataUrl} alt="Mã QR tải ứng dụng Soulscape" className="h-24 w-24 rounded-lg object-contain" />
+                  <img src={qrDataUrl} alt="QR Code to Download Soulscape" className="h-24 w-24 rounded-lg object-contain" />
                 </div>
                 <div>
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 mb-1">
                     <Smartphone className="h-3.5 w-3.5" />
-                    Quét Mã Bằng Điện Thoại
+                    Scan with Your Phone Camera
                   </span>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    Mở Camera trên iPhone hoặc Android quét mã QR để tải ngay ứng dụng về máy.
+                    Point your iPhone or Android camera at the QR code to open the download page instantly.
                   </p>
                 </div>
               </div>
@@ -313,11 +307,11 @@ export function SmartAppDownloadLanding() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-indigo-950/60 bg-[#05080f]/90 py-6 text-center text-xs text-slate-500">
         <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© {new Date().getFullYear()} Soulscape by Botly Wellness. Mọi quyền được bảo lưu.</p>
+          <p>© {new Date().getFullYear()} Soulscape by Botly Wellness. All rights reserved.</p>
           <div className="flex items-center gap-4 text-[11px] text-slate-400">
-            <span>✓ Bảo mật quyền riêng tư</span>
-            <span>✓ Không quảng cáo rác</span>
-            <span>✓ 100% Miễn phí tải</span>
+            <span>✓ Privacy Protected</span>
+            <span>✓ Ad-free Sanctuary</span>
+            <span>✓ 100% Free Download</span>
           </div>
         </div>
       </footer>
