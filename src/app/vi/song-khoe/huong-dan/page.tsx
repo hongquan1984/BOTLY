@@ -10,7 +10,12 @@ export const metadata: Metadata = {
   title: 'Kho Bài Viết Y Sinh Thực Chứng & Cơ Chế Dược Tính | Botly Wellness',
   description: 'Khám phá thư viện bài viết khoa học giải mã các mẹo sức khỏe, bài thuốc tự nhiên, mô phỏng 3D giải phẫu tế bào và trắc nghiệm an toàn.',
   alternates: {
-    canonical: '/vi/song-khoe/huong-dan'
+    canonical: '/vi/song-khoe/huong-dan',
+    languages: {
+      en: '/en/wellness/guides',
+      vi: '/vi/song-khoe/huong-dan',
+      'x-default': '/en/wellness/guides',
+    },
   }
 };
 

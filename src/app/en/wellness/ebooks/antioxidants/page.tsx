@@ -5,6 +5,10 @@ export const metadata: Metadata = {
   title: "Antioxidants on the Plate – Evidence-Based Handbook | HealthClues",
   description:
     "Six everyday food combinations, carotenoid bioavailability, green tea catechin dynamics, and human clinical research. Free 14-page PDF download.",
+  alternates: {
+    canonical: "/en/wellness/ebooks/antioxidants",
+    languages: { en: "/en/wellness/ebooks/antioxidants", vi: "/vi/song-khoe/ebooks/chat-chong-oxy-hoa", "x-default": "/en/wellness/ebooks/antioxidants" },
+  },
   openGraph: {
     title: "Antioxidants on the Plate – Free HealthClues Ebook",
     description: "Everyday food combinations, compounds and what human research actually says.",

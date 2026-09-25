@@ -14,14 +14,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/en/wellness/ebooks", "/vi/song-khoe/ebooks",
     "/en/wellness/ebooks/blood-sugar-pairings", "/vi/song-khoe/ebooks/duong-huyet",
     "/en/wellness/ebooks/antioxidants", "/vi/song-khoe/ebooks/chat-chong-oxy-hoa",
+    "/tai-app", "/app",
   ];
   const articlePaths = wellnessArticles.map((article) => article.locale === "en" ? `/en/wellness/guides/${article.slug}` : `/vi/song-khoe/huong-dan/${article.slug}`);
   const published = await publishedSitemapEntries();
-  return [...paths, ...articlePaths].map((path, index) => ({
+  const staticEntries: MetadataRoute.Sitemap = [...paths, ...articlePaths].map((path, index) => ({
     url: `${siteConfig.url}${path}`,
-    lastModified: new Date(),
+    // Do not claim every URL changed on every deploy. Google uses lastmod
+    // as a crawl scheduling signal only when it is accurate and stable.
     changeFrequency: index === 0 ? "weekly" as const : "monthly" as const,
     priority: index === 0 ? 1 : 0.8,
-  })).concat(published.map(a => ({ url: `${siteConfig.url}${a.path}`,
+  }));
+  return staticEntries.concat(published.map(a => ({ url: `${siteConfig.url}${a.path}`,
     lastModified: new Date(a.updatedAt), changeFrequency: 'monthly' as const, priority: 0.8 })));
 }

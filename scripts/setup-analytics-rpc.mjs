@@ -138,9 +138,9 @@ async function main() {
             WHEN e.path = '/en/wellness/ebooks/antioxidants' THEN 'Ebook Vol 02 - Antioxidants (EN)'
             WHEN e.path = '/vi/song-khoe/ebooks/chat-chong-oxy-hoa' THEN 'Ebook Vol 02 - Chất Chống Oxy Hóa (VI)'
             WHEN e.path = '/en/business' THEN 'Cổng Khách Hàng Doanh Nghiệp (EN)'
-            WHEN e.path = '/vi/doanh-nghiep' THEN 'Cổng Khách Hàng Doanh Nghiệp (VI)'
             WHEN e.path = '/en/wellness/health-tips' THEN 'Mẹo Sống Khỏe & Lối Sống (EN)'
             WHEN e.path = '/vi/song-khoe/meo-hay' THEN 'Mẹo Sống Khỏe & Lối Sống (VI)'
+            WHEN e.path = '/tai-app' OR e.path = '/app' OR e.path = '/download' THEN 'Landing Page Tải App Soulscape'
             ELSE e.path
           END AS title,
           CASE WHEN e.path LIKE '/vi%' THEN 'vi' ELSE 'en' END AS locale,

@@ -16,6 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const title = ('seo_title' in a && a.seo_title) || a.title;
   const description = ('seo_description' in a && a.seo_description) || a.description;
   const canonicalUrl = `${siteConfig.url}${articlePath('en', slug)}`;
+  const translatedPath = await translatedArticlePath(a as any);
   const coverUrl = ('wellness_articles' in a && a.wellness_articles?.cover_image_url)
     || ('heroImage' in a && a.heroImage)
     || '/og-image.jpg';
@@ -24,7 +25,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
-    alternates: { canonical: canonicalUrl },
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        en: canonicalUrl,
+        ...(translatedPath ? { vi: `${siteConfig.url}${translatedPath}` } : {}),
+        'x-default': canonicalUrl,
+      },
+    },
     openGraph: {
       title,
       description,

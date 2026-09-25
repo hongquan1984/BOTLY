@@ -12,6 +12,7 @@ import {
 } from './ArticleWidgets';
 import { MindfulOnboardingWizard } from './MindfulOnboardingWizard';
 import { RelatedArticlesSection } from './RelatedArticlesSection';
+import { getArticleCoverImage } from './ArticleCard';
 
 export function PublishedArticlePage({ article: a, translationPath, relatedArticles = [] }: {
   article: PublishedArticle; translationPath: string | null; relatedArticles?: PublishedArticle[];
@@ -261,26 +262,29 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
               </div>
             ) : (
               <>
-                {a.wellness_articles?.cover_image_url && (
-                  <figure className="mb-8 overflow-hidden rounded-3xl border border-stone-200/80 shadow-md bg-stone-100">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={a.wellness_articles.cover_image_url}
-                      alt={a.cover_image_alt || a.title}
-                      className="w-full object-cover max-h-[460px] rounded-3xl"
-                      loading="eager"
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                    />
-                    {a.cover_image_alt && (
-                      <figcaption className="p-3 text-center text-xs text-stone-500 font-medium bg-stone-50/80 border-t border-stone-150">
-                        {a.cover_image_alt}
-                      </figcaption>
-                    )}
-                  </figure>
-                )}
+                {(() => {
+                  const coverImg = a.wellness_articles?.cover_image_url || getArticleCoverImage(a);
+                  return (
+                    <figure className="mb-8 overflow-hidden rounded-3xl border border-stone-200/80 shadow-md bg-stone-100">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={coverImg}
+                        alt={a.cover_image_alt || a.title}
+                        className="w-full object-cover max-h-[460px] rounded-3xl"
+                        loading="eager"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          e.currentTarget.src = '/ebooks/antioxidants/tomato-olive-oil-hero.png';
+                        }}
+                      />
+                      {a.cover_image_alt && (
+                        <figcaption className="p-3 text-center text-xs text-stone-500 font-medium bg-stone-50/80 border-t border-stone-150">
+                          {a.cover_image_alt}
+                        </figcaption>
+                      )}
+                    </figure>
+                  );
+                })()}
 
                 {a.wellness_articles?.facebook_url && (
                   <p className="mb-8">

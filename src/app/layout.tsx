@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/data/site";
 import { JsonLd } from "@/components/sections/JsonLd";
 import { ToastProvider } from "@/components/layout/ToastProvider";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 import { MonetagInPagePush } from "@/components/monetag/MonetagInPagePush";
+import { LocaleHtmlLang } from "@/components/seo/LocaleHtmlLang";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -66,9 +68,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  alternates: {
-    canonical: siteConfig.url,
-  },
+  alternates: { canonical: siteConfig.url },
 };
 
 export const viewport: Viewport = {
@@ -78,16 +78,20 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = (await headers()).get("x-pathname") || "/";
+  const lang = pathname.startsWith("/vi/") ? "vi" : "en";
+
   return (
-    <html lang="en">
+    <html lang={lang}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <LocaleHtmlLang />
         <JsonLd />
         <AnalyticsTracker />
         <MonetagInPagePush />

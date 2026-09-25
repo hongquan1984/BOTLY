@@ -10,7 +10,12 @@ export const metadata: Metadata = {
   title: 'Complete Evidence-Based Scientific Wellness Library | Botly',
   description: 'Explore the full collection of biochemical analyses, natural remedy mechanism evaluations, 3D anatomical simulations, and safety quizzes.',
   alternates: {
-    canonical: '/en/wellness/guides'
+    canonical: '/en/wellness/guides',
+    languages: {
+      en: '/en/wellness/guides',
+      vi: '/vi/song-khoe/huong-dan',
+      'x-default': '/en/wellness/guides',
+    },
   }
 };
 

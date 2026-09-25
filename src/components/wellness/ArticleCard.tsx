@@ -3,6 +3,29 @@ import type { PublishedArticle } from '@/lib/published-articles';
 import { articlePath } from '@/lib/article-publishing';
 import { ArrowRight, Clock, ShieldCheck, Sparkles, Moon } from 'lucide-react';
 
+export function getArticleCoverImage(article: PublishedArticle): string {
+  if (article.wellness_articles?.cover_image_url) {
+    return article.wellness_articles.cover_image_url;
+  }
+  const slug = (article.slug || '').toLowerCase();
+  if (slug.includes('tomato') && (slug.includes('olive') || slug.includes('oil'))) return '/ebooks/antioxidants/tomato-olive-oil-hero.png';
+  if (slug.includes('green-tea') || slug.includes('tea') || slug.includes('lemon') || slug.includes('citrus')) return '/ebooks/antioxidants/green-tea-citrus-hero.png';
+  if (slug.includes('avocado')) return '/ebooks/antioxidants/avocado-tomato-hero.png';
+  if (slug.includes('lentil') || slug.includes('rice')) return '/ebooks/blood-sugar/lentils-rice-hero.png';
+  if (slug.includes('oat') || slug.includes('berr')) return '/ebooks/blood-sugar/oats-berries-hero.png';
+  if (slug.includes('bean') || slug.includes('toast')) return '/ebooks/blood-sugar/beans-toast-hero.png';
+  if (slug.includes('broccoli') || slug.includes('mustard')) return '/ebooks/antioxidants/broccoli-olive-oil-hero.png';
+  if (slug.includes('carrot') || slug.includes('hummus')) return '/ebooks/antioxidants/carrot-hummus-hero.png';
+  if (slug.includes('kimchi')) return '/ebooks/antioxidants/kimchi-rice-hero.png';
+  if (slug.includes('turmeric') || slug.includes('pepper')) return '/ebooks/antioxidants/tomato-olive-oil-hero.png';
+
+  const cat = article.wellness_articles?.category_id;
+  if (cat === 'healing') return '/characters/lumi-healing.png';
+  if (cat === 'weight') return '/ebooks/covers/vol3-weight-management.png';
+
+  return '/ebooks/antioxidants/tomato-olive-oil-hero.png';
+}
+
 export function ArticleCard({
   article,
   locale
@@ -12,7 +35,7 @@ export function ArticleCard({
 }) {
   const vi = locale === 'vi';
   const href = articlePath(locale, article.slug);
-  const coverImg = article.wellness_articles?.cover_image_url || '/og-image.jpg';
+  const coverImg = getArticleCoverImage(article);
   const score = article.trust_meter?.score;
 
   const categoryName = {
@@ -35,6 +58,9 @@ export function ArticleCard({
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
           referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.src = '/ebooks/antioxidants/tomato-olive-oil-hero.png';
+          }}
         />
 
         {/* Category Pill */}
@@ -63,42 +89,29 @@ export function ArticleCard({
         ) : null}
       </div>
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col p-5 sm:p-6">
-        {/* Meta Info */}
-        <div className="mb-2.5 flex items-center gap-3 text-xs text-[#637d73]">
-          {article.reading_minutes && (
-            <span className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5 text-emerald-600" />
-              {article.reading_minutes} {vi ? 'phút đọc' : 'min read'}
+      <div className="flex flex-1 flex-col justify-between p-6">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800">
+            <span>{article.eyebrow || 'Y SINH & DINH DƯỠNG'}</span>
+            <span>•</span>
+            <span className="flex items-center gap-1 text-slate-500 font-normal">
+              <Clock className="h-3 w-3" />
+              {article.reading_minutes || 3} {vi ? 'phút' : 'min'}
             </span>
-          )}
-          <span>•</span>
-          <span>
-            {new Date(article.published_at).toLocaleDateString(vi ? 'vi-VN' : 'en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric'
-            })}
-          </span>
+          </div>
+
+          <h3 className="mt-2.5 text-lg font-black leading-snug tracking-tight text-[#18302b] group-hover:text-emerald-700 transition">
+            {article.title}
+          </h3>
+
+          <p className="mt-2 text-xs text-[#526b62] line-clamp-2 leading-relaxed">
+            {article.description}
+          </p>
         </div>
 
-        {/* Title */}
-        <h3 className="text-lg font-bold leading-snug text-[#18302b] transition-colors group-hover:text-emerald-700 line-clamp-2">
-          {article.title}
-        </h3>
-
-        {/* Excerpt */}
-        <p className="mt-2 text-xs leading-relaxed text-[#4e665d] line-clamp-2 flex-1">
-          {article.takeaway || article.description}
-        </p>
-
-        {/* Read More Footer */}
-        <div className="mt-5 flex items-center justify-between border-t border-[#f0f4ef] pt-3 text-xs font-bold text-emerald-700">
-          <span>{vi ? 'Đọc bài viết' : 'Read guide'}</span>
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f0f5ee] text-emerald-800 transition-transform group-hover:translate-x-1 group-hover:bg-emerald-600 group-hover:text-white">
-            <ArrowRight className="h-3.5 w-3.5" />
-          </span>
+        <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 text-xs font-bold text-emerald-850">
+          <span>{vi ? 'Khám phá ngay' : 'Explore guide'}</span>
+          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 text-emerald-700" />
         </div>
       </div>
     </Link>
