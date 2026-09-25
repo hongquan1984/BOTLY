@@ -32,6 +32,9 @@ import {
 interface SummaryData {
   total_page_views: number;
   today_page_views: number;
+  total_unique_visitors?: number;
+  today_unique_visitors?: number;
+  views_per_visitor?: number;
   total_quiz_starts?: number;
   today_quiz_starts?: number;
   total_quiz_completions: number;
@@ -60,6 +63,7 @@ interface SummaryData {
 interface DailyRecord {
   day: string;
   page_views: number;
+  unique_visitors?: number;
   quiz_starts?: number;
   quiz_completions: number;
   quiz_drop_offs?: number;
@@ -73,6 +77,7 @@ interface ArticleRecord {
   title: string;
   locale: string;
   views: number;
+  unique_visitors?: number;
   quiz_starts?: number;
   quiz_completions: number;
   quiz_drop_offs?: number;
@@ -88,6 +93,7 @@ interface StaticPageRecord {
   title: string;
   locale: string;
   views: number;
+  unique_visitors?: number;
   quiz_starts: number;
   quiz_completions: number;
   quiz_drop_offs: number;
@@ -380,25 +386,35 @@ export default function AdminAnalyticsPage() {
 
         {/* 6 Summary KPI Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          {/* Card 1: Pageviews */}
+          {/* Card 1: Pageviews & Unique Visitors */}
           <div className="rounded-3xl border border-emerald-900/50 bg-gradient-to-b from-[#132320] to-[#0f1b18] p-5 shadow-lg shadow-black/20">
             <div className="flex items-center justify-between text-emerald-400">
-              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300/70">Tổng Lượt Xem</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300/70">Lượt Xem & Người Dùng</span>
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-900/40 text-emerald-300">
                 <Eye className="h-5 w-5" />
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-3xl font-extrabold text-white tracking-tight">
-                {data?.summary?.total_page_views?.toLocaleString('vi-VN') || 0}
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-3xl font-extrabold text-white tracking-tight">
+                  {data?.summary?.total_page_views?.toLocaleString('vi-VN') || 0}
+                </span>
+                <span className="text-xs font-bold text-emerald-400/80 uppercase">views</span>
+              </div>
+              <div className="mt-1 flex items-center gap-1.5 text-xs text-emerald-200">
+                <span>👤</span>
+                <span className="font-extrabold text-white">{data?.summary?.total_unique_visitors?.toLocaleString('vi-VN') || 0}</span>
+                <span className="text-emerald-300/70">người (UV)</span>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center justify-between border-t border-emerald-900/40 pt-2 text-[11px]">
+              <span className="text-emerald-400 font-medium">
+                +{data?.summary?.today_page_views || 0} views hôm nay
               </span>
-              <span className="ml-2 text-xs font-medium text-emerald-400 bg-emerald-950/80 border border-emerald-800/40 px-2 py-0.5 rounded-md">
-                +{data?.summary?.today_page_views || 0} hôm nay
+              <span className="text-emerald-300/80 font-mono">
+                ({data?.summary?.today_unique_visitors || 0} người)
               </span>
             </div>
-            <p className="mt-2 text-xs text-emerald-200/50">
-              Toàn bộ bài viết y sinh học & cẩm nang trong {selectedDays} ngày
-            </p>
           </div>
 
           {/* Card 2: Quizzes Funnel (Starts, Drop-offs, Completions) */}
@@ -564,7 +580,7 @@ export default function AdminAnalyticsPage() {
                       {/* Tooltip on Hover */}
                       <div className="pointer-events-none absolute -top-14 left-1/2 -translate-x-1/2 z-20 hidden rounded-xl border border-emerald-700/60 bg-[#081210] p-2 text-center text-xs shadow-xl group-hover:block whitespace-nowrap">
                         <p className="font-semibold text-white">{dayItem.day}</p>
-                        <p className="text-emerald-400">👁️ {dayItem.page_views} xem</p>
+                        <p className="text-emerald-400">👁️ {dayItem.page_views} xem ({dayItem.unique_visitors || dayItem.page_views} người)</p>
                         <p className="text-amber-400">🧪 {dayItem.quiz_completions} quiz</p>
                         {dayItem.leads > 0 && <p className="text-teal-300">💌 {dayItem.leads} email</p>}
                       </div>
@@ -1046,7 +1062,8 @@ export default function AdminAnalyticsPage() {
                   <tr className="border-b border-emerald-900/40 text-xs font-semibold uppercase tracking-wider text-emerald-300/70">
                     <th className="py-3 px-4">Tên Bài Viết & Slug</th>
                     <th className="py-3 px-4 text-center">Ngôn Ngữ</th>
-                    <th className="py-3 px-4 text-right">Lượt Xem</th>
+                    <th className="py-3 px-4 text-right">Lượt Xem (Views)</th>
+                    <th className="py-3 px-4 text-right">Người Xem (UV)</th>
                     <th className="py-3 px-4 text-right">Bắt Đầu Quiz</th>
                     <th className="py-3 px-4 text-right">Xong 100%</th>
                     <th className="py-3 px-4 text-right">Dang Dở</th>
@@ -1078,6 +1095,7 @@ export default function AdminAnalyticsPage() {
                             </span>
                           </td>
                           <td className="py-3.5 px-4 text-right font-bold text-white">{art.views}</td>
+                          <td className="py-3.5 px-4 text-right font-semibold text-emerald-300">{art.unique_visitors || art.views}</td>
                           <td className="py-3.5 px-4 text-right font-bold text-indigo-300">{starts}</td>
                           <td className="py-3.5 px-4 text-right font-bold text-emerald-300">{art.quiz_completions}</td>
                           <td className="py-3.5 px-4 text-right font-bold text-amber-400">
@@ -1106,7 +1124,7 @@ export default function AdminAnalyticsPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={10} className="py-8 text-center text-sm text-emerald-400/50">
+                      <td colSpan={11} className="py-8 text-center text-sm text-emerald-400/50">
                         Chưa có dữ liệu bài viết
                       </td>
                     </tr>
@@ -1131,7 +1149,8 @@ export default function AdminAnalyticsPage() {
                   <tr className="border-b border-emerald-900/40 text-xs font-semibold uppercase tracking-wider text-emerald-300/70">
                     <th className="py-3 px-4">Tên Trang & Đường Dẫn</th>
                     <th className="py-3 px-4 text-center">Ngôn Ngữ</th>
-                    <th className="py-3 px-4 text-right">Lượt Xem Toàn Bộ</th>
+                    <th className="py-3 px-4 text-right">Lượt Xem (Views)</th>
+                    <th className="py-3 px-4 text-right">Người Xem (UV)</th>
                     <th className="py-3 px-4 text-right">Bắt Đầu Quiz</th>
                     <th className="py-3 px-4 text-right">Xong 100%</th>
                     <th className="py-3 px-4 text-right">Dang Dở</th>
@@ -1153,6 +1172,7 @@ export default function AdminAnalyticsPage() {
                           </span>
                         </td>
                         <td className="py-3.5 px-4 text-right font-bold text-white">{sp.views}</td>
+                        <td className="py-3.5 px-4 text-right font-semibold text-emerald-300">{sp.unique_visitors || sp.views}</td>
                         <td className="py-3.5 px-4 text-right font-bold text-indigo-300">{sp.quiz_starts}</td>
                         <td className="py-3.5 px-4 text-right font-bold text-emerald-300">{sp.quiz_completions}</td>
                         <td className="py-3.5 px-4 text-right font-bold text-amber-400">{sp.quiz_drop_offs}</td>
@@ -1170,7 +1190,7 @@ export default function AdminAnalyticsPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={8} className="py-8 text-center text-sm text-emerald-400/50">
+                      <td colSpan={9} className="py-8 text-center text-sm text-emerald-400/50">
                         Chưa có dữ liệu trang tĩnh
                       </td>
                     </tr>

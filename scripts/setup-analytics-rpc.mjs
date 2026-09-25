@@ -41,6 +41,7 @@ async function main() {
         SELECT
           to_char(d, 'YYYY-MM-DD') AS day,
           coalesce(count(e.id) FILTER (WHERE e.event_type = 'page_view'), 0) AS page_views,
+          coalesce(count(DISTINCT coalesce(e.visitor_id, e.session_id, e.id::text)) FILTER (WHERE e.event_type = 'page_view'), 0) AS unique_visitors,
           coalesce(count(e.id) FILTER (WHERE e.event_type = 'quiz_started'), 0) AS quiz_starts,
           coalesce(count(e.id) FILTER (WHERE e.event_type = 'quiz_completed'), 0) AS quiz_completions,
           coalesce(count(e.id) FILTER (WHERE e.event_type = 'lead_submit'), 0) AS lead_submits,
@@ -63,6 +64,7 @@ async function main() {
         SELECT
           de.day,
           de.page_views,
+          de.unique_visitors,
           de.quiz_starts,
           de.quiz_completions,
           greatest(de.quiz_starts - de.quiz_completions, 0) AS quiz_drop_offs,
@@ -79,6 +81,7 @@ async function main() {
           coalesce(max(t.title), e.article_slug) AS title,
           coalesce(max(t.locale), 'vi') AS locale,
           count(e.id) FILTER (WHERE e.event_type = 'page_view') AS views,
+          count(DISTINCT coalesce(e.visitor_id, e.session_id, e.id::text)) FILTER (WHERE e.event_type = 'page_view') AS unique_visitors,
           count(e.id) FILTER (WHERE e.event_type = 'quiz_started') AS quiz_starts,
           count(e.id) FILTER (WHERE e.event_type = 'quiz_completed') AS quiz_completions,
           count(e.id) FILTER (WHERE e.event_type = 'onboarding_app_download_click') AS app_clicks
@@ -106,6 +109,7 @@ async function main() {
           a.title,
           a.locale,
           a.views,
+          a.unique_visitors,
           a.quiz_starts,
           a.quiz_completions,
           greatest(a.quiz_starts - a.quiz_completions, 0) AS quiz_drop_offs,
@@ -145,6 +149,7 @@ async function main() {
           END AS title,
           CASE WHEN e.path LIKE '/vi%' THEN 'vi' ELSE 'en' END AS locale,
           count(e.id) FILTER (WHERE e.event_type = 'page_view') AS views,
+          count(DISTINCT coalesce(e.visitor_id, e.session_id, e.id::text)) FILTER (WHERE e.event_type = 'page_view') AS unique_visitors,
           count(e.id) FILTER (WHERE e.event_type = 'quiz_started') AS quiz_starts,
           count(e.id) FILTER (WHERE e.event_type = 'quiz_completed') AS quiz_completions,
           greatest(count(e.id) FILTER (WHERE e.event_type = 'quiz_started') - count(e.id) FILTER (WHERE e.event_type = 'quiz_completed'), 0) AS quiz_drop_offs,
@@ -283,6 +288,8 @@ async function main() {
         SELECT
           (SELECT coalesce(sum(page_views), 0) FROM daily_merged) AS total_page_views,
           (SELECT coalesce(page_views, 0) FROM daily_merged WHERE day = to_char(now(), 'YYYY-MM-DD')) AS today_page_views,
+          (SELECT coalesce(count(DISTINCT coalesce(e.visitor_id, e.session_id, e.id::text)), 0) FROM events_filtered e WHERE e.event_type = 'page_view') AS total_unique_visitors,
+          (SELECT coalesce(count(DISTINCT coalesce(e.visitor_id, e.session_id, e.id::text)), 0) FROM events_filtered e WHERE e.event_type = 'page_view' AND to_char(e.created_at, 'YYYY-MM-DD') = to_char(now(), 'YYYY-MM-DD')) AS today_unique_visitors,
           (SELECT coalesce(sum(quiz_starts), 0) FROM daily_merged) AS total_quiz_starts,
           (SELECT coalesce(quiz_starts, 0) FROM daily_merged WHERE day = to_char(now(), 'YYYY-MM-DD')) AS today_quiz_starts,
           (SELECT coalesce(sum(quiz_completions), 0) FROM daily_merged) AS total_quiz_completions,
@@ -306,6 +313,9 @@ async function main() {
         'summary', jsonb_build_object(
           'total_page_views', sc.total_page_views,
           'today_page_views', sc.today_page_views,
+          'total_unique_visitors', sc.total_unique_visitors,
+          'today_unique_visitors', sc.today_unique_visitors,
+          'views_per_visitor', CASE WHEN sc.total_unique_visitors > 0 THEN round((sc.total_page_views::numeric / sc.total_unique_visitors::numeric), 1) ELSE 1.0 END,
           'total_quiz_starts', sc.total_quiz_starts,
           'today_quiz_starts', sc.today_quiz_starts,
           'total_quiz_completions', sc.total_quiz_completions,

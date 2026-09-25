@@ -16,6 +16,8 @@ export async function POST(request: Request) {
       locale = 'vi',
       referrer = '',
       device_type = 'desktop',
+      visitor_id,
+      session_id,
       metadata = {}
     } = body as Record<string, unknown>;
 
@@ -35,6 +37,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'Not configured' }, { status: 503 });
     }
 
+    // Server fallback identifier if client storage was blocked or empty
+    let finalVisitorId = typeof visitor_id === 'string' && visitor_id.trim() ? visitor_id.trim() : null;
+    let finalSessionId = typeof session_id === 'string' && session_id.trim() ? session_id.trim() : null;
+
+    if (!finalVisitorId) {
+      const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
+      const ua = request.headers.get('user-agent') || '';
+      const day = new Date().toISOString().slice(0, 10);
+      finalVisitorId = 'srv_' + Buffer.from(`${ip}-${ua}-${day}`).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 24);
+    }
+
+    if (!finalSessionId) {
+      finalSessionId = 's_' + finalVisitorId;
+    }
+
     // Await database insert so Vercel Serverless does not terminate early
     const insertRes = await fetch(`${url}/rest/v1/analytics_events`, {
       method: 'POST',
@@ -51,6 +68,8 @@ export async function POST(request: Request) {
         locale: locale === 'en' ? 'en' : 'vi',
         referrer: String(referrer).slice(0, 500),
         device_type: String(device_type).slice(0, 50),
+        visitor_id: finalVisitorId.slice(0, 100),
+        session_id: finalSessionId.slice(0, 100),
         metadata: typeof metadata === 'object' && metadata !== null ? metadata : {},
         created_at: new Date().toISOString()
       })
