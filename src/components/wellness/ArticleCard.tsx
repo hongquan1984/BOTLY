@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import type { PublishedArticle } from '@/lib/published-articles';
 import { articlePath } from '@/lib/article-publishing';
