@@ -26,7 +26,11 @@ import {
   EyeOff,
   Flame,
   FileSpreadsheet,
-  BookOpen
+  BookOpen,
+  ArrowUpRight,
+  Radio,
+  Layers,
+  Tag
 } from 'lucide-react';
 
 interface SummaryData {
@@ -162,6 +166,48 @@ interface RecentQuizRecord {
   created_at: string;
 }
 
+interface AppDownloadDailyRecord {
+  day: string;
+  total_clicks: number;
+  unique_visitors: number;
+  ios: number;
+  android: number;
+  desktop: number;
+  from_ads: number;
+  organic: number;
+}
+
+interface AppDownloadSourceRecord {
+  campaign: string;
+  source: string;
+  medium: string;
+  content: string;
+  article_slug?: string | null;
+  source_title: string;
+  path: string;
+  total_clicks: number;
+  unique_visitors: number;
+  ios: number;
+  android: number;
+  last_click_at: string;
+}
+
+interface AppDownloadRecentRecord {
+  id: string;
+  created_at_vn: string;
+  platform: string;
+  path: string;
+  article_slug?: string | null;
+  article_title: string;
+  utm_campaign?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_content?: string | null;
+  referrer_clean: string;
+  referrer?: string | null;
+  visitor_id?: string | null;
+}
+
 interface AnalyticsPayload {
   summary: SummaryData;
   daily: DailyRecord[];
@@ -173,6 +219,9 @@ interface AnalyticsPayload {
   devices: DeviceRecord[];
   referrers: ReferrerRecord[];
   recent_quizzes: RecentQuizRecord[];
+  app_downloads_daily?: AppDownloadDailyRecord[];
+  app_downloads_sources?: AppDownloadSourceRecord[];
+  app_downloads_recent?: AppDownloadRecentRecord[];
 }
 
 export default function AdminAnalyticsPage() {
@@ -180,7 +229,12 @@ export default function AdminAnalyticsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDays, setSelectedDays] = useState<number>(7);
-  const [activeTab, setActiveTab] = useState<'subscribers' | 'ebooks' | 'articles' | 'static_pages' | 'quizzes' | 'devices'>('subscribers');
+  const [activeTab, setActiveTab] = useState<'app_downloads' | 'subscribers' | 'ebooks' | 'articles' | 'static_pages' | 'quizzes' | 'devices'>('app_downloads');
+
+  // Search and filters for app downloads
+  const [appSearchQuery, setAppSearchQuery] = useState<string>('');
+  const [appFilterSource, setAppFilterSource] = useState<string>('all');
+  const [appSubTab, setAppSubTab] = useState<'daily' | 'sources' | 'recent'>('daily');
 
   // Search and filters for subscribers
   const [searchEmail, setSearchEmail] = useState<string>('');
@@ -211,6 +265,83 @@ export default function AdminAnalyticsPage() {
     fetchData(selectedDays);
   }, [selectedDays]);
 
+  // Filtered app downloads daily
+  const filteredAppDaily = useMemo(() => {
+    if (!data?.app_downloads_daily) return [];
+    return data.app_downloads_daily.filter(item => {
+      const q = appSearchQuery.toLowerCase();
+      const matchSearch = !q || item.day.includes(q);
+      const matchSource =
+        appFilterSource === 'all'
+          ? true
+          : appFilterSource === 'ads'
+          ? item.from_ads > 0
+          : appFilterSource === 'direct' || appFilterSource === 'facebook' || appFilterSource === 'zalo' || appFilterSource === 'article'
+          ? item.organic > 0
+          : true;
+      return matchSearch && matchSource;
+    });
+  }, [data?.app_downloads_daily, appSearchQuery, appFilterSource]);
+
+  // Filtered app downloads sources
+  const filteredAppSources = useMemo(() => {
+    if (!data?.app_downloads_sources) return [];
+    return data.app_downloads_sources.filter(item => {
+      const q = appSearchQuery.toLowerCase();
+      const matchSearch =
+        !q ||
+        item.campaign.toLowerCase().includes(q) ||
+        item.source.toLowerCase().includes(q) ||
+        item.source_title.toLowerCase().includes(q) ||
+        item.path.toLowerCase().includes(q);
+
+      const matchSource =
+        appFilterSource === 'all'
+          ? true
+          : appFilterSource === 'ads'
+          ? item.medium === 'paid' || (item.campaign && !item.campaign.includes('Tự nhiên'))
+          : appFilterSource === 'facebook'
+          ? item.source.toLowerCase().includes('facebook') || item.source.toLowerCase().includes('fb')
+          : appFilterSource === 'zalo'
+          ? item.source.toLowerCase().includes('zalo')
+          : appFilterSource === 'article'
+          ? !!item.article_slug || item.path.includes('/guides') || item.path.includes('/huong-dan')
+          : item.source.toLowerCase().includes('direct') || item.source.toLowerCase().includes('trực tiếp');
+
+      return matchSearch && matchSource;
+    });
+  }, [data?.app_downloads_sources, appSearchQuery, appFilterSource]);
+
+  // Filtered app downloads recent
+  const filteredAppRecent = useMemo(() => {
+    if (!data?.app_downloads_recent) return [];
+    return data.app_downloads_recent.filter(item => {
+      const q = appSearchQuery.toLowerCase();
+      const matchSearch =
+        !q ||
+        (item.utm_campaign && item.utm_campaign.toLowerCase().includes(q)) ||
+        (item.utm_source && item.utm_source.toLowerCase().includes(q)) ||
+        item.article_title.toLowerCase().includes(q) ||
+        item.path.toLowerCase().includes(q) ||
+        item.referrer_clean.toLowerCase().includes(q);
+
+      const matchSource =
+        appFilterSource === 'all'
+          ? true
+          : appFilterSource === 'ads'
+          ? item.utm_medium === 'paid' || !!item.utm_campaign
+          : appFilterSource === 'facebook'
+          ? item.referrer_clean.toLowerCase().includes('facebook') || (item.utm_source && item.utm_source.toLowerCase().includes('fb'))
+          : appFilterSource === 'zalo'
+          ? item.referrer_clean.toLowerCase().includes('zalo') || (item.utm_source && item.utm_source.toLowerCase().includes('zalo'))
+          : appFilterSource === 'article'
+          ? !!item.article_slug || item.path.includes('/guides') || item.path.includes('/huong-dan')
+          : item.referrer_clean.toLowerCase().includes('direct');
+
+      return matchSearch && matchSource;
+    });
+  }, [data?.app_downloads_recent, appSearchQuery, appFilterSource]);
+
   // Filtered subscribers list
   const filteredSubscribers = useMemo(() => {
     if (!data?.subscribers) return [];
@@ -238,6 +369,33 @@ export default function AdminAnalyticsPage() {
 
   // Export CSV
   const handleExportCSV = () => {
+    if (activeTab === 'app_downloads') {
+      if (!data?.app_downloads_sources || data.app_downloads_sources.length === 0) return;
+      const headers = ['Chiến dịch / Video', 'Kênh nguồn', 'Hình thức', 'Trang / Bài viết', 'Đường dẫn', 'Tổng Click', 'Khách thật (UV)', 'iOS', 'Android', 'Lần click cuối'];
+      const rows = data.app_downloads_sources.map(s => [
+        `"${s.campaign}"`,
+        `"${s.source}"`,
+        `"${s.medium}"`,
+        `"${s.source_title.replace(/"/g, '""')}"`,
+        `"${s.path}"`,
+        s.total_clicks,
+        s.unique_visitors,
+        s.ios,
+        s.android,
+        `"${s.last_click_at}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `botly-app-downloads-${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+
     if (!data?.subscribers || data.subscribers.length === 0) return;
     const headers = ['ID', 'Email', 'Ngôn ngữ', 'Nguồn đăng ký', 'Ngày đăng ký', 'Trạng thái'];
     const rows = data.subscribers.map(s => [
@@ -369,7 +527,7 @@ export default function AdminAnalyticsPage() {
               className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-900/20 hover:from-emerald-500 hover:to-teal-400 transition-all cursor-pointer"
             >
               <FileSpreadsheet className="h-4 w-4" />
-              Xuất File Email (CSV)
+              {activeTab === 'app_downloads' ? 'Xuất Thống Kê Tải App (CSV)' : 'Xuất File Email (CSV)'}
             </button>
           </div>
         </div>
@@ -474,7 +632,11 @@ export default function AdminAnalyticsPage() {
           </div>
 
           {/* Card 4: App Download Clicks */}
-          <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-b from-[#1b1429] to-[#120d1c] p-5 shadow-lg shadow-black/20">
+          <div
+            onClick={() => setActiveTab('app_downloads')}
+            className="rounded-3xl border border-purple-900/40 bg-gradient-to-b from-[#1b1429] to-[#120d1c] p-5 shadow-lg shadow-black/20 cursor-pointer hover:border-purple-500/80 transition-all hover:scale-[1.02]"
+            title="Bấm để xem chi tiết lượt tải theo ngày và nguồn link"
+          >
             <div className="flex items-center justify-between text-purple-300">
               <span className="text-xs font-semibold uppercase tracking-wider text-purple-300/70">Click Nút Tải App</span>
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-900/40 text-purple-300">
@@ -621,6 +783,7 @@ export default function AdminAnalyticsPage() {
         <div className="mt-10 border-b border-emerald-900/40">
           <nav className="flex space-x-2 sm:space-x-8 overflow-x-auto pb-px">
             {[
+              { id: 'app_downloads', label: `🚀 Lượt Tải App & Nguồn Link (${data?.summary?.total_app_clicks || 0})` },
               { id: 'subscribers', label: `💌 Danh Sách Email (${data?.subscribers?.length || 0})` },
               { id: 'ebooks', label: `📚 Cẩm Nang Ebook (${data?.summary?.total_ebook_downloads || 0} lượt tải)` },
               { id: 'articles', label: `📊 Bài Viết (${data?.articles?.length || 0})` },
@@ -633,7 +796,7 @@ export default function AdminAnalyticsPage() {
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
                 className={`py-3 px-1 text-sm font-semibold border-b-2 whitespace-nowrap transition-all cursor-pointer ${
                   activeTab === tab.id
-                    ? 'border-emerald-400 text-emerald-300'
+                    ? 'border-purple-400 text-purple-300'
                     : 'border-transparent text-emerald-200/50 hover:text-white hover:border-emerald-700'
                 }`}
               >
@@ -642,6 +805,451 @@ export default function AdminAnalyticsPage() {
             ))}
           </nav>
         </div>
+
+        {/* TAB 0: APP DOWNLOADS & SOURCES BREAKDOWN */}
+        {activeTab === 'app_downloads' && (
+          <div className="mt-6 space-y-6">
+            {/* Quick Metrics Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-b from-[#181126] to-[#0f0b18] p-5 shadow-lg shadow-black/20">
+                <span className="text-xs text-purple-300/70 font-semibold uppercase tracking-wider">Tổng Click Tải App</span>
+                <p className="mt-2 text-3xl font-extrabold text-white">
+                  {data?.summary?.total_app_clicks?.toLocaleString('vi-VN') || 0}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-purple-300/80 border-t border-purple-900/30 pt-2 font-medium">
+                  <span>+{data?.summary?.today_app_clicks || 0} hôm nay</span>
+                  <span className="text-purple-200/50">Toàn thời gian</span>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-b from-[#181126] to-[#0f0b18] p-5 shadow-lg shadow-black/20">
+                <span className="text-xs text-purple-300/70 font-semibold uppercase tracking-wider">Tỷ Lệ Thiết Bị</span>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-xl font-extrabold text-white"> {data?.summary?.app_clicks_ios || 0}</span>
+                  <span className="text-xs text-purple-300/60 font-semibold">iOS</span>
+                  <span className="text-purple-500">•</span>
+                  <span className="text-xl font-extrabold text-emerald-400">▶ {data?.summary?.app_clicks_android || 0}</span>
+                  <span className="text-xs text-emerald-300/60 font-semibold">Android</span>
+                </div>
+                <div className="mt-2 flex items-center gap-1.5 text-[11px] text-purple-300/80 border-t border-purple-900/30 pt-2 font-medium">
+                  <div className="w-full bg-purple-950/80 rounded-full h-1.5 flex overflow-hidden">
+                    <div
+                      className="bg-purple-400 h-full"
+                      style={{ width: `${Math.round(((data?.summary?.app_clicks_ios || 0) / Math.max(data?.summary?.total_app_clicks || 1, 1)) * 100)}%` }}
+                    />
+                    <div
+                      className="bg-emerald-400 h-full"
+                      style={{ width: `${Math.round(((data?.summary?.app_clicks_android || 0) / Math.max(data?.summary?.total_app_clicks || 1, 1)) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-amber-900/40 bg-gradient-to-b from-[#211a14] to-[#14100c] p-5 shadow-lg shadow-black/20">
+                <span className="text-xs text-amber-300/70 font-semibold uppercase tracking-wider">Từ Quảng Cáo Trả Phí</span>
+                <p className="mt-2 text-3xl font-extrabold text-amber-400">
+                  {data?.app_downloads_daily?.reduce((acc, cur) => acc + (cur.from_ads || 0), 0) || 0}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-amber-300/80 border-t border-amber-900/30 pt-2 font-medium">
+                  <span>Facebook Ads / UTM Paid</span>
+                  <span>{Math.round(((data?.app_downloads_daily?.reduce((acc, cur) => acc + (cur.from_ads || 0), 0) || 0) / Math.max(data?.summary?.total_app_clicks || 1, 1)) * 100)}%</span>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-emerald-900/40 bg-gradient-to-b from-[#11221b] to-[#0a1712] p-5 shadow-lg shadow-black/20">
+                <span className="text-xs text-emerald-300/70 font-semibold uppercase tracking-wider">Tự Nhiên & Mạng Xã Hội</span>
+                <p className="mt-2 text-3xl font-extrabold text-emerald-400">
+                  {data?.app_downloads_daily?.reduce((acc, cur) => acc + (cur.organic || 0), 0) || 0}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-emerald-300/80 border-t border-emerald-900/30 pt-2 font-medium">
+                  <span>Reels, Zalo, Direct, Bài viết</span>
+                  <span>{Math.round(((data?.app_downloads_daily?.reduce((acc, cur) => acc + (cur.organic || 0), 0) || 0) / Math.max(data?.summary?.total_app_clicks || 1, 1)) * 100)}%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Main App Downloads Content Box */}
+            <div className="rounded-3xl border border-purple-900/40 bg-[#120f1f] p-5 shadow-xl shadow-black/20">
+              {/* Header with Sub-tabs & Search Filters */}
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-5 border-b border-purple-900/30">
+                {/* Sub Tab Navigation Pills */}
+                <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#090710] border border-purple-900/40 w-fit">
+                  <button
+                    onClick={() => setAppSubTab('daily')}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      appSubTab === 'daily'
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : 'text-purple-300/60 hover:text-white hover:bg-purple-950/40'
+                    }`}
+                  >
+                    📅 Theo Từng Ngày ({filteredAppDaily.length})
+                  </button>
+                  <button
+                    onClick={() => setAppSubTab('sources')}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      appSubTab === 'sources'
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : 'text-purple-300/60 hover:text-white hover:bg-purple-950/40'
+                    }`}
+                  >
+                    🎯 Theo Nguồn & Bài Viết / Video ({filteredAppSources.length})
+                  </button>
+                  <button
+                    onClick={() => setAppSubTab('recent')}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      appSubTab === 'recent'
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : 'text-purple-300/60 hover:text-white hover:bg-purple-950/40'
+                    }`}
+                  >
+                    ⏱️ Nhật Ký 100 Lượt Click ({filteredAppRecent.length})
+                  </button>
+                </div>
+
+                {/* Filter and Search */}
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-purple-400/60" />
+                    <input
+                      type="text"
+                      placeholder="Tìm chiến dịch, bài viết, ngày..."
+                      value={appSearchQuery}
+                      onChange={e => setAppSearchQuery(e.target.value)}
+                      className="w-48 sm:w-60 rounded-xl border border-purple-900/60 bg-[#090710] py-1.5 pl-8 pr-3 text-xs text-white placeholder-purple-400/40 focus:border-purple-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <select
+                    value={appFilterSource}
+                    onChange={e => setAppFilterSource(e.target.value)}
+                    className="rounded-xl border border-purple-900/60 bg-[#090710] px-3 py-1.5 text-xs text-purple-200 focus:outline-none"
+                  >
+                    <option value="all">Tất cả kênh nguồn</option>
+                    <option value="ads">🎯 Từ Quảng cáo (Paid Ads)</option>
+                    <option value="facebook">📱 Facebook (Tự nhiên / Reels)</option>
+                    <option value="article">📰 Từ Bài viết Sống Khỏe (Guides)</option>
+                    <option value="zalo">💬 Zalo</option>
+                    <option value="direct">🔗 Trực tiếp (Direct)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* SUB-VIEW 1: DAILY TABLE */}
+              {appSubTab === 'daily' && (
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-purple-900/30 text-xs font-semibold uppercase tracking-wider text-purple-300/70">
+                        <th className="py-3 px-4">Ngày (Giờ VN)</th>
+                        <th className="py-3 px-4 text-center">Tổng Lượt Click</th>
+                        <th className="py-3 px-4 text-center">Người Dùng Thực (UV)</th>
+                        <th className="py-3 px-4 text-center"> iOS</th>
+                        <th className="py-3 px-4 text-center">▶ Android</th>
+                        <th className="py-3 px-4 text-center">💻 Máy Tính</th>
+                        <th className="py-3 px-4 text-center">🎯 Quảng Cáo</th>
+                        <th className="py-3 px-4 text-center">🌿 Tự Nhiên / MXH</th>
+                        <th className="py-3 px-4">Phân Bổ Kênh</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-purple-900/20">
+                      {filteredAppDaily.length > 0 ? (
+                        filteredAppDaily.map(row => {
+                          const isToday = row.day === new Date().toISOString().slice(0, 10);
+                          const total = row.total_clicks || 1;
+                          const adsPercent = Math.round(((row.from_ads || 0) / total) * 100);
+                          const organicPercent = 100 - adsPercent;
+
+                          return (
+                            <tr key={row.day} className={`hover:bg-purple-950/20 transition-colors ${isToday ? 'bg-purple-950/10' : ''}`}>
+                              <td className="py-3.5 px-4 font-mono font-medium text-white flex items-center gap-2">
+                                <Calendar className="h-3.5 w-3.5 text-purple-400" />
+                                <span>{row.day}</span>
+                                {isToday && (
+                                  <span className="rounded-md bg-purple-500/20 border border-purple-400/40 px-1.5 py-0.5 text-[10px] text-purple-300 font-sans font-bold">
+                                    Hôm nay
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 text-center font-extrabold text-white">
+                                {row.total_clicks}
+                              </td>
+                              <td className="py-3.5 px-4 text-center font-bold text-purple-300 font-mono">
+                                {row.unique_visitors}
+                              </td>
+                              <td className="py-3.5 px-4 text-center text-purple-300 font-medium">
+                                {row.ios > 0 ? (
+                                  <span className="rounded-md bg-purple-950/80 border border-purple-800/40 px-2 py-0.5">
+                                    {row.ios}
+                                  </span>
+                                ) : (
+                                  <span className="text-purple-300/30">-</span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 text-center text-emerald-400 font-medium">
+                                {row.android > 0 ? (
+                                  <span className="rounded-md bg-emerald-950/80 border border-emerald-800/40 px-2 py-0.5">
+                                    {row.android}
+                                  </span>
+                                ) : (
+                                  <span className="text-emerald-400/30">-</span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 text-center text-sky-400 font-medium">
+                                {row.desktop > 0 ? (
+                                  <span className="rounded-md bg-sky-950/80 border border-sky-800/40 px-2 py-0.5">
+                                    {row.desktop}
+                                  </span>
+                                ) : (
+                                  <span className="text-sky-400/30">-</span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 text-center">
+                                {row.from_ads > 0 ? (
+                                  <span className="rounded-md bg-amber-950/80 border border-amber-800/50 px-2 py-0.5 text-xs font-semibold text-amber-300">
+                                    {row.from_ads}
+                                  </span>
+                                ) : (
+                                  <span className="text-amber-300/30 text-xs">0</span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 text-center">
+                                {row.organic > 0 ? (
+                                  <span className="rounded-md bg-emerald-950/80 border border-emerald-800/50 px-2 py-0.5 text-xs font-semibold text-emerald-300">
+                                    {row.organic}
+                                  </span>
+                                ) : (
+                                  <span className="text-emerald-300/30 text-xs">0</span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4">
+                                <div className="flex flex-col gap-1 w-32">
+                                  <div className="w-full bg-purple-950/80 rounded-full h-1.5 flex overflow-hidden">
+                                    {row.from_ads > 0 && (
+                                      <div className="bg-amber-400 h-full" style={{ width: `${adsPercent}%` }} />
+                                    )}
+                                    {row.organic > 0 && (
+                                      <div className="bg-emerald-400 h-full" style={{ width: `${organicPercent}%` }} />
+                                    )}
+                                  </div>
+                                  <span className="text-[10px] text-purple-300/60 font-mono">
+                                    {row.from_ads > 0 ? `${adsPercent}% Ads` : ''} {row.organic > 0 ? `${organicPercent}% Tự nhiên` : ''}
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={9} className="py-8 text-center text-sm text-purple-300/50">
+                            Chưa có dữ liệu lượt tải app trong khoảng thời gian này.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* SUB-VIEW 2: SOURCES & ARTICLES BREAKDOWN */}
+              {appSubTab === 'sources' && (
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-purple-900/30 text-xs font-semibold uppercase tracking-wider text-purple-300/70">
+                        <th className="py-3 px-4">#</th>
+                        <th className="py-3 px-4">Chiến Dịch / Mã Video</th>
+                        <th className="py-3 px-4">Kênh Nguồn (Source)</th>
+                        <th className="py-3 px-4">Trang / Bài Viết Đích</th>
+                        <th className="py-3 px-4 text-center"> iOS</th>
+                        <th className="py-3 px-4 text-center">▶ Android</th>
+                        <th className="py-3 px-4 text-center">Khách Thật (UV)</th>
+                        <th className="py-3 px-4 text-center">Tổng Click</th>
+                        <th className="py-3 px-4">Lần Click Cuối</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-purple-900/20">
+                      {filteredAppSources.length > 0 ? (
+                        filteredAppSources.map((item, idx) => {
+                          const isPaid = item.medium === 'paid' || (item.campaign && !item.campaign.includes('Tự nhiên'));
+                          const isArticle = !!item.article_slug || item.path.includes('/guides') || item.path.includes('/huong-dan');
+
+                          return (
+                            <tr key={idx} className="hover:bg-purple-950/20 transition-colors">
+                              <td className="py-3.5 px-4 text-xs text-purple-400/50 font-mono">{idx + 1}</td>
+                              <td className="py-3.5 px-4 font-medium text-white">
+                                {isPaid ? (
+                                  <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-950/70 border border-amber-800/50 px-2.5 py-1 text-xs font-bold text-amber-300">
+                                    <Tag className="h-3 w-3" />
+                                    {item.campaign}
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 rounded-lg bg-purple-950/60 border border-purple-800/40 px-2 py-1 text-xs text-purple-200">
+                                    {item.campaign}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 text-xs">
+                                <div className="flex flex-col">
+                                  <span className="font-semibold text-white capitalize">{item.source}</span>
+                                  <span className="text-purple-300/50 text-[10px]">Medium: {item.medium}</span>
+                                </div>
+                              </td>
+                              <td className="py-3.5 px-4 text-xs">
+                                {isArticle ? (
+                                  <Link
+                                    href={item.path}
+                                    target="_blank"
+                                    className="group flex items-center gap-1.5 text-emerald-300 hover:text-white font-medium transition-colors"
+                                  >
+                                    <span className="max-w-[280px] truncate">{item.source_title}</span>
+                                    <ArrowUpRight className="h-3 w-3 shrink-0 opacity-70 group-hover:opacity-100" />
+                                  </Link>
+                                ) : (
+                                  <span className="text-purple-200 font-medium">
+                                    {item.source_title}
+                                  </span>
+                                )}
+                                <span className="block text-[10px] text-purple-300/40 font-mono mt-0.5">{item.path}</span>
+                              </td>
+                              <td className="py-3.5 px-4 text-center font-mono text-purple-300">
+                                {item.ios > 0 ? (
+                                  <span className="font-bold">{item.ios}</span>
+                                ) : (
+                                  <span className="text-purple-300/30">0</span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 text-center font-mono text-emerald-400">
+                                {item.android > 0 ? (
+                                  <span className="font-bold">{item.android}</span>
+                                ) : (
+                                  <span className="text-emerald-400/30">0</span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 text-center font-mono font-bold text-white">
+                                {item.unique_visitors}
+                              </td>
+                              <td className="py-3.5 px-4 text-center">
+                                <span className="rounded-lg bg-purple-950 border border-purple-800/50 px-2.5 py-1 text-sm font-extrabold text-white shadow-sm">
+                                  {item.total_clicks}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4 text-xs text-purple-300/70 font-mono">
+                                {item.last_click_at}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={9} className="py-8 text-center text-sm text-purple-300/50">
+                            Không tìm thấy nguồn tải phù hợp với bộ lọc.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* SUB-VIEW 3: RECENT 100 REALTIME CLICKS */}
+              {appSubTab === 'recent' && (
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-purple-900/30 text-xs font-semibold uppercase tracking-wider text-purple-300/70">
+                        <th className="py-3 px-4">Thời Gian (Giờ VN)</th>
+                        <th className="py-3 px-4 text-center">Thiết Bị</th>
+                        <th className="py-3 px-4">Trang / Bài Viết Đích</th>
+                        <th className="py-3 px-4">Mã Video / Chiến Dịch</th>
+                        <th className="py-3 px-4">Kênh & Nguồn Đến</th>
+                        <th className="py-3 px-4">Mã Khách (Visitor)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-purple-900/20">
+                      {filteredAppRecent.length > 0 ? (
+                        filteredAppRecent.map(item => {
+                          const isIos = item.platform.toLowerCase().includes('ios');
+                          const isAndroid = item.platform.toLowerCase().includes('android');
+                          const isArticle = !!item.article_slug || item.path.includes('/guides') || item.path.includes('/huong-dan');
+
+                          return (
+                            <tr key={item.id} className="hover:bg-purple-950/20 transition-colors">
+                              <td className="py-3 px-4 text-xs font-mono text-purple-200">
+                                {item.created_at_vn}
+                              </td>
+                              <td className="py-3 px-4 text-center">
+                                {isIos ? (
+                                  <span className="inline-flex items-center gap-1 rounded-md bg-purple-950/90 border border-purple-700/50 px-2 py-0.5 text-xs font-semibold text-purple-300">
+                                     iOS
+                                  </span>
+                                ) : isAndroid ? (
+                                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-950/90 border border-emerald-700/50 px-2 py-0.5 text-xs font-semibold text-emerald-300">
+                                    ▶ Android
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 rounded-md bg-sky-950/90 border border-sky-700/50 px-2 py-0.5 text-xs font-semibold text-sky-300">
+                                    💻 Máy tính
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-3 px-4 text-xs">
+                                {isArticle ? (
+                                  <Link
+                                    href={item.path}
+                                    target="_blank"
+                                    className="group flex items-center gap-1 text-emerald-300 hover:text-white font-medium"
+                                  >
+                                    <span className="max-w-[240px] truncate">{item.article_title}</span>
+                                    <ArrowUpRight className="h-3 w-3 shrink-0 opacity-70 group-hover:opacity-100" />
+                                  </Link>
+                                ) : (
+                                  <span className="text-white font-medium">{item.article_title}</span>
+                                )}
+                                <span className="block text-[10px] text-purple-300/40 font-mono">{item.path}</span>
+                              </td>
+                              <td className="py-3 px-4 text-xs">
+                                {item.utm_campaign ? (
+                                  <span className="rounded bg-amber-950/80 border border-amber-800/40 px-2 py-0.5 font-bold text-amber-300">
+                                    {item.utm_campaign}
+                                  </span>
+                                ) : (
+                                  <span className="text-purple-300/40 italic">Tự nhiên</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-4 text-xs">
+                                <div className="flex flex-col">
+                                  <span className="font-semibold text-white">
+                                    {item.referrer_clean}
+                                    {item.utm_source ? ` (${item.utm_source})` : ''}
+                                  </span>
+                                  {item.referrer && (
+                                    <span className="text-[10px] text-purple-300/40 max-w-[200px] truncate font-mono" title={item.referrer}>
+                                      {item.referrer}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="py-3 px-4 text-xs font-mono text-purple-300/50">
+                                {item.visitor_id ? `${item.visitor_id.slice(0, 14)}...` : '-'}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="py-8 text-center text-sm text-purple-300/50">
+                            Không có nhật ký click phù hợp.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* TAB 1: SUBSCRIBERS TABLE */}
         {activeTab === 'subscribers' && (
