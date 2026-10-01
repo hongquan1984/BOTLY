@@ -30,7 +30,10 @@ import {
   ArrowUpRight,
   Radio,
   Layers,
-  Tag
+  Tag,
+  Moon,
+  Activity,
+  Zap
 } from 'lucide-react';
 
 interface SummaryData {
@@ -208,6 +211,64 @@ interface AppDownloadRecentRecord {
   visitor_id?: string | null;
 }
 
+interface InsomniaQuizPayload {
+  summary: {
+    page_views: number;
+    unique_visitors: number;
+    today_views: number;
+    today_unique_visitors: number;
+    starts: number;
+    today_starts: number;
+    completions: number;
+    today_completions: number;
+    leads: number;
+    today_leads: number;
+    app_clicks: number;
+    today_app_clicks: number;
+    app_clicks_ios: number;
+    app_clicks_android: number;
+    avg_isi_score: number;
+    start_rate: number;
+    completion_rate: number;
+    lead_rate: number;
+    app_download_rate: number;
+  };
+  step_waterfall: Array<{
+    step: number;
+    title_vi: string;
+    title_en: string;
+    count: number;
+    reach_pct: number;
+    dropoff_pct: number;
+  }>;
+  traffic_sources: Array<{
+    source: string;
+    campaign: string;
+    medium: string;
+    views: number;
+    unique_visitors: number;
+    starts: number;
+    completions: number;
+    leads: number;
+    app_clicks: number;
+    last_active_at: string;
+  }>;
+  recent_submissions: Array<{
+    id: string;
+    created_at_vn: string;
+    event_type: string;
+    email?: string;
+    isi_score: number;
+    device: string;
+    platform?: string;
+    issues?: string[];
+    pills_use?: string;
+    duration?: string;
+    source: string;
+    app_clicked: boolean;
+  }>;
+}
+
 interface AnalyticsPayload {
   summary: SummaryData;
   daily: DailyRecord[];
@@ -222,6 +283,7 @@ interface AnalyticsPayload {
   app_downloads_daily?: AppDownloadDailyRecord[];
   app_downloads_sources?: AppDownloadSourceRecord[];
   app_downloads_recent?: AppDownloadRecentRecord[];
+  insomnia_quiz?: InsomniaQuizPayload;
 }
 
 export default function AdminAnalyticsPage() {
@@ -229,7 +291,12 @@ export default function AdminAnalyticsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDays, setSelectedDays] = useState<number>(7);
-  const [activeTab, setActiveTab] = useState<'app_downloads' | 'subscribers' | 'ebooks' | 'articles' | 'static_pages' | 'quizzes' | 'devices'>('app_downloads');
+  const [activeTab, setActiveTab] = useState<'app_downloads' | 'quiz_insomnia' | 'subscribers' | 'ebooks' | 'articles' | 'static_pages' | 'quizzes' | 'devices'>('app_downloads');
+
+  // Search and filters for quiz insomnia
+  const [quizSearch, setQuizSearch] = useState<string>('');
+  const [quizFilterDevice, setQuizFilterDevice] = useState<string>('all');
+  const [quizSubTab, setQuizSubTab] = useState<'overview' | 'funnel' | 'sources' | 'submissions'>('overview');
 
   // Search and filters for app downloads
   const [appSearchQuery, setAppSearchQuery] = useState<string>('');
@@ -784,6 +851,7 @@ export default function AdminAnalyticsPage() {
           <nav className="flex space-x-2 sm:space-x-8 overflow-x-auto pb-px">
             {[
               { id: 'app_downloads', label: `🚀 Lượt Tải App & Nguồn Link (${data?.summary?.total_app_clicks || 0})` },
+              { id: 'quiz_insomnia', label: `🌙 Phễu Quiz Mất Ngủ (${data?.insomnia_quiz?.summary?.page_views || 0} views / ${data?.insomnia_quiz?.summary?.starts || 0} làm)` },
               { id: 'subscribers', label: `💌 Danh Sách Email (${data?.subscribers?.length || 0})` },
               { id: 'ebooks', label: `📚 Cẩm Nang Ebook (${data?.summary?.total_ebook_downloads || 0} lượt tải)` },
               { id: 'articles', label: `📊 Bài Viết (${data?.articles?.length || 0})` },
@@ -1248,6 +1316,364 @@ export default function AdminAnalyticsPage() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* TAB: QUIZ INSOMNIA DETAILED FUNNEL */}
+        {activeTab === 'quiz_insomnia' && (
+          <div className="mt-6 space-y-6">
+            {/* Funnel Header Banner */}
+            <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-r from-[#170e28] via-[#121324] to-[#0c1815] p-6 shadow-xl relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-purple-950/80 border border-purple-800/50 px-3 py-1 text-xs font-semibold text-purple-300 mb-2">
+                    <Moon className="h-3.5 w-3.5 text-amber-400" />
+                    <span>PHỄU CHUYỂN ĐỔI CHUYÊN BIỆT · CLINICAL FUNNEL</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white">
+                    Thống Kê Chi Tiết Phễu Đánh Giá Mất Ngủ (Insomnia Quiz)
+                  </h3>
+                  <p className="text-xs sm:text-sm text-purple-200/70 mt-1 max-w-2xl leading-relaxed">
+                    Theo dõi toàn diện lưu lượng người click vào trang quiz, tỷ lệ bắt đầu, độ rơi rụng qua 18 bước, thu thập Email và chuyển đổi tải ứng dụng Soulscape.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href="/quiz-insomnia"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-xs font-bold text-white hover:opacity-95 transition-all shadow-lg shadow-purple-950/40"
+                  >
+                    <span>Mở Trang Quiz Trực Tiếp</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* 6 Key Performance Metric Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
+              {/* Card 1: Views */}
+              <div className="rounded-3xl border border-purple-900/40 bg-[#121124] p-4 sm:p-5 shadow-lg shadow-black/20">
+                <div className="flex items-center justify-between text-purple-300/70">
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Lượt Xem Quiz</span>
+                  <Eye className="h-4 w-4 text-purple-400" />
+                </div>
+                <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-white">
+                  {data?.insomnia_quiz?.summary?.page_views?.toLocaleString('vi-VN') || 0}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-purple-300/80 border-t border-purple-900/30 pt-2 font-medium">
+                  <span>+{data?.insomnia_quiz?.summary?.today_views || 0} hôm nay</span>
+                  <span className="text-purple-400 font-semibold">{data?.insomnia_quiz?.summary?.unique_visitors || 0} UV</span>
+                </div>
+              </div>
+
+              {/* Card 2: Starts */}
+              <div className="rounded-3xl border border-indigo-900/40 bg-[#101328] p-4 sm:p-5 shadow-lg shadow-black/20">
+                <div className="flex items-center justify-between text-indigo-300/70">
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Bắt Đầu Làm</span>
+                  <Activity className="h-4 w-4 text-indigo-400" />
+                </div>
+                <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-indigo-200">
+                  {data?.insomnia_quiz?.summary?.starts?.toLocaleString('vi-VN') || 0}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-indigo-300/80 border-t border-indigo-900/30 pt-2 font-medium">
+                  <span>+{data?.insomnia_quiz?.summary?.today_starts || 0} hôm nay</span>
+                  <span className="text-indigo-400 font-semibold">{data?.insomnia_quiz?.summary?.start_rate || 0}% click</span>
+                </div>
+              </div>
+
+              {/* Card 3: Completions */}
+              <div className="rounded-3xl border border-teal-900/40 bg-[#0e1922] p-4 sm:p-5 shadow-lg shadow-black/20">
+                <div className="flex items-center justify-between text-teal-300/70">
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Hoàn Thành 100%</span>
+                  <CheckCircle2 className="h-4 w-4 text-teal-400" />
+                </div>
+                <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-teal-300">
+                  {data?.insomnia_quiz?.summary?.completions?.toLocaleString('vi-VN') || 0}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-teal-300/80 border-t border-teal-900/30 pt-2 font-medium">
+                  <span>+{data?.insomnia_quiz?.summary?.today_completions || 0} hôm nay</span>
+                  <span className="text-teal-400 font-semibold">{data?.insomnia_quiz?.summary?.completion_rate || 0}% xong</span>
+                </div>
+              </div>
+
+              {/* Card 4: Leads */}
+              <div className="rounded-3xl border border-pink-900/40 bg-[#1d1020] p-4 sm:p-5 shadow-lg shadow-black/20">
+                <div className="flex items-center justify-between text-pink-300/70">
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Thu Email (Leads)</span>
+                  <Mail className="h-4 w-4 text-pink-400" />
+                </div>
+                <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-pink-300">
+                  {data?.insomnia_quiz?.summary?.leads?.toLocaleString('vi-VN') || 0}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-pink-300/80 border-t border-pink-900/30 pt-2 font-medium">
+                  <span>+{data?.insomnia_quiz?.summary?.today_leads || 0} hôm nay</span>
+                  <span className="text-pink-400 font-semibold">{data?.insomnia_quiz?.summary?.lead_rate || 0}% lead</span>
+                </div>
+              </div>
+
+              {/* Card 5: App Clicks */}
+              <div className="rounded-3xl border border-emerald-900/40 bg-[#0d1a16] p-4 sm:p-5 shadow-lg shadow-black/20">
+                <div className="flex items-center justify-between text-emerald-300/70">
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Click Tải App</span>
+                  <Download className="h-4 w-4 text-emerald-400" />
+                </div>
+                <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-emerald-300">
+                  {data?.insomnia_quiz?.summary?.app_clicks?.toLocaleString('vi-VN') || 0}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-emerald-300/80 border-t border-emerald-900/30 pt-2 font-medium">
+                  <span>iOS: {data?.insomnia_quiz?.summary?.app_clicks_ios || 0}</span>
+                  <span className="text-emerald-400 font-semibold">CH Play: {data?.insomnia_quiz?.summary?.app_clicks_android || 0}</span>
+                </div>
+              </div>
+
+              {/* Card 6: Average ISI Score */}
+              <div className="rounded-3xl border border-amber-900/40 bg-[#1d1610] p-4 sm:p-5 shadow-lg shadow-black/20">
+                <div className="flex items-center justify-between text-amber-300/70">
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Điểm ISI TB</span>
+                  <Sparkles className="h-4 w-4 text-amber-400" />
+                </div>
+                <p className="mt-2 text-2xl sm:text-3xl font-black text-amber-300 font-mono">
+                  {data?.insomnia_quiz?.summary?.avg_isi_score || 0}<span className="text-xs text-amber-400/60 font-sans">/100</span>
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-amber-300/80 border-t border-amber-900/30 pt-2 font-medium">
+                  <span>Nghiêm trọng</span>
+                  <span className="text-amber-400 font-semibold">Cần CBT-I</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sub-tabs Selector */}
+            <div className="flex items-center justify-between border-b border-purple-900/40 pb-3">
+              <div className="flex gap-2">
+                {[
+                  { id: 'overview', label: '📊 Tổng Quan & Phễu Rơi Rụng 19 Bước' },
+                  { id: 'sources', label: `🌐 Nguồn & Link Video (${data?.insomnia_quiz?.traffic_sources?.length || 0})` },
+                  { id: 'submissions', label: `📋 Nhật Ký Người Làm Quiz (${data?.insomnia_quiz?.recent_submissions?.length || 0})` }
+                ].map(sub => (
+                  <button
+                    key={sub.id}
+                    onClick={() => setQuizSubTab(sub.id as typeof quizSubTab)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      quizSubTab === sub.id
+                        ? 'bg-purple-950 border border-purple-700/60 text-purple-200 shadow-sm'
+                        : 'text-slate-400 hover:text-white bg-slate-900/40 border border-slate-800/40'
+                    }`}
+                  >
+                    {sub.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* SUB-VIEW 1: STEP-BY-STEP WATERFALL FUNNEL */}
+            {(quizSubTab === 'overview' || quizSubTab === 'funnel') && (
+              <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h4 className="text-base font-bold text-white flex items-center gap-2">
+                      <Layers className="h-5 w-5 text-purple-400" />
+                      Phễu Rơi Rụng Từng Bước (19 Steps Waterfall)
+                    </h4>
+                    <p className="text-xs text-purple-300/60 mt-0.5">
+                      Theo dõi số lượng người trả lời qua từng câu hỏi để phát hiện điểm nghẽn người dùng thoát ra nhiều nhất
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  {data?.insomnia_quiz?.step_waterfall && data.insomnia_quiz.step_waterfall.length > 0 ? (
+                    data.insomnia_quiz.step_waterfall.map((stepItem, idx) => {
+                      const isHighDrop = stepItem.dropoff_pct > 25 && idx > 0;
+                      return (
+                        <div
+                          key={idx}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-2xl border border-purple-950 bg-[#0d0f1c] hover:border-purple-800/50 transition-all text-xs"
+                        >
+                          <div className="flex items-center gap-3 sm:w-1/3">
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-purple-950 border border-purple-800/40 text-[10px] font-mono font-bold text-purple-300">
+                              {stepItem.step}
+                            </span>
+                            <div>
+                              <p className="font-semibold text-white truncate max-w-xs">{stepItem.title_vi}</p>
+                              <p className="text-[10px] text-slate-400 font-mono">{stepItem.title_en}</p>
+                            </div>
+                          </div>
+
+                          {/* Progress bar */}
+                          <div className="flex-1 px-2">
+                            <div className="h-3 w-full rounded-full bg-slate-900/80 border border-purple-950 overflow-hidden relative">
+                              <div
+                                style={{ width: `${Math.max(stepItem.reach_pct, stepItem.count > 0 ? 5 : 0)}%` }}
+                                className="h-full rounded-full bg-gradient-to-r from-purple-600 via-indigo-500 to-teal-400 transition-all duration-500"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Numbers */}
+                          <div className="flex items-center justify-between sm:justify-end gap-4 sm:w-1/4 text-right">
+                            <div>
+                              <span className="font-bold text-white font-mono">{stepItem.count} lượt</span>
+                              <span className="block text-[10px] text-purple-400/80 font-mono">{stepItem.reach_pct}% tiếp cận</span>
+                            </div>
+                            {idx > 0 && (
+                              <div className="w-16">
+                                <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold font-mono ${isHighDrop ? 'bg-rose-950 text-rose-300 border border-rose-800/40' : 'bg-slate-800/60 text-slate-400'}`}>
+                                  -{stepItem.dropoff_pct}%
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="py-8 text-center text-sm text-slate-500">
+                      Chưa có dữ liệu bước làm quiz
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* SUB-VIEW 2: TRAFFIC SOURCES & VIDEO CAMPAIGNS */}
+            {quizSubTab === 'sources' && (
+              <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
+                <h4 className="text-base font-bold text-white mb-1 flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-indigo-400" />
+                  Nguồn Lưu Lượng Truy Cập Vào Quiz (Video / TikTok / Ads / Direct)
+                </h4>
+                <p className="text-xs text-purple-300/60 mb-4">
+                  Phân tích xem người làm quiz đến từ link video nào, chiến dịch quảng cáo nào và tỷ lệ chuyển đổi tải app ra sao
+                </p>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-purple-900/40 text-xs font-semibold uppercase tracking-wider text-purple-300/70">
+                        <th className="py-3 px-4">Kênh & Nguồn (Source)</th>
+                        <th className="py-3 px-4">Chiến Dịch / Link Video</th>
+                        <th className="py-3 px-4 text-right">Lượt Xem (Views)</th>
+                        <th className="py-3 px-4 text-right">Người Xem (UV)</th>
+                        <th className="py-3 px-4 text-right">Bắt Đầu (Starts)</th>
+                        <th className="py-3 px-4 text-right">Email (Leads)</th>
+                        <th className="py-3 px-4 text-right">Tải App (Clicks)</th>
+                        <th className="py-3 px-4 text-right">Hoạt Động Gần Nhất</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-purple-950">
+                      {data?.insomnia_quiz?.traffic_sources && data.insomnia_quiz.traffic_sources.length > 0 ? (
+                        data.insomnia_quiz.traffic_sources.map((src, i) => (
+                          <tr key={i} className="hover:bg-purple-950/20 transition-colors">
+                            <td className="py-3.5 px-4">
+                              <span className="font-bold text-white">{src.source}</span>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span className="rounded-md bg-purple-950/70 border border-purple-800/40 px-2 py-0.5 text-xs font-mono text-purple-300">
+                                {src.campaign}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-right font-bold text-white font-mono">{src.views}</td>
+                            <td className="py-3.5 px-4 text-right font-semibold text-purple-300 font-mono">{src.unique_visitors}</td>
+                            <td className="py-3.5 px-4 text-right font-bold text-indigo-300 font-mono">{src.starts}</td>
+                            <td className="py-3.5 px-4 text-right font-bold text-pink-300 font-mono">{src.leads}</td>
+                            <td className="py-3.5 px-4 text-right font-bold text-emerald-300 font-mono">{src.app_clicks}</td>
+                            <td className="py-3.5 px-4 text-right text-xs text-slate-400 font-mono">{src.last_active_at || '-'}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={8} className="py-8 text-center text-sm text-purple-400/50">
+                            Chưa có dữ liệu nguồn truy cập
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* SUB-VIEW 3: RECENT SUBMISSIONS FEED */}
+            {quizSubTab === 'submissions' && (
+              <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-purple-900/40">
+                  <div>
+                    <h4 className="text-base font-bold text-white flex items-center gap-2">
+                      <Mail className="h-5 w-5 text-pink-400" />
+                      Nhật Ký Chi Tiết Người Làm Quiz Thời Gian Thực
+                    </h4>
+                    <p className="text-xs text-purple-300/60 mt-0.5">
+                      Xem danh sách độc giả đã điền email, điểm số ISI và hành vi tải App Soulscape
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="relative max-w-xs">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-purple-400/60" />
+                      <input
+                        type="text"
+                        placeholder="Tìm email, nguồn..."
+                        value={quizSearch}
+                        onChange={e => setQuizSearch(e.target.value)}
+                        className="pl-9 pr-3 py-1.5 rounded-xl border border-purple-900/60 bg-[#0d0f1c] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  {data?.insomnia_quiz?.recent_submissions && data.insomnia_quiz.recent_submissions.length > 0 ? (
+                    data.insomnia_quiz.recent_submissions
+                      .filter(item => !quizSearch || item.email?.toLowerCase().includes(quizSearch.toLowerCase()) || item.source?.toLowerCase().includes(quizSearch.toLowerCase()))
+                      .map((sub, idx) => (
+                        <div
+                          key={idx}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border border-purple-950 bg-[#0c0e1a] hover:border-purple-800/50 transition-all text-xs"
+                        >
+                          <div className="flex items-start sm:items-center gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-950/80 border border-purple-800/50 text-purple-300 font-mono font-bold text-sm">
+                              {sub.isi_score}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-white text-sm">
+                                  {sub.email ? sub.email : <span className="text-slate-500 italic">Khách chưa để lại email</span>}
+                                </p>
+                                {sub.app_clicked && (
+                                  <span className="rounded-md bg-emerald-950 border border-emerald-700/60 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
+                                    ✓ Đã Bấm Tải App
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-slate-400">
+                                <span>Thiết bị: <strong className="text-slate-200">{sub.device}</strong></span>
+                                <span>•</span>
+                                <span>Nguồn: <strong className="text-purple-300">{sub.source || 'Direct'}</strong></span>
+                                {sub.pills_use && (
+                                  <>
+                                    <span>•</span>
+                                    <span>Thuốc ngủ: <strong className="text-amber-300">{sub.pills_use}</strong></span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="text-right text-[11px] text-purple-300/60 font-mono">
+                            {sub.created_at_vn}
+                          </div>
+                        </div>
+                      ))
+                  ) : (
+                    <div className="py-8 text-center text-sm text-purple-400/50">
+                      Chưa có lượt gửi kết quả quiz nào
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

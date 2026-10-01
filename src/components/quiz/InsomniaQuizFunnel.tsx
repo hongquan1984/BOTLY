@@ -124,6 +124,15 @@ export function InsomniaQuizFunnel() {
       const timer3 = setTimeout(() => setPlanProgress(98), 2000);
       const timer4 = setTimeout(() => {
         setPlanProgress(100);
+        trackClientEvent('quiz_step', {
+          locale: lang,
+          metadata: {
+            funnel: 'quiz_insomnia',
+            step: 17,
+            previous_step: 16,
+            isi_score: isiScore
+          }
+        });
         setCurrentStep(17); // Move to email gate
       }, 2500);
 
@@ -138,13 +147,43 @@ export function InsomniaQuizFunnel() {
 
   // Navigate next
   const goNext = () => {
+    const nextStep = currentStep + 1;
     if (currentStep === 0) {
+      const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
       trackClientEvent('quiz_started', {
         locale: lang,
-        metadata: { funnel: 'quiz_insomnia' }
+        metadata: {
+          funnel: 'quiz_insomnia',
+          utm_source: searchParams?.get('utm_source') || 'direct',
+          utm_campaign: searchParams?.get('utm_campaign') || '',
+          utm_medium: searchParams?.get('utm_medium') || '',
+          utm_content: searchParams?.get('utm_content') || '',
+          referrer: typeof document !== 'undefined' ? document.referrer : ''
+        }
       });
     }
-    setCurrentStep(prev => prev + 1);
+
+    if (nextStep <= 18) {
+      trackClientEvent('quiz_step', {
+        locale: lang,
+        metadata: {
+          funnel: 'quiz_insomnia',
+          step: nextStep,
+          previous_step: currentStep,
+          isi_score: isiScore,
+          gender: gender || undefined,
+          issues_count: selectedIssues.length || undefined,
+          frequency: frequency || undefined,
+          duration: duration || undefined,
+          age_group: ageGroup || undefined,
+          sleep_hours: sleepHours || undefined,
+          pills_use: pillsUse || undefined,
+          primary_goal: primaryGoal || undefined
+        }
+      });
+    }
+
+    setCurrentStep(nextStep);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
