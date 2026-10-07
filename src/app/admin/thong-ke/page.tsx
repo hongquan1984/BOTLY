@@ -211,6 +211,49 @@ interface AppDownloadRecentRecord {
   visitor_id?: string | null;
 }
 
+interface PatternBreakdownItem {
+  pattern_key: string;
+  label_vi: string;
+  label_en: string;
+  count: number;
+  percentage: number;
+  color: string;
+  desc_vi: string;
+}
+
+interface IssueBreakdownItem {
+  issue_key: string;
+  label_vi: string;
+  label_en: string;
+  count: number;
+  percentage: number;
+}
+
+interface GoalBreakdownItem {
+  goal_key: string;
+  label_vi: string;
+  label_en: string;
+  count: number;
+  percentage: number;
+}
+
+interface SupportBreakdownItem {
+  support_key: string;
+  label_vi: string;
+  label_en: string;
+  count: number;
+  percentage: number;
+}
+
+interface PostQuizFunnelItem {
+  key: string;
+  label_vi: string;
+  label_en: string;
+  count: number;
+  conversion_rate: number;
+  icon_name: string;
+}
+
 interface InsomniaQuizPayload {
   summary: {
     page_views: number;
@@ -221,17 +264,26 @@ interface InsomniaQuizPayload {
     today_starts: number;
     completions: number;
     today_completions: number;
-    leads: number;
-    today_leads: number;
+    start_rate: number;
+    completion_rate: number;
+    night_1_clicks: number;
+    today_night_1_clicks: number;
+    night_1_rate: number;
     app_clicks: number;
     today_app_clicks: number;
     app_clicks_ios: number;
     app_clicks_android: number;
-    avg_isi_score: number;
-    start_rate: number;
-    completion_rate: number;
-    lead_rate: number;
     app_download_rate: number;
+    waitlist_signups: number;
+    today_waitlist_signups: number;
+    waitlist_rate: number;
+    recommendation_clicks?: number;
+    top_pattern?: string;
+    top_pattern_label?: string;
+    leads?: number;
+    today_leads?: number;
+    lead_rate?: number;
+    avg_isi_score?: number;
   };
   step_waterfall: Array<{
     step: number;
@@ -241,6 +293,11 @@ interface InsomniaQuizPayload {
     reach_pct: number;
     dropoff_pct: number;
   }>;
+  pattern_breakdown?: PatternBreakdownItem[];
+  issues_breakdown?: IssueBreakdownItem[];
+  goals_breakdown?: GoalBreakdownItem[];
+  support_breakdown?: SupportBreakdownItem[];
+  post_quiz_funnel?: PostQuizFunnelItem[];
   traffic_sources: Array<{
     source: string;
     campaign: string;
@@ -249,8 +306,9 @@ interface InsomniaQuizPayload {
     unique_visitors: number;
     starts: number;
     completions: number;
-    leads: number;
+    night_1_clicks?: number;
     app_clicks: number;
+    leads: number;
     last_active_at: string;
   }>;
   recent_submissions: Array<{
@@ -258,14 +316,25 @@ interface InsomniaQuizPayload {
     created_at_vn: string;
     event_type: string;
     email?: string;
-    isi_score: number;
+    isi_score?: number;
+    night_pattern?: string;
+    night_pattern_label?: string;
+    secondary_pattern?: string;
+    primary_goal?: string;
+    primary_goal_label?: string;
+    issues?: string[];
+    issues_labels?: string[];
+    sleep_support?: string;
+    frequency?: string;
+    duration?: string;
+    sleep_hours?: string;
     device: string;
     platform?: string;
-    issues?: string[];
-    pills_use?: string;
-    duration?: string;
     source: string;
+    clicked_night_1?: boolean;
     app_clicked: boolean;
+    waitlist_signed?: boolean;
+    pills_use?: string;
   }>;
 }
 
@@ -296,7 +365,8 @@ export default function AdminAnalyticsPage() {
   // Search and filters for quiz insomnia
   const [quizSearch, setQuizSearch] = useState<string>('');
   const [quizFilterDevice, setQuizFilterDevice] = useState<string>('all');
-  const [quizSubTab, setQuizSubTab] = useState<'overview' | 'funnel' | 'sources' | 'submissions'>('overview');
+  const [quizPatternFilter, setQuizPatternFilter] = useState<string>('all');
+  const [quizSubTab, setQuizSubTab] = useState<'overview' | 'insights' | 'sources' | 'submissions'>('overview');
 
   // Search and filters for app downloads
   const [appSearchQuery, setAppSearchQuery] = useState<string>('');
@@ -1328,17 +1398,25 @@ export default function AdminAnalyticsPage() {
                 <div>
                   <div className="inline-flex items-center gap-2 rounded-full bg-purple-950/80 border border-purple-800/50 px-3 py-1 text-xs font-semibold text-purple-300 mb-2">
                     <Moon className="h-3.5 w-3.5 text-amber-400" />
-                    <span>PHỄU CHUYỂN ĐỔI CHUYÊN BIỆT · CLINICAL FUNNEL</span>
+                    <span>PHỄU CHUYỂN ĐỔI CHUYÊN BIỆT · NIGHT PATTERN & CLINICAL QUIZ</span>
                   </div>
                   <h3 className="text-xl sm:text-2xl font-black text-white">
-                    Thống Kê Chi Tiết Phễu Đánh Giá Mất Ngủ (Insomnia Quiz)
+                    Thống Kê Chi Tiết Phễu Đánh Giá Mẫu Hình Giấc Ngủ (Night Pattern Quiz)
                   </h3>
                   <p className="text-xs sm:text-sm text-purple-200/70 mt-1 max-w-2xl leading-relaxed">
-                    Theo dõi toàn diện lưu lượng người click vào trang quiz, tỷ lệ bắt đầu, độ rơi rụng qua 18 bước, thu thập Email và chuyển đổi tải ứng dụng Soulscape.
+                    Theo dõi toàn diện tỷ lệ bắt đầu, độ rơi rụng qua 17 bước, nhận diện 6 mẫu hình giấc ngủ y sinh, tỷ lệ trải nghiệm âm thanh Đêm 1 (Night Companion), tải ứng dụng Soulscape và đăng ký Waitlist.
                   </p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href="/admin/night-companion"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 rounded-xl border border-teal-800/60 bg-teal-950/60 px-4 py-2.5 text-xs font-bold text-teal-300 hover:bg-teal-900/50 transition-all shadow-lg"
+                  >
+                    <span>Báo Cáo Phễu 7 Đêm & Player</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
                   <Link
                     href="/quiz-insomnia"
                     target="_blank"
@@ -1351,15 +1429,15 @@ export default function AdminAnalyticsPage() {
               </div>
             </div>
 
-            {/* 6 Key Performance Metric Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
+            {/* 8 Key Performance Metric Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
               {/* Card 1: Views */}
-              <div className="rounded-3xl border border-purple-900/40 bg-[#121124] p-4 sm:p-5 shadow-lg shadow-black/20">
+              <div className="rounded-3xl border border-purple-900/40 bg-[#121124] p-4 shadow-lg shadow-black/20">
                 <div className="flex items-center justify-between text-purple-300/70">
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Lượt Xem Quiz</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Xem Quiz</span>
                   <Eye className="h-4 w-4 text-purple-400" />
                 </div>
-                <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-white">
+                <p className="mt-2 text-2xl font-extrabold text-white">
                   {data?.insomnia_quiz?.summary?.page_views?.toLocaleString('vi-VN') || 0}
                 </p>
                 <div className="mt-2 flex items-center justify-between text-[11px] text-purple-300/80 border-t border-purple-900/30 pt-2 font-medium">
@@ -1369,12 +1447,12 @@ export default function AdminAnalyticsPage() {
               </div>
 
               {/* Card 2: Starts */}
-              <div className="rounded-3xl border border-indigo-900/40 bg-[#101328] p-4 sm:p-5 shadow-lg shadow-black/20">
+              <div className="rounded-3xl border border-indigo-900/40 bg-[#101328] p-4 shadow-lg shadow-black/20">
                 <div className="flex items-center justify-between text-indigo-300/70">
                   <span className="text-[11px] font-bold uppercase tracking-wider">Bắt Đầu Làm</span>
                   <Activity className="h-4 w-4 text-indigo-400" />
                 </div>
-                <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-indigo-200">
+                <p className="mt-2 text-2xl font-extrabold text-indigo-200">
                   {data?.insomnia_quiz?.summary?.starts?.toLocaleString('vi-VN') || 0}
                 </p>
                 <div className="mt-2 flex items-center justify-between text-[11px] text-indigo-300/80 border-t border-indigo-900/30 pt-2 font-medium">
@@ -1384,12 +1462,12 @@ export default function AdminAnalyticsPage() {
               </div>
 
               {/* Card 3: Completions */}
-              <div className="rounded-3xl border border-teal-900/40 bg-[#0e1922] p-4 sm:p-5 shadow-lg shadow-black/20">
+              <div className="rounded-3xl border border-teal-900/40 bg-[#0e1922] p-4 shadow-lg shadow-black/20">
                 <div className="flex items-center justify-between text-teal-300/70">
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Hoàn Thành 100%</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Hoàn Tất 100%</span>
                   <CheckCircle2 className="h-4 w-4 text-teal-400" />
                 </div>
-                <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-teal-300">
+                <p className="mt-2 text-2xl font-extrabold text-teal-300">
                   {data?.insomnia_quiz?.summary?.completions?.toLocaleString('vi-VN') || 0}
                 </p>
                 <div className="mt-2 flex items-center justify-between text-[11px] text-teal-300/80 border-t border-teal-900/30 pt-2 font-medium">
@@ -1398,64 +1476,95 @@ export default function AdminAnalyticsPage() {
                 </div>
               </div>
 
-              {/* Card 4: Leads */}
-              <div className="rounded-3xl border border-pink-900/40 bg-[#1d1020] p-4 sm:p-5 shadow-lg shadow-black/20">
-                <div className="flex items-center justify-between text-pink-300/70">
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Thu Email (Leads)</span>
-                  <Mail className="h-4 w-4 text-pink-400" />
+              {/* Card 4: Top Pattern */}
+              <div className="rounded-3xl border border-purple-900/40 bg-[#19102b] p-4 shadow-lg shadow-black/20">
+                <div className="flex items-center justify-between text-purple-300/70">
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Mẫu Hình Đêm</span>
+                  <Moon className="h-4 w-4 text-amber-400" />
                 </div>
-                <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-pink-300">
-                  {data?.insomnia_quiz?.summary?.leads?.toLocaleString('vi-VN') || 0}
+                <p className="mt-2 text-base font-extrabold text-white truncate" title={data?.insomnia_quiz?.summary?.top_pattern_label || 'Tâm Trí Bận Rộn'}>
+                  {data?.insomnia_quiz?.summary?.top_pattern_label || 'Tâm Trí Bận Rộn'}
                 </p>
-                <div className="mt-2 flex items-center justify-between text-[11px] text-pink-300/80 border-t border-pink-900/30 pt-2 font-medium">
-                  <span>+{data?.insomnia_quiz?.summary?.today_leads || 0} hôm nay</span>
-                  <span className="text-pink-400 font-semibold">{data?.insomnia_quiz?.summary?.lead_rate || 0}% lead</span>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-purple-300/80 border-t border-purple-900/30 pt-2 font-medium">
+                  <span>Phổ biến nhất</span>
+                  <span className="text-amber-400 font-mono font-semibold">{data?.insomnia_quiz?.summary?.top_pattern || 'RACING_MIND'}</span>
                 </div>
               </div>
 
-              {/* Card 5: App Clicks */}
-              <div className="rounded-3xl border border-emerald-900/40 bg-[#0d1a16] p-4 sm:p-5 shadow-lg shadow-black/20">
+              {/* Card 5: Night 1 Clicks */}
+              <div className="rounded-3xl border border-cyan-900/40 bg-[#0c1a24] p-4 shadow-lg shadow-black/20">
+                <div className="flex items-center justify-between text-cyan-300/70">
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Vào Đêm 1</span>
+                  <Sparkles className="h-4 w-4 text-cyan-400" />
+                </div>
+                <p className="mt-2 text-2xl font-extrabold text-cyan-300">
+                  {data?.insomnia_quiz?.summary?.night_1_clicks?.toLocaleString('vi-VN') || 0}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-cyan-300/80 border-t border-cyan-900/30 pt-2 font-medium">
+                  <span>+{data?.insomnia_quiz?.summary?.today_night_1_clicks || 0} hôm nay</span>
+                  <span className="text-cyan-400 font-semibold">{data?.insomnia_quiz?.summary?.night_1_rate || 0}% CVR</span>
+                </div>
+              </div>
+
+              {/* Card 6: App Clicks */}
+              <div className="rounded-3xl border border-emerald-900/40 bg-[#0d1a16] p-4 shadow-lg shadow-black/20">
                 <div className="flex items-center justify-between text-emerald-300/70">
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Click Tải App</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Tải App</span>
                   <Download className="h-4 w-4 text-emerald-400" />
                 </div>
-                <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-emerald-300">
+                <p className="mt-2 text-2xl font-extrabold text-emerald-300">
                   {data?.insomnia_quiz?.summary?.app_clicks?.toLocaleString('vi-VN') || 0}
                 </p>
                 <div className="mt-2 flex items-center justify-between text-[11px] text-emerald-300/80 border-t border-emerald-900/30 pt-2 font-medium">
                   <span>iOS: {data?.insomnia_quiz?.summary?.app_clicks_ios || 0}</span>
-                  <span className="text-emerald-400 font-semibold">CH Play: {data?.insomnia_quiz?.summary?.app_clicks_android || 0}</span>
+                  <span className="text-emerald-400 font-semibold">{data?.insomnia_quiz?.summary?.app_download_rate || 0}% CVR</span>
                 </div>
               </div>
 
-              {/* Card 6: Average ISI Score */}
-              <div className="rounded-3xl border border-amber-900/40 bg-[#1d1610] p-4 sm:p-5 shadow-lg shadow-black/20">
-                <div className="flex items-center justify-between text-amber-300/70">
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Điểm ISI TB</span>
-                  <Sparkles className="h-4 w-4 text-amber-400" />
+              {/* Card 7: Waitlist */}
+              <div className="rounded-3xl border border-pink-900/40 bg-[#1d1020] p-4 shadow-lg shadow-black/20">
+                <div className="flex items-center justify-between text-pink-300/70">
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Waitlist</span>
+                  <Mail className="h-4 w-4 text-pink-400" />
                 </div>
-                <p className="mt-2 text-2xl sm:text-3xl font-black text-amber-300 font-mono">
-                  {data?.insomnia_quiz?.summary?.avg_isi_score || 0}<span className="text-xs text-amber-400/60 font-sans">/100</span>
+                <p className="mt-2 text-2xl font-extrabold text-pink-300">
+                  {data?.insomnia_quiz?.summary?.waitlist_signups?.toLocaleString('vi-VN') || 0}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[11px] text-pink-300/80 border-t border-pink-900/30 pt-2 font-medium">
+                  <span>+{data?.insomnia_quiz?.summary?.today_waitlist_signups || 0} hôm nay</span>
+                  <span className="text-pink-400 font-semibold">{data?.insomnia_quiz?.summary?.waitlist_rate || 0}% CVR</span>
+                </div>
+              </div>
+
+              {/* Card 8: Funnel Retention */}
+              <div className="rounded-3xl border border-amber-900/40 bg-[#1d1610] p-4 shadow-lg shadow-black/20">
+                <div className="flex items-center justify-between text-amber-300/70">
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Tỷ Lệ Giữ Chân</span>
+                  <TrendingUp className="h-4 w-4 text-amber-400" />
+                </div>
+                <p className="mt-2 text-2xl font-extrabold text-amber-300 font-mono">
+                  {data?.insomnia_quiz?.summary?.completion_rate || 0}%
                 </p>
                 <div className="mt-2 flex items-center justify-between text-[11px] text-amber-300/80 border-t border-amber-900/30 pt-2 font-medium">
-                  <span>Nghiêm trọng</span>
-                  <span className="text-amber-400 font-semibold">Cần CBT-I</span>
+                  <span>Phễu 17 bước</span>
+                  <span className="text-amber-400 font-semibold">Tối ưu tốt</span>
                 </div>
               </div>
             </div>
 
             {/* Sub-tabs Selector */}
             <div className="flex items-center justify-between border-b border-purple-900/40 pb-3">
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {[
-                  { id: 'overview', label: '📊 Tổng Quan & Phễu Rơi Rụng 19 Bước' },
+                  { id: 'overview', label: '📊 Phễu 17 Bước & Hành Vi Sau Quiz' },
+                  { id: 'insights', label: '🧠 Mẫu Hình Đêm & Vấn Đề Giấc Ngủ' },
                   { id: 'sources', label: `🌐 Nguồn & Link Video (${data?.insomnia_quiz?.traffic_sources?.length || 0})` },
                   { id: 'submissions', label: `📋 Nhật Ký Người Làm Quiz (${data?.insomnia_quiz?.recent_submissions?.length || 0})` }
                 ].map(sub => (
                   <button
                     key={sub.id}
                     onClick={() => setQuizSubTab(sub.id as typeof quizSubTab)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       quizSubTab === sub.id
                         ? 'bg-purple-950 border border-purple-700/60 text-purple-200 shadow-sm'
                         : 'text-slate-400 hover:text-white bg-slate-900/40 border border-slate-800/40'
@@ -1467,77 +1576,280 @@ export default function AdminAnalyticsPage() {
               </div>
             </div>
 
-            {/* SUB-VIEW 1: STEP-BY-STEP WATERFALL FUNNEL */}
-            {(quizSubTab === 'overview' || quizSubTab === 'funnel') && (
-              <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h4 className="text-base font-bold text-white flex items-center gap-2">
-                      <Layers className="h-5 w-5 text-purple-400" />
-                      Phễu Rơi Rụng Từng Bước (19 Steps Waterfall)
-                    </h4>
-                    <p className="text-xs text-purple-300/60 mt-0.5">
-                      Theo dõi số lượng người trả lời qua từng câu hỏi để phát hiện điểm nghẽn người dùng thoát ra nhiều nhất
-                    </p>
+            {/* SUB-VIEW 1: OVERVIEW & POST-QUIZ FUNNEL */}
+            {quizSubTab === 'overview' && (
+              <div className="space-y-6">
+                {/* Post-Quiz Actions Funnel Cards */}
+                <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h4 className="text-base font-bold text-white flex items-center gap-2">
+                        <Zap className="h-5 w-5 text-amber-400" />
+                        Phễu Chuyển Đổi Sau Khi Nhận Kết Quả (Post-Quiz Actions)
+                      </h4>
+                      <p className="text-xs text-purple-300/60 mt-0.5">
+                        Theo dõi hành vi thực tế của độc giả sau khi xem kết quả mẫu hình và phác đồ cá nhân hóa
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {data?.insomnia_quiz?.post_quiz_funnel?.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="rounded-2xl border border-purple-950 bg-[#0d0f1c] p-4 hover:border-purple-800/50 transition-all"
+                      >
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span className="font-semibold">{item.label_en}</span>
+                          <span className="text-purple-400 font-mono font-bold">{item.conversion_rate}% CVR</span>
+                        </div>
+                        <p className="mt-1 text-sm font-bold text-white">{item.label_vi}</p>
+                        <p className="mt-3 text-2xl font-extrabold text-purple-300 font-mono">
+                          {item.count.toLocaleString('vi-VN')} <span className="text-xs text-slate-400 font-normal">lượt</span>
+                        </p>
+                        <div className="mt-3 h-2 w-full rounded-full bg-slate-900 overflow-hidden">
+                          <div
+                            style={{ width: `${Math.min(100, Math.max(item.conversion_rate, 4))}%` }}
+                            className="h-full rounded-full bg-gradient-to-r from-purple-600 via-indigo-500 to-teal-400"
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="space-y-2.5">
-                  {data?.insomnia_quiz?.step_waterfall && data.insomnia_quiz.step_waterfall.length > 0 ? (
-                    data.insomnia_quiz.step_waterfall.map((stepItem, idx) => {
-                      const isHighDrop = stepItem.dropoff_pct > 25 && idx > 0;
-                      return (
-                        <div
-                          key={idx}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-2xl border border-purple-950 bg-[#0d0f1c] hover:border-purple-800/50 transition-all text-xs"
-                        >
-                          <div className="flex items-center gap-3 sm:w-1/3">
-                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-purple-950 border border-purple-800/40 text-[10px] font-mono font-bold text-purple-300">
-                              {stepItem.step}
-                            </span>
-                            <div>
-                              <p className="font-semibold text-white truncate max-w-xs">{stepItem.title_vi}</p>
-                              <p className="text-[10px] text-slate-400 font-mono">{stepItem.title_en}</p>
-                            </div>
-                          </div>
-
-                          {/* Progress bar */}
-                          <div className="flex-1 px-2">
-                            <div className="h-3 w-full rounded-full bg-slate-900/80 border border-purple-950 overflow-hidden relative">
-                              <div
-                                style={{ width: `${Math.max(stepItem.reach_pct, stepItem.count > 0 ? 5 : 0)}%` }}
-                                className="h-full rounded-full bg-gradient-to-r from-purple-600 via-indigo-500 to-teal-400 transition-all duration-500"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Numbers */}
-                          <div className="flex items-center justify-between sm:justify-end gap-4 sm:w-1/4 text-right">
-                            <div>
-                              <span className="font-bold text-white font-mono">{stepItem.count} lượt</span>
-                              <span className="block text-[10px] text-purple-400/80 font-mono">{stepItem.reach_pct}% tiếp cận</span>
-                            </div>
-                            {idx > 0 && (
-                              <div className="w-16">
-                                <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold font-mono ${isHighDrop ? 'bg-rose-950 text-rose-300 border border-rose-800/40' : 'bg-slate-800/60 text-slate-400'}`}>
-                                  -{stepItem.dropoff_pct}%
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="py-8 text-center text-sm text-slate-500">
-                      Chưa có dữ liệu bước làm quiz
+                {/* Step-by-Step 17 Waterfall */}
+                <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h4 className="text-base font-bold text-white flex items-center gap-2">
+                        <Layers className="h-5 w-5 text-purple-400" />
+                        Phễu Rơi Rụng Từng Bước (17 Steps Waterfall)
+                      </h4>
+                      <p className="text-xs text-purple-300/60 mt-0.5">
+                        Theo dõi từng câu hỏi trắc nghiệm để phát hiện chính xác vị trí độc giả thoát ra nhiều nhất
+                      </p>
                     </div>
-                  )}
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {data?.insomnia_quiz?.step_waterfall && data.insomnia_quiz.step_waterfall.length > 0 ? (
+                      data.insomnia_quiz.step_waterfall.map((stepItem, idx) => {
+                        const isHighDrop = stepItem.dropoff_pct > 25 && idx > 0;
+                        return (
+                          <div
+                            key={idx}
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-2xl border border-purple-950 bg-[#0d0f1c] hover:border-purple-800/50 transition-all text-xs"
+                          >
+                            <div className="flex items-center gap-3 sm:w-1/3">
+                              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-purple-950 border border-purple-800/40 text-[10px] font-mono font-bold text-purple-300">
+                                {stepItem.step}
+                              </span>
+                              <div>
+                                <p className="font-semibold text-white truncate max-w-xs">{stepItem.title_vi}</p>
+                                <p className="text-[10px] text-slate-400 font-mono">{stepItem.title_en}</p>
+                              </div>
+                            </div>
+
+                            {/* Progress bar */}
+                            <div className="flex-1 px-2">
+                              <div className="h-3 w-full rounded-full bg-slate-900/80 border border-purple-950 overflow-hidden relative">
+                                <div
+                                  style={{ width: `${Math.max(stepItem.reach_pct, stepItem.count > 0 ? 5 : 0)}%` }}
+                                  className="h-full rounded-full bg-gradient-to-r from-purple-600 via-indigo-500 to-teal-400 transition-all duration-500"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Numbers */}
+                            <div className="flex items-center justify-between sm:justify-end gap-4 sm:w-1/4 text-right">
+                              <div>
+                                <span className="font-bold text-white font-mono">{stepItem.count} lượt</span>
+                                <span className="block text-[10px] text-purple-400/80 font-mono">{stepItem.reach_pct}% tiếp cận</span>
+                              </div>
+                              {idx > 0 && (
+                                <div className="w-16">
+                                  <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold font-mono ${isHighDrop ? 'bg-rose-950 text-rose-300 border border-rose-800/40' : 'bg-slate-800/60 text-slate-400'}`}>
+                                    -{stepItem.dropoff_pct}%
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="py-8 text-center text-sm text-slate-500">
+                        Chưa có dữ liệu bước làm quiz
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* SUB-VIEW 2: TRAFFIC SOURCES & VIDEO CAMPAIGNS */}
+            {/* SUB-VIEW 2: INSIGHTS & NIGHT PATTERNS BREAKDOWN */}
+            {quizSubTab === 'insights' && (
+              <div className="space-y-6">
+                {/* Row 1: Night Patterns Distribution & Top Sleep Issues */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Pattern Breakdown */}
+                  <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
+                    <h4 className="text-base font-bold text-white mb-1 flex items-center gap-2">
+                      <Moon className="h-5 w-5 text-indigo-400" />
+                      Phân Bổ 6 Mẫu Hình Giấc Ngủ (Night Patterns Distribution)
+                    </h4>
+                    <p className="text-xs text-purple-300/60 mb-4">
+                      Tỷ lệ phần trăm độc giả được chuẩn đoán theo từng nhóm phản ứng thần kinh ban đêm
+                    </p>
+
+                    <div className="space-y-3">
+                      {data?.insomnia_quiz?.pattern_breakdown?.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3.5 rounded-2xl border border-purple-950 bg-[#0d0f1c] hover:border-purple-800/50 transition-all"
+                        >
+                          <div className="flex items-center justify-between text-xs mb-1.5">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="h-2.5 w-2.5 rounded-full"
+                                style={{ backgroundColor: item.color }}
+                              />
+                              <span className="font-bold text-white">{item.label_vi}</span>
+                              <span className="text-[10px] text-slate-400 font-mono">({item.label_en})</span>
+                            </div>
+                            <span className="font-bold font-mono text-purple-300">
+                              {item.count} ca ({item.percentage}%)
+                            </span>
+                          </div>
+
+                          <div className="h-2 w-full rounded-full bg-slate-900 overflow-hidden mb-2">
+                            <div
+                              style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
+                              className="h-full rounded-full transition-all duration-500"
+                            />
+                          </div>
+
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            {item.desc_vi}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Top Sleep Issues */}
+                  <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
+                    <h4 className="text-base font-bold text-white mb-1 flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-amber-400" />
+                      Top Vấn Đề Giấc Ngủ Độc Giả Gặp Phải (Reported Issues)
+                    </h4>
+                    <p className="text-xs text-purple-300/60 mb-4">
+                      Các triệu chứng cản trở giấc ngủ được người dùng tick chọn nhiều nhất tại bước 2
+                    </p>
+
+                    <div className="space-y-2.5">
+                      {data?.insomnia_quiz?.issues_breakdown?.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3 rounded-2xl border border-purple-950 bg-[#0d0f1c] text-xs hover:border-purple-800/50 transition-all"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-lg bg-amber-950/60 border border-amber-800/40 text-[10px] font-mono font-bold text-amber-300">
+                              #{idx + 1}
+                            </span>
+                            <div>
+                              <p className="font-semibold text-white">{item.label_vi}</p>
+                              <p className="text-[10px] text-slate-400 font-mono">{item.label_en}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 text-right">
+                            <div className="w-24 h-2 rounded-full bg-slate-900 overflow-hidden hidden sm:block">
+                              <div
+                                style={{ width: `${Math.max(item.percentage, 5)}%` }}
+                                className="h-full rounded-full bg-gradient-to-r from-amber-500 to-rose-400"
+                              />
+                            </div>
+                            <span className="font-bold text-white font-mono">{item.count} lượt</span>
+                            <span className="text-[11px] text-amber-300 font-mono font-bold w-12">{item.percentage}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 2: Goals & Support */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Primary Goals */}
+                  <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
+                    <h4 className="text-base font-bold text-white mb-1 flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-teal-400" />
+                      Mục Tiêu Ưu Tiên Hàng Đầu Của Độc Giả (Primary Goals)
+                    </h4>
+                    <p className="text-xs text-purple-300/60 mb-4">
+                      Kết quả độc giả mong muốn đạt được nhất khi hoàn thành trắc nghiệm
+                    </p>
+
+                    <div className="space-y-2.5">
+                      {data?.insomnia_quiz?.goals_breakdown?.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3 rounded-2xl border border-purple-950 bg-[#0d0f1c] text-xs hover:border-purple-800/50 transition-all"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-lg bg-teal-950/60 border border-teal-800/40 text-[10px] font-mono font-bold text-teal-300">
+                              #{idx + 1}
+                            </span>
+                            <p className="font-semibold text-white">{item.label_vi}</p>
+                          </div>
+
+                          <div className="flex items-center gap-3 text-right">
+                            <span className="font-bold text-white font-mono">{item.count} ca</span>
+                            <span className="text-[11px] text-teal-300 font-mono font-bold w-12">{item.percentage}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Sleep Support & Pills */}
+                  <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
+                    <h4 className="text-base font-bold text-white mb-1 flex items-center gap-2">
+                      <Activity className="h-5 w-5 text-rose-400" />
+                      Thói Quen Dùng Thuốc Ngủ & Hỗ Trợ (Sleep Aids & Pills)
+                    </h4>
+                    <p className="text-xs text-purple-300/60 mb-4">
+                      Mức độ phụ thuộc vào thuốc kê đơn, melatonin hoặc thảo dược hỗ trợ ngủ
+                    </p>
+
+                    <div className="space-y-2.5">
+                      {data?.insomnia_quiz?.support_breakdown?.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3 rounded-2xl border border-purple-950 bg-[#0d0f1c] text-xs hover:border-purple-800/50 transition-all"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-lg bg-purple-950 border border-purple-800/40 text-[10px] font-mono font-bold text-purple-300">
+                              #{idx + 1}
+                            </span>
+                            <p className="font-semibold text-white">{item.label_vi}</p>
+                          </div>
+
+                          <div className="flex items-center gap-3 text-right">
+                            <span className="font-bold text-white font-mono">{item.count} ca</span>
+                            <span className="text-[11px] text-purple-300 font-mono font-bold w-12">{item.percentage}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SUB-VIEW 3: TRAFFIC SOURCES & VIDEO CAMPAIGNS */}
             {quizSubTab === 'sources' && (
               <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
                 <h4 className="text-base font-bold text-white mb-1 flex items-center gap-2">
@@ -1545,7 +1857,7 @@ export default function AdminAnalyticsPage() {
                   Nguồn Lưu Lượng Truy Cập Vào Quiz (Video / TikTok / Ads / Direct)
                 </h4>
                 <p className="text-xs text-purple-300/60 mb-4">
-                  Phân tích xem người làm quiz đến từ link video nào, chiến dịch quảng cáo nào và tỷ lệ chuyển đổi tải app ra sao
+                  Phân tích xem độc giả đến từ link video nào, chiến dịch quảng cáo nào và tỷ lệ hoàn tất cũng như chuyển đổi tải app
                 </p>
 
                 <div className="overflow-x-auto">
@@ -1557,7 +1869,8 @@ export default function AdminAnalyticsPage() {
                         <th className="py-3 px-4 text-right">Lượt Xem (Views)</th>
                         <th className="py-3 px-4 text-right">Người Xem (UV)</th>
                         <th className="py-3 px-4 text-right">Bắt Đầu (Starts)</th>
-                        <th className="py-3 px-4 text-right">Email (Leads)</th>
+                        <th className="py-3 px-4 text-right">Hoàn Tất (Done)</th>
+                        <th className="py-3 px-4 text-right">Vào Đêm 1</th>
                         <th className="py-3 px-4 text-right">Tải App (Clicks)</th>
                         <th className="py-3 px-4 text-right">Hoạt Động Gần Nhất</th>
                       </tr>
@@ -1577,14 +1890,15 @@ export default function AdminAnalyticsPage() {
                             <td className="py-3.5 px-4 text-right font-bold text-white font-mono">{src.views}</td>
                             <td className="py-3.5 px-4 text-right font-semibold text-purple-300 font-mono">{src.unique_visitors}</td>
                             <td className="py-3.5 px-4 text-right font-bold text-indigo-300 font-mono">{src.starts}</td>
-                            <td className="py-3.5 px-4 text-right font-bold text-pink-300 font-mono">{src.leads}</td>
+                            <td className="py-3.5 px-4 text-right font-bold text-teal-300 font-mono">{src.completions}</td>
+                            <td className="py-3.5 px-4 text-right font-bold text-cyan-300 font-mono">{src.night_1_clicks || 0}</td>
                             <td className="py-3.5 px-4 text-right font-bold text-emerald-300 font-mono">{src.app_clicks}</td>
                             <td className="py-3.5 px-4 text-right text-xs text-slate-400 font-mono">{src.last_active_at || '-'}</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={8} className="py-8 text-center text-sm text-purple-400/50">
+                          <td colSpan={9} className="py-8 text-center text-sm text-purple-400/50">
                             Chưa có dữ liệu nguồn truy cập
                           </td>
                         </tr>
@@ -1595,7 +1909,7 @@ export default function AdminAnalyticsPage() {
               </div>
             )}
 
-            {/* SUB-VIEW 3: RECENT SUBMISSIONS FEED */}
+            {/* SUB-VIEW 4: RECENT SUBMISSIONS FEED */}
             {quizSubTab === 'submissions' && (
               <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-purple-900/40">
@@ -1605,16 +1919,31 @@ export default function AdminAnalyticsPage() {
                       Nhật Ký Chi Tiết Người Làm Quiz Thời Gian Thực
                     </h4>
                     <p className="text-xs text-purple-300/60 mt-0.5">
-                      Xem danh sách độc giả đã điền email, điểm số ISI và hành vi tải App Soulscape
+                      Xem danh sách các ca hoàn tất trắc nghiệm, mẫu hình được phân tích và hành vi tiếp theo
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="relative max-w-xs">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Pattern Filter */}
+                    <select
+                      value={quizPatternFilter}
+                      onChange={e => setQuizPatternFilter(e.target.value)}
+                      className="px-3 py-1.5 rounded-xl border border-purple-900/60 bg-[#0d0f1c] text-xs text-purple-200 focus:outline-none focus:border-purple-500"
+                    >
+                      <option value="all">Tất cả mẫu hình ({data?.insomnia_quiz?.recent_submissions?.length || 0})</option>
+                      <option value="RACING_MIND">Tâm Trí Bận Rộn (RACING_MIND)</option>
+                      <option value="SLEEP_ANXIETY">Lo Âu Trước Giờ Ngủ (SLEEP_ANXIETY)</option>
+                      <option value="STRESS_CARRYOVER">Căng Thẳng Kéo Dài (STRESS_CARRYOVER)</option>
+                      <option value="BEDTIME_PROCRASTINATION">Trì Hoãn Giờ Ngủ (BEDTIME_PROCRASTINATION)</option>
+                      <option value="NIGHT_WAKING">Thức Giấc Nửa Đêm (NIGHT_WAKING)</option>
+                      <option value="SLEEP_RHYTHM">Lệch Nhịp Sinh Học (SLEEP_RHYTHM)</option>
+                    </select>
+
+                    <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-purple-400/60" />
                       <input
                         type="text"
-                        placeholder="Tìm email, nguồn..."
+                        placeholder="Tìm kiếm..."
                         value={quizSearch}
                         onChange={e => setQuizSearch(e.target.value)}
                         className="pl-9 pr-3 py-1.5 rounded-xl border border-purple-900/60 bg-[#0d0f1c] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
@@ -1626,42 +1955,76 @@ export default function AdminAnalyticsPage() {
                 <div className="mt-4 space-y-3">
                   {data?.insomnia_quiz?.recent_submissions && data.insomnia_quiz.recent_submissions.length > 0 ? (
                     data.insomnia_quiz.recent_submissions
-                      .filter(item => !quizSearch || item.email?.toLowerCase().includes(quizSearch.toLowerCase()) || item.source?.toLowerCase().includes(quizSearch.toLowerCase()))
+                      .filter(item => {
+                        const matchPattern = quizPatternFilter === 'all' || item.night_pattern === quizPatternFilter;
+                        const q = quizSearch.toLowerCase();
+                        const matchSearch =
+                          !q ||
+                          item.email?.toLowerCase().includes(q) ||
+                          item.source?.toLowerCase().includes(q) ||
+                          item.night_pattern_label?.toLowerCase().includes(q) ||
+                          item.primary_goal_label?.toLowerCase().includes(q);
+                        return matchPattern && matchSearch;
+                      })
                       .map((sub, idx) => (
                         <div
                           key={idx}
                           className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border border-purple-950 bg-[#0c0e1a] hover:border-purple-800/50 transition-all text-xs"
                         >
                           <div className="flex items-start sm:items-center gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-950/80 border border-purple-800/50 text-purple-300 font-mono font-bold text-sm">
-                              {sub.isi_score}
+                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-950/80 border border-purple-800/50 text-purple-300 font-mono font-bold text-xs text-center px-1">
+                              {sub.night_pattern?.slice(0, 4)}
                             </div>
                             <div>
-                              <div className="flex items-center gap-2">
-                                <p className="font-bold text-white text-sm">
-                                  {sub.email ? sub.email : <span className="text-slate-500 italic">Khách chưa để lại email</span>}
-                                </p>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-bold text-white text-sm">
+                                  {sub.night_pattern_label || sub.night_pattern}
+                                </span>
+                                {sub.clicked_night_1 && (
+                                  <span className="rounded-md bg-cyan-950 border border-cyan-700/60 px-2 py-0.5 text-[10px] font-bold text-cyan-300">
+                                    🌙 Đã Vào Đêm 1
+                                  </span>
+                                )}
                                 {sub.app_clicked && (
                                   <span className="rounded-md bg-emerald-950 border border-emerald-700/60 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
-                                    ✓ Đã Bấm Tải App
+                                    🚀 Đã Bấm Tải App
+                                  </span>
+                                )}
+                                {sub.waitlist_signed && (
+                                  <span className="rounded-md bg-pink-950 border border-pink-700/60 px-2 py-0.5 text-[10px] font-bold text-pink-300">
+                                    💌 Đăng Ký Waitlist
                                   </span>
                                 )}
                               </div>
-                              <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-slate-400">
+
+                              <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] text-slate-400">
+                                {sub.primary_goal_label && (
+                                  <span>Mục tiêu: <strong className="text-teal-300">{sub.primary_goal_label}</strong> • </span>
+                                )}
                                 <span>Thiết bị: <strong className="text-slate-200">{sub.device}</strong></span>
                                 <span>•</span>
                                 <span>Nguồn: <strong className="text-purple-300">{sub.source || 'Direct'}</strong></span>
-                                {sub.pills_use && (
+                                {sub.sleep_support && (
                                   <>
                                     <span>•</span>
-                                    <span>Thuốc ngủ: <strong className="text-amber-300">{sub.pills_use}</strong></span>
+                                    <span>Hỗ trợ: <strong className="text-amber-300">{sub.sleep_support}</strong></span>
                                   </>
                                 )}
                               </div>
+
+                              {sub.issues_labels && sub.issues_labels.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 mt-2">
+                                  {sub.issues_labels.map((issue, i) => (
+                                    <span key={i} className="rounded-lg bg-slate-900 border border-purple-900/40 px-2 py-0.5 text-[10px] text-purple-200/80">
+                                      {issue}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
 
-                          <div className="text-right text-[11px] text-purple-300/60 font-mono">
+                          <div className="text-right text-[11px] text-purple-300/60 font-mono shrink-0">
                             {sub.created_at_vn}
                           </div>
                         </div>
