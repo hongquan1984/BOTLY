@@ -1,0 +1,133 @@
+{
+  "scenarioA": {
+    "MIND_WONT_STOP": {
+      "state": "MIND_WONT_STOP",
+      "expectedFile": "night1_intro_mind_wont_stop_en_v2.mp3",
+      "introSrc": "http://localhost:3000/audio/night-companion/intro/night1_intro_mind_wont_stop_en_v2.mp3",
+      "voiceSrc": "http://localhost:3000/audio/night-companion/voice/guided-coherent-5-5.mp3",
+      "bgSrc": "http://localhost:3000/audio/night-companion/music/ocean-waves.mp3",
+      "introDuration": 13.76,
+      "introReadyState": 4,
+      "match": true,
+      "generalNotChained": true,
+      "initialPaused": true,
+      "status": "PASS"
+    },
+    "WOKE_UP": {
+      "state": "WOKE_UP",
+      "expectedFile": "night1_intro_woke_up_en_v2.mp3",
+      "introSrc": "http://localhost:3000/audio/night-companion/intro/night1_intro_woke_up_en_v2.mp3",
+      "voiceSrc": "http://localhost:3000/audio/night-companion/voice/guided-coherent-5-5.mp3",
+      "bgSrc": "http://localhost:3000/audio/night-companion/music/ocean-waves.mp3",
+      "introDuration": 16.96,
+      "introReadyState": 4,
+      "match": true,
+      "generalNotChained": true,
+      "initialPaused": true,
+      "status": "PASS"
+    },
+    "SLEEP_ANXIETY": {
+      "state": "SLEEP_ANXIETY",
+      "expectedFile": "night1_intro_sleep_anxiety_en_v1.mp3",
+      "introSrc": "http://localhost:3000/audio/night-companion/intro/night1_intro_sleep_anxiety_en_v1.mp3",
+      "voiceSrc": "http://localhost:3000/audio/night-companion/voice/guided-coherent-5-5.mp3",
+      "bgSrc": "http://localhost:3000/audio/night-companion/music/ocean-waves.mp3",
+      "introDuration": 18.32,
+      "introReadyState": 4,
+      "match": true,
+      "generalNotChained": true,
+      "initialPaused": true,
+      "status": "PASS"
+    },
+    "NOT_SLEEPY": {
+      "state": "NOT_SLEEPY",
+      "expectedFile": "night1_intro_not_sleepy_en_v1.mp3",
+      "introSrc": "http://localhost:3000/audio/night-companion/intro/night1_intro_not_sleepy_en_v1.mp3",
+      "voiceSrc": "",
+      "bgSrc": "http://localhost:3000/audio/night-companion/music/ocean-waves.mp3",
+      "introDuration": 18.24,
+      "introReadyState": 4,
+      "match": true,
+      "generalNotChained": true,
+      "initialPaused": true,
+      "status": "PASS"
+    },
+    "STRESS_CARRYOVER": {
+      "state": "STRESS_CARRYOVER",
+      "expectedFile": "night1_intro_stress_carryover_en_v1.mp3",
+      "introSrc": "http://localhost:3000/audio/night-companion/intro/night1_intro_stress_carryover_en_v1.mp3",
+      "voiceSrc": "http://localhost:3000/audio/night-companion/voice/guided-coherent-5-5.mp3",
+      "bgSrc": "http://localhost:3000/audio/night-companion/music/ocean-waves.mp3",
+      "introDuration": 18.32,
+      "introReadyState": 4,
+      "match": true,
+      "generalNotChained": true,
+      "initialPaused": true,
+      "status": "PASS"
+    }
+  },
+  "scenarioB": {
+    "quizPattern": "RACING_MIND",
+    "tonightState": "WOKE_UP",
+    "expectedIntro": "night1_intro_woke_up_en_v2.mp3",
+    "actualIntro": "http://localhost:3000/audio/night-companion/intro/night1_intro_woke_up_en_v2.mp3",
+    "introBadgeText": "Stage 1: State Intro Giai đoạn 1: Lời mở đầu Ready Middle of the Night Resting Lời mở đầu khi tỉnh giấc giữa đêm Skip intro to breathing Bỏ qua phần giới thiệu",
+    "isWokeUpV2": true,
+    "notMindWontStop": true,
+    "status": "PASS"
+  },
+  "scenarioC": {
+    "badgeText": "Stage 1: State Intro Giai đoạn 1: Lời mở đầu Ready Busy Mind Settling Lời mở đầu khi tâm trí bận rộn Skip intro to breathing Bỏ qua phần giới thiệu",
+    "transcriptEn": "Welcome. You mentioned that your mind feels busy tonight. For the next few minutes, you don’t need to work through every thought. Let’s begin gently, with no need to force sleep.",
+    "transcriptVi": "Chào bạn. Bạn chia sẻ rằng tâm trí đang bận rộn tối nay. Trong vài phút tới, bạn không cần giải quyết từng suy nghĩ. Mình bắt đầu nhẹ nhàng, không cần cố ngủ.",
+    "noSetAsideForTomorrow": true,
+    "noCureOrTreats": true,
+    "audioSrc": "http://localhost:3000/audio/night-companion/intro/night1_intro_mind_wont_stop_en_v2.mp3",
+    "status": "PASS"
+  },
+  "scenarioD": {
+    "playingBeforeSwitch": true,
+    "allPausedAfterSwitch": true,
+    "hasStartButton": true,
+    "newIntroSrc": "http://localhost:3000/audio/night-companion/intro/night1_intro_sleep_anxiety_en_v1.mp3",
+    "correctNewStateAudio": true,
+    "status": "PASS"
+  },
+  "scenarioE": {
+    "introPaused": false,
+    "voiceSrc": "http://localhost:3000/audio/night-companion/voice/guided-coherent-5-5.mp3",
+    "voicePlaying": true,
+    "voiceCurrentTime": 1.138666,
+    "bgPlaying": true,
+    "hasGuidedHeader": true,
+    "status": "PASS"
+  },
+  "scenarioF": {
+    "firstClickSucceeded": true,
+    "secondClickIgnored": true,
+    "introPaused": true,
+    "voicePlaying": true,
+    "voiceCurrentTime": 1.369656,
+    "bgPlaying": true,
+    "skipButtonRemoved": true,
+    "status": "PASS"
+  },
+  "scenarioG": {
+    "selectedTimer": "15",
+    "timerValueAfterTransition": "15",
+    "timerPreserved": true,
+    "status": "PASS"
+  },
+  "scenarioH": {
+    "audioCount": 3,
+    "allPaused": true,
+    "currentTimes": [
+      0,
+      0,
+      0
+    ],
+    "hasStartButton": true,
+    "noPauseButton": true,
+    "status": "PASS"
+  }
+}

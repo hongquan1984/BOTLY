@@ -1,0 +1,74 @@
+{
+  "night1_intro_general_en_v1": {
+    "file": "night1_intro_general_en_v1.mp3",
+    "duration_seconds": 23.76,
+    "bytes": 259580,
+    "sha256": "9b54bb82360674faf87dd318db030d97ff406c6ce389bf0d9fe83e291d0d9941",
+    "voice_engine": "Vieneu-TTS-Clone (calm_thien/reference_clean.wav)",
+    "accent": "Calm Irish/Meditation tone",
+    "license": "Proprietary In-House Clone / CC-BY Compatible"
+  },
+  "night1_intro_mind_wont_stop_en_v1": {
+    "file": "night1_intro_mind_wont_stop_en_v1.mp3",
+    "duration_seconds": 21.2,
+    "bytes": 243356,
+    "sha256": "f3f06d3630d4f93db0a2b23927a27c1a682f1ca7bf3556c7587920f81ca6e8e9",
+    "voice_engine": "Vieneu-TTS-Clone (calm_thien/reference_clean.wav)",
+    "accent": "Calm Irish/Meditation tone",
+    "license": "Proprietary In-House Clone / CC-BY Compatible"
+  },
+  "night1_intro_mind_wont_stop_en_v2": {
+    "file": "night1_intro_mind_wont_stop_en_v2.mp3",
+    "duration_seconds": 13.76,
+    "bytes": 158516,
+    "sha256": "286ac16675204dcc50ea616b6ff0f80b4ed02e6501e255687a0ea43d5185dcb0",
+    "voice_engine": "Vieneu-TTS-Clone (calm_thien/reference_clean.wav)",
+    "accent": "Calm Irish/Meditation tone",
+    "license": "Proprietary In-House Clone / CC-BY Compatible"
+  },
+  "night1_intro_not_sleepy_en_v1": {
+    "file": "night1_intro_not_sleepy_en_v1.mp3",
+    "duration_seconds": 18.24,
+    "bytes": 188300,
+    "sha256": "0b44041729dedf7e6924ee51636ce9e821d251049b26fbfd8970b6317e6fe942",
+    "voice_engine": "Vieneu-TTS-Clone (calm_thien/reference_clean.wav)",
+    "accent": "Calm Irish/Meditation tone",
+    "license": "Proprietary In-House Clone / CC-BY Compatible"
+  },
+  "night1_intro_sleep_anxiety_en_v1": {
+    "file": "night1_intro_sleep_anxiety_en_v1.mp3",
+    "duration_seconds": 18.32,
+    "bytes": 193772,
+    "sha256": "ac039f76bc7297b886e5ef3aa2840344a290be2bd2a77d56a1d5ff22149e0aef",
+    "voice_engine": "Vieneu-TTS-Clone (calm_thien/reference_clean.wav)",
+    "accent": "Calm Irish/Meditation tone",
+    "license": "Proprietary In-House Clone / CC-BY Compatible"
+  },
+  "night1_intro_stress_carryover_en_v1": {
+    "file": "night1_intro_stress_carryover_en_v1.mp3",
+    "duration_seconds": 18.32,
+    "bytes": 209156,
+    "sha256": "131414dac82b04727dcb6ed9537a35a9ad730faa989baa7c58dcfdc14770b36b",
+    "voice_engine": "Vieneu-TTS-Clone (calm_thien/reference_clean.wav)",
+    "accent": "Calm Irish/Meditation tone",
+    "license": "Proprietary In-House Clone / CC-BY Compatible"
+  },
+  "night1_intro_woke_up_en_v1": {
+    "file": "night1_intro_woke_up_en_v1.mp3",
+    "duration_seconds": 19.68,
+    "bytes": 196628,
+    "sha256": "94d09bacdaf579d3e16a57e65d2f6a2cd3366406b52a9fbd4da2f44159e69d45",
+    "voice_engine": "Vieneu-TTS-Clone (calm_thien/reference_clean.wav)",
+    "accent": "Calm Irish/Meditation tone",
+    "license": "Proprietary In-House Clone / CC-BY Compatible"
+  },
+  "night1_intro_woke_up_en_v2": {
+    "file": "night1_intro_woke_up_en_v2.mp3",
+    "duration_seconds": 16.96,
+    "bytes": 176180,
+    "sha256": "725c86f0cd652b71aa5af3041e98637b5ed1b9166cbbf823ddec9cad1e0b2b5e",
+    "voice_engine": "Vieneu-TTS-Clone (calm_thien/reference_clean.wav)",
+    "accent": "Calm Irish/Meditation tone",
+    "license": "Proprietary In-House Clone / CC-BY Compatible"
+  }
+}

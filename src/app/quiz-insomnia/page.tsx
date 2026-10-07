@@ -2,19 +2,19 @@ import type { Metadata } from 'next';
 import { InsomniaQuizFunnel } from '@/components/quiz/InsomniaQuizFunnel';
 
 export const metadata: Metadata = {
-  title: 'Clinical Sleep & Insomnia Assessment | Botly & Soulscape',
-  description: 'Take the 2-minute clinical sleep assessment based on CBT-I and the Insomnia Severity Index. Discover your personal sleep score and natural reset plan.',
-  alternates: { canonical: 'https://www.botly.vn/quiz-insomnia' },
+  title: 'Night Pattern Quiz | Soulscape',
+  description: 'Discover what may be keeping your mind awake and get a personalized plan for tonight.',
+  alternates: { canonical: 'https://www.botly.vn/sleep-quiz' },
   openGraph: {
-    title: 'Clinical Sleep & Insomnia Assessment | 2-Minute Diagnostic',
-    description: 'Calculate your Insomnia Severity Score (ISI) and discover your personalized CBT-I somatic sleep recovery plan.',
-    url: 'https://www.botly.vn/quiz-insomnia',
-    images: [{ url: '/app/soulscape-hero.jpg', width: 600, height: 600, alt: 'Sleep & Insomnia Assessment' }],
+    title: 'Night Pattern Quiz | Soulscape',
+    description: 'Discover what may be keeping your mind awake and get a personalized plan for tonight.',
+    url: 'https://www.botly.vn/sleep-quiz',
+    images: [{ url: '/app/soulscape-hero.jpg', width: 600, height: 600, alt: 'Soulscape Night Pattern Quiz' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Clinical Sleep & Insomnia Assessment',
-    description: 'Calculate your Insomnia Severity Score (ISI) and discover your personalized CBT-I somatic sleep recovery plan.',
+    title: 'Night Pattern Quiz',
+    description: 'Discover what may be keeping your mind awake and get a personalized plan for tonight.',
     images: ['/app/soulscape-hero.jpg'],
   },
 };

@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/en/wellness/ebooks", "/vi/song-khoe/ebooks",
     "/en/wellness/ebooks/blood-sugar-pairings", "/vi/song-khoe/ebooks/duong-huyet",
     "/en/wellness/ebooks/antioxidants", "/vi/song-khoe/ebooks/chat-chong-oxy-hoa",
-    "/tai-app", "/app", "/quiz-insomnia",
+    "/tai-app", "/app", "/quiz-insomnia", "/sleep-quiz",
   ];
   const articlePaths = wellnessArticles.map((article) => article.locale === "en" ? `/en/wellness/guides/${article.slug}` : `/vi/song-khoe/huong-dan/${article.slug}`);
   const published = await publishedSitemapEntries();

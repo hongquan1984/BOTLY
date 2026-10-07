@@ -88,6 +88,15 @@ export function HealingSanctuaryHub({
     };
   }, []);
 
+  useEffect(() => {
+    if (window.location.hash !== '#somatic-quiz') return;
+
+    setActiveHeroTab('screener');
+    window.setTimeout(() => {
+      document.getElementById('somatic-quiz')?.scrollIntoView({ block: 'start' });
+    }, 0);
+  }, []);
+
   // --- 15-SECOND SOMATIC SCREENER ---
   const [quizStep, setQuizStep] = useState(1);
   const [quizAnswers, setQuizAnswers] = useState<{ q1?: string; q2?: string; q3?: string }>({});
@@ -301,7 +310,7 @@ export function HealingSanctuaryHub({
           </div>
 
           {/* 🌿 INTERACTIVE SANCTUARY CONSOLE DIRECTLY IN HERO */}
-          <div className="mt-10 mx-auto max-w-2xl rounded-3xl border border-indigo-800/60 bg-gradient-to-br from-[#0c1222]/90 to-[#11182c]/90 p-6 sm:p-8 shadow-2xl shadow-black/40 backdrop-blur-xl">
+          <div id="somatic-quiz" className="mt-10 mx-auto max-w-2xl scroll-mt-24 rounded-3xl border border-indigo-800/60 bg-gradient-to-br from-[#0c1222]/90 to-[#11182c]/90 p-6 sm:p-8 shadow-2xl shadow-black/40 backdrop-blur-xl">
             {/* Tabs */}
             <div className="flex items-center justify-center gap-2 border-b border-indigo-900/60 pb-5">
               <button

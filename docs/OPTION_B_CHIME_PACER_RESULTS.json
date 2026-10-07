@@ -1,0 +1,184 @@
+{
+  "timestamp": "2026-10-07T08:39:05.583Z",
+  "allTestsPass": true,
+  "results": {
+    "dom_3stage_presence": {
+      "pass": true,
+      "stage1Text": true,
+      "stage2Text": true,
+      "stage3Text": true,
+      "voiceOptionCount": 4
+    },
+    "all_4_breathing_options_present": {
+      "pass": true,
+      "expectedVoiceIds": [
+        "night1-guided-coherent-5-5",
+        "night1-guided-4-7-8",
+        "night1-guided-box-4-4-4-4",
+        "night1-guided-4-2-6"
+      ],
+      "foundVoiceIds": [
+        "night1-guided-coherent-5-5",
+        "night1-guided-4-7-8",
+        "night1-guided-box-4-4-4-4",
+        "night1-guided-4-2-6"
+      ]
+    },
+    "initial_audio_loop_properties": {
+      "pass": true,
+      "voiceLoop": false,
+      "pacerLoop": true,
+      "introFound": true
+    },
+    "start_listening_playback": {
+      "pass": true,
+      "audios": [
+        {
+          "src": "http://localhost:3000/audio/night-companion/intro/night1_intro_mind_wont_stop_en_v2.mp3",
+          "paused": false,
+          "currentTime": 0.94293
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/voice/guided-coherent-5-5.mp3",
+          "paused": true,
+          "currentTime": 0
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/pacer/pacer-chime-coherent-5-5.mp3",
+          "paused": true,
+          "currentTime": 0
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/music/ocean-waves.mp3",
+          "paused": false,
+          "currentTime": 0.942941
+        }
+      ]
+    },
+    "skip_intro_to_voice": {
+      "pass": true,
+      "audios": [
+        {
+          "src": "http://localhost:3000/audio/night-companion/intro/night1_intro_mind_wont_stop_en_v2.mp3",
+          "paused": true,
+          "currentTime": 0
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/voice/guided-coherent-5-5.mp3",
+          "paused": false,
+          "currentTime": 0.968337
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/pacer/pacer-chime-coherent-5-5.mp3",
+          "paused": true,
+          "currentTime": 0
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/music/ocean-waves.mp3",
+          "paused": false,
+          "currentTime": 2.0784
+        }
+      ]
+    },
+    "skip_voice_to_pacer": {
+      "pass": true,
+      "stage3Active": true,
+      "audios": [
+        {
+          "src": "http://localhost:3000/audio/night-companion/intro/night1_intro_mind_wont_stop_en_v2.mp3",
+          "paused": true,
+          "loop": false,
+          "currentTime": 0
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/voice/guided-coherent-5-5.mp3",
+          "paused": true,
+          "loop": false,
+          "currentTime": 0
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/pacer/pacer-chime-coherent-5-5.mp3",
+          "paused": false,
+          "loop": true,
+          "currentTime": 0.96806
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/music/ocean-waves.mp3",
+          "paused": false,
+          "loop": true,
+          "currentTime": 3.198014
+        }
+      ]
+    },
+    "pacer_switch_mapping": {
+      "pass": true,
+      "switchResults": {
+        "night1-guided-coherent-5-5": "/audio/night-companion/pacer/pacer-chime-coherent-5-5.mp3",
+        "night1-guided-4-7-8": "/audio/night-companion/pacer/pacer-chime-4-7-8.mp3",
+        "night1-guided-box-4-4-4-4": "/audio/night-companion/pacer/pacer-chime-box-4-4-4-4.mp3",
+        "night1-guided-4-2-6": "/audio/night-companion/pacer/pacer-chime-4-2-6.mp3"
+      }
+    },
+    "natural_voice_transition": {
+      "pass": true,
+      "voiceLoop": false,
+      "isPacerPlaying": true,
+      "isVoicePaused": true,
+      "audios": [
+        {
+          "src": "http://localhost:3000/audio/night-companion/intro/night1_intro_mind_wont_stop_en_v2.mp3",
+          "paused": true,
+          "loop": false
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/voice/guided-coherent-5-5.mp3",
+          "paused": true,
+          "loop": false
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/pacer/pacer-chime-coherent-5-5.mp3",
+          "paused": false,
+          "loop": true
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/music/ocean-waves.mp3",
+          "paused": false,
+          "loop": true
+        }
+      ]
+    },
+    "pause_resume_pacer": {
+      "pass": true,
+      "afterPauseAllPaused": true,
+      "afterResumePacerPlaying": true,
+      "afterResumeBgPlaying": true,
+      "resumeAudios": [
+        {
+          "src": "http://localhost:3000/audio/night-companion/intro/night1_intro_mind_wont_stop_en_v2.mp3",
+          "paused": true,
+          "currentTime": 0
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/voice/guided-coherent-5-5.mp3",
+          "paused": true,
+          "currentTime": 0.474356
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/pacer/pacer-chime-coherent-5-5.mp3",
+          "paused": false,
+          "currentTime": 2.478004
+        },
+        {
+          "src": "http://localhost:3000/audio/night-companion/music/ocean-waves.mp3",
+          "paused": false,
+          "currentTime": 3.618625
+        }
+      ]
+    },
+    "until_voice_timer_stops": {
+      "pass": true,
+      "allPaused": true,
+      "hasPacerPlaying": false
+    }
+  }
+}

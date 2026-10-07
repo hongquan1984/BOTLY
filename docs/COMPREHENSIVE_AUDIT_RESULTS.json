@@ -1,0 +1,135 @@
+{
+  "test1_not_sleepy_and_bg_only": {
+    "status": "PASS",
+    "evidence": {
+      "notSleepyInit": {
+        "guidedCheckboxChecked": false,
+        "guidedCheckboxDisabled": true,
+        "audioCount": 3,
+        "hasStartBtn": true,
+        "allPaused": true
+      },
+      "notSleepyPlaying": {
+        "introPlaying": false,
+        "voicePlaying": false,
+        "bgPlaying": true
+      },
+      "mindWontStopBgOnlyInit": {
+        "guidedChecked": false
+      },
+      "mindWontStopBgOnlyPlaying": {
+        "introPlaying": false,
+        "voicePlaying": false,
+        "bgPlaying": true
+      }
+    }
+  },
+  "test2_pause_resume": {
+    "status": "PASS",
+    "evidence": {
+      "introPlayingState": {
+        "introPlaying": true,
+        "bgPlaying": true
+      },
+      "introPausedState": {
+        "introPaused": true,
+        "bgPaused": true
+      },
+      "introResumedState": {
+        "introPlaying": true,
+        "bgPlaying": true
+      },
+      "guidedPlayingState": {
+        "voicePlaying": true,
+        "bgPlaying": true
+      },
+      "guidedPausedState": {
+        "voicePaused": true,
+        "bgPaused": true
+      },
+      "guidedResumedState": {
+        "voicePlaying": true,
+        "bgPlaying": true
+      }
+    }
+  },
+  "test3_stop_boundary_race": {
+    "status": "PASS",
+    "evidence": {
+      "introPaused": true,
+      "voicePaused": true,
+      "voiceCurrentTime": 0
+    }
+  },
+  "test4_timer_preservation": {
+    "status": "PASS",
+    "evidence": {
+      "timerBeforeSkip": "15",
+      "timerAfterSkip": "15"
+    }
+  },
+  "test5_audio_error_retry": {
+    "status": "PASS",
+    "evidence": {
+      "hasErrorBanner": true,
+      "hasRetry": true,
+      "isPlayerStillOpen": true,
+      "errorCleared": true
+    }
+  },
+  "test6_f5_across_5_states": {
+    "status": "PASS",
+    "evidence": {
+      "f5_during_intro": {
+        "noAutoplayOnReload": true,
+        "allPausedInPlayer": true,
+        "readyWithStartButton": true
+      },
+      "f5_during_guided": {
+        "noAutoplayOnReload": true,
+        "allPausedInPlayer": true,
+        "readyWithStartButton": true
+      },
+      "f5_while_paused": {
+        "noAutoplayOnReload": true,
+        "allPausedInPlayer": true,
+        "readyWithStartButton": true
+      },
+      "f5_background_only": {
+        "noAutoplayOnReload": true,
+        "allPausedInPlayer": true,
+        "readyWithStartButton": true
+      },
+      "f5_when_stopped": {
+        "noAutoplayOnReload": true,
+        "allPausedInPlayer": true,
+        "readyWithStartButton": true
+      }
+    }
+  },
+  "test7_no_forced_popup_on_finish": {
+    "status": "PASS",
+    "evidence": {
+      "hasEmailPrompt": false,
+      "hasDialog": false,
+      "hasModal": false,
+      "playerStillPresent": true
+    }
+  },
+  "test8_feedback_save_failure": {
+    "status": "PASS",
+    "evidence": {
+      "errorMsg": "",
+      "isDoneScreen": false
+    }
+  },
+  "test9_analytics_isolation": {
+    "status": "PASS",
+    "evidence": {
+      "totalAfterSimultaneous": 1,
+      "simultaneousNoDoubleCount": true,
+      "seekNotCountedAsInterval": true,
+      "introSeparateFromVoice": true
+    }
+  }
+}
