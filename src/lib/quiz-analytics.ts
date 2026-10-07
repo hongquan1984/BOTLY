@@ -98,6 +98,22 @@ export interface PostQuizFunnelItem {
   icon_name: string;
 }
 
+export interface PostQuizPeriodData {
+  period: 'today' | 'week' | 'month' | 'all';
+  label_vi: string;
+  completions: number;
+  night_1_clicks: number;
+  unique_night_1: number;
+  night_1_rate: number;
+  app_clicks: number;
+  unique_app: number;
+  app_rate: number;
+  waitlist_signups: number;
+  unique_waitlist: number;
+  waitlist_rate: number;
+  funnel: PostQuizFunnelItem[];
+}
+
 export interface InsomniaQuizStats {
   summary: {
     page_views: number;
@@ -147,6 +163,7 @@ export interface InsomniaQuizStats {
   goals_breakdown: GoalBreakdownItem[];
   support_breakdown: SupportBreakdownItem[];
   post_quiz_funnel: PostQuizFunnelItem[];
+  post_quiz_by_period: Record<'today' | 'week' | 'month' | 'all', PostQuizPeriodData>;
   traffic_sources: Array<{
     source: string;
     campaign: string;
@@ -547,6 +564,113 @@ export async function processInsomniaQuizAnalytics(url: string, serviceKey: stri
       }
     ];
 
+    // Period-filtered post quiz funnels (today / 7 days / 30 days / all)
+    const nowTs = Date.now();
+    const periodFilters: Record<'today' | 'week' | 'month' | 'all', (dateStr?: string) => boolean> = {
+      today: (dateStr?: string) => isToday(dateStr),
+      week: (dateStr?: string) => {
+        if (!dateStr) return false;
+        const t = new Date(dateStr).getTime();
+        return !isNaN(t) && nowTs - t <= 7 * 86400 * 1000;
+      },
+      month: (dateStr?: string) => {
+        if (!dateStr) return false;
+        const t = new Date(dateStr).getTime();
+        return !isNaN(t) && nowTs - t <= 30 * 86400 * 1000;
+      },
+      all: () => true
+    };
+
+    const periodLabels: Record<'today' | 'week' | 'month' | 'all', string> = {
+      today: 'Hôm nay (24h)',
+      week: '7 ngày qua (Tuần)',
+      month: '30 ngày qua (Tháng)',
+      all: 'Toàn thời gian'
+    };
+
+    const post_quiz_by_period: Record<'today' | 'week' | 'month' | 'all', PostQuizPeriodData> = {
+      today: {} as PostQuizPeriodData,
+      week: {} as PostQuizPeriodData,
+      month: {} as PostQuizPeriodData,
+      all: {} as PostQuizPeriodData
+    };
+
+    (['today', 'week', 'month', 'all'] as const).forEach(periodKey => {
+      const filterFn = periodFilters[periodKey];
+
+      // Completions for this period
+      const pCompletions = completions.filter(e => filterFn(e.created_at));
+      const pUniqueCompUsers = new Set(pCompletions.map(e => e.metadata?.quiz_attempt_id || e.visitor_id || e.session_id || ''));
+      const pTotalCompletions = Math.max(pCompletions.length, pUniqueCompUsers.size);
+
+      // Night 1 clicks
+      const pNight1 = night1Clicks.filter(e => filterFn(e.created_at));
+      const pNight1Users = new Set(pNight1.map(e => e.metadata?.quiz_attempt_id || e.visitor_id || e.session_id || '')).size;
+      const pNight1Rate = pTotalCompletions > 0 ? Math.min(100, Math.round((pNight1Users / pTotalCompletions) * 100)) : 0;
+
+      // App clicks
+      const pAppClicks = appClicks.filter(e => filterFn(e.created_at));
+      const pAppUsers = new Set(pAppClicks.map(e => e.metadata?.quiz_attempt_id || e.visitor_id || e.session_id || '')).size;
+      const pAppRate = pTotalCompletions > 0 ? Math.min(100, Math.round((pAppUsers / pTotalCompletions) * 100)) : 0;
+
+      // Waitlist
+      const pWaitlistEvents = waitlistEvents.filter(e => filterFn(e.created_at));
+      const pWaitlistTable = Array.isArray(waitlist) ? waitlist.filter((w: { created_at?: string }) => filterFn(w.created_at)).length : 0;
+      const pSubs = subs.filter((s: InsomniaQuizSubscriber) => filterFn(s.consented_at)).length;
+      const pTotalWaitlist = Math.max(pWaitlistEvents.length, pWaitlistTable, pSubs);
+      const pWaitlistUsers = new Set(pWaitlistEvents.map(e => e.metadata?.quiz_attempt_id || e.visitor_id || e.session_id || '')).size;
+      const pWaitlistRate = pTotalCompletions > 0 ? Math.min(100, Math.round((pWaitlistUsers / pTotalCompletions) * 100)) : 0;
+
+      post_quiz_by_period[periodKey] = {
+        period: periodKey,
+        label_vi: periodLabels[periodKey],
+        completions: pTotalCompletions,
+        night_1_clicks: pNight1.length,
+        unique_night_1: pNight1Users,
+        night_1_rate: pNight1Rate,
+        app_clicks: pAppClicks.length,
+        unique_app: pAppUsers,
+        app_rate: pAppRate,
+        waitlist_signups: pTotalWaitlist,
+        unique_waitlist: pWaitlistUsers,
+        waitlist_rate: pWaitlistRate,
+        funnel: [
+          {
+            key: 'completions',
+            label_vi: 'Hoàn Tất Quiz & Xem Phác Đồ',
+            label_en: 'Completed Quiz & Viewed Plan',
+            count: pTotalCompletions,
+            conversion_rate: 100,
+            icon_name: 'CheckCircle2'
+          },
+          {
+            key: 'night_1',
+            label_vi: 'Bắt Đầu Kế Hoạch Đêm 1 (Night Companion)',
+            label_en: 'Started Night 1 Sound Journey',
+            count: pNight1.length,
+            conversion_rate: pNight1Rate,
+            icon_name: 'Moon'
+          },
+          {
+            key: 'app_download',
+            label_vi: 'Click Tải Ứng Dụng Soulscape',
+            label_en: 'App Download Clicks (iOS & Android)',
+            count: pAppClicks.length,
+            conversion_rate: pAppRate,
+            icon_name: 'Download'
+          },
+          {
+            key: 'waitlist',
+            label_vi: 'Đăng Ký Danh Sách Chờ & Nhắc Nhở',
+            label_en: 'Waitlist & Notification Signups',
+            count: pTotalWaitlist,
+            conversion_rate: pWaitlistRate,
+            icon_name: 'Mail'
+          }
+        ]
+      };
+    });
+
     // 6. Accurate 17 Steps Waterfall
     const STEP_DEFINITIONS = [
       { step: 0, title_vi: 'Trang Giới Thiệu (Hero)', title_en: 'Intro Landing' },
@@ -761,6 +885,7 @@ export async function processInsomniaQuizAnalytics(url: string, serviceKey: stri
       goals_breakdown,
       support_breakdown,
       post_quiz_funnel,
+      post_quiz_by_period,
       traffic_sources,
       recent_submissions: recent_submissions.slice(0, 50)
     };

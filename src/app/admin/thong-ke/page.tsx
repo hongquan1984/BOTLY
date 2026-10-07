@@ -254,6 +254,22 @@ interface PostQuizFunnelItem {
   icon_name: string;
 }
 
+interface PostQuizPeriodData {
+  period: 'today' | 'week' | 'month' | 'all';
+  label_vi: string;
+  completions: number;
+  night_1_clicks: number;
+  unique_night_1: number;
+  night_1_rate: number;
+  app_clicks: number;
+  unique_app: number;
+  app_rate: number;
+  waitlist_signups: number;
+  unique_waitlist: number;
+  waitlist_rate: number;
+  funnel: PostQuizFunnelItem[];
+}
+
 interface InsomniaQuizPayload {
   summary: {
     page_views: number;
@@ -298,6 +314,7 @@ interface InsomniaQuizPayload {
   goals_breakdown?: GoalBreakdownItem[];
   support_breakdown?: SupportBreakdownItem[];
   post_quiz_funnel?: PostQuizFunnelItem[];
+  post_quiz_by_period?: Record<'today' | 'week' | 'month' | 'all', PostQuizPeriodData>;
   traffic_sources: Array<{
     source: string;
     campaign: string;
@@ -367,6 +384,7 @@ export default function AdminAnalyticsPage() {
   const [quizFilterDevice, setQuizFilterDevice] = useState<string>('all');
   const [quizPatternFilter, setQuizPatternFilter] = useState<string>('all');
   const [quizSubTab, setQuizSubTab] = useState<'overview' | 'insights' | 'sources' | 'submissions'>('overview');
+  const [postQuizPeriod, setPostQuizPeriod] = useState<'today' | 'week' | 'month' | 'all'>('all');
 
   // Search and filters for app downloads
   const [appSearchQuery, setAppSearchQuery] = useState<string>('');
@@ -1581,7 +1599,7 @@ export default function AdminAnalyticsPage() {
               <div className="space-y-6">
                 {/* Post-Quiz Actions Funnel Cards */}
                 <div className="rounded-3xl border border-purple-900/40 bg-[#111322] p-5 shadow-xl shadow-black/20">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div>
                       <h4 className="text-base font-bold text-white flex items-center gap-2">
                         <Zap className="h-5 w-5 text-amber-400" />
@@ -1591,31 +1609,82 @@ export default function AdminAnalyticsPage() {
                         Theo dõi hành vi thực tế của độc giả sau khi xem kết quả mẫu hình và phác đồ cá nhân hóa
                       </p>
                     </div>
+
+                    {/* Timeframe Filter Buttons */}
+                    <div className="flex items-center gap-1 bg-[#0a0c16] border border-purple-900/50 p-1 rounded-2xl shrink-0 self-start sm:self-auto">
+                      {[
+                        { id: 'today', label: 'Hôm nay (24h)', icon: '⚡' },
+                        { id: 'week', label: '7 ngày qua', icon: '🗓️' },
+                        { id: 'month', label: '30 ngày qua', icon: '📆' },
+                        { id: 'all', label: 'Toàn thời gian', icon: '🌐' }
+                      ].map(tab => (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => setPostQuizPeriod(tab.id as typeof postQuizPeriod)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                            postQuizPeriod === tab.id
+                              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-950/50'
+                              : 'text-purple-300/60 hover:text-purple-200 hover:bg-purple-950/40'
+                          }`}
+                        >
+                          <span className="text-[11px]">{tab.icon}</span>
+                          <span>{tab.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {data?.insomnia_quiz?.post_quiz_funnel?.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="rounded-2xl border border-purple-950 bg-[#0d0f1c] p-4 hover:border-purple-800/50 transition-all"
-                      >
-                        <div className="flex items-center justify-between text-xs text-slate-400">
-                          <span className="font-semibold">{item.label_en}</span>
-                          <span className="text-purple-400 font-mono font-bold">{item.conversion_rate}% CVR</span>
+                  {(() => {
+                    const periodData = data?.insomnia_quiz?.post_quiz_by_period?.[postQuizPeriod];
+                    const activeFunnel = periodData?.funnel || data?.insomnia_quiz?.post_quiz_funnel || [];
+
+                    return (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                          {activeFunnel.map((item, idx) => (
+                            <div
+                              key={idx}
+                              className="rounded-2xl border border-purple-950 bg-[#0d0f1c] p-4 hover:border-purple-800/50 transition-all"
+                            >
+                              <div className="flex items-center justify-between text-xs text-slate-400">
+                                <span className="font-semibold">{item.label_en}</span>
+                                <span className="text-purple-400 font-mono font-bold">{item.conversion_rate}% CVR</span>
+                              </div>
+                              <p className="mt-1 text-sm font-bold text-white">{item.label_vi}</p>
+                              <p className="mt-3 text-2xl font-extrabold text-purple-300 font-mono">
+                                {item.count.toLocaleString('vi-VN')} <span className="text-xs text-slate-400 font-normal">lượt</span>
+                              </p>
+                              <div className="mt-3 h-2 w-full rounded-full bg-slate-900 overflow-hidden">
+                                <div
+                                  style={{ width: `${Math.min(100, Math.max(item.conversion_rate, 4))}%` }}
+                                  className="h-full rounded-full bg-gradient-to-r from-purple-600 via-indigo-500 to-teal-400"
+                                />
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                        <p className="mt-1 text-sm font-bold text-white">{item.label_vi}</p>
-                        <p className="mt-3 text-2xl font-extrabold text-purple-300 font-mono">
-                          {item.count.toLocaleString('vi-VN')} <span className="text-xs text-slate-400 font-normal">lượt</span>
-                        </p>
-                        <div className="mt-3 h-2 w-full rounded-full bg-slate-900 overflow-hidden">
-                          <div
-                            style={{ width: `${Math.min(100, Math.max(item.conversion_rate, 4))}%` }}
-                            className="h-full rounded-full bg-gradient-to-r from-purple-600 via-indigo-500 to-teal-400"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+
+                        {periodData && (
+                          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 rounded-xl bg-purple-950/30 border border-purple-900/30 text-xs text-purple-300/70">
+                            <span className="flex items-center gap-1.5 font-medium">
+                              <span>📌 Khung thời gian:</span>
+                              <strong className="text-purple-200">{periodData.label_vi}</strong>
+                            </span>
+                            <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono">
+                              <span>Hoàn tất: <strong className="text-white">{periodData.completions}</strong></span>
+                              <span>·</span>
+                              <span>Đêm 1: <strong className="text-purple-300">{periodData.night_1_clicks}</strong> ({periodData.unique_night_1} UV)</span>
+                              <span>·</span>
+                              <span>Tải App: <strong className="text-teal-300">{periodData.app_clicks}</strong> ({periodData.unique_app} UV)</span>
+                              <span>·</span>
+                              <span>Waitlist: <strong className="text-pink-300">{periodData.waitlist_signups}</strong></span>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
 
                 {/* Step-by-Step 17 Waterfall */}
