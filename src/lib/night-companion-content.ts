@@ -272,7 +272,7 @@ export const NIGHT_ONE_VOICES: Record<string, NightVoiceTrack> = {
     duration_seconds: 181.348,
     kind: 'voice',
     recommended: true,
-    suitable_states: ['MIND_WONT_STOP', 'SLEEP_ANXIETY', 'WOKE_UP', 'STRESS_CARRYOVER'],
+    suitable_states: ['MIND_WONT_STOP', 'SLEEP_ANXIETY', 'WOKE_UP', 'STRESS_CARRYOVER', 'NOT_SLEEPY'],
   },
   'night1-guided-4-7-8': {
     asset_id: 'night1-guided-4-7-8',
@@ -286,7 +286,7 @@ export const NIGHT_ONE_VOICES: Record<string, NightVoiceTrack> = {
     duration_seconds: 377.487,
     kind: 'voice',
     recommended: false,
-    suitable_states: ['MIND_WONT_STOP', 'SLEEP_ANXIETY', 'WOKE_UP', 'STRESS_CARRYOVER'],
+    suitable_states: ['MIND_WONT_STOP', 'SLEEP_ANXIETY', 'WOKE_UP', 'STRESS_CARRYOVER', 'NOT_SLEEPY'],
   },
   'night1-guided-box-4-4-4-4': {
     asset_id: 'night1-guided-box-4-4-4-4',
@@ -300,7 +300,7 @@ export const NIGHT_ONE_VOICES: Record<string, NightVoiceTrack> = {
     duration_seconds: 185.063,
     kind: 'voice',
     recommended: false,
-    suitable_states: ['MIND_WONT_STOP', 'SLEEP_ANXIETY', 'WOKE_UP', 'STRESS_CARRYOVER'],
+    suitable_states: ['MIND_WONT_STOP', 'SLEEP_ANXIETY', 'WOKE_UP', 'STRESS_CARRYOVER', 'NOT_SLEEPY'],
   },
   'night1-guided-4-2-6': {
     asset_id: 'night1-guided-4-2-6',
@@ -314,11 +314,13 @@ export const NIGHT_ONE_VOICES: Record<string, NightVoiceTrack> = {
     duration_seconds: 12.053,
     kind: 'voice',
     recommended: false,
-    suitable_states: ['MIND_WONT_STOP', 'SLEEP_ANXIETY', 'WOKE_UP', 'STRESS_CARRYOVER'],
+    suitable_states: ['MIND_WONT_STOP', 'SLEEP_ANXIETY', 'WOKE_UP', 'STRESS_CARRYOVER', 'NOT_SLEEPY'],
   },
 };
 
-export function selectNightOneVoiceOptions(state: TonightStateId) {
-  if (state === 'NOT_SLEEPY') return [];
-  return Object.values(NIGHT_ONE_VOICES).filter(voice => voice.suitable_states.includes(state));
+export function selectNightOneVoiceOptions(state?: TonightStateId) {
+  const allVoices = Object.values(NIGHT_ONE_VOICES);
+  if (!state) return allVoices;
+  const filtered = allVoices.filter(voice => voice.suitable_states.includes(state));
+  return filtered.length > 0 ? filtered : allVoices;
 }

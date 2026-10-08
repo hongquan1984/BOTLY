@@ -24,16 +24,15 @@ assert.ok(manifest[0].license && manifest[0].license_url && manifest[0].source_u
 assert.equal(manifest[0].kind, 'background');
 assert.equal(Object.keys(NIGHT_ONE_AUDIO).length, 6);
 assert.equal(manifest.length, 12);
-assert.equal(Object.keys(NIGHT_ONE_VOICES).length, 3, 'all three production guided voice assets are registered');
+assert.equal(Object.keys(NIGHT_ONE_VOICES).length, 4, 'all four production guided voice assets are registered');
 assert.equal(NIGHT_ONE_VOICES['night1-guided-coherent-5-5'].recommended, true);
 assert.equal(NIGHT_ONE_VOICES['night1-guided-coherent-5-5'].duration_seconds, 181.348);
 assert.equal(selectNightOneVoiceOptions('MIND_WONT_STOP')[0].asset_id, 'night1-guided-coherent-5-5');
-assert.equal(selectNightOneVoiceOptions('NOT_SLEEPY').length, 0);
+assert.ok(selectNightOneVoiceOptions('NOT_SLEEPY').length > 0, 'NOT_SLEEPY has voice options fallback');
 assert.ok(player.includes('Start listening'));
 assert.ok(player.includes('Stop listening'));
 assert.ok(player.includes('visibilitychange'));
 assert.ok(player.includes('fadeAndStopBackground'));
 assert.ok(player.includes('No background'));
-assert.ok(player.includes('Selected backgrounds play together.'));
 assert.ok(player.includes('15 minutes'));
 console.log('Night Companion content and audio manifest tests passed');

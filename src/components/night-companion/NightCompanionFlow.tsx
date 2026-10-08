@@ -396,7 +396,7 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
         <NightAudioPlayer
           script={NIGHT_ONE_SCRIPTS.gentle_breathing_v1}
           state={state || undefined}
-          voices={state ? selectNightOneVoiceOptions(state) : []}
+          voices={selectNightOneVoiceOptions(state || undefined)}
           backgrounds={Object.values(NIGHT_ONE_AUDIO)}
           presets={NIGHT_ONE_BACKGROUND_PRESETS}
           profileId={profile?.profile_id}
