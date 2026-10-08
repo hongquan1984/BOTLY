@@ -25,9 +25,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'Missing event_type or path' }, { status: 400 });
     }
 
-    // Ignore admin visits from analytics to prevent skews
-    if (reqPath.startsWith('/admin')) {
+    // Ignore admin and stat dashboard visits
+    if (reqPath.startsWith('/admin') || reqPath.startsWith('/thong-ke') || reqPath.startsWith('/thongke')) {
       return NextResponse.json({ ok: true, ignored: true });
+    }
+
+    // Ignore localhost, 127.0.0.1, or test referrers/hosts
+    const host = request.headers.get('host') || '';
+    const origin = request.headers.get('origin') || '';
+    const ref = String(referrer || '');
+    if (
+      host.includes('localhost') || host.includes('127.0.0.1') ||
+      origin.includes('localhost') || origin.includes('127.0.0.1') ||
+      ref.includes('localhost') || ref.includes('127.0.0.1')
+    ) {
+      return NextResponse.json({ ok: true, ignored: true });
+    }
+
+    // Ignore automated headless test browsers
+    const ua = (request.headers.get('user-agent') || '').toLowerCase();
+    if (ua.includes('headlesschrome') || ua.includes('puppeteer') || ua.includes('webdriver')) {
+      return NextResponse.json({ ok: true, ignored: true });
+    }
+
+    // Ignore explicit test or dev flags
+    if (typeof metadata === 'object' && metadata !== null) {
+      const meta = metadata as Record<string, unknown>;
+      if (meta.is_test === true || meta.is_dev === true || meta.exclude_tracking === true) {
+        return NextResponse.json({ ok: true, ignored: true });
+      }
     }
 
     const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL)?.replace(/\/$/, '');

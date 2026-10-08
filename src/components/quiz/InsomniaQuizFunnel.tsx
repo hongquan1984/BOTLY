@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Check, ChevronLeft, Moon, Smartphone, Sparkles, Wind } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, ChevronLeft, ChevronUp, Lock, Moon, Sparkles, Wind } from 'lucide-react';
 import { trackClientEvent } from '@/components/analytics/AnalyticsTracker';
 import { buildNightPatternResult, type NightPatternAnswers } from '@/lib/night-pattern';
 import { getRecommendations, type Recommendation } from '@/lib/recommendations';
 import { getOrCreateQuizAttemptId } from '@/lib/night-companion-analytics';
 import { BilingualLine } from '@/lib/night-companion-i18n';
+import { JOURNEY_PREVIEW_NIGHTS } from '@/lib/night-companion-map';
 import { NightCompanionFlow } from '@/components/night-companion/NightCompanionFlow';
 import { CompactResultScreen } from './CompactResultScreen';
 
@@ -115,12 +116,51 @@ export function InsomniaQuizFunnel() {
     }
   }, [screen, locale, sourceIntent]);
 
-  const goNext = () => {
+  const handleStartQuiz = (location: 'hero' | 'preview_night_1' = 'hero') => {
     const attemptId = getOrCreateQuizAttemptId();
-    if (screen === 0) { trackClientEvent('quiz_start', { locale, metadata: { funnel: 'night_pattern', quiz_attempt_id: attemptId, source_intent: sourceIntent || 'direct' } }); trackClientEvent('quiz_started', { locale, metadata: { funnel: 'quiz_insomnia', quiz_attempt_id: attemptId, source_intent: sourceIntent || 'direct' } }); }
-    if (screen >= 1 && screen <= 15) { trackClientEvent('quiz_step_complete', { locale, metadata: { funnel: 'night_pattern', quiz_attempt_id: attemptId, step: screen, source_intent: sourceIntent, answers } }); trackClientEvent('quiz_step', { locale, metadata: { funnel: 'quiz_insomnia', quiz_attempt_id: attemptId, step: screen, source_intent: sourceIntent, answers } }); }
-    if ([6, 8, 11].includes(screen)) trackClientEvent('micro_insight_view', { locale, metadata: { funnel: 'night_pattern', insight_step: screen, source_intent: sourceIntent } });
-    setScreen(current => Math.min(current + 1, 17)); window.scrollTo({ top: 0, behavior: 'smooth' });
+    trackClientEvent('quiz_start', {
+      locale,
+      metadata: {
+        funnel: 'night_pattern',
+        quiz_attempt_id: attemptId,
+        source_intent: sourceIntent || 'direct',
+        cta_location: location,
+      },
+    });
+    trackClientEvent('quiz_started', {
+      locale,
+      metadata: {
+        funnel: 'quiz_insomnia',
+        quiz_attempt_id: attemptId,
+        source_intent: sourceIntent || 'direct',
+        cta_location: location,
+      },
+    });
+    setScreen(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const goNext = () => {
+    if (screen === 0) {
+      handleStartQuiz('hero');
+      return;
+    }
+    const attemptId = getOrCreateQuizAttemptId();
+    if (screen >= 1 && screen <= 15) {
+      trackClientEvent('quiz_step_complete', {
+        locale,
+        metadata: { funnel: 'night_pattern', quiz_attempt_id: attemptId, step: screen, source_intent: sourceIntent, answers },
+      });
+      trackClientEvent('quiz_step', {
+        locale,
+        metadata: { funnel: 'quiz_insomnia', quiz_attempt_id: attemptId, step: screen, source_intent: sourceIntent, answers },
+      });
+    }
+    if ([6, 8, 11].includes(screen)) {
+      trackClientEvent('micro_insight_view', { locale, metadata: { funnel: 'night_pattern', insight_step: screen, source_intent: sourceIntent } });
+    }
+    setScreen(current => Math.min(current + 1, 17));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const goBack = () => { if (screen === 0 || screen === 16 || screen === 17) return; setScreen(current => Math.max(current - 1, 0)); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const setAnswer = <K extends AnswerKey>(key: K, value: NightPatternAnswers[K], autoAdvance = true) => {
@@ -167,8 +207,39 @@ export function InsomniaQuizFunnel() {
   const intentText = sourceIntent && intentLabels[sourceIntent] ? `You came here looking for help with ${intentLabels[sourceIntent]}. ` : '';
   const progress = screen === 0 || screen === 17 ? 0 : Math.round((screen / 16) * 100);
 
-  return <div className="min-h-screen bg-[#080b15] text-slate-100 selection:bg-indigo-500 selection:text-white"><header className="sticky top-0 z-50 border-b border-indigo-950/60 bg-[#080b15]/90 backdrop-blur-xl"><div className="mx-auto flex max-w-xl items-center justify-between px-4 py-3"><div className="flex items-center gap-2"><button type="button" onClick={goBack} disabled={screen === 0 || screen === 16 || screen === 17} className="grid h-8 w-8 place-items-center rounded-xl border border-indigo-900/60 bg-indigo-950/50 text-indigo-300 disabled:opacity-50" aria-label="Back"><ChevronLeft className="h-4 w-4" /></button><span className="text-xs font-extrabold tracking-[0.16em] text-indigo-200">SOULSCAPE · NIGHT PATTERN</span></div><span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{screen > 0 && screen < 17 ? `${progress}%` : '2 min'}</span></div>{progress > 0 && <div className="h-1 bg-indigo-950/60"><div className="h-full bg-gradient-to-r from-indigo-500 via-purple-400 to-teal-300 transition-all duration-500" style={{ width: `${progress}%` }} /></div>}</header><main className="mx-auto flex min-h-[calc(100vh-60px)] w-full max-w-xl flex-col px-4 py-6 sm:px-6">
-    {screen === 0 && <Intro intentText={intentText} onStart={goNext} />}
+  return (
+    <div className="min-h-screen bg-[#080b15] text-slate-100 selection:bg-indigo-500 selection:text-white">
+      <header className="sticky top-0 z-50 border-b border-indigo-950/60 bg-[#080b15]/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-xl items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={goBack}
+              disabled={screen === 0 || screen === 16 || screen === 17}
+              className="grid h-8 w-8 place-items-center rounded-xl border border-indigo-900/60 bg-indigo-950/50 text-indigo-300 disabled:opacity-50"
+              aria-label="Back"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <span className="text-xs font-extrabold tracking-[0.16em] text-indigo-200">
+              {screen === 0 ? 'MINDFUL HAVEN · NIGHT COMPANION' : 'MINDFUL HAVEN · NIGHT PATTERN'}
+            </span>
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            {screen > 0 && screen < 17 ? `${progress}%` : ''}
+          </span>
+        </div>
+        {progress > 0 && (
+          <div className="h-1 bg-indigo-950/60">
+            <div
+              className="h-full bg-gradient-to-r from-indigo-500 via-purple-400 to-teal-300 transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
+      </header>
+      <main className={`mx-auto flex min-h-[calc(100vh-60px)] w-full ${screen === 0 ? 'max-w-2xl' : 'max-w-xl'} flex-col px-4 py-6 sm:px-6`}>
+        {screen === 0 && <Intro intentText={intentText} onStart={handleStartQuiz} locale={locale} />}
     {screen === 1 && <SingleScreen title="A little context first" question="How would you like to describe yourself?" options={['Woman', 'Man', 'Non-binary', 'Prefer not to say']} value={answers.gender} onSelect={value => setAnswer('gender', value)} />}
     {screen === 2 && <MultiScreen title="Your nights" question="What is getting in the way most often?" options={issueOptions} selected={answers.issues} onToggle={value => toggleList('issues', value)} onContinue={() => submitMultiAnswer('issues')} />}
     {screen === 3 && <SingleScreen title="Your sleep" question="How many nights per week does this usually happen?" options={['1-2 nights', '3-4 nights', '5+ nights']} value={answers.frequency} onSelect={value => setAnswer('frequency', value === '5+ nights' ? '5+' : value.startsWith('3') ? '3-4' : '1-2')} />}
@@ -185,12 +256,267 @@ export function InsomniaQuizFunnel() {
     {screen === 14 && <InsightScreen title="Your answers are pointing toward a pattern." body="Several behavioral and mental factors may be affecting how easily you wind down. Let's build a starting plan for tonight." onContinue={goNext} continueLabel="Build my plan" />}
     {screen === 15 && <SingleScreen title="Your goal" question="What would make the biggest difference right now?" options={['Quiet my mind', 'Fall asleep more easily', 'Feel less anxious before bed', 'Stop waking during the night', 'Put my phone down earlier', 'Build a consistent sleep routine', 'Feel calmer at night']} value={answers.primaryGoal} onSelect={value => setAnswer('primaryGoal', value === 'Quiet my mind' ? 'quiet_mind' : value.includes('easily') ? 'fall_asleep' : value.includes('anxious') ? 'less_anxious' : value.includes('waking') ? 'stop_waking' : value.includes('phone') ? 'phone_earlier' : value.includes('consistent') ? 'consistent_routine' : 'calmer_night')} />}
     {screen === 16 && <BuildScreen progress={buildProgress} />}
-    {screen === 17 && <>{!showNightCompanion && <CompactResultScreen result={result} recommendations={recommendations} onStartTonight={startTonight} onRecommendation={openRecommendation} onBetaPlan={startNightCompanion} />}{showNightCompanion && <div id="night-companion-beta"><NightCompanionFlow result={result} /></div>}</>}
-  </main></div>;
+    {screen === 17 && (
+      <>
+        {!showNightCompanion && (
+          <CompactResultScreen
+            result={result}
+            recommendations={recommendations}
+            onStartTonight={startTonight}
+            onRecommendation={openRecommendation}
+            onBetaPlan={startNightCompanion}
+          />
+        )}
+        {showNightCompanion && (
+          <div id="night-companion-beta">
+            <NightCompanionFlow result={result} />
+          </div>
+        )}
+      </>
+    )}
+  </main>
+</div>
+);
 }
 
-function Intro({ intentText, onStart }: { intentText: string; onStart: () => void }) { return <section className="flex flex-1 flex-col justify-between py-8 text-center"><div><div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-3xl bg-indigo-950/80 text-indigo-300 shadow-2xl shadow-indigo-950/50"><Moon className="h-8 w-8" /></div><p className="text-xs font-bold uppercase tracking-[0.22em] text-teal-300">SOULSCAPE · NIGHT PATTERN QUIZ</p><h1 className="mt-4 text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl"><BilingualLine english="What’s keeping you awake at night?" vietnamese="Dieu gi dang khien ban kho ngu vao ban dem?" /></h1><p className="mx-auto mt-4 max-w-md text-sm leading-6 text-slate-300"><BilingualLine english="Take the 2-minute Night Pattern Quiz and discover what may be getting in the way of winding down." /></p>{intentText && <p className="mx-auto mt-3 max-w-sm rounded-2xl border border-indigo-800/50 bg-indigo-950/40 p-3 text-xs text-indigo-200">{intentText}<BilingualLine english="We’ll use your answers to personalize the result." vietnamese="Chung toi se dung cau tra loi de ca nhan hoa ket qua." /></p>}<div className="mt-8 grid gap-3 text-left sm:grid-cols-3"><ValueCard icon={<Wind />} title="Understand" text="See what your nights may be responding to." /><ValueCard icon={<Sparkles />} title="Personalize" text="Get a realistic starting plan for tonight." /><ValueCard icon={<Smartphone />} title="Continue" text="Take your plan into Soulscape." /></div></div><div className="mt-10"><button type="button" onClick={onStart} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-500 px-6 py-4 text-base font-bold shadow-xl shadow-indigo-950/50"><BilingualLine english="Discover My Night Pattern" vietnamese="Kham pha mau hinh ban dem cua toi" /><ArrowRight className="h-5 w-5" /></button><p className="mt-3 text-[11px] text-slate-500"><BilingualLine english="For general wellness and educational purposes. Not a medical diagnosis." /></p></div></section>; }
-function ValueCard({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) { return <div className="rounded-2xl border border-indigo-900/50 bg-[#111629] p-3"><div className="mb-2 text-teal-300 [&>svg]:h-4 [&>svg]:w-4">{icon}</div><p className="text-xs font-bold text-white"><BilingualLine english={title} /></p><p className="mt-1 text-[11px] leading-4 text-slate-400"><BilingualLine english={text} /></p></div>; }
+function Intro({
+  intentText,
+  onStart,
+  locale = 'en',
+}: {
+  intentText: string;
+  onStart: (location: 'hero' | 'preview_night_1') => void;
+  locale?: string;
+}) {
+  const [mobileExpanded, setMobileExpanded] = useState(false);
+
+  const toggleJourneyPreview = () => {
+    const nextState = !mobileExpanded;
+    setMobileExpanded(nextState);
+    trackClientEvent('journey_preview_toggled', {
+      locale,
+      metadata: {
+        funnel: 'night_pattern',
+        expanded: nextState,
+        quiz_attempt_id: getOrCreateQuizAttemptId(),
+      },
+    });
+  };
+
+  return (
+    <section className="flex flex-1 flex-col py-2 sm:py-4">
+      {/* 1. Hero Block */}
+      <div className="text-center">
+        <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl border border-indigo-800/40 bg-indigo-950/70 text-indigo-300 shadow-xl shadow-indigo-950/50">
+          <Moon className="h-7 w-7 text-indigo-300" />
+        </div>
+
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-teal-300">
+          MINDFUL HAVEN · NIGHT COMPANION
+        </p>
+
+        <div className="mt-3">
+          <h1 className="text-3xl sm:text-4xl font-black leading-tight tracking-tight text-white">
+            Tired of fighting for sleep every night?
+          </h1>
+        </div>
+
+        <div className="mx-auto mt-3 max-w-lg">
+          <p className="text-sm leading-6 text-slate-300">
+            Find a gentler place to begin tonight. Answer a few questions, then try guided breathing and calming sounds at your own pace.
+          </p>
+        </div>
+
+        {intentText && (
+          <div className="mx-auto mt-4 max-w-md rounded-2xl border border-indigo-800/40 bg-indigo-950/40 p-3 text-left text-xs text-indigo-200">
+            <p>{intentText}</p>
+          </div>
+        )}
+      </div>
+
+      {/* 2. Three Feature Cards */}
+      <div className="mt-6 grid gap-3 sm:grid-cols-3 text-left">
+        {/* Card 1 */}
+        <div className="flex flex-col justify-between rounded-2xl border border-indigo-900/50 bg-[#101426] p-3.5 sm:p-4">
+          <div>
+            <div className="mb-2 text-indigo-300">
+              <Moon className="h-5 w-5" />
+            </div>
+            <h3 className="text-sm font-bold text-white">Tell us about your nights</h3>
+          </div>
+          <p className="mt-2.5 text-xs leading-relaxed text-slate-300 border-t border-indigo-950/80 pt-2.5">
+            A few questions about what bedtime feels like for you.
+          </p>
+        </div>
+
+        {/* Card 2 */}
+        <div className="flex flex-col justify-between rounded-2xl border border-indigo-900/50 bg-[#101426] p-3.5 sm:p-4">
+          <div>
+            <div className="mb-2 text-teal-300">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <h3 className="text-sm font-bold text-white">Choose what fits tonight</h3>
+          </div>
+          <p className="mt-2.5 text-xs leading-relaxed text-slate-300 border-t border-indigo-950/80 pt-2.5">
+            A small starting step based on how you feel.
+          </p>
+        </div>
+
+        {/* Card 3 */}
+        <div className="flex flex-col justify-between rounded-2xl border border-indigo-900/50 bg-[#101426] p-3.5 sm:p-4">
+          <div>
+            <div className="mb-2 text-cyan-300">
+              <Wind className="h-5 w-5" />
+            </div>
+            <h3 className="text-sm font-bold text-white">Press play and settle in</h3>
+          </div>
+          <p className="mt-2.5 text-xs leading-relaxed text-slate-300 border-t border-indigo-950/80 pt-2.5">
+            Guided breathing and a background sound you choose.
+          </p>
+        </div>
+      </div>
+
+      {/* 3. Primary CTA Section (Appears BEFORE the 7-night preview) */}
+      <div className="mt-6 space-y-3">
+        <button
+          type="button"
+          onClick={() => onStart('hero')}
+          className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-500 px-6 py-3.5 text-white shadow-xl shadow-indigo-950/60 hover:opacity-95 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2 focus:ring-offset-[#080b15]"
+        >
+          <span className="text-base font-extrabold tracking-wide">
+            Find My Starting Point
+          </span>
+          <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+        </button>
+
+        {/* Reassurance Badges */}
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-slate-300 text-center">
+          <div className="inline-flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-teal-400 shrink-0" />
+            <span>A few short questions</span>
+          </div>
+          <div className="inline-flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 shrink-0" />
+            <span>Night 1 is free · No account or payment required</span>
+          </div>
+        </div>
+
+        {/* Wellness Disclaimer */}
+        <div className="pt-0.5 text-center text-[11px] text-slate-400/90 leading-relaxed max-w-md mx-auto">
+          <p>For general wellness and educational purposes. Not a medical diagnosis.</p>
+        </div>
+      </div>
+
+      {/* 4. 7-Night Journey Preview (Placed UNDER Primary CTA) */}
+      <div className="mt-8 border-t border-indigo-950/80 pt-6 text-left">
+        <div className="mb-4">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-indigo-950/70 border border-indigo-800/50 px-3 py-1 text-xs font-semibold text-teal-300 mb-2">
+            <Sparkles className="h-3.5 w-3.5 text-teal-300" />
+            <span>7-NIGHT COMPANION PATH</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-white">
+            Your 7-night journey
+          </h2>
+
+          <p className="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+            A gentler night starts with one small step. Begin with Night 1. Explore what we’re preparing for the nights ahead.
+          </p>
+        </div>
+
+        {/* Night 1 Hero Card */}
+        <div className="rounded-3xl border-2 border-teal-500/50 bg-gradient-to-br from-[#121832] via-[#0f1429] to-[#0c1a24] p-4 sm:p-5 shadow-2xl shadow-teal-950/30 mb-3.5 transition-all">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-900/40">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-400 text-slate-950 font-black text-sm shadow-md shadow-teal-950/40">
+                1
+              </span>
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-white">
+                  Night 1 — A Gentle Beginning
+                </h3>
+              </div>
+            </div>
+            <span className="self-start sm:self-auto rounded-full bg-teal-950 border border-teal-600/60 px-3 py-1 text-xs font-bold text-teal-300">
+              Start here
+            </span>
+          </div>
+
+          <div className="mt-3">
+            <p className="text-sm leading-relaxed text-slate-200 font-medium">
+              Begin with guided breathing and a background sound you choose.
+            </p>
+          </div>
+
+          <div className="mt-3.5 pt-3 border-t border-indigo-950/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <span className="inline-block h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
+              <span>Available now</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => onStart('preview_night_1')}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-400 hover:bg-teal-300 px-5 py-2.5 text-xs font-extrabold text-slate-950 shadow-lg shadow-teal-950/50 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-300"
+            >
+              <span>Start Night 1</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Accordion Toggle */}
+        <div className="sm:hidden mb-3">
+          <button
+            type="button"
+            onClick={toggleJourneyPreview}
+            aria-expanded={mobileExpanded}
+            aria-controls="upcoming-nights-preview"
+            className="flex w-full items-center justify-between rounded-2xl border border-indigo-900/60 bg-[#101426] px-4 py-3 text-xs font-bold text-indigo-200 hover:border-indigo-700 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-teal-300" />
+              <span>{mobileExpanded ? 'Collapse journey' : 'Explore the 7-night journey (Nights 2–7)'}</span>
+            </div>
+            {mobileExpanded ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+        </div>
+
+        {/* Nights 2-7 Grid (Always visible on desktop, toggleable on mobile) */}
+        <div
+          id="upcoming-nights-preview"
+          className={`${mobileExpanded ? 'grid' : 'hidden sm:grid'} grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3`}
+        >
+          {JOURNEY_PREVIEW_NIGHTS.slice(1).map(night => (
+            <div
+              key={night.night_number}
+              className="rounded-2xl border border-indigo-950 bg-[#0d1020]/90 p-3.5 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-950 border border-indigo-800/40 text-xs font-bold text-slate-400">
+                    {night.night_number}
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/90 border border-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-400">
+                    <Lock className="h-3 w-3 text-slate-400" />
+                    <span>Coming soon</span>
+                  </span>
+                </div>
+                <h4 className="text-sm font-bold text-slate-200">
+                  Night {night.night_number} — {night.title_en}
+                </h4>
+              </div>
+
+              <div className="mt-2.5 pt-2 border-t border-indigo-950/60">
+                <p className="text-xs leading-relaxed text-slate-300">
+                  {night.summary_en}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 function SingleScreen({ title, question, options, value, onSelect }: { title: string; question: string; options: string[]; value: string; onSelect: (value: string) => void }) { return <section className="flex flex-1 flex-col justify-between py-8"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-300"><BilingualLine english={title} /></p><h2 className="mt-3 text-3xl font-black leading-tight text-white"><BilingualLine english={question} /></h2><div className="mt-8 space-y-3">{options.map(option => <button key={option} type="button" onClick={() => onSelect(option)} className={`flex w-full items-center justify-between rounded-2xl border p-4 text-left text-sm font-semibold transition ${value === option ? 'border-teal-400 bg-teal-950/50 text-white' : 'border-indigo-900/50 bg-[#111629] text-slate-200 hover:border-indigo-500'}`}><BilingualLine english={option} />{value === option ? <Check className="h-5 w-5 text-teal-300" /> : <ArrowRight className="h-4 w-4 text-indigo-400" />}</button>)}</div></div></section>; }
 function MultiScreen({ title, question, options, selected, onToggle, onContinue }: { title: string; question: string; options: readonly (readonly [string, string])[]; selected: string[]; onToggle: (value: string) => void; onContinue: () => void }) { return <section className="flex flex-1 flex-col justify-between py-8"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-300"><BilingualLine english={title} /></p><h2 className="mt-3 text-3xl font-black leading-tight text-white"><BilingualLine english={question} /></h2><p className="mt-2 text-sm text-slate-400"><BilingualLine english="Select all that apply." /></p><div className="mt-7 space-y-3">{options.map(([id, label]) => <button key={id} type="button" onClick={() => onToggle(id)} className={`flex w-full items-center justify-between rounded-2xl border p-4 text-left text-sm font-semibold transition ${selected.includes(id) ? 'border-teal-400 bg-teal-950/50 text-white' : 'border-indigo-900/50 bg-[#111629] text-slate-200 hover:border-indigo-500'}`}><BilingualLine english={label} /><span className={`grid h-5 w-5 place-items-center rounded-md border ${selected.includes(id) ? 'border-teal-300 bg-teal-400 text-slate-950' : 'border-slate-600'}`}>{selected.includes(id) && <Check className="h-3 w-3" />}</span></button>)}</div></div><button type="button" disabled={!selected.length} onClick={onContinue} className="mt-8 w-full rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 font-bold disabled:cursor-not-allowed disabled:opacity-40"><BilingualLine english="Continue" /> <span className="text-indigo-200">({selected.length})</span></button></section>; }
 function InsightScreen({ title, body, onContinue, continueLabel }: { title: string; body: string; onContinue: () => void; continueLabel: string }) { return <section className="flex flex-1 flex-col justify-between py-8 text-center"><div><div className="mx-auto grid h-16 w-16 place-items-center rounded-3xl border border-teal-800/60 bg-teal-950/50 text-teal-300"><Sparkles className="h-7 w-7" /></div><p className="mt-7 text-xs font-bold uppercase tracking-[0.2em] text-teal-300"><BilingualLine english="A small reflection" /></p><h2 className="mt-3 text-3xl font-black leading-tight text-white"><BilingualLine english={title} /></h2><p className="mx-auto mt-4 max-w-md text-sm leading-6 text-slate-300"><BilingualLine english={body} /></p></div><button type="button" onClick={onContinue} className="mt-10 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 font-bold"><BilingualLine english={continueLabel} /><ArrowRight className="h-5 w-5" /></button></section>; }

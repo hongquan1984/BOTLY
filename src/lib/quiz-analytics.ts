@@ -287,7 +287,17 @@ export async function processInsomniaQuizAnalytics(url: string, serviceKey: stri
       }).catch(() => ({ ok: false, json: async () => [] }))
     ]);
 
-    const events: InsomniaQuizEvent[] = eventsRes.ok ? await eventsRes.json() : [];
+    const rawEvents: InsomniaQuizEvent[] = eventsRes.ok ? await eventsRes.json() : [];
+    // Strictly filter out test traffic (localhost, admin visits, dev/test sessions)
+    const events: InsomniaQuizEvent[] = rawEvents.filter(e => {
+      const ref = String(e.referrer || '');
+      const path = String(e.path || '');
+      const meta = (e.metadata || {}) as Record<string, unknown>;
+      if (ref.includes('localhost') || ref.includes('127.0.0.1')) return false;
+      if (path.includes('/admin') || path.includes('/thong-ke') || path.includes('/thongke')) return false;
+      if (meta.is_test === true || meta.is_dev === true || meta.exclude_tracking === true) return false;
+      return true;
+    });
     const subs: InsomniaQuizSubscriber[] = subsRes && 'ok' in subsRes && subsRes.ok ? await subsRes.json() : [];
     const waitlist = waitlistRes && 'ok' in waitlistRes && waitlistRes.ok ? await waitlistRes.json() : [];
 

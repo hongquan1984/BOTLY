@@ -58,8 +58,28 @@ export function trackClientEvent(
 ) {
   if (typeof window === 'undefined') return;
 
+  // 1. Never track on localhost / dev environment
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local')) {
+    return;
+  }
+
+  // 2. Never track automated browser tests (Puppeteer, Playwright, CDP)
+  if (navigator.webdriver) {
+    return;
+  }
+
+  // 3. Exclude admin / tester devices if configured
+  try {
+    if (localStorage.getItem('botly_exclude_tracking') === 'true') {
+      return;
+    }
+  } catch {
+    // ignore storage access error
+  }
+
   const path = window.location.pathname;
-  if (path.startsWith('/admin')) return;
+  if (path.startsWith('/admin') || path.startsWith('/thong-ke') || path.startsWith('/thongke')) return;
 
   const userAgent = navigator.userAgent;
   const isMobile = /mobile|android|iphone|ipad|ipod/i.test(userAgent);

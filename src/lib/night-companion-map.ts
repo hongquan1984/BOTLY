@@ -119,3 +119,88 @@ export function getNightOneCtaInfo(stage?: string, hasReview?: boolean): {
     label_vi: 'Bắt đầu Đêm 1 — Miễn phí',
   };
 }
+
+export type JourneyPreviewNight = {
+  night_number: number;
+  title_en: string;
+  title_vi: string;
+  summary_en: string;
+  summary_vi: string;
+  badge_en: string;
+  badge_vi: string;
+  status: 'available' | 'coming_soon';
+};
+
+export const JOURNEY_PREVIEW_NIGHTS: readonly JourneyPreviewNight[] = [
+  {
+    night_number: 1,
+    title_en: 'A Gentle Beginning',
+    title_vi: 'Khởi đầu nhẹ nhàng',
+    summary_en: 'Begin with guided breathing and a background sound you choose.',
+    summary_vi: 'Làm quen với bài thở có hướng dẫn và âm thanh bạn chọn.',
+    badge_en: 'Start here',
+    badge_vi: 'Bắt đầu tại đây',
+    status: 'available',
+  },
+  {
+    night_number: 2,
+    title_en: 'Rediscover Calm',
+    title_vi: 'Tìm lại thanh thản',
+    summary_en: 'A quiet moment to close the day and set unfinished things aside.',
+    summary_vi: 'Một khoảng lặng để khép lại ngày và đặt những việc chưa xong xuống.',
+    badge_en: 'Coming soon',
+    badge_vi: 'Đang chuẩn bị',
+    status: 'coming_soon',
+  },
+  {
+    night_number: 3,
+    title_en: 'Let the Tension Go',
+    title_vi: 'Buông hết mỏi mệt',
+    summary_en: 'A guided practice to unwind after a long day.',
+    summary_vi: 'Một bài hướng dẫn thả lỏng sau một ngày dài.',
+    badge_en: 'Coming soon',
+    badge_vi: 'Đang chuẩn bị',
+    status: 'coming_soon',
+  },
+  {
+    night_number: 4,
+    title_en: 'Quiet the Mind',
+    title_vi: 'Lắng dịu tâm trí',
+    summary_en: 'Practice resting without working through every thought.',
+    summary_vi: 'Thực hành nghỉ ngơi mà không phải giải quyết từng suy nghĩ.',
+    badge_en: 'Coming soon',
+    badge_vi: 'Đang chuẩn bị',
+    status: 'coming_soon',
+  },
+  {
+    night_number: 5,
+    title_en: 'At Peace with the Night',
+    title_vi: 'An yên khi đêm xuống',
+    summary_en: 'Build a simple evening ritual you can return to.',
+    summary_vi: 'Tạo một nghi thức buổi tối đơn giản, dễ quay lại.',
+    badge_en: 'Coming soon',
+    badge_vi: 'Đang chuẩn bị',
+    status: 'coming_soon',
+  },
+  {
+    night_number: 6,
+    title_en: 'Ease Into Sleep',
+    title_vi: 'Nhẹ lòng vào giấc',
+    summary_en: 'Explore resting with less pressure to fall asleep.',
+    summary_vi: 'Khám phá cách nghỉ ngơi với ít áp lực phải ngủ hơn.',
+    badge_en: 'Coming soon',
+    badge_vi: 'Đang chuẩn bị',
+    status: 'coming_soon',
+  },
+  {
+    night_number: 7,
+    title_en: 'Sleep Like a Child',
+    title_vi: 'Giấc ngủ trẻ thơ',
+    summary_en: 'Bring your favorite practices together into a routine of your own.',
+    summary_vi: 'Kết hợp những thực hành bạn thích thành khoảng nghỉ của riêng mình.',
+    badge_en: 'Coming soon',
+    badge_vi: 'Đang chuẩn bị',
+    status: 'coming_soon',
+  },
+];
+
