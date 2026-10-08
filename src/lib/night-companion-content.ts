@@ -324,3 +324,147 @@ export function selectNightOneVoiceOptions(state?: TonightStateId) {
   const filtered = allVoices.filter(voice => voice.suitable_states.includes(state));
   return filtered.length > 0 ? filtered : allVoices;
 }
+
+// Stage 3: Cognitive Pivot & Paradoxical Whispers (Min 25 - 40)
+export interface CognitivePivotTrack {
+  asset_id: string;
+  local_path: string;
+  state: TonightStateId;
+  title_en: string;
+  subtitle_en: string;
+  technique: 'cognitive_shuffle' | 'paradoxical_intention' | 'midnight_reassurance' | 'somatic_release' | 'nsdr_drift';
+  duration_seconds: number;
+}
+
+export const COGNITIVE_PIVOT_TRACKS: Record<TonightStateId, CognitivePivotTrack> = {
+  MIND_WONT_STOP: {
+    asset_id: 'pivot-mind-wont-stop',
+    local_path: '/audio/night-companion/pivot/pivot_mind_wont_stop.mp3',
+    state: 'MIND_WONT_STOP',
+    title_en: 'Cognitive Shuffle & Mind Wandering',
+    subtitle_en: 'Random sensory imagery to disengage analytical thinking loops',
+    technique: 'cognitive_shuffle',
+    duration_seconds: 120,
+  },
+  SLEEP_ANXIETY: {
+    asset_id: 'pivot-sleep-anxiety',
+    local_path: '/audio/night-companion/pivot/pivot_sleep_anxiety.mp3',
+    state: 'SLEEP_ANXIETY',
+    title_en: 'Paradoxical Intention & Sleep Release',
+    subtitle_en: 'Releasing the demand to sleep; passive physical restoration',
+    technique: 'paradoxical_intention',
+    duration_seconds: 70,
+  },
+  WOKE_UP: {
+    asset_id: 'pivot-woke-up',
+    local_path: '/audio/night-companion/pivot/pivot_woke_up.mp3',
+    state: 'WOKE_UP',
+    title_en: 'Midnight Awakening Reassurance',
+    subtitle_en: 'Clock-check prevention and quiet nighttime sanctuary',
+    technique: 'midnight_reassurance',
+    duration_seconds: 48,
+  },
+  STRESS_CARRYOVER: {
+    asset_id: 'pivot-stress-carryover',
+    local_path: '/audio/night-companion/pivot/pivot_stress_carryover.mp3',
+    state: 'STRESS_CARRYOVER',
+    title_en: 'Somatic Decompression & Gravity Release',
+    subtitle_en: 'Unclamping jaw, shoulders, and muscular holding patterns',
+    technique: 'somatic_release',
+    duration_seconds: 53,
+  },
+  NOT_SLEEPY: {
+    asset_id: 'pivot-not-sleepy',
+    local_path: '/audio/night-companion/pivot/pivot_not_sleepy.mp3',
+    state: 'NOT_SLEEPY',
+    title_en: 'Non-Sleep Deep Rest (NSDR) Drift',
+    subtitle_en: 'Metabolic slow-down and restful alertness without strain',
+    technique: 'nsdr_drift',
+    duration_seconds: 49,
+  },
+};
+
+export function selectCognitivePivotTrack(state?: TonightStateId): CognitivePivotTrack {
+  if (state && COGNITIVE_PIVOT_TRACKS[state]) return COGNITIVE_PIVOT_TRACKS[state];
+  return COGNITIVE_PIVOT_TRACKS.MIND_WONT_STOP;
+}
+
+// Stage 4: Deep Delta & Velvet Brown Noise (Min 40 - 55)
+export const DEEP_DELTA_TRACK = {
+  asset_id: 'delta-brown-noise',
+  local_path: '/audio/night-companion/delta/deep_delta_brown_noise.mp3',
+  title_en: '1.8Hz Deep Delta Waves & Velvet Brown Noise',
+  subtitle_en: 'Slow-wave brain entrainment with acoustic masking for deep sleep',
+  duration_seconds: 600,
+} as const;
+
+// Stage 5: Infinite Sleep Cocoon (Min 55 - 60+)
+export const SLEEP_COCOON_TRACK = {
+  asset_id: 'sleep-cocoon-continuous',
+  local_path: '/audio/night-companion/cocoon/sleep_cocoon_continuous.mp3',
+  title_en: 'Sub-Bass Sleep Cocoon',
+  subtitle_en: 'Continuous acoustic cushion protecting deep uninterrupted sleep',
+  duration_seconds: 600,
+} as const;
+
+export type SleepJourneyStageId = 'intro' | 'guided' | 'theta_drift' | 'cognitive_pivot' | 'delta_immersion' | 'sleep_cocoon';
+
+export interface SleepJourneyStageInfo {
+  id: SleepJourneyStageId;
+  stageNumber: number;
+  timeRange: string;
+  name_en: string;
+  description_en: string;
+  scienceNote_en: string;
+}
+
+export const SLEEP_JOURNEY_STAGES: SleepJourneyStageInfo[] = [
+  {
+    id: 'intro',
+    stageNumber: 1,
+    timeRange: '0:00 - 0:20',
+    name_en: 'State Intro',
+    description_en: 'Personalized arrival and phone-down orientation',
+    scienceNote_en: 'Initial boundary setting to break daytime momentum',
+  },
+  {
+    id: 'guided',
+    stageNumber: 1,
+    timeRange: '0:20 - 6:00',
+    name_en: 'Guided Breathing',
+    description_en: 'Paced somatic downshift with real-time breathing visualizer',
+    scienceNote_en: 'Vagal nerve stimulation; shifts autonomic nervous system to parasympathetic',
+  },
+  {
+    id: 'theta_drift',
+    stageNumber: 2,
+    timeRange: '6:00 - 25:00',
+    name_en: '432Hz Theta Drift',
+    description_en: 'Harmonic 432Hz chimes and theta wave soundscape',
+    scienceNote_en: 'Encourages transition from Alpha (8-12Hz) to Theta (4-7Hz) hypnagogic state',
+  },
+  {
+    id: 'cognitive_pivot',
+    stageNumber: 3,
+    timeRange: '25:00 - 40:00',
+    name_en: 'Cognitive Pivot',
+    description_en: 'Whisper Cognitive Shuffle or Paradoxical Intention',
+    scienceNote_en: 'Breaks the 30-min sleep-effort crisis and dissolves analytical loops',
+  },
+  {
+    id: 'delta_immersion',
+    stageNumber: 4,
+    timeRange: '40:00 - 55:00',
+    name_en: 'Deep Delta & Brown Noise',
+    description_en: '1.8Hz binaural delta entrainment and warm low-frequency noise',
+    scienceNote_en: 'Direct entrainment for N3 slow-wave deep sleep; sound masking prevents arousals',
+  },
+  {
+    id: 'sleep_cocoon',
+    stageNumber: 5,
+    timeRange: '55:00 - 60:00+',
+    name_en: 'Sleep Cocoon',
+    description_en: 'Ultra-gentle sub-bass cushion running seamlessly all night',
+    scienceNote_en: 'Sustained sleep protection and acoustic isolation throughout the night',
+  },
+];

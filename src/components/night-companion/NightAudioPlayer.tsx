@@ -6,17 +6,25 @@ import {
   Eye,
   EyeOff,
   FastForward,
+  Moon,
   Pause,
   Play,
   Radio,
   Sparkles,
   Square,
+  Waves,
 } from 'lucide-react';
 import {
   type NightOneBackgroundPreset,
   type NightScript,
   selectNightOneIntro,
+  selectNightOneVoiceOptions,
+  selectCognitivePivotTrack,
   NIGHT_ONE_VOICES,
+  DEEP_DELTA_TRACK,
+  SLEEP_COCOON_TRACK,
+  SLEEP_JOURNEY_STAGES,
+  type SleepJourneyStageId,
 } from '@/lib/night-companion-content';
 import { ListeningAccumulator, createPlaybackSessionId } from '@/lib/night-companion-analytics';
 import type { TonightStateId } from '@/lib/night-companion';
@@ -33,7 +41,7 @@ type Track = {
   duration_seconds: number;
   kind: 'background' | 'voice';
 };
-type SleepTimer = 'until_voice' | '15' | '30' | '60';
+type SleepTimer = 'until_voice' | '15' | '30' | '60' | '90';
 
 type Props = {
   script?: NightScript;
@@ -87,10 +95,12 @@ function VisualBreathingPacer({
   pattern = '5-5',
   isPlaying,
   stage,
+  stageName,
 }: {
   pattern?: string;
   isPlaying: boolean;
-  stage: 'intro' | 'guided' | 'pacer';
+  stage: SleepJourneyStageId;
+  stageName: string;
 }) {
   const [elapsed, setElapsed] = useState(0);
   const phases = PATTERN_PHASES[pattern] || PATTERN_PHASES['5-5'];
@@ -127,19 +137,23 @@ function VisualBreathingPacer({
   let scale = 1.0;
   if (!isPlaying) {
     scale = 1.0;
-  } else if (currentPhase.name === 'inhale') {
-    scale = 0.86 + 0.34 * (1 - Math.cos(progress * Math.PI)) / 2;
-  } else if (currentPhase.name === 'hold') {
-    scale = 1.20 + 0.015 * Math.sin(progress * Math.PI * 2);
-  } else if (currentPhase.name === 'exhale') {
-    scale = 1.20 - 0.34 * (1 - Math.cos(progress * Math.PI)) / 2;
+  } else if (stage === 'intro' || stage === 'guided') {
+    if (currentPhase.name === 'inhale') {
+      scale = 0.86 + 0.34 * (1 - Math.cos(progress * Math.PI)) / 2;
+    } else if (currentPhase.name === 'hold') {
+      scale = 1.20 + 0.015 * Math.sin(progress * Math.PI * 2);
+    } else if (currentPhase.name === 'exhale') {
+      scale = 1.20 - 0.34 * (1 - Math.cos(progress * Math.PI)) / 2;
+    } else {
+      scale = 0.86;
+    }
   } else {
-    scale = 0.86;
+    // Gentle hypnotic slow pulse for theta, pivot, delta, cocoon
+    scale = 0.95 + 0.08 * Math.sin((elapsed * Math.PI) / 4);
   }
 
   const isHold = currentPhase.name === 'hold' || currentPhase.name === 'rest';
   const isExhale = currentPhase.name === 'exhale';
-  const isPacerStage = stage === 'pacer';
 
   const radius = 48;
   const circumference = 2 * Math.PI * radius;
@@ -150,23 +164,38 @@ function VisualBreathingPacer({
       <div
         className="pointer-events-none absolute inset-0 transition-opacity duration-1000"
         style={{
-          background: isPacerStage
-            ? 'radial-gradient(circle at 50% 50%, rgba(245,158,11,0.08) 0%, transparent 70%)'
-            : isHold
-            ? 'radial-gradient(circle at 50% 50%, rgba(129,140,248,0.12) 0%, transparent 70%)'
-            : isExhale
-            ? 'radial-gradient(circle at 50% 50%, rgba(56,189,248,0.1) 0%, transparent 70%)'
-            : 'radial-gradient(circle at 50% 50%, rgba(45,212,191,0.12) 0%, transparent 70%)',
+          background:
+            stage === 'theta_drift'
+              ? 'radial-gradient(circle at 50% 50%, rgba(245,158,11,0.08) 0%, transparent 70%)'
+              : stage === 'cognitive_pivot'
+              ? 'radial-gradient(circle at 50% 50%, rgba(168,85,247,0.12) 0%, transparent 70%)'
+              : stage === 'delta_immersion'
+              ? 'radial-gradient(circle at 50% 50%, rgba(59,130,246,0.10) 0%, transparent 70%)'
+              : stage === 'sleep_cocoon'
+              ? 'radial-gradient(circle at 50% 50%, rgba(20,184,166,0.08) 0%, transparent 70%)'
+              : isHold
+              ? 'radial-gradient(circle at 50% 50%, rgba(129,140,248,0.12) 0%, transparent 70%)'
+              : isExhale
+              ? 'radial-gradient(circle at 50% 50%, rgba(56,189,248,0.1) 0%, transparent 70%)'
+              : 'radial-gradient(circle at 50% 50%, rgba(45,212,191,0.12) 0%, transparent 70%)',
         }}
       />
 
       <div className="relative flex items-center justify-between text-[11px] text-slate-400">
         <span className="flex items-center gap-1 font-semibold text-teal-300">
           <Sparkles className="h-3 w-3" />
-          <span>Visual Breathing Guide</span>
+          <span>Visual Sleep Guide</span>
         </span>
         <span className="rounded bg-[#0c1222] border border-teal-900/70 px-2 py-0.5 text-[10px] font-mono font-medium text-slate-300">
-          {isPacerStage ? '432Hz Sound Waves' : `Pattern: ${pattern}`}
+          {stage === 'theta_drift'
+            ? 'Stage 2: 432Hz Waves'
+            : stage === 'cognitive_pivot'
+            ? 'Stage 3: Cognitive Pivot'
+            : stage === 'delta_immersion'
+            ? 'Stage 4: 1.8Hz Deep Delta'
+            : stage === 'sleep_cocoon'
+            ? 'Stage 5: Sleep Cocoon'
+            : `Pattern: ${pattern}`}
         </span>
       </div>
 
@@ -188,7 +217,19 @@ function VisualBreathingPacer({
               r={radius}
               fill="none"
               stroke={
-                isPacerStage ? '#f59e0b' : isHold ? '#818cf8' : isExhale ? '#38bdf8' : '#2dd4bf'
+                stage === 'theta_drift'
+                  ? '#f59e0b'
+                  : stage === 'cognitive_pivot'
+                  ? '#a855f7'
+                  : stage === 'delta_immersion'
+                  ? '#3b82f6'
+                  : stage === 'sleep_cocoon'
+                  ? '#14b8a6'
+                  : isHold
+                  ? '#818cf8'
+                  : isExhale
+                  ? '#38bdf8'
+                  : '#2dd4bf'
               }
               strokeWidth="3.5"
               strokeDasharray={circumference}
@@ -200,8 +241,14 @@ function VisualBreathingPacer({
 
           <div
             className={`relative flex h-20 w-20 flex-col items-center justify-center rounded-full border transition-transform duration-150 ${
-              isPacerStage
+              stage === 'theta_drift'
                 ? 'border-amber-400/40 bg-gradient-to-br from-amber-500/20 to-amber-950/40 shadow-[0_0_25px_rgba(245,158,11,0.25)]'
+                : stage === 'cognitive_pivot'
+                ? 'border-purple-400/40 bg-gradient-to-br from-purple-500/20 to-indigo-950/40 shadow-[0_0_25px_rgba(168,85,247,0.25)]'
+                : stage === 'delta_immersion'
+                ? 'border-blue-400/40 bg-gradient-to-br from-blue-500/20 to-slate-950/40 shadow-[0_0_25px_rgba(59,130,246,0.25)]'
+                : stage === 'sleep_cocoon'
+                ? 'border-teal-400/40 bg-gradient-to-br from-teal-500/20 to-emerald-950/40 shadow-[0_0_25px_rgba(20,184,166,0.25)]'
                 : isHold
                 ? 'border-indigo-400/40 bg-gradient-to-br from-indigo-500/20 to-purple-950/40 shadow-[0_0_25px_rgba(129,140,248,0.25)]'
                 : isExhale
@@ -210,15 +257,29 @@ function VisualBreathingPacer({
             }`}
             style={{ transform: `scale(${scale})` }}
           >
-            {isPacerStage ? (
+            {stage === 'theta_drift' ? (
               <div className="flex flex-col items-center justify-center">
                 <div className="flex items-center gap-1 my-0.5">
                   <span className="w-1 h-3 rounded-full bg-amber-400 animate-pulse" />
                   <span className="w-1 h-5 rounded-full bg-amber-300 animate-pulse [animation-delay:150ms]" />
                   <span className="w-1 h-4 rounded-full bg-amber-400 animate-pulse [animation-delay:300ms]" />
-                  <span className="w-1 h-2 rounded-full bg-amber-400 animate-pulse [animation-delay:450ms]" />
                 </div>
                 <span className="text-[10px] font-bold text-amber-200">432Hz</span>
+              </div>
+            ) : stage === 'cognitive_pivot' ? (
+              <div className="flex flex-col items-center justify-center text-center px-1">
+                <Moon className="h-4 w-4 text-purple-300 animate-pulse" />
+                <span className="text-[9px] font-bold text-purple-200 mt-0.5">Whisper</span>
+              </div>
+            ) : stage === 'delta_immersion' ? (
+              <div className="flex flex-col items-center justify-center">
+                <Waves className="h-4 w-4 text-blue-300 animate-pulse" />
+                <span className="text-[9px] font-bold text-blue-200 mt-0.5">1.8Hz Delta</span>
+              </div>
+            ) : stage === 'sleep_cocoon' ? (
+              <div className="flex flex-col items-center justify-center">
+                <span className="text-base">🌙</span>
+                <span className="text-[9px] font-bold text-teal-200">Cocoon</span>
               </div>
             ) : (
               <>
@@ -240,11 +301,17 @@ function VisualBreathingPacer({
       </div>
 
       <p className="relative text-center text-xs font-medium text-slate-300">
-        {isPacerStage
+        {stage === 'theta_drift'
           ? '432Hz theta sleep waves looping. Rest comfortably.'
+          : stage === 'cognitive_pivot'
+          ? 'Quiet cognitive whisper playing — releasing sleep effort.'
+          : stage === 'delta_immersion'
+          ? '1.8Hz deep delta waves & velvet brown noise entrainment.'
+          : stage === 'sleep_cocoon'
+          ? 'Continuous sleep cocoon protecting rest through the night.'
           : isPlaying
           ? currentPhase.sublabel
-          : 'Press "Start listening" below to begin breathing.'}
+          : 'Press "Start listening" below — progression will transition automatically.'}
       </p>
     </div>
   );
@@ -265,7 +332,11 @@ export function NightAudioPlayer({
   const introRef = useRef<HTMLAudioElement>(null);
   const voiceRef = useRef<HTMLAudioElement>(null);
   const pacerRef = useRef<HTMLAudioElement>(null);
+  const pivotRef = useRef<HTMLAudioElement>(null);
+  const deltaRef = useRef<HTMLAudioElement>(null);
+  const cocoonRef = useRef<HTMLAudioElement>(null);
   const backgroundRefs = useRef<Record<string, HTMLAudioElement | null>>({});
+
   const fadeTimerRef = useRef<number | undefined>(undefined);
   const accumulatorRef = useRef<ListeningAccumulator | null>(null);
   const isPlayingRef = useRef(false);
@@ -274,15 +345,16 @@ export function NightAudioPlayer({
   const introTrack = selectNightOneIntro(state);
   const fallbackVoices = Object.values(NIGHT_ONE_VOICES);
   const effectiveVoices = voices.length > 0 ? voices : fallbackVoices;
+  const pivotTrack = selectCognitivePivotTrack(state);
 
   const [guidedOn, setGuidedOn] = useState(true);
   const [showVisualPacer, setShowVisualPacer] = useState(true);
-  const [playStage, setPlayStage] = useState<'intro' | 'guided' | 'pacer'>('intro');
+  const [playStage, setPlayStage] = useState<SleepJourneyStageId>('intro');
   const [voiceId, setVoiceId] = useState(effectiveVoices[0]?.asset_id || 'night1-guided-coherent-5-5');
   const [backgroundIds, setBackgroundIds] = useState<string[]>(presets[0]?.asset_ids || (backgrounds[0] ? [backgrounds[0].asset_id] : []));
   const [voiceVolume, setVoiceVolume] = useState(1);
   const [backgroundVolume, setBackgroundVolume] = useState(DEFAULT_BACKGROUND_VOLUME);
-  const [timer, setTimer] = useState<SleepTimer>('30');
+  const [timer, setTimer] = useState<SleepTimer>('60');
   const [deadline, setDeadline] = useState<number | null>(null);
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState('');
@@ -303,18 +375,19 @@ export function NightAudioPlayer({
     isPlayingRef.current = false;
     if (fadeTimerRef.current) window.clearInterval(fadeTimerRef.current);
     fadeTimerRef.current = undefined;
-    introRef.current?.pause();
-    if (introRef.current) introRef.current.currentTime = 0;
-    voiceRef.current?.pause();
-    if (voiceRef.current) voiceRef.current.currentTime = 0;
-    pacerRef.current?.pause();
-    if (pacerRef.current) pacerRef.current.currentTime = 0;
+
+    [introRef, voiceRef, pacerRef, pivotRef, deltaRef, cocoonRef].forEach(ref => {
+      ref.current?.pause();
+      if (ref.current) ref.current.currentTime = 0;
+    });
+
     Object.values(backgroundRefs.current).forEach(audio => {
       if (audio) {
         audio.pause();
         audio.currentTime = 0;
       }
     });
+
     setPlaying(false);
     setDeadline(null);
     setPlayStage('intro');
@@ -361,12 +434,10 @@ export function NightAudioPlayer({
 
   const stopAtDeadline = useCallback(() => {
     isPlayingRef.current = false;
-    introRef.current?.pause();
-    if (introRef.current) introRef.current.currentTime = 0;
-    voiceRef.current?.pause();
-    if (voiceRef.current) voiceRef.current.currentTime = 0;
-    pacerRef.current?.pause();
-    if (pacerRef.current) pacerRef.current.currentTime = 0;
+    [introRef, voiceRef, pacerRef, pivotRef, deltaRef, cocoonRef].forEach(ref => {
+      ref.current?.pause();
+      if (ref.current) ref.current.currentTime = 0;
+    });
     fadeAndStopBackground();
     setPlaying(false);
     setPlayStage('intro');
@@ -375,77 +446,53 @@ export function NightAudioPlayer({
 
   const pauseAll = useCallback(() => {
     isPlayingRef.current = false;
-    introRef.current?.pause();
-    voiceRef.current?.pause();
-    pacerRef.current?.pause();
+    [introRef, voiceRef, pacerRef, pivotRef, deltaRef, cocoonRef].forEach(ref => {
+      ref.current?.pause();
+    });
     Object.values(backgroundRefs.current).forEach(audio => audio?.pause());
     setPlaying(false);
     accumulatorRef.current?.pause();
   }, []);
 
-  const handleSkipIntro = async () => {
-    if (playStage !== 'intro') return;
-    if (introRef.current) {
-      const elapsed = introRef.current.currentTime || 0;
-      introRef.current.pause();
-      introRef.current.currentTime = 0;
-      accumulatorRef.current?.trackIntroSkipped(introTrack.asset_id, elapsed);
-    }
-    setPlayStage('guided');
-    if (isPlayingRef.current && guidedOn && voiceRef.current) {
+  // Automatic progression pipeline:
+  // Stage 1 (Intro) -> Stage 1B (Guided Voice) -> Stage 2 (432Hz Theta Drift) -> Stage 3 (Cognitive Pivot) -> Stage 4 (Delta Immersion) -> Stage 5 (Sleep Cocoon)
+  const advanceToStage = async (nextStage: SleepJourneyStageId) => {
+    if (!isPlayingRef.current) return;
+    setPlayStage(nextStage);
+
+    let nextAudio: HTMLAudioElement | null = null;
+    if (nextStage === 'guided') nextAudio = voiceRef.current;
+    else if (nextStage === 'theta_drift') nextAudio = pacerRef.current;
+    else if (nextStage === 'cognitive_pivot') nextAudio = pivotRef.current;
+    else if (nextStage === 'delta_immersion') nextAudio = deltaRef.current;
+    else if (nextStage === 'sleep_cocoon') nextAudio = cocoonRef.current;
+
+    if (nextAudio && guidedOn) {
       try {
-        await voiceRef.current.play();
-        accumulatorRef.current?.trackGuidedPracticeStarted(selectedVoice?.asset_id || '');
+        await nextAudio.play();
       } catch {
-        setError('Could not start guided practice audio.');
+        setError(`Could not transition smoothly to ${nextStage}.`);
       }
     }
   };
 
-  const handleSkipVoiceToPacer = async () => {
-    if (playStage === 'pacer') return;
-    if (introRef.current) {
-      introRef.current.pause();
-      introRef.current.currentTime = 0;
-    }
-    if (voiceRef.current) {
-      voiceRef.current.pause();
-      voiceRef.current.currentTime = 0;
-    }
-    setPlayStage('pacer');
-    if (isPlayingRef.current && guidedOn && pacerRef.current) {
-      try {
-        await pacerRef.current.play();
-        accumulatorRef.current?.trackPacerStarted(selectedVoice?.asset_id || '');
-      } catch {
-        setError('Could not start 432Hz sleep frequency audio.');
-      }
-    }
-  };
+  const playSpecificStage = async (targetStage: SleepJourneyStageId) => {
+    [introRef, voiceRef, pacerRef, pivotRef, deltaRef, cocoonRef].forEach(ref => {
+      ref.current?.pause();
+      if (ref.current) ref.current.currentTime = 0;
+    });
 
-  const playSpecificStage = async (stage: 'intro' | 'guided' | 'pacer') => {
-    introRef.current?.pause();
-    if (introRef.current) introRef.current.currentTime = 0;
-    voiceRef.current?.pause();
-    if (voiceRef.current) voiceRef.current.currentTime = 0;
-    pacerRef.current?.pause();
-    if (pacerRef.current) pacerRef.current.currentTime = 0;
-
-    setPlayStage(stage);
+    setPlayStage(targetStage);
     setGuidedOn(true);
     setError('');
 
     const elements: HTMLAudioElement[] = [];
-    if (stage === 'intro' && introRef.current) {
-      elements.push(introRef.current);
-      accumulatorRef.current?.trackIntroStarted(introTrack.asset_id);
-    } else if (stage === 'guided' && voiceRef.current) {
-      elements.push(voiceRef.current);
-      accumulatorRef.current?.trackGuidedPracticeStarted(selectedVoice?.asset_id || '');
-    } else if (stage === 'pacer' && pacerRef.current) {
-      elements.push(pacerRef.current);
-      accumulatorRef.current?.trackPacerStarted(selectedVoice?.asset_id || '');
-    }
+    if (targetStage === 'intro' && introRef.current) elements.push(introRef.current);
+    else if (targetStage === 'guided' && voiceRef.current) elements.push(voiceRef.current);
+    else if (targetStage === 'theta_drift' && pacerRef.current) elements.push(pacerRef.current);
+    else if (targetStage === 'cognitive_pivot' && pivotRef.current) elements.push(pivotRef.current);
+    else if (targetStage === 'delta_immersion' && deltaRef.current) elements.push(deltaRef.current);
+    else if (targetStage === 'sleep_cocoon' && cocoonRef.current) elements.push(cocoonRef.current);
 
     selectedBackgrounds.forEach(track => {
       const audio = backgroundRefs.current[track.asset_id];
@@ -465,21 +512,6 @@ export function NightAudioPlayer({
     }
   };
 
-  const onIntroEnded = async () => {
-    if (!isPlayingRef.current) return;
-    accumulatorRef.current?.trackIntroEnded(introTrack.asset_id);
-    accumulatorRef.current?.trackEnded('intro');
-    setPlayStage('guided');
-    if (guidedOn && voiceRef.current) {
-      try {
-        await voiceRef.current.play();
-        accumulatorRef.current?.trackGuidedPracticeStarted(selectedVoice?.asset_id || '');
-      } catch {
-        setError('Could not start guided practice audio.');
-      }
-    }
-  };
-
   const start = async () => {
     if (!hasSelection) {
       setError('Choose guided practice or a background sound before starting.');
@@ -495,27 +527,19 @@ export function NightAudioPlayer({
     const elements: HTMLAudioElement[] = [];
     if (guidedOn) {
       if (playStage === 'intro') {
-        if (introRef.current) {
-          elements.push(introRef.current);
-          accumulatorRef.current?.trackIntroStarted(introTrack.asset_id);
-        } else if (voiceRef.current) {
-          elements.push(voiceRef.current);
-          accumulatorRef.current?.trackGuidedPracticeStarted(selectedVoice?.asset_id || '');
-        }
-      } else if (playStage === 'guided') {
-        if (voiceRef.current) {
-          elements.push(voiceRef.current);
-          accumulatorRef.current?.trackGuidedPracticeStarted(selectedVoice?.asset_id || '');
-        } else if (pacerRef.current) {
-          elements.push(pacerRef.current);
-          accumulatorRef.current?.trackPacerStarted(selectedVoice?.asset_id || '');
-        }
-      } else if (playStage === 'pacer' && pacerRef.current) {
+        if (introRef.current) elements.push(introRef.current);
+        else if (voiceRef.current) elements.push(voiceRef.current);
+      } else if (playStage === 'guided' && voiceRef.current) {
+        elements.push(voiceRef.current);
+      } else if (playStage === 'theta_drift' && pacerRef.current) {
         elements.push(pacerRef.current);
-        accumulatorRef.current?.trackPacerStarted(selectedVoice?.asset_id || '');
+      } else if (playStage === 'cognitive_pivot' && pivotRef.current) {
+        elements.push(pivotRef.current);
+      } else if (playStage === 'delta_immersion' && deltaRef.current) {
+        elements.push(deltaRef.current);
+      } else if (playStage === 'sleep_cocoon' && cocoonRef.current) {
+        elements.push(cocoonRef.current);
       }
-    } else {
-      accumulatorRef.current?.trackBackgroundOnlyStarted(backgroundIds);
     }
 
     selectedBackgrounds.forEach(track => {
@@ -542,7 +566,7 @@ export function NightAudioPlayer({
     const interval = window.setInterval(() => {
       const isIntro = Boolean(guidedOn && playStage === 'intro' && introRef.current && !introRef.current.paused);
       const isVoice = Boolean(guidedOn && playStage === 'guided' && voiceRef.current && !voiceRef.current.paused);
-      const isPacer = Boolean(guidedOn && playStage === 'pacer' && pacerRef.current && !pacerRef.current.paused);
+      const isPacer = Boolean(guidedOn && playStage === 'theta_drift' && pacerRef.current && !pacerRef.current.paused);
       const isBg = selectedBackgrounds.some(b => !backgroundRefs.current[b.asset_id]?.paused);
       const voiceTime = voiceRef.current?.currentTime || 0;
       accumulatorRef.current?.updateState(isVoice, isBg, voiceTime, isIntro, isPacer);
@@ -550,10 +574,11 @@ export function NightAudioPlayer({
     return () => clearInterval(interval);
   }, [playing, guidedOn, playStage, selectedBackgrounds]);
 
+  // Volume sync across all primary tracks
   useEffect(() => {
-    if (introRef.current) introRef.current.volume = voiceVolume;
-    if (voiceRef.current) voiceRef.current.volume = voiceVolume;
-    if (pacerRef.current) pacerRef.current.volume = voiceVolume;
+    [introRef, voiceRef, pacerRef, pivotRef, deltaRef, cocoonRef].forEach(ref => {
+      if (ref.current) ref.current.volume = voiceVolume;
+    });
     Object.values(backgroundRefs.current).forEach(audio => {
       if (audio) audio.volume = backgroundVolume;
     });
@@ -586,26 +611,6 @@ export function NightAudioPlayer({
     setError('');
   };
 
-  const onVoiceEnded = async () => {
-    if (!isPlayingRef.current) return;
-    if (voiceRef.current) voiceRef.current.pause();
-    accumulatorRef.current?.trackEnded('voice');
-    if (timer === 'until_voice') {
-      stopAll();
-      return;
-    }
-    // Transition to Stage 3: 432Hz sleep frequency & gentle wave chime
-    setPlayStage('pacer');
-    if (guidedOn && pacerRef.current) {
-      try {
-        await pacerRef.current.play();
-        accumulatorRef.current?.trackPacerStarted(selectedVoice?.asset_id || '');
-      } catch {
-        setError('Could not start 432Hz sleep frequency audio.');
-      }
-    }
-  };
-
   const handleSkip = () => {
     stopAll();
     onSkip();
@@ -622,16 +627,18 @@ export function NightAudioPlayer({
     onStillAwake();
   };
 
+  const currentStageInfo = SLEEP_JOURNEY_STAGES.find(s => s.id === playStage) || SLEEP_JOURNEY_STAGES[0];
+
   return (
     <div className="rounded-2xl border border-teal-900/60 bg-[#080b15] p-3.5 sm:p-4">
       {/* Top Banner with Visual Guide Toggle */}
       <div className="flex items-center justify-between rounded-xl border border-teal-900/70 bg-teal-950/30 px-3 py-2 text-xs">
         <div>
           <p className="font-semibold text-teal-200">
-            From here, you can put your phone down.
+            60-Minute Progressive Sleep Engine
           </p>
           <p className="text-[11px] text-slate-400 mt-0.5">
-            Follow along with the breath, or switch to ambient sound anytime.
+            Transitions automatically from breath to theta, cognitive pivot, delta, and sleep cocoon.
           </p>
         </div>
         <button
@@ -644,44 +651,101 @@ export function NightAudioPlayer({
         </button>
       </div>
 
-      {/* Visual Breathing Pacer ("Video hơi thở") */}
+      {/* Visual Sleep / Breathing Guide */}
       {showVisualPacer && (
         <div className="mt-2.5">
           <VisualBreathingPacer
             pattern={selectedVoice?.pacer_pattern || '5-5'}
             isPlaying={playing}
             stage={playStage}
+            stageName={currentStageInfo.name_en}
           />
         </div>
       )}
 
-      {/* Header */}
-      <div className="mt-2.5 flex items-baseline justify-between gap-2">
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-teal-300">
-            Tonight’s Practice
+      {/* 60-Minute Progressive Sleep Timeline Bar */}
+      <div className="mt-3 rounded-xl border border-teal-900/60 bg-[#060a14] p-2.5">
+        <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-teal-300 mb-1.5">
+          <span>60-Min Automated Progression</span>
+          <span className="text-slate-400 font-mono">
+            {playStage === 'sleep_cocoon' ? '55:00+' : currentStageInfo.timeRange}
           </span>
-          <h2 className="text-lg font-black text-white">
-            {selectedVoice?.label || (script?.id === 'gentle_breathing_v1' ? 'Gentle breathing' : 'Quiet sound')}
-          </h2>
         </div>
-        {selectedVoice && (
-          <span className="text-[11px] font-medium text-slate-400 shrink-0">
-            {Math.round(selectedVoice.duration_seconds / 60)} min guided
-          </span>
-        )}
+
+        {/* Stage Progress Pills */}
+        <div className="grid grid-cols-5 gap-1 text-[9px] font-semibold text-center">
+          <button
+            type="button"
+            onClick={() => void playSpecificStage('intro')}
+            className={`rounded py-1 px-0.5 border transition truncate ${
+              playStage === 'intro' || playStage === 'guided'
+                ? 'border-teal-400 bg-teal-950/60 text-teal-200 shadow-[0_0_10px_rgba(45,212,191,0.2)]'
+                : 'border-slate-800 bg-slate-900/40 text-slate-400 hover:text-white'
+            }`}
+          >
+            1. Breath
+          </button>
+          <button
+            type="button"
+            onClick={() => void playSpecificStage('theta_drift')}
+            className={`rounded py-1 px-0.5 border transition truncate ${
+              playStage === 'theta_drift'
+                ? 'border-amber-400 bg-amber-950/60 text-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.2)]'
+                : 'border-slate-800 bg-slate-900/40 text-slate-400 hover:text-white'
+            }`}
+          >
+            2. 432Hz
+          </button>
+          <button
+            type="button"
+            onClick={() => void playSpecificStage('cognitive_pivot')}
+            className={`rounded py-1 px-0.5 border transition truncate ${
+              playStage === 'cognitive_pivot'
+                ? 'border-purple-400 bg-purple-950/60 text-purple-200 shadow-[0_0_10px_rgba(168,85,247,0.2)]'
+                : 'border-slate-800 bg-slate-900/40 text-slate-400 hover:text-white'
+            }`}
+          >
+            3. Pivot
+          </button>
+          <button
+            type="button"
+            onClick={() => void playSpecificStage('delta_immersion')}
+            className={`rounded py-1 px-0.5 border transition truncate ${
+              playStage === 'delta_immersion'
+                ? 'border-blue-400 bg-blue-950/60 text-blue-200 shadow-[0_0_10px_rgba(59,130,246,0.2)]'
+                : 'border-slate-800 bg-slate-900/40 text-slate-400 hover:text-white'
+            }`}
+          >
+            4. Delta
+          </button>
+          <button
+            type="button"
+            onClick={() => void playSpecificStage('sleep_cocoon')}
+            className={`rounded py-1 px-0.5 border transition truncate ${
+              playStage === 'sleep_cocoon'
+                ? 'border-teal-400 bg-teal-950/60 text-teal-200 shadow-[0_0_10px_rgba(20,184,166,0.2)]'
+                : 'border-slate-800 bg-slate-900/40 text-slate-400 hover:text-white'
+            }`}
+          >
+            5. Cocoon
+          </button>
+        </div>
+
+        <p className="mt-1.5 text-[10px] text-slate-400 truncate">
+          Active: <span className="font-semibold text-slate-200">{currentStageInfo.name_en}</span> · {currentStageInfo.description_en}
+        </p>
       </div>
 
+      {/* Main Guided Practice & Voice Options */}
       <div className="mt-3 space-y-2.5">
-        {/* Guided Practice & 3 Stages */}
         <div className="rounded-xl border border-indigo-800/70 p-2.5 space-y-2">
           <div className="flex items-center justify-between gap-2">
             <div>
               <span className="text-xs font-bold text-white block">
-                Guided voice practice
+                Guided Somatic Practice (0–10 min)
               </span>
               <span className="text-[11px] text-slate-400">
-                1. State intro → 2. Guided breathing → 3. 432Hz sleep frequency
+                Paced breathing rhythm for nervous system deceleration
               </span>
             </div>
             <input
@@ -696,153 +760,63 @@ export function NightAudioPlayer({
             />
           </div>
 
-          {/* Stage 1: State Intro */}
-          {guidedOn && (
-            <div className="rounded-lg border border-teal-900/60 bg-teal-950/20 p-2 text-xs">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-bold text-teal-200 text-[11px]">
-                  Stage 1: State Intro (~15s)
-                </span>
-                <span className="rounded bg-[#0c1222] px-1.5 py-0.5 text-[10px] font-semibold text-teal-300 border border-teal-900">
-                  {playStage === 'intro' ? (playing ? 'Playing' : 'Ready') : 'Passed'}
-                </span>
-              </div>
-              <p className="mt-0.5 text-[11px] text-slate-300 truncate">
-                {introTrack.title_en}
-              </p>
-              <div className="mt-1.5 flex flex-wrap gap-1.5">
-                {playStage !== 'intro' && (
-                  <button
-                    type="button"
-                    onClick={() => void playSpecificStage('intro')}
-                    className="inline-flex items-center gap-1 rounded-md border border-teal-700/80 bg-teal-900/40 px-2 py-0.5 text-[10px] font-semibold text-teal-200 hover:bg-teal-800/50"
-                  >
-                    <Play className="h-2.5 w-2.5" />
-                    Replay intro
-                  </button>
-                )}
-                {playStage === 'intro' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => void handleSkipIntro()}
-                      className="inline-flex items-center gap-1 rounded-md border border-teal-700/80 bg-teal-900/40 px-2 py-0.5 text-[10px] font-semibold text-teal-200 hover:bg-teal-800/50"
-                    >
-                      <FastForward className="h-2.5 w-2.5" />
-                      Skip intro to voice
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void handleSkipVoiceToPacer()}
-                      className="inline-flex items-center gap-1 rounded-md border border-amber-700/80 bg-amber-950/40 px-2 py-0.5 text-[10px] font-semibold text-amber-200 hover:bg-amber-900/50"
-                    >
-                      <FastForward className="h-2.5 w-2.5" />
-                      Skip to 432Hz frequency
-                    </button>
-                  </>
-                )}
-              </div>
+          {/* Voice Selector */}
+          <div className="rounded-lg border border-indigo-900/60 bg-indigo-950/20 p-2 text-xs space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-bold text-indigo-200 text-[11px]">
+                Breathing Technique & Voice
+              </span>
+              <span className="rounded bg-[#0c1222] px-1.5 py-0.5 text-[10px] font-semibold text-indigo-300 border border-indigo-800">
+                {selectedVoice?.pacer_pattern || '5-5'}
+              </span>
             </div>
-          )}
+            <select
+              value={voiceId}
+              onChange={event => {
+                pauseAll();
+                setVoiceId(event.target.value);
+              }}
+              className="w-full rounded-md border border-indigo-800 bg-[#0c1222] px-2.5 py-1 text-xs text-white"
+            >
+              {effectiveVoices.map(voice => (
+                <option key={voice.asset_id} value={voice.asset_id}>{voice.label}</option>
+              ))}
+            </select>
+          </div>
 
-          {/* Stage 2: Voice Guidance */}
-          {guidedOn && (
-            <div className="rounded-lg border border-indigo-900/60 bg-indigo-950/20 p-2 text-xs space-y-1.5">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-bold text-indigo-200 text-[11px]">
-                  Stage 2: Voice Guidance (Plays 1x)
-                </span>
-                <span className="rounded bg-[#0c1222] px-1.5 py-0.5 text-[10px] font-semibold text-indigo-300 border border-indigo-800">
-                  {playStage === 'guided' ? (playing ? 'Playing (1x)' : 'Ready') : (playStage === 'pacer' ? 'Completed' : 'Upcoming')}
-                </span>
-              </div>
-              <select
-                value={voiceId}
-                onChange={event => {
-                  pauseAll();
-                  setVoiceId(event.target.value);
-                }}
-                className="w-full rounded-md border border-indigo-800 bg-[#0c1222] px-2.5 py-1 text-xs text-white"
-              >
-                {effectiveVoices.map(voice => (
-                  <option key={voice.asset_id} value={voice.asset_id}>{voice.label}</option>
-                ))}
-              </select>
-              <div className="flex flex-wrap gap-1.5 pt-0.5">
-                {playStage !== 'guided' && (
-                  <button
-                    type="button"
-                    onClick={() => void playSpecificStage('guided')}
-                    className="inline-flex items-center gap-1 rounded-md border border-indigo-700/80 bg-indigo-900/40 px-2 py-0.5 text-[10px] font-semibold text-indigo-200 hover:bg-indigo-800/50"
-                  >
-                    <Play className="h-2.5 w-2.5" />
-                    Play voice directly
-                  </button>
-                )}
-                {playStage === 'guided' && (
-                  <button
-                    type="button"
-                    onClick={() => void handleSkipVoiceToPacer()}
-                    className="inline-flex items-center gap-1 rounded-md border border-amber-700/80 bg-amber-950/40 px-2 py-0.5 text-[10px] font-semibold text-amber-200 hover:bg-amber-900/50"
-                  >
-                    <FastForward className="h-2.5 w-2.5" />
-                    Skip voice to 432Hz frequency
-                  </button>
-                )}
-              </div>
+          {/* Active Stage Detail Card */}
+          <div className="rounded-lg border border-purple-900/60 bg-purple-950/20 p-2 text-xs">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-bold text-purple-200 text-[11px] flex items-center gap-1">
+                <Moon className="h-3 w-3 text-purple-400" />
+                <span>Stage 3 Cognitive Pivot (Min 25–40)</span>
+              </span>
+              <span className="rounded bg-[#0c1222] px-1.5 py-0.5 text-[10px] font-semibold text-purple-300 border border-purple-900">
+                Auto-engages
+              </span>
             </div>
-          )}
+            <p className="mt-0.5 text-[11px] text-slate-300">
+              {pivotTrack.title_en}
+            </p>
+            <p className="text-[10px] text-slate-400 mt-0.5">
+              {pivotTrack.subtitle_en}
+            </p>
+          </div>
 
-          {/* Stage 3: 432Hz Sleep Frequency & Gentle Waves (Loops) */}
-          {guidedOn && selectedVoice?.pacer_path && (
-            <div className="rounded-lg border border-amber-900/60 bg-amber-950/20 p-2 text-xs">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-bold text-amber-200 text-[11px] flex items-center gap-1">
-                  <Radio className="h-3 w-3" />
-                  <span>Stage 3: 432Hz Sleep Frequency (Loops)</span>
-                </span>
-                <span className="rounded bg-[#0c1222] px-1.5 py-0.5 text-[10px] font-semibold text-amber-300 border border-amber-800">
-                  {playStage === 'pacer' ? (playing ? 'Active (Looping)' : 'Paused') : (timer === 'until_voice' ? 'Off (timer: until voice)' : 'Auto-starts next')}
-                </span>
-              </div>
-              <p className="mt-0.5 text-[11px] text-slate-300 truncate">
-                {selectedVoice.pacer_title_en || '432Hz Sleep Frequency & Gentle Breath Waves'}
-              </p>
-              <div className="mt-1 flex items-center justify-between gap-2">
-                <div className="inline-flex items-center gap-1 rounded bg-black/40 px-1.5 py-0.5 text-[10px] text-amber-300/90 border border-amber-900/50">
-                  <span>🎵</span>
-                  <span>{selectedVoice.pacer_pattern || 'Breathing cycle'} · 432Hz & Theta sleep waves · Soft volume</span>
-                </div>
-                {playStage !== 'pacer' && (
-                  <button
-                    type="button"
-                    onClick={() => void playSpecificStage('pacer')}
-                    className="shrink-0 inline-flex items-center gap-1 rounded-md border border-amber-700/80 bg-amber-900/40 px-2 py-0.5 text-[10px] font-semibold text-amber-200 hover:bg-amber-800/50"
-                  >
-                    <Play className="h-2.5 w-2.5" />
-                    Play 432Hz now
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Volume sliders in 2 columns */}
+          {/* Volume sliders */}
           <div className="grid grid-cols-2 gap-2 pt-1">
-            {selectedVoice && guidedOn && (
-              <label className="block text-[11px] text-slate-400">
-                <span>Guidance volume</span>
-                <input
-                  aria-label="Guidance volume"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={Math.round(voiceVolume * 100)}
-                  onChange={event => setVoiceVolume(Number(event.target.value) / 100)}
-                  className="mt-1 w-full"
-                />
-              </label>
-            )}
+            <label className="block text-[11px] text-slate-400">
+              <span>Guidance & Waves</span>
+              <input
+                aria-label="Guidance volume"
+                type="range"
+                min="0"
+                max="100"
+                value={Math.round(voiceVolume * 100)}
+                onChange={event => setVoiceVolume(Number(event.target.value) / 100)}
+                className="mt-1 w-full"
+              />
+            </label>
             {selectedBackgrounds.length > 0 && (
               <label className="block text-[11px] text-slate-400">
                 <span>Background volume</span>
@@ -874,10 +848,11 @@ export function NightAudioPlayer({
                 }}
                 className="rounded-md border border-indigo-800 bg-[#0c1222] px-2 py-0.5 text-[11px] text-white"
               >
+                <option value="60">60 minutes (Full Journey)</option>
+                <option value="90">90 minutes (Full Sleep Cycle)</option>
                 <option value="30">30 minutes</option>
                 <option value="15">15 minutes</option>
-                <option value="60">60 minutes</option>
-                <option value="until_voice" disabled={!selectedVoice}>Stop with guided practice</option>
+                <option value="until_voice" disabled={!selectedVoice}>Stop with guided voice</option>
               </select>
             </div>
           </div>
@@ -915,13 +890,13 @@ export function NightAudioPlayer({
         </div>
       </div>
 
-      {/* Audio tags */}
+      {/* Audio tags for the entire 60-minute automated pipeline */}
       <audio
         ref={introRef}
         key={`intro-${introTrack.asset_id}-${retry}`}
         src={introTrack.local_path}
         preload="metadata"
-        onEnded={() => void onIntroEnded()}
+        onEnded={() => void advanceToStage('guided')}
         onError={() => setError('The introductory audio could not be loaded.')}
       />
       <audio
@@ -930,16 +905,43 @@ export function NightAudioPlayer({
         src={selectedVoice?.local_path}
         preload="metadata"
         loop={false}
-        onEnded={() => void onVoiceEnded()}
+        onEnded={() => void advanceToStage('theta_drift')}
         onError={() => setError('The guided audio could not be loaded.')}
       />
       <audio
         ref={pacerRef}
-        key={`pacer-${voiceId}-${retry}`}
+        key={`theta-${voiceId}-${retry}`}
         src={selectedVoice?.pacer_path}
         preload="metadata"
-        loop={timer !== 'until_voice'}
+        loop={false}
+        onEnded={() => void advanceToStage('cognitive_pivot')}
         onError={() => setError('The 432Hz sleep frequency audio could not be loaded.')}
+      />
+      <audio
+        ref={pivotRef}
+        key={`pivot-${pivotTrack.asset_id}-${retry}`}
+        src={pivotTrack.local_path}
+        preload="metadata"
+        loop={false}
+        onEnded={() => void advanceToStage('delta_immersion')}
+        onError={() => setError('The cognitive pivot audio could not be loaded.')}
+      />
+      <audio
+        ref={deltaRef}
+        key={`delta-${retry}`}
+        src={DEEP_DELTA_TRACK.local_path}
+        preload="metadata"
+        loop={false}
+        onEnded={() => void advanceToStage('sleep_cocoon')}
+        onError={() => setError('The deep delta audio could not be loaded.')}
+      />
+      <audio
+        ref={cocoonRef}
+        key={`cocoon-${retry}`}
+        src={SLEEP_COCOON_TRACK.local_path}
+        preload="metadata"
+        loop={timer !== 'until_voice'}
+        onError={() => setError('The sleep cocoon audio could not be loaded.')}
       />
       {selectedBackgrounds.map(background => (
         <audio
@@ -970,7 +972,7 @@ export function NightAudioPlayer({
           className="companion-button flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 py-2.5 text-xs font-bold"
         >
           {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-          <span>{playing ? 'Pause' : 'Start listening'}</span>
+          <span>{playing ? 'Pause' : 'Start 60-min sleep journey'}</span>
         </button>
         <button
           type="button"
@@ -982,7 +984,7 @@ export function NightAudioPlayer({
         </button>
       </div>
 
-      {/* Complete button to advance with completed status */}
+      {/* Complete button */}
       <button
         type="button"
         onClick={handleComplete}
