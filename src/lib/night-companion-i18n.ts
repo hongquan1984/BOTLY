@@ -96,7 +96,6 @@ function repairVietnamese(text: string): string {
   }
 }
 
-export function BilingualLine({ english, vietnamese, className = '' }: { english: string; vietnamese?: string; className?: string }) {
-  const vi = vietnamese || viForAction(english) || viForQuiz(english);
-  return createElement('span', { className }, english, SHOW_VI_TEST_COPY && vi ? createElement('span', { className: 'mt-1 block text-[0.88em] font-normal leading-5 text-teal-200/80' }, repairVietnamese(vi)) : null);
+export function BilingualLine({ english, className = '' }: { english: string; vietnamese?: string; className?: string }) {
+  return createElement('span', { className }, english);
 }

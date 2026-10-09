@@ -201,25 +201,22 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
       <CompanionShell onBackToMap={() => setStage('map')}>
         <div className="space-y-4">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300">
-            <BilingualLine english="Night 1 — A Gentle Beginning" vietnamese="Đêm 1 — Khởi đầu nhẹ nhàng" />
+            <BilingualLine english="Night 1 — A Gentle Beginning" />
           </p>
           <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
             <BilingualLine
               english="You don’t have to solve the whole day right now"
-              vietnamese="Bạn không cần giải quyết mọi việc của cả ngày ngay lúc này"
             />
           </h2>
           <div className="rounded-2xl border border-teal-900/60 bg-teal-950/20 p-4 text-sm leading-6 text-slate-300">
             <p>
               <BilingualLine
                 english="Tonight helps you gently transition from a busy day into a restful space. You will have a natural-paced breathing practice and calming sound tailored to how you are feeling tonight."
-                vietnamese="Đêm đầu tiên giúp bạn nhẹ nhàng chuyển trạng thái từ một ngày bận rộn sang không gian nghỉ ngơi, qua bài thở có nhịp điệu tự nhiên và âm thanh êm dịu phù hợp với cảm giác tối nay của bạn."
               />
             </p>
             <p className="mt-2 text-xs text-slate-400">
               <BilingualLine
                 english="No medical claims. No pressure to sleep immediately. This is a quiet, comfortable space to unwind."
-                vietnamese="Không có tuyên bố y khoa. Không áp lực phải ngủ ngay. Đây là một không gian êm dịu để bạn thả lỏng."
               />
             </p>
           </div>
@@ -240,13 +237,12 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
             }}
             className="companion-button mt-4"
           >
-            <BilingualLine english="Prepare for tonight" vietnamese="Chuẩn bị cho tối nay" />
+            <BilingualLine english="Prepare for tonight" />
           </button>
 
           <p className="text-center text-xs text-slate-400">
             <BilingualLine
               english="Skip or stop whenever you like"
-              vietnamese="Có thể bỏ qua hoặc dừng bất cứ lúc nào"
             />
           </p>
         </div>
@@ -254,8 +250,8 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
     );
   }
 
-  if (stage === 'loading') return <CompanionShell onBackToMap={() => setStage('map')}>{restoreError ? <><BilingualLine english={restoreError} vietnamese="Không thể khôi phục Night Profile. Vui lòng thử lại." /><button type="button" onClick={() => setRestoreAttempt(value => value + 1)} className="companion-button mt-6"><BilingualLine english="Retry" vietnamese="Thử lại" /></button></> : <BilingualLine english={isSaving ? 'Saving your Night Profile...' : 'Loading your Night Profile...'} vietnamese={isSaving ? 'Đang lưu Night Profile của bạn...' : 'Đang tải Night Profile của bạn...'} />}</CompanionShell>;
-  if (stage === 'done') return <CompanionShell onBackToMap={() => setStage('map')}>{reviewSaved ? <><Check className="mx-auto h-8 w-8 text-teal-300" /><h2 className="mt-3 text-2xl font-black text-white"><BilingualLine english="Night 1 is complete." /></h2><p className="mt-2 text-sm leading-6 text-slate-300"><BilingualLine english={completionStatus === 'completed' ? 'Your review is saved for future learning.' : 'Your pause is saved. You stopped before finishing every module, and that is okay.'} /> You can stop here whenever you want.</p><button type="button" onClick={() => setStage('map')} className="companion-button mt-5"><BilingualLine english="View 7-Night Journey" vietnamese="Xem Bản đồ 7 Đêm" /></button><SupportNote /></> : <><h2 className="mt-3 text-2xl font-black text-white"><BilingualLine english="No Night 1 review saved yet." /></h2><p className="mt-2 text-sm leading-6 text-slate-300"><BilingualLine english="Start from the quiz to create a Night Profile and choose tonight’s state." /></p></>}{process.env.NODE_ENV !== 'production' && <button type="button" onClick={resetLocalTestSession} className="mt-6 w-full rounded-xl border border-amber-700/70 px-4 py-3 text-sm font-bold text-amber-200"><BilingualLine english="Reset local test session" /></button>}</CompanionShell>;
+  if (stage === 'loading') return <CompanionShell onBackToMap={() => setStage('map')}>{restoreError ? <><BilingualLine english={restoreError} /><button type="button" onClick={() => setRestoreAttempt(value => value + 1)} className="companion-button mt-6"><BilingualLine english="Retry" /></button></> : <BilingualLine english={isSaving ? 'Saving your Night Profile...' : 'Loading your Night Profile...'} />}</CompanionShell>;
+  if (stage === 'done') return <CompanionShell onBackToMap={() => setStage('map')}>{reviewSaved ? <><Check className="mx-auto h-8 w-8 text-teal-300" /><h2 className="mt-3 text-2xl font-black text-white"><BilingualLine english="Night 1 is complete." /></h2><p className="mt-2 text-sm leading-6 text-slate-300"><BilingualLine english={completionStatus === 'completed' ? 'Your review is saved for future learning.' : 'Your pause is saved. You stopped before finishing every module, and that is okay.'} /> You can stop here whenever you want.</p><button type="button" onClick={() => setStage('map')} className="companion-button mt-5"><BilingualLine english="View 7-Night Journey" /></button><SupportNote /></> : <><h2 className="mt-3 text-2xl font-black text-white"><BilingualLine english="No Night 1 review saved yet." /></h2><p className="mt-2 text-sm leading-6 text-slate-300"><BilingualLine english="Start from the quiz to create a Night Profile and choose tonight’s state." /></p></>}{process.env.NODE_ENV !== 'production' && <button type="button" onClick={resetLocalTestSession} className="mt-6 w-full rounded-xl border border-amber-700/70 px-4 py-3 text-sm font-bold text-amber-200"><BilingualLine english="Reset local test session" /></button>}</CompanionShell>;
   if (stage === 'setup') return <CompanionShell onBackToMap={() => setStage('map')}><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300"><BilingualLine english="Free Night 1 beta" /></p><h2 className="mt-2 text-3xl font-black text-white"><BilingualLine english="Set up tonight gently." /></h2><p className="mt-2 text-sm leading-6 text-slate-300"><BilingualLine english="No payment or account required. This is a wellness companion, not medical treatment." /></p>{setupStep === 0 && <div className="mt-7 space-y-5"><Field label="What time would you ideally like to be asleep tonight?" value={desiredBedtime} onChange={setDesiredBedtime} /><Field label="What time do you usually wake up?" value={usualWakeTime} onChange={setUsualWakeTime} type="time" /><button type="button" disabled={!desiredBedtime || !usualWakeTime} onClick={() => setSetupStep(1)} className="companion-button"><BilingualLine english="Continue" /></button></div>}{setupStep === 1 && <div className="mt-7"><h3 className="text-xl font-bold text-white"><BilingualLine english="What usually happens during your last hour before bed?" /></h3><div className="mt-4 space-y-2">{lastHourOptions.map(([value, label]) => <Choice key={value} selected={lastHour.includes(value)} onClick={() => toggleLastHour(value)}>{label}</Choice>)}</div><button type="button" disabled={!lastHour.length} onClick={() => setSetupStep(2)} className="companion-button mt-5"><BilingualLine english="Continue" /></button></div>}{setupStep === 2 && <div className="mt-7"><h3 className="text-xl font-bold text-white"><BilingualLine english="What usually happens when you can’t sleep?" /></h3><div className="mt-4 space-y-2">{[['thoughts_busier', 'My thoughts get busier'], ['check_phone', 'I check my phone'], ['check_time', 'I check the time'], ['try_harder', 'I stay in bed trying harder'], ['get_up', 'I get up for a while'], ['varies', 'It varies']].map(([value, label]) => <Choice key={value} selected={sleepDoesntCome === value} onClick={() => setSleepDoesntCome(value as SleepDoesntCome)}>{label}</Choice>)}</div><button type="button" onClick={beginSetup} className="companion-button mt-5"><BilingualLine english="Create my Night Profile" /></button></div>}{error && <p className="mt-4 text-sm text-rose-300"><BilingualLine english={error} /></p>}</CompanionShell>;
   if (stage === 'tonight') return <CompanionShell onBackToMap={() => setStage('map')}><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300">Night 1</p><h2 className="mt-2 text-3xl font-black text-white"><BilingualLine english="How’s tonight going?" /></h2><p className="mt-2 text-sm text-slate-300"><BilingualLine english="Choose what is happening now. Your Night Pattern stays separate from this Tonight State." /></p><div className="mt-6 space-y-2">{tonightOptions.map(([value, label]) => <Choice key={value} onClick={() => void chooseTonight(value, isStillAwake)}>{label}</Choice>)}</div></CompanionShell>;
   
@@ -263,27 +259,25 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
     return (
       <CompanionShell onBackToMap={() => setStage('map')}>
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300">
-          <BilingualLine english="Post-listening reflection" vietnamese="Cảm nhận sau bài nghe" />
+          <BilingualLine english="Post-listening reflection" />
         </p>
         <h2 className="mt-2 text-2xl sm:text-3xl font-black text-white">
           <BilingualLine
             english="Did the listening experience help you feel a little more at ease?"
-            vietnamese="Bài nghe có giúp bạn cảm thấy nhẹ nhõm hơn đôi chút không?"
           />
         </h2>
         <p className="mt-2 text-xs text-slate-400">
           <BilingualLine
             english="Your honest response helps tailor future nights."
-            vietnamese="Phản hồi chân thật giúp điều chỉnh các đêm tiếp theo phù hợp hơn."
           />
         </p>
 
         <div className="mt-6 space-y-2">
           {[
-            { id: 'A_LITTLE' as const, en: 'A little', vi: 'Đôi chút' },
-            { id: 'NOT_MUCH' as const, en: 'Not much', vi: 'Không nhiều' },
-            { id: 'NOT_FOR_ME' as const, en: 'It wasn’t for me', vi: 'Không phù hợp với tôi' },
-            { id: 'NOT_ENOUGH' as const, en: 'I didn’t listen enough', vi: 'Tôi chưa nghe đủ lâu' },
+            { id: 'A_LITTLE' as const, en: 'A little' },
+            { id: 'NOT_MUCH' as const, en: 'Not much' },
+            { id: 'NOT_FOR_ME' as const, en: 'It wasn’t for me' },
+            { id: 'NOT_ENOUGH' as const, en: 'I didn’t listen enough' },
           ].map(option => (
             <button
               key={option.id}
@@ -314,7 +308,7 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
                   : 'border-indigo-800 bg-indigo-950/40 text-slate-200 hover:border-indigo-500'
               }`}
             >
-              <BilingualLine english={option.en} vietnamese={option.vi} />
+              <BilingualLine english={option.en} />
               {postListenFeedback === option.id && <Check className="h-4 w-4 shrink-0" />}
             </button>
           ))}
@@ -326,7 +320,6 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
               <p>
                 <BilingualLine
                   english="Glad it provided a bit of comfort. You can close your eyes and rest now."
-                  vietnamese="Rất vui vì bài nghe mang lại chút dễ chịu. Bạn có thể nhắm mắt và nghỉ ngơi bây giờ."
                 />
               </p>
             )}
@@ -334,7 +327,6 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
               <p>
                 <BilingualLine
                   english="That is okay. Resting quietly without pressure to sleep is still restorative."
-                  vietnamese="Không sao cả. Nghỉ ngơi yên tĩnh không áp lực phải ngủ vẫn giúp cơ thể phục hồi."
                 />
               </p>
             )}
@@ -342,7 +334,6 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
               <p>
                 <BilingualLine
                   english="Thank you for noting that. Next time you can choose soothing background sound only without voice guidance."
-                  vietnamese="Cảm ơn bạn đã ghi nhận. Lần tới bạn có thể chọn chỉ nghe âm thanh nền êm dịu thay vì giọng đọc."
                 />
               </p>
             )}
@@ -350,7 +341,6 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
               <p>
                 <BilingualLine
                   english="No worries at all. You can replay the practice whenever you like, or rest in quiet comfort."
-                  vietnamese="Hoàn toàn không sao. Bạn có thể nghe lại bài bất cứ lúc nào hoặc nghỉ ngơi trong yên lặng."
                 />
               </p>
             )}
@@ -363,14 +353,14 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
             onClick={() => setStage('map')}
             className="companion-button"
           >
-            <BilingualLine english="Rest now & Back to map" vietnamese="Nghỉ ngơi & Quay lại Bản đồ 7 Đêm" />
+            <BilingualLine english="Rest now & Back to map" />
           </button>
           <button
             type="button"
             onClick={() => setStage('review')}
             className="w-full rounded-xl border border-indigo-800 px-4 py-3 text-sm font-bold text-indigo-200 hover:bg-indigo-900/40"
           >
-            <BilingualLine english="Leave detailed review" vietnamese="Đánh giá chi tiết" />
+            <BilingualLine english="Leave detailed review" />
           </button>
           <button
             type="button"
@@ -381,14 +371,14 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
             }}
             className="w-full rounded-xl border border-indigo-900/80 px-4 py-3 text-sm text-slate-400 hover:text-white"
           >
-            <BilingualLine english="Listen again" vietnamese="Nghe lại bài này" />
+            <BilingualLine english="Listen again" />
           </button>
         </div>
       </CompanionShell>
     );
   }
 
-  if (stage === 'resting') return <CompanionShell onBackToMap={() => setStage('map')}><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300">Night 1</p><h2 className="mt-2 text-3xl font-black text-white"><BilingualLine english="You can put the phone down now." vietnamese="Bây giờ bạn có thể đặt điện thoại xuống." /></h2><p className="mt-3 text-base leading-7 text-slate-200"><BilingualLine english="The activity is finished. Rest in whatever way feels comfortable. Come back for the review when you are ready." vietnamese="Hoạt động đã kết thúc. Hãy nghỉ theo cách thoải mái với bạn. Quay lại đánh giá khi bạn sẵn sàng." /></p><button type="button" onClick={() => setStage('feedback')} className="companion-button mt-7"><BilingualLine english="How was the listening experience?" vietnamese="Cảm nhận bài nghe như thế nào?" /></button><button type="button" onClick={stopForTonight} className="mt-3 w-full rounded-xl border border-indigo-800 px-4 py-3 text-sm font-bold text-indigo-200"><BilingualLine english="I’m still awake" /></button></CompanionShell>;
+  if (stage === 'resting') return <CompanionShell onBackToMap={() => setStage('map')}><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300">Night 1</p><h2 className="mt-2 text-3xl font-black text-white"><BilingualLine english="You can put the phone down now." /></h2><p className="mt-3 text-base leading-7 text-slate-200"><BilingualLine english="The activity is finished. Rest in whatever way feels comfortable. Come back for the review when you are ready." /></p><button type="button" onClick={() => setStage('feedback')} className="companion-button mt-7"><BilingualLine english="How was the listening experience?" /></button><button type="button" onClick={stopForTonight} className="mt-3 w-full rounded-xl border border-indigo-800 px-4 py-3 text-sm font-bold text-indigo-200"><BilingualLine english="I’m still awake" /></button></CompanionShell>;
   
   if (stage === 'plan' && activeModule?.module_id === 'calming_audio') {
     return (
@@ -427,18 +417,18 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
           }}
           onBackToMap={() => setStage('map')}
           onStillAwake={() => setStillAwakePrompt(true)}
-          stillAwakeContent={stillAwakePrompt && <div className="mt-4 space-y-2 rounded-2xl border border-indigo-800/60 p-3"><p className="text-xs text-slate-400"><BilingualLine english="Choose a bounded reset. The current audio is paused before the new activity starts." vietnamese="Chọn một bước điều chỉnh có giới hạn. Bài nghe hiện tại đã tạm dừng trước khi bắt đầu hoạt động mới." /></p>{tonightOptions.map(([value, label]) => <Choice key={value} onClick={() => void chooseTonight(value, true)}>{label}</Choice>)}</div>}
+          stillAwakeContent={stillAwakePrompt && <div className="mt-4 space-y-2 rounded-2xl border border-indigo-800/60 p-3"><p className="text-xs text-slate-400"><BilingualLine english="Choose a bounded reset. The current audio is paused before the new activity starts." /></p>{tonightOptions.map(([value, label]) => <Choice key={value} onClick={() => void chooseTonight(value, true)}>{label}</Choice>)}</div>}
         />
       </CompanionShell>
     );
   }
 
-  if (stage === 'plan' && activeModule) return <CompanionShell onBackToMap={() => setStage('map')}><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300">{isStillAwake ? <BilingualLine english="Still awake reset" /> : <BilingualLine english="Night 1 plan" />} · {moduleIndex + 1} of {plan?.modules.length} · <BilingualLine english="optional" /></p>{moduleIndex === 0 && plan?.explanation && <div className="mt-4 rounded-2xl border border-teal-900/60 bg-teal-950/20 p-4 text-sm leading-6 text-slate-200"><p className="font-bold text-teal-200"><BilingualLine english="Why this is suggested" vietnamese="Vì sao bước này được gợi ý" /></p><p className="mt-2"><BilingualLine english={plan.explanation} vietnamese={plan.explanation_vi} /></p></div>}<h2 className="mt-5 text-3xl font-black text-white"><BilingualLine english={activeModule.title} vietnamese={viForModule(activeModule.title)} /></h2><p className="mt-2 text-xs text-slate-400">About {activeDuration} min · <BilingualLine english="choose what feels useful" vietnamese="chọn điều thấy hữu ích" /></p><p className="mt-4 text-base leading-7 text-slate-200"><BilingualLine english={activeModule.instruction} /></p><p className="mt-4 rounded-2xl border border-indigo-800/60 bg-indigo-950/40 p-4 text-sm leading-6 text-indigo-100"><BilingualLine english={activeModule.opening} /></p>{activeKind === 'writing' && <label className="mt-5 block text-sm font-semibold text-slate-200"><BilingualLine english="One short note (optional)" /><input type="text" value={moduleNote} maxLength={140} onChange={event => setModuleNote(event.target.value)} placeholder="A few words are enough" className="mt-2 min-h-12 w-full rounded-xl border border-indigo-800 bg-[#080b15] px-4 text-white outline-none focus:border-teal-300" /><span className="mt-2 block text-xs text-slate-500"><BilingualLine english="You can use paper instead. This note is not sent to analytics or saved to your profile." vietnamese="Bạn cũng có thể dùng giấy. Ghi chú này không gửi vào analytics và không lưu vào hồ sơ." /></span></label>}{activeKind === 'choice' && <div className="mt-5 space-y-2">{(activeModule.module_id === 'quiet_activity' ? quietActivityOptions : routineCueOptions).map(option => <Choice key={option} selected={moduleChoice === option} onClick={() => setModuleChoice(option)}>{option}</Choice>)}</div>}{activeScript && <details className="mt-5 rounded-2xl border border-indigo-800/60 bg-[#080b15] p-4"><summary className="cursor-pointer text-sm font-bold text-teal-200"><BilingualLine english="Read the text guidance" vietnamese="Mở hướng dẫn bằng chữ" /></summary><div className="mt-3 space-y-3 text-sm leading-6 text-slate-300"><p><BilingualLine english="Voice audio is not available in this workspace yet. Follow the text at your own pace." vietnamese="Workspace này chưa có file giọng đọc. Bạn có thể làm theo phần chữ với nhịp riêng." /></p><p><BilingualLine english={activeModule.opening} /></p><p><BilingualLine english={activeModule.instruction} /></p></div></details>}{activeAudio && <div className="mt-5 rounded-2xl border border-indigo-800/60 bg-[#080b15] p-4"><p className="text-sm font-bold text-white"><BilingualLine english="Background sound only" vietnamese="Chỉ nghe âm thanh nền" /></p><p className="mt-1 text-xs leading-5 text-slate-400"><BilingualLine english="Quiet ocean sound · 6.4 minutes · no voice track" vietnamese="Âm thanh biển yên dịu · 6,4 phút · không có giọng đọc" /></p><audio key={audioRetry} controls preload="metadata" className="mt-3 w-full" src="/audio/night-companion/ocean-waves.ogg" onError={() => setAudioErrorModule(activeModule.module_id)} /><p className="mt-2 text-xs leading-5 text-slate-400"><BilingualLine english="No autoplay. Play, pause, seek, or stop whenever you want." vietnamese="Không tự phát. Bạn có thể phát, tạm dừng, tua hoặc dừng bất cứ lúc nào." /></p>{activeAudioError && <div className="mt-3 rounded-xl border border-rose-800/60 bg-rose-950/30 p-3 text-sm text-rose-200"><BilingualLine english="This audio could not be loaded. Check your connection and try again." vietnamese="Không thể tải âm thanh. Hãy kiểm tra kết nối và thử lại." /><button type="button" onClick={() => { setAudioErrorModule(''); setAudioRetry(value => value + 1); }} className="mt-2 underline"><BilingualLine english="Retry" vietnamese="Thử lại" /></button></div>}</div>}<p className="mt-4 text-sm leading-6 text-slate-400"><BilingualLine english={activeModule.closing} /></p><button type="button" onClick={() => void completeModule()} className="companion-button mt-6"><BilingualLine english={activeModule.action_label} vietnamese={viForAction(activeModule.action_label)} /></button>{plan.modules.some(m => m.module_id === 'calming_audio') && activeModule.module_id !== 'calming_audio' && (<button type="button" onClick={() => { const audioIdx = plan.modules.findIndex(m => m.module_id === 'calming_audio'); if (audioIdx >= 0) { setModuleIndex(audioIdx); void persistProgress(plan, usedModules, 'plan', audioIdx); } }} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-teal-500/70 bg-teal-950/40 px-4 py-3 text-sm font-bold text-teal-200 hover:bg-teal-900/60"><BilingualLine english="Listen now (skip prep)" vietnamese="Nghe ngay (bỏ qua bước chuẩn bị)" /></button>)}<button type="button" onClick={() => void skipModule()} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-800 px-4 py-3 text-sm font-bold text-indigo-200"><PauseCircle className="h-4 w-4" /><BilingualLine english={activeModule.skip_label} vietnamese={viForAction(activeModule.skip_label)} /></button><button type="button" onClick={stopForTonight} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-900 px-4 py-3 text-sm text-slate-400"><Square className="h-3.5 w-3.5" /><BilingualLine english="I’m done for tonight" /></button><button type="button" onClick={() => setStillAwakePrompt(value => !value)} className="mt-3 w-full text-sm font-bold text-indigo-300 underline underline-offset-4"><BilingualLine english="I’m still awake" /></button>{stillAwakePrompt && <div className="mt-4 space-y-2 rounded-2xl border border-indigo-800/60 p-3"><p className="text-xs text-slate-400"><BilingualLine english="Choose a bounded reset. Starting it will replace this activity." vietnamese="Chọn một bước điều chỉnh giới hạn. Khi bắt đầu, hoạt động này sẽ được thay thế." /></p>{tonightOptions.map(([value, label]) => <Choice key={value} onClick={() => void chooseTonight(value, true)}>{label}</Choice>)}</div>}</CompanionShell>;
-  if (stage === 'review' && plan && state) return <CompanionShell onBackToMap={() => setStage('map')}><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300"><BilingualLine english="Night 1 review · optional" vietnamese="Đánh giá Night 1 · tùy chọn" /></p><h2 className="mt-2 text-3xl font-black text-white"><BilingualLine english="How did tonight feel?" /></h2>{completionStatus !== 'completed' && <p className="mt-3 rounded-xl border border-indigo-800/60 bg-indigo-950/40 p-3 text-sm leading-6 text-slate-300"><BilingualLine english="You chose to stop before finishing the plan. Nothing is saved as complete until you choose an option below." vietnamese="Bạn đã dừng trước khi làm hết kế hoạch. Chưa có gì được lưu là hoàn tất cho đến khi bạn chọn một lựa chọn bên dưới." /></p>}<div className="mt-5 grid grid-cols-3 gap-2">{(['BETTER', 'SAME', 'WORSE'] as const).map(value => <Choice key={value} selected={reviewOverall === value} onClick={() => setReviewOverall(value)}>{value}</Choice>)}</div><div className="mt-7 space-y-4"><h3 className="text-sm font-bold uppercase tracking-[0.16em] text-teal-300"><BilingualLine english="Module feedback" /></h3>{plan.modules.map(module => <div key={module.module_id} className="border-b border-indigo-900/60 pb-3"><p className="text-sm font-bold text-white"><BilingualLine english={module.title} vietnamese={viForModule(module.title)} /></p><div className="mt-2 flex gap-2">{(['YES', 'A_LITTLE', 'NO'] as const).map(value => <button key={value} type="button" onClick={() => setHelpfulness(current => ({ ...current, [module.module_id]: value }))} className={`rounded-lg border px-3 py-2 text-xs font-bold ${helpfulness[module.module_id] === value ? 'border-teal-300 bg-teal-300 text-slate-950' : 'border-indigo-800 text-slate-300'}`}>{value === 'A_LITTLE' ? 'A LITTLE' : value}</button>)}</div></div>)}</div><div className="mt-6 grid gap-2"><button type="button" onClick={() => void saveReview()} className="companion-button"><BilingualLine english="Save review" /></button><button type="button" onClick={() => void saveReview('partial')} className="rounded-xl border border-indigo-800 px-4 py-3 text-sm font-bold text-indigo-200"><BilingualLine english="Save and rest" /></button></div><p className="mt-4 text-xs leading-5 text-slate-500"><BilingualLine english="You can leave the review now. It is not a condition for resting." /></p>{error && <p className="mt-4 text-sm text-rose-300"><BilingualLine english={error} /></p>}</CompanionShell>;
+  if (stage === 'plan' && activeModule) return <CompanionShell onBackToMap={() => setStage('map')}><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300">{isStillAwake ? <BilingualLine english="Still awake reset" /> : <BilingualLine english="Night 1 plan" />} · {moduleIndex + 1} of {plan?.modules.length} · <BilingualLine english="optional" /></p>{moduleIndex === 0 && plan?.explanation && <div className="mt-4 rounded-2xl border border-teal-900/60 bg-teal-950/20 p-4 text-sm leading-6 text-slate-200"><p className="font-bold text-teal-200"><BilingualLine english="Why this is suggested" /></p><p className="mt-2"><BilingualLine english={plan.explanation} /></p></div>}<h2 className="mt-5 text-3xl font-black text-white"><BilingualLine english={activeModule.title} /></h2><p className="mt-2 text-xs text-slate-400">About {activeDuration} min · <BilingualLine english="choose what feels useful" /></p><p className="mt-4 text-base leading-7 text-slate-200"><BilingualLine english={activeModule.instruction} /></p><p className="mt-4 rounded-2xl border border-indigo-800/60 bg-indigo-950/40 p-4 text-sm leading-6 text-indigo-100"><BilingualLine english={activeModule.opening} /></p>{activeKind === 'writing' && <label className="mt-5 block text-sm font-semibold text-slate-200"><BilingualLine english="One short note (optional)" /><input type="text" value={moduleNote} maxLength={140} onChange={event => setModuleNote(event.target.value)} placeholder="A few words are enough" className="mt-2 min-h-12 w-full rounded-xl border border-indigo-800 bg-[#080b15] px-4 text-white outline-none focus:border-teal-300" /><span className="mt-2 block text-xs text-slate-500"><BilingualLine english="You can use paper instead. This note is not sent to analytics or saved to your profile." /></span></label>}{activeKind === 'choice' && <div className="mt-5 space-y-2">{(activeModule.module_id === 'quiet_activity' ? quietActivityOptions : routineCueOptions).map(option => <Choice key={option} selected={moduleChoice === option} onClick={() => setModuleChoice(option)}>{option}</Choice>)}</div>}{activeScript && <details className="mt-5 rounded-2xl border border-indigo-800/60 bg-[#080b15] p-4"><summary className="cursor-pointer text-sm font-bold text-teal-200"><BilingualLine english="Read the text guidance" /></summary><div className="mt-3 space-y-3 text-sm leading-6 text-slate-300"><p><BilingualLine english="Voice audio is not available in this workspace yet. Follow the text at your own pace." /></p><p><BilingualLine english={activeModule.opening} /></p><p><BilingualLine english={activeModule.instruction} /></p></div></details>}{activeAudio && <div className="mt-5 rounded-2xl border border-indigo-800/60 bg-[#080b15] p-4"><p className="text-sm font-bold text-white"><BilingualLine english="Background sound only" /></p><p className="mt-1 text-xs leading-5 text-slate-400"><BilingualLine english="Quiet ocean sound · 6.4 minutes · no voice track" /></p><audio key={audioRetry} controls preload="metadata" className="mt-3 w-full" src="/audio/night-companion/ocean-waves.ogg" onError={() => setAudioErrorModule(activeModule.module_id)} /><p className="mt-2 text-xs leading-5 text-slate-400"><BilingualLine english="No autoplay. Play, pause, seek, or stop whenever you want." /></p>{activeAudioError && <div className="mt-3 rounded-xl border border-rose-800/60 bg-rose-950/30 p-3 text-sm text-rose-200"><BilingualLine english="This audio could not be loaded. Check your connection and try again." /><button type="button" onClick={() => { setAudioErrorModule(''); setAudioRetry(value => value + 1); }} className="mt-2 underline"><BilingualLine english="Retry" /></button></div>}</div>}<p className="mt-4 text-sm leading-6 text-slate-400"><BilingualLine english={activeModule.closing} /></p><button type="button" onClick={() => void completeModule()} className="companion-button mt-6"><BilingualLine english={activeModule.action_label} /></button>{plan.modules.some(m => m.module_id === 'calming_audio') && activeModule.module_id !== 'calming_audio' && (<button type="button" onClick={() => { const audioIdx = plan.modules.findIndex(m => m.module_id === 'calming_audio'); if (audioIdx >= 0) { setModuleIndex(audioIdx); void persistProgress(plan, usedModules, 'plan', audioIdx); } }} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-teal-500/70 bg-teal-950/40 px-4 py-3 text-sm font-bold text-teal-200 hover:bg-teal-900/60"><BilingualLine english="Listen now (skip prep)" /></button>)}<button type="button" onClick={() => void skipModule()} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-800 px-4 py-3 text-sm font-bold text-indigo-200"><PauseCircle className="h-4 w-4" /><BilingualLine english={activeModule.skip_label} /></button><button type="button" onClick={stopForTonight} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-900 px-4 py-3 text-sm text-slate-400"><Square className="h-3.5 w-3.5" /><BilingualLine english="I’m done for tonight" /></button><button type="button" onClick={() => setStillAwakePrompt(value => !value)} className="mt-3 w-full text-sm font-bold text-indigo-300 underline underline-offset-4"><BilingualLine english="I’m still awake" /></button>{stillAwakePrompt && <div className="mt-4 space-y-2 rounded-2xl border border-indigo-800/60 p-3"><p className="text-xs text-slate-400"><BilingualLine english="Choose a bounded reset. Starting it will replace this activity." /></p>{tonightOptions.map(([value, label]) => <Choice key={value} onClick={() => void chooseTonight(value, true)}>{label}</Choice>)}</div>}</CompanionShell>;
+  if (stage === 'review' && plan && state) return <CompanionShell onBackToMap={() => setStage('map')}><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300"><BilingualLine english="Night 1 review · optional" /></p><h2 className="mt-2 text-3xl font-black text-white"><BilingualLine english="How did tonight feel?" /></h2>{completionStatus !== 'completed' && <p className="mt-3 rounded-xl border border-indigo-800/60 bg-indigo-950/40 p-3 text-sm leading-6 text-slate-300"><BilingualLine english="You chose to stop before finishing the plan. Nothing is saved as complete until you choose an option below." /></p>}<div className="mt-5 grid grid-cols-3 gap-2">{(['BETTER', 'SAME', 'WORSE'] as const).map(value => <Choice key={value} selected={reviewOverall === value} onClick={() => setReviewOverall(value)}>{value}</Choice>)}</div><div className="mt-7 space-y-4"><h3 className="text-sm font-bold uppercase tracking-[0.16em] text-teal-300"><BilingualLine english="Module feedback" /></h3>{plan.modules.map(module => <div key={module.module_id} className="border-b border-indigo-900/60 pb-3"><p className="text-sm font-bold text-white"><BilingualLine english={module.title} /></p><div className="mt-2 flex gap-2">{(['YES', 'A_LITTLE', 'NO'] as const).map(value => <button key={value} type="button" onClick={() => setHelpfulness(current => ({ ...current, [module.module_id]: value }))} className={`rounded-lg border px-3 py-2 text-xs font-bold ${helpfulness[module.module_id] === value ? 'border-teal-300 bg-teal-300 text-slate-950' : 'border-indigo-800 text-slate-300'}`}>{value === 'A_LITTLE' ? 'A LITTLE' : value}</button>)}</div></div>)}</div><div className="mt-6 grid gap-2"><button type="button" onClick={() => void saveReview()} className="companion-button"><BilingualLine english="Save review" /></button><button type="button" onClick={() => void saveReview('partial')} className="rounded-xl border border-indigo-800 px-4 py-3 text-sm font-bold text-indigo-200"><BilingualLine english="Save and rest" /></button></div><p className="mt-4 text-xs leading-5 text-slate-500"><BilingualLine english="You can leave the review now. It is not a condition for resting." /></p>{error && <p className="mt-4 text-sm text-rose-300"><BilingualLine english={error} /></p>}</CompanionShell>;
   return null;
 }
 
-function SupportNote() { return <p className="mt-5 text-xs leading-5 text-slate-500"><BilingualLine english="If sleep trouble lasts for months, affects daytime life, or comes with loud snoring, pauses, or gasping, consider speaking with a healthcare professional." vietnamese="Nếu khó ngủ kéo dài nhiều tháng, ảnh hưởng ban ngày, hoặc kèm ngủ ngáy, ngừng thở hay ngáp, hãy cân nhắc nói chuyện với nhân viên y tế." /></p>; }
+function SupportNote() { return <p className="mt-5 text-xs leading-5 text-slate-500"><BilingualLine english="If sleep trouble lasts for months, affects daytime life, or comes with loud snoring, pauses, or gasping, consider speaking with a healthcare professional." /></p>; }
 function CompanionShell({ children, onBackToMap }: { children: React.ReactNode; onBackToMap?: () => void }) {
   return (
     <section className="mx-auto my-3 sm:my-4 w-full max-w-xl rounded-2xl border border-teal-900/50 bg-[#0c1222] p-4 sm:p-5 shadow-2xl shadow-indigo-950/30">
@@ -454,7 +444,7 @@ function CompanionShell({ children, onBackToMap }: { children: React.ReactNode; 
             className="flex items-center gap-1 text-[11px] font-semibold text-teal-300 hover:text-teal-200"
           >
             <Map className="h-3 w-3" />
-            <BilingualLine english="Journey Map" vietnamese="Bản đồ 7 đêm" />
+            <BilingualLine english="Journey Map" />
           </button>
         )}
       </div>
@@ -463,4 +453,4 @@ function CompanionShell({ children, onBackToMap }: { children: React.ReactNode; 
   );
 }
 function Field({ label, value, onChange, type = 'time' }: { label: string; value: string; onChange: (value: string) => void; type?: 'time' | 'text' }) { return <label className="block text-sm font-semibold text-slate-200"><BilingualLine english={label} /> <input type={type} value={value} onChange={event => onChange(event.target.value)} className="mt-2 min-h-12 w-full rounded-xl border border-indigo-800 bg-[#080b15] px-4 text-white outline-none focus:border-teal-300" /></label>; }
-function Choice({ children, selected, onClick }: { children: React.ReactNode; selected?: boolean; onClick: () => void }) { const english = typeof children === 'string' ? children : ''; return <button type="button" onClick={onClick} className={`flex min-h-12 w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${selected ? 'border-teal-300 bg-teal-300 text-slate-950' : 'border-indigo-800 bg-indigo-950/40 text-slate-200 hover:border-indigo-500'}`}>{english ? <BilingualLine english={english} vietnamese={viForAction(english) || viForState(english)} /> : children}{selected && <Check className="h-4 w-4 shrink-0" />}</button>; }
+function Choice({ children, selected, onClick }: { children: React.ReactNode; selected?: boolean; onClick: () => void }) { const english = typeof children === 'string' ? children : ''; return <button type="button" onClick={onClick} className={`flex min-h-12 w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${selected ? 'border-teal-300 bg-teal-300 text-slate-950' : 'border-indigo-800 bg-indigo-950/40 text-slate-200 hover:border-indigo-500'}`}>{english ? <BilingualLine english={english} /> : children}{selected && <Check className="h-4 w-4 shrink-0" />}</button>; }

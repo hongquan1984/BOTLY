@@ -770,10 +770,10 @@ export function NightAudioPlayer({
             <div className="flex items-center justify-between gap-2">
               <span className="font-bold text-purple-200 text-[11px] flex items-center gap-1.5">
                 <Sparkles className="h-3 w-3 text-purple-400" />
-                <span>Giọng dẫn (VietVoiceStudio Clone)</span>
+                <span>Guide Voice (VietVoiceStudio Clone)</span>
               </span>
               <span className="text-[10px] text-purple-300 font-medium">
-                {guideVoice === 'female_whisper' ? '🌸 Nữ thì thầm' : '🌿 Nam trầm ấm'}
+                {guideVoice === 'female_whisper' ? '🌸 Female Whisper' : '🌿 Male Calm'}
               </span>
             </div>
 
@@ -792,10 +792,10 @@ export function NightAudioPlayer({
               >
                 <div className="flex items-center gap-1.5 font-bold text-[11px] text-white">
                   <span>🌸</span>
-                  <span>Nữ thì thầm</span>
+                  <span>Female Whisper</span>
                 </div>
                 <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                  Bedtime Whisper · Êm dịu ru ngủ
+                  Bedtime Whisper · Intimate & Soothing
                 </span>
               </button>
 
@@ -813,10 +813,10 @@ export function NightAudioPlayer({
               >
                 <div className="flex items-center gap-1.5 font-bold text-[11px] text-white">
                   <span>🌿</span>
-                  <span>Nam trầm ấm</span>
+                  <span>Male Calm</span>
                 </div>
                 <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                  Calm Meditation · Tĩnh lặng vững chãi
+                  Calm Meditation · Grounded & Serene
                 </span>
               </button>
             </div>
@@ -826,7 +826,7 @@ export function NightAudioPlayer({
           <div className="rounded-lg border border-indigo-900/60 bg-indigo-950/20 p-2 text-xs space-y-1.5">
             <div className="flex items-center justify-between gap-2">
               <span className="font-bold text-indigo-200 text-[11px]">
-                Kỹ thuật thở (Breathing Technique)
+                Breathing Technique
               </span>
               <span className="rounded bg-[#0c1222] px-1.5 py-0.5 text-[10px] font-semibold text-indigo-300 border border-indigo-800">
                 {selectedVoice?.pacer_pattern || '5-5'}
