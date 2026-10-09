@@ -472,7 +472,7 @@ export function NightAudioPlayer({
     else if (nextStage === 'delta_immersion') nextAudio = deltaRef.current;
     else if (nextStage === 'sleep_cocoon') nextAudio = cocoonRef.current;
 
-    if (nextAudio && guidedOn) {
+    if (nextAudio && (guidedOn || nextStage === 'delta_immersion' || nextStage === 'sleep_cocoon')) {
       try {
         await nextAudio.play();
       } catch {
@@ -505,11 +505,17 @@ export function NightAudioPlayer({
     });
 
     try {
-      await Promise.all(elements.map(el => el.play()));
-      isPlayingRef.current = true;
-      setPlaying(true);
-      setDeadline(current => current || (timer === 'until_voice' ? null : Date.now() + Number(timer) * 60_000));
-      accumulatorRef.current?.start();
+      const results = await Promise.allSettled(elements.map(el => el.play()));
+      const anySucceeded = results.some(r => r.status === 'fulfilled');
+      if (anySucceeded) {
+        isPlayingRef.current = true;
+        setPlaying(true);
+        setDeadline(current => current || (timer === 'until_voice' ? null : Date.now() + Number(timer) * 60_000));
+        accumulatorRef.current?.start();
+        setError('');
+      } else {
+        throw new Error('All audio elements failed to start');
+      }
     } catch {
       isPlayingRef.current = false;
       pauseAll();
@@ -545,6 +551,12 @@ export function NightAudioPlayer({
       } else if (playStage === 'sleep_cocoon' && cocoonRef.current) {
         elements.push(cocoonRef.current);
       }
+    } else {
+      if (playStage === 'delta_immersion' && deltaRef.current) {
+        elements.push(deltaRef.current);
+      } else if (playStage === 'sleep_cocoon' && cocoonRef.current) {
+        elements.push(cocoonRef.current);
+      }
     }
 
     selectedBackgrounds.forEach(track => {
@@ -553,11 +565,17 @@ export function NightAudioPlayer({
     });
 
     try {
-      await Promise.all(elements.map(element => element.play()));
-      isPlayingRef.current = true;
-      setPlaying(true);
-      setDeadline(current => current || (timer === 'until_voice' ? null : Date.now() + Number(timer) * 60_000));
-      accumulatorRef.current?.start();
+      const results = await Promise.allSettled(elements.map(element => element.play()));
+      const anySucceeded = results.some(r => r.status === 'fulfilled');
+      if (anySucceeded) {
+        isPlayingRef.current = true;
+        setPlaying(true);
+        setDeadline(current => current || (timer === 'until_voice' ? null : Date.now() + Number(timer) * 60_000));
+        accumulatorRef.current?.start();
+        setError('');
+      } else {
+        throw new Error('All audio elements failed to start');
+      }
     } catch {
       isPlayingRef.current = false;
       pauseAll();
