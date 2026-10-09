@@ -23,7 +23,7 @@ export type NightCompanionState = {
   night_one_plan?: NightPlan;
   module_feedback: ModuleFeedback[];
   review?: NightReview;
-  resume_stage?: 'intro' | 'tonight' | 'plan' | 'resting' | 'review' | 'feedback';
+  resume_stage?: 'intro' | 'tonight' | 'plan' | 'resting' | 'review' | 'feedback' | 'done';
   active_module_index?: number;
   post_listen_feedback?: PostListenFeedback;
   last_session_has_listened?: boolean;

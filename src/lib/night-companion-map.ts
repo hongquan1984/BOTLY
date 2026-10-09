@@ -99,7 +99,7 @@ export function getNightOneCtaInfo(stage?: string, hasReview?: boolean): {
   label_en: string;
   label_vi: string;
 } {
-  if (hasReview || stage === 'done') {
+  if (hasReview || stage === 'done' || stage === 'feedback') {
     return {
       status: 'replay',
       label_en: 'Replay Night 1',

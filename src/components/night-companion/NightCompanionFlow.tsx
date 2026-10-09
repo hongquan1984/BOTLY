@@ -72,8 +72,7 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
         
         let targetResume: 'setup' | 'intro' | 'tonight' | 'plan' | 'feedback' | 'resting' | 'review' | 'done' = 'tonight';
         if (companion.review) targetResume = 'done';
-        else if (companion.resume_stage === 'feedback') targetResume = 'feedback';
-        else if (companion.resume_stage === 'resting') targetResume = 'resting';
+        else if (companion.resume_stage === 'feedback' || companion.resume_stage === 'resting' || companion.resume_stage === 'done') targetResume = 'done';
         else if (companion.resume_stage === 'review') targetResume = 'review';
         else if (companion.resume_stage === 'plan' || companion.night_one_plan) targetResume = 'plan';
         else targetResume = 'tonight';
@@ -226,12 +225,11 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
             onClick={() => {
               if (!profile) {
                 setStage('setup');
-              } else if (reviewSaved || savedResumeStage === 'done') {
-                trackNightFunnel('night_1_replayed', {}, { night_profile_id: profile.profile_id });
-                setStage('tonight');
-              } else if (savedResumeStage && savedResumeStage !== 'setup' && savedResumeStage !== 'intro') {
-                setStage(savedResumeStage);
+              } else if (savedResumeStage === 'plan' && plan) {
+                setStage('plan');
               } else {
+                trackNightFunnel('night_1_replayed', {}, { night_profile_id: profile.profile_id });
+                setSavedResumeStage('tonight');
                 setStage('tonight');
               }
             }}
@@ -350,7 +348,26 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
         <div className="mt-6 space-y-3">
           <button
             type="button"
-            onClick={() => setStage('map')}
+            onClick={async () => {
+              setSavedResumeStage('done');
+              if (profile && state && plan) {
+                await updateNightCompanionProfile({
+                  profile,
+                  tonight_state: { night_number: 1, current_state: state, selected_at: new Date().toISOString() },
+                  night_one_plan: plan,
+                  module_feedback: plan.modules.map(module => ({
+                    module_id: module.module_id,
+                    used: usedModules.includes(module.module_id),
+                    helpfulness: helpfulness[module.module_id] || 'NO',
+                  })),
+                  resume_stage: 'done',
+                  post_listen_feedback: postListenFeedback || undefined,
+                  last_session_has_listened: true,
+                  active_module_index: moduleIndex,
+                }).catch(() => {});
+              }
+              setStage('map');
+            }}
             className="companion-button"
           >
             <BilingualLine english="Rest now & Back to map" />
@@ -366,7 +383,8 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
             type="button"
             onClick={() => {
               const audioIndex = plan?.modules.findIndex(m => m.module_id === 'calming_audio') ?? 0;
-              setModuleIndex(audioIndex);
+              setModuleIndex(audioIndex >= 0 ? audioIndex : 0);
+              setSavedResumeStage('plan');
               setStage('plan');
             }}
             className="w-full rounded-xl border border-indigo-900/80 px-4 py-3 text-sm text-slate-400 hover:text-white"
