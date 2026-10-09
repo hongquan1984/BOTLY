@@ -177,11 +177,13 @@ export const NIGHT_ONE_INTROS: Record<string, NightIntroTrack> = {
   },
 };
 
-export function selectNightOneIntro(state?: TonightStateId): NightIntroTrack {
-  if (state && NIGHT_ONE_INTROS[state]) {
-    return NIGHT_ONE_INTROS[state];
-  }
-  return NIGHT_ONE_INTROS.GENERAL;
+export function selectNightOneIntro(state?: TonightStateId, voicePreference: GuideVoiceOption = 'female_whisper'): NightIntroTrack {
+  const base = (state && NIGHT_ONE_INTROS[state]) ? NIGHT_ONE_INTROS[state] : NIGHT_ONE_INTROS.GENERAL;
+  const suffix = voicePreference === 'male_calm' ? '_male.mp3' : '_female.mp3';
+  return {
+    ...base,
+    local_path: base.local_path.replace('.mp3', suffix),
+  };
 }
 
 export const NIGHT_ONE_AUDIO = {
@@ -318,6 +320,42 @@ export const NIGHT_ONE_VOICES: Record<string, NightVoiceTrack> = {
   },
 };
 
+export type GuideVoiceOption = 'female_whisper' | 'male_calm';
+
+export const GUIDE_VOICE_PROFILES: Record<GuideVoiceOption, {
+  id: GuideVoiceOption;
+  label_en: string;
+  label_vi: string;
+  subtitle_en: string;
+  subtitle_vi: string;
+  engine: string;
+  reference_name: string;
+}> = {
+  female_whisper: {
+    id: 'female_whisper',
+    label_en: 'Female Whisper',
+    label_vi: 'Nữ thì thầm',
+    subtitle_en: 'Bedtime relaxation & gentle intimate pacing',
+    subtitle_vi: 'Thì thầm ru ngủ, nhịp điệu êm dịu chậm rãi',
+    engine: 'VieNeu-TTS Cloned Neural Voice',
+    reference_name: 'Bedtime Relaxation Recording Brief',
+  },
+  male_calm: {
+    id: 'male_calm',
+    label_en: 'Male Calm Meditation',
+    label_vi: 'Nam trầm ấm',
+    subtitle_en: 'Deep grounding tone & meditative cadence',
+    subtitle_vi: 'Trầm ấm tĩnh lặng, nhịp điệu thiền định vững chãi',
+    engine: 'VieNeu-TTS Cloned Neural Voice',
+    reference_name: 'Calm Meditation Reference',
+  },
+};
+
+export function getNightOneVoicePath(voice: NightVoiceTrack, voicePreference: GuideVoiceOption = 'female_whisper'): string {
+  const suffix = voicePreference === 'male_calm' ? '_male.mp3' : '_female.mp3';
+  return voice.local_path.replace('.mp3', suffix);
+}
+
 export function selectNightOneVoiceOptions(state?: TonightStateId) {
   const allVoices = Object.values(NIGHT_ONE_VOICES);
   if (!state) return allVoices;
@@ -384,9 +422,13 @@ export const COGNITIVE_PIVOT_TRACKS: Record<TonightStateId, CognitivePivotTrack>
   },
 };
 
-export function selectCognitivePivotTrack(state?: TonightStateId): CognitivePivotTrack {
-  if (state && COGNITIVE_PIVOT_TRACKS[state]) return COGNITIVE_PIVOT_TRACKS[state];
-  return COGNITIVE_PIVOT_TRACKS.MIND_WONT_STOP;
+export function selectCognitivePivotTrack(state?: TonightStateId, voicePreference: GuideVoiceOption = 'female_whisper'): CognitivePivotTrack {
+  const base = (state && COGNITIVE_PIVOT_TRACKS[state]) ? COGNITIVE_PIVOT_TRACKS[state] : COGNITIVE_PIVOT_TRACKS.MIND_WONT_STOP;
+  const suffix = voicePreference === 'male_calm' ? '_male.mp3' : '_female.mp3';
+  return {
+    ...base,
+    local_path: base.local_path.replace('.mp3', suffix),
+  };
 }
 
 // Stage 4: Deep Delta & Velvet Brown Noise (Min 40 - 55)

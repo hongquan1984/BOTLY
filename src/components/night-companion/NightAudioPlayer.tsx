@@ -17,6 +17,9 @@ import {
 import {
   type NightOneBackgroundPreset,
   type NightScript,
+  type GuideVoiceOption,
+  GUIDE_VOICE_PROFILES,
+  getNightOneVoicePath,
   selectNightOneIntro,
   selectNightOneVoiceOptions,
   selectCognitivePivotTrack,
@@ -342,10 +345,11 @@ export function NightAudioPlayer({
   const isPlayingRef = useRef(false);
   const prevStateRef = useRef(state);
 
-  const introTrack = selectNightOneIntro(state);
+  const [guideVoice, setGuideVoice] = useState<GuideVoiceOption>('female_whisper');
+  const introTrack = selectNightOneIntro(state, guideVoice);
   const fallbackVoices = Object.values(NIGHT_ONE_VOICES);
   const effectiveVoices = voices.length > 0 ? voices : fallbackVoices;
-  const pivotTrack = selectCognitivePivotTrack(state);
+  const pivotTrack = selectCognitivePivotTrack(state, guideVoice);
 
   const [guidedOn, setGuidedOn] = useState(true);
   const [showVisualPacer, setShowVisualPacer] = useState(true);
@@ -368,6 +372,7 @@ export function NightAudioPlayer({
   }, [effectiveVoices, voiceId]);
 
   const selectedVoice = effectiveVoices.find(track => track.asset_id === voiceId) || effectiveVoices[0];
+  const voicePath = selectedVoice ? getNightOneVoicePath(selectedVoice as any, guideVoice) : '';
   const selectedBackgrounds = backgrounds.filter(track => backgroundIds.includes(track.asset_id));
   const hasSelection = (guidedOn && !!selectedVoice) || selectedBackgrounds.length > 0;
 
@@ -760,11 +765,68 @@ export function NightAudioPlayer({
             />
           </div>
 
+          {/* Guide Voice Selector (Cloned from calm_thien) */}
+          <div className="rounded-lg border border-purple-900/60 bg-purple-950/20 p-2 text-xs space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-bold text-purple-200 text-[11px] flex items-center gap-1.5">
+                <Sparkles className="h-3 w-3 text-purple-400" />
+                <span>Giọng dẫn (VietVoiceStudio Clone)</span>
+              </span>
+              <span className="text-[10px] text-purple-300 font-medium">
+                {guideVoice === 'female_whisper' ? '🌸 Nữ thì thầm' : '🌿 Nam trầm ấm'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  pauseAll();
+                  setGuideVoice('female_whisper');
+                }}
+                className={`flex flex-col text-left rounded-lg p-2 border transition ${
+                  guideVoice === 'female_whisper'
+                    ? 'border-purple-400 bg-purple-900/50 text-purple-100 ring-1 ring-purple-400/60 shadow-[0_0_10px_rgba(168,85,247,0.25)]'
+                    : 'border-slate-800 bg-slate-900/40 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <div className="flex items-center gap-1.5 font-bold text-[11px] text-white">
+                  <span>🌸</span>
+                  <span>Nữ thì thầm</span>
+                </div>
+                <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                  Bedtime Whisper · Êm dịu ru ngủ
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  pauseAll();
+                  setGuideVoice('male_calm');
+                }}
+                className={`flex flex-col text-left rounded-lg p-2 border transition ${
+                  guideVoice === 'male_calm'
+                    ? 'border-teal-400 bg-teal-900/50 text-teal-100 ring-1 ring-teal-400/60 shadow-[0_0_10px_rgba(45,212,191,0.25)]'
+                    : 'border-slate-800 bg-slate-900/40 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <div className="flex items-center gap-1.5 font-bold text-[11px] text-white">
+                  <span>🌿</span>
+                  <span>Nam trầm ấm</span>
+                </div>
+                <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                  Calm Meditation · Tĩnh lặng vững chãi
+                </span>
+              </button>
+            </div>
+          </div>
+
           {/* Voice Selector */}
           <div className="rounded-lg border border-indigo-900/60 bg-indigo-950/20 p-2 text-xs space-y-1.5">
             <div className="flex items-center justify-between gap-2">
               <span className="font-bold text-indigo-200 text-[11px]">
-                Breathing Technique & Voice
+                Kỹ thuật thở (Breathing Technique)
               </span>
               <span className="rounded bg-[#0c1222] px-1.5 py-0.5 text-[10px] font-semibold text-indigo-300 border border-indigo-800">
                 {selectedVoice?.pacer_pattern || '5-5'}
@@ -893,7 +955,7 @@ export function NightAudioPlayer({
       {/* Audio tags for the entire 60-minute automated pipeline */}
       <audio
         ref={introRef}
-        key={`intro-${introTrack.asset_id}-${retry}`}
+        key={`intro-${introTrack.asset_id}-${guideVoice}-${retry}`}
         src={introTrack.local_path}
         preload="metadata"
         onEnded={() => void advanceToStage('guided')}
@@ -901,8 +963,8 @@ export function NightAudioPlayer({
       />
       <audio
         ref={voiceRef}
-        key={`voice-${voiceId}-${retry}`}
-        src={selectedVoice?.local_path}
+        key={`voice-${voiceId}-${guideVoice}-${retry}`}
+        src={voicePath}
         preload="metadata"
         loop={false}
         onEnded={() => void advanceToStage('theta_drift')}
@@ -919,7 +981,7 @@ export function NightAudioPlayer({
       />
       <audio
         ref={pivotRef}
-        key={`pivot-${pivotTrack.asset_id}-${retry}`}
+        key={`pivot-${pivotTrack.asset_id}-${guideVoice}-${retry}`}
         src={pivotTrack.local_path}
         preload="metadata"
         loop={false}
