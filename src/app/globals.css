@@ -34,9 +34,9 @@ html {
     scroll-behavior: auto;
   }
 
-  *,
-  *::before,
-  *::after {
+  *:not([data-aura-anim]):not([data-aura-anim] *),
+  *:not([data-aura-anim])::before,
+  *:not([data-aura-anim])::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -223,3 +223,101 @@ select option {
 .story-box{display:grid;grid-template-columns:4.3rem 1fr auto;align-items:center;gap:1rem;border:1px solid rgba(24,48,43,.1);border-radius:1.5rem;background:white;padding:.8rem;transition:.2s ease}.story-box:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(24,48,43,.07)}.story-number{display:grid;height:4.3rem;place-items:center;overflow:hidden;border-radius:1rem;font-size:.75rem;font-weight:800}.story-number img{width:100%;height:100%;object-fit:contain}.story-box span{font-size:.58rem;font-weight:850;letter-spacing:.15em;color:#74867e}.story-box h3{margin-top:.3rem;font-size:.9rem;font-weight:650;line-height:1.35}.story-box>svg{width:1rem;height:1rem;margin-right:.4rem}
 @media(max-width:1023px){.portal-home-card{min-height:28rem}.portal-mascot{height:25rem}.featured-tool>img{opacity:.35;width:50%}.featured-tool>div{max-width:75%}}
 @media(max-width:639px){.section-row{align-items:start;flex-direction:column}.portal-home-card{min-height:27rem}.portal-mascot{height:22rem}.portal-mascot span{right:4%;top:4%}.featured-tool{min-height:27rem}.featured-tool>img{right:-8%;width:70%;height:75%;opacity:.32}.featured-tool>div{max-width:100%}.story-box{grid-template-columns:3.7rem 1fr auto}.story-number{height:3.7rem}.py-18{padding-top:3.5rem;padding-bottom:3.5rem}}
+
+/* Night Companion Atmospheric Aura & Orb Animations */
+@keyframes auraOrbFloat {
+  0% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+    box-shadow: 0 0 35px rgba(20, 184, 166, 0.25), inset 0 0 20px rgba(20, 184, 166, 0.15);
+  }
+  33% {
+    transform: translate(5px, -6px) scale(1.05) rotate(1.5deg);
+    box-shadow: 0 0 50px rgba(20, 184, 166, 0.4), 0 0 30px rgba(168, 85, 247, 0.25), inset 0 0 25px rgba(20, 184, 166, 0.25);
+  }
+  66% {
+    transform: translate(-5px, 4px) scale(0.97) rotate(-1.5deg);
+    box-shadow: 0 0 40px rgba(147, 51, 234, 0.35), 0 0 20px rgba(45, 212, 191, 0.2), inset 0 0 20px rgba(147, 51, 234, 0.2);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+    box-shadow: 0 0 35px rgba(20, 184, 166, 0.25), inset 0 0 20px rgba(20, 184, 166, 0.15);
+  }
+}
+
+@keyframes auraMistCore {
+  0% {
+    transform: scale(0.94) translate(0, 0);
+    opacity: 0.45;
+    filter: blur(14px);
+  }
+  50% {
+    transform: scale(1.12) translate(3px, -4px);
+    opacity: 0.75;
+    filter: blur(18px);
+  }
+  100% {
+    transform: scale(0.94) translate(0, 0);
+    opacity: 0.45;
+    filter: blur(14px);
+  }
+}
+
+@keyframes auraMistTeal {
+  0% { transform: translate(0%, 0%) scale(1); opacity: 0.26; }
+  50% { transform: translate(6%, -4%) scale(1.08); opacity: 0.42; }
+  100% { transform: translate(0%, 0%) scale(1); opacity: 0.26; }
+}
+
+@keyframes auraMistViolet {
+  0% { transform: translate(0%, 0%) scale(1); opacity: 0.22; }
+  50% { transform: translate(-6%, 5%) scale(1.1); opacity: 0.38; }
+  100% { transform: translate(0%, 0%) scale(1); opacity: 0.22; }
+}
+
+@keyframes auraMistCenter {
+  0% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.22; }
+  50% { transform: translate(-48%, -52%) scale(1.06); opacity: 0.36; }
+  100% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.22; }
+}
+
+.aura-anim-orb {
+  animation-name: auraOrbFloat !important;
+  animation-duration: 9s !important;
+  animation-iteration-count: infinite !important;
+  animation-timing-function: ease-in-out !important;
+  animation-direction: alternate !important;
+}
+
+.aura-anim-core {
+  animation-name: auraMistCore !important;
+  animation-duration: 8s !important;
+  animation-iteration-count: infinite !important;
+  animation-timing-function: ease-in-out !important;
+  animation-direction: alternate !important;
+}
+
+.aura-anim-teal {
+  animation-name: auraMistTeal !important;
+  animation-duration: 13s !important;
+  animation-iteration-count: infinite !important;
+  animation-timing-function: ease-in-out !important;
+  animation-direction: alternate !important;
+}
+
+.aura-anim-violet {
+  animation-name: auraMistViolet !important;
+  animation-duration: 15s !important;
+  animation-iteration-count: infinite !important;
+  animation-timing-function: ease-in-out !important;
+  animation-direction: alternate !important;
+}
+
+.aura-anim-center {
+  animation-name: auraMistCenter !important;
+  animation-duration: 11s !important;
+  animation-iteration-count: infinite !important;
+  animation-timing-function: ease-in-out !important;
+  animation-direction: alternate !important;
+}
+
+

@@ -288,13 +288,45 @@ export async function processInsomniaQuizAnalytics(url: string, serviceKey: stri
     ]);
 
     const rawEvents: InsomniaQuizEvent[] = eventsRes.ok ? await eventsRes.json() : [];
-    // Strictly filter out test traffic (localhost, admin visits, dev/test sessions)
-    const events: InsomniaQuizEvent[] = rawEvents.filter(e => {
+
+    // Collect all visitor IDs that belong to admin, test scripts, or internal development
+    const internalVisitorIds = new Set<string>([
+      'v_13a690ff3d534f9eb8d1e392c3bd9e40', // Admin test visitor
+      'v_c1ef96811dc243b5befd4cc5389d3d6c', // CDP Agent test visitor
+    ]);
+    const testProfileIds = new Set<string>([
+      'test-seed-profile-prod',
+      '6ab4030b-ce93-4d4f-9287-e07736ae51a3', // Admin local test profile
+    ]);
+
+    rawEvents.forEach(e => {
       const ref = String(e.referrer || '');
       const path = String(e.path || '');
       const meta = (e.metadata || {}) as Record<string, unknown>;
+      const pId = String(meta.night_profile_id || '');
+      const vid = String(e.visitor_id || '');
+      if (
+        ref.includes('localhost') || ref.includes('127.0.0.1') ||
+        path.startsWith('/admin') || path.startsWith('/thong-ke') || path.startsWith('/thongke') ||
+        meta.is_test === true || meta.is_dev === true || meta.exclude_tracking === true ||
+        testProfileIds.has(pId) || pId.startsWith('test-') || pId.includes('seed-')
+      ) {
+        if (vid) internalVisitorIds.add(vid);
+        if (pId) testProfileIds.add(pId);
+      }
+    });
+
+    // Strictly filter out test traffic (admin visits, dev/test sessions, agent automation)
+    const events: InsomniaQuizEvent[] = rawEvents.filter(e => {
+      const vid = String(e.visitor_id || '');
+      if (vid && internalVisitorIds.has(vid)) return false;
+      const ref = String(e.referrer || '');
+      const path = String(e.path || '');
+      const meta = (e.metadata || {}) as Record<string, unknown>;
+      const pId = String(meta.night_profile_id || '');
+      if (testProfileIds.has(pId) || pId.startsWith('test-') || pId.includes('seed-')) return false;
       if (ref.includes('localhost') || ref.includes('127.0.0.1')) return false;
-      if (path.includes('/admin') || path.includes('/thong-ke') || path.includes('/thongke')) return false;
+      if (path.startsWith('/admin') || path.startsWith('/thong-ke') || path.startsWith('/thongke')) return false;
       if (meta.is_test === true || meta.is_dev === true || meta.exclude_tracking === true) return false;
       return true;
     });

@@ -79,7 +79,13 @@ export function trackClientEvent(
   }
 
   const path = window.location.pathname;
-  if (path.startsWith('/admin') || path.startsWith('/thong-ke') || path.startsWith('/thongke')) return;
+  if (path.startsWith('/admin') || path.startsWith('/thong-ke') || path.startsWith('/thongke')) {
+    try {
+      localStorage.setItem('botly_exclude_tracking', 'true');
+      document.cookie = 'botly_exclude_tracking=true; path=/; max-age=31536000; SameSite=Lax';
+    } catch {}
+    return;
+  }
 
   const userAgent = navigator.userAgent;
   const isMobile = /mobile|android|iphone|ipad|ipod/i.test(userAgent);

@@ -130,9 +130,19 @@ export async function processNightCompanionFunnel(url: string, serviceKey: strin
 
   for (const ev of rawEvents) {
     const meta = ev.metadata || {};
+    const vid = typeof ev.visitor_id === 'string' ? ev.visitor_id : '';
+    const pId = typeof meta.night_profile_id === 'string' ? meta.night_profile_id : '';
     const isTest = Boolean(
       meta.is_test ||
-      (typeof ev.visitor_id === 'string' && ev.visitor_id.startsWith('test_')) ||
+      meta.is_dev ||
+      meta.exclude_tracking ||
+      vid.startsWith('test_') ||
+      vid === 'v_13a690ff3d534f9eb8d1e392c3bd9e40' ||
+      vid === 'v_c1ef96811dc243b5befd4cc5389d3d6c' ||
+      pId === 'test-seed-profile-prod' ||
+      pId === '6ab4030b-ce93-4d4f-9287-e07736ae51a3' ||
+      pId.startsWith('test-') ||
+      pId.includes('seed-') ||
       (typeof meta.email === 'string' && meta.email.includes('test'))
     );
 

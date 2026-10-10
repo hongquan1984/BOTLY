@@ -48,12 +48,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, ignored: true });
     }
 
-    // Ignore explicit test or dev flags
+    // Ignore explicit test or dev flags, test profiles, or admin devices
     if (typeof metadata === 'object' && metadata !== null) {
       const meta = metadata as Record<string, unknown>;
-      if (meta.is_test === true || meta.is_dev === true || meta.exclude_tracking === true) {
+      const pId = String(meta.night_profile_id || '');
+      if (
+        meta.is_test === true ||
+        meta.is_dev === true ||
+        meta.exclude_tracking === true ||
+        pId === 'test-seed-profile-prod' ||
+        pId.startsWith('test-') ||
+        pId.includes('seed-')
+      ) {
         return NextResponse.json({ ok: true, ignored: true });
       }
+    }
+
+    const cookieHeader = request.headers.get('cookie') || '';
+    if (cookieHeader.includes('botly_exclude_tracking=true')) {
+      return NextResponse.json({ ok: true, ignored: true });
+    }
+
+    if (
+      visitor_id === 'v_13a690ff3d534f9eb8d1e392c3bd9e40' ||
+      visitor_id === 'v_c1ef96811dc243b5befd4cc5389d3d6c'
+    ) {
+      return NextResponse.json({ ok: true, ignored: true });
     }
 
     const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL)?.replace(/\/$/, '');

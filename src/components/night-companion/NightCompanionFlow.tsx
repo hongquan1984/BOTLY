@@ -396,7 +396,48 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
     );
   }
 
-  if (stage === 'resting') return <CompanionShell onBackToMap={() => setStage('map')}><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300">Night 1</p><h2 className="mt-2 text-3xl font-black text-white"><BilingualLine english="You can put the phone down now." /></h2><p className="mt-3 text-base leading-7 text-slate-200"><BilingualLine english="The activity is finished. Rest in whatever way feels comfortable. Come back for the review when you are ready." /></p><button type="button" onClick={() => setStage('feedback')} className="companion-button mt-7"><BilingualLine english="How was the listening experience?" /></button><button type="button" onClick={stopForTonight} className="mt-3 w-full rounded-xl border border-indigo-800 px-4 py-3 text-sm font-bold text-indigo-200"><BilingualLine english="I’m still awake" /></button></CompanionShell>;
+  if (stage === 'resting') return (
+    <CompanionShell onBackToMap={() => setStage('map')}>
+      <div className="space-y-4 text-center py-2">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-teal-500/30 bg-teal-950/40 text-teal-300">
+          <Moon className="h-7 w-7 text-teal-300" />
+        </div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-300">Night 1 · Gentle Rest</p>
+        <h2 className="text-2xl sm:text-3xl font-black text-white">
+          <BilingualLine english="You can put the phone down now." />
+        </h2>
+        <p className="text-sm leading-6 text-slate-300">
+          <BilingualLine english="The journey has gently faded to silence. Close your eyes, let your breathing stay soft, and rest comfortably until morning." />
+        </p>
+        <div className="pt-3 space-y-2">
+          <button
+            type="button"
+            onClick={() => {
+              setSavedResumeStage('done');
+              setStage('map');
+            }}
+            className="companion-button"
+          >
+            <BilingualLine english="Close & Sleep" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setStage('feedback')}
+            className="w-full rounded-xl border border-indigo-900/80 px-4 py-2.5 text-xs text-slate-400 hover:text-white"
+          >
+            <BilingualLine english="Leave a reflection now (optional)" />
+          </button>
+          <button
+            type="button"
+            onClick={stopForTonight}
+            className="w-full pt-1 text-xs font-semibold text-indigo-300/80 hover:text-indigo-200"
+          >
+            <BilingualLine english="I’m still awake" />
+          </button>
+        </div>
+      </div>
+    </CompanionShell>
+  );
   
   if (stage === 'plan' && activeModule?.module_id === 'calming_audio') {
     return (
@@ -414,8 +455,8 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
               track('audio_completed', profile, state, 'calming_audio');
               const nextUsed = usedModules.includes('calming_audio') ? usedModules : [...usedModules, 'calming_audio'];
               setUsedModules(nextUsed);
-              setSavedResumeStage('feedback');
-              setStage('feedback');
+              setSavedResumeStage('resting');
+              setStage('resting');
               await updateNightCompanionProfile({
                 profile,
                 tonight_state: { night_number: 1, current_state: state, selected_at: new Date().toISOString() },
@@ -425,12 +466,12 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
                   used: nextUsed.includes(module.module_id),
                   helpfulness: helpfulness[module.module_id] || 'NO',
                 })),
-                resume_stage: 'feedback',
+                resume_stage: 'resting',
                 last_session_has_listened: true,
                 active_module_index: moduleIndex,
               }).catch(() => setError('Progress updated locally.'));
             } else {
-              setStage('feedback');
+              setStage('resting');
             }
           }}
           onBackToMap={() => setStage('map')}
