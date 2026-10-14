@@ -21,23 +21,36 @@
     const res = await send('Runtime.evaluate', {
       expression: `
         (async () => {
-          const results = [];
-          for (const a of Array.from(document.querySelectorAll('audio'))) {
+          const delta = document.querySelector('audio[src*="delta"]');
+          const cocoon = document.querySelector('audio[src*="cocoon"]');
+          const pacer = document.querySelector('audio[src*="pacers"]');
+          const bg = document.querySelector('audio[src*="music"]');
+          
+          const testEl = async (name, el) => {
+            if (!el) return { name, exists: false };
             try {
-              await a.play();
-              results.push({ src: a.src, status: 'ok' });
-              a.pause();
+              el.volume = 0.5;
+              await el.play();
+              const playing = !el.paused;
+              el.pause();
+              return { name, exists: true, src: el.src, playing, duration: el.duration, error: el.error };
             } catch (err) {
-              results.push({ src: a.src, status: 'error', errorName: err.name, errorMessage: err.message });
+              return { name, exists: true, src: el.src, errorName: err.name, errorMsg: err.message };
             }
-          }
-          return JSON.stringify(results);
+          };
+
+          return {
+            delta: await testEl('delta', delta),
+            cocoon: await testEl('cocoon', cocoon),
+            pacer: await testEl('pacer', pacer),
+            bg: await testEl('bg', bg)
+          };
         })()
       `,
-      awaitPromise: true
+      awaitPromise: true,
+      returnByValue: true
     });
-    console.log('INDIVIDUAL AUDIO TEST:');
-    console.log(JSON.parse(res.result.value));
+    console.log('Results:', JSON.stringify(res.result.value, null, 2));
     ws.close();
     process.exit(0);
   });

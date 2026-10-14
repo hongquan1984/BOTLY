@@ -23,7 +23,7 @@ import { Container } from "@/components/shared/Container";
 import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Chính Sách & Quyền Riêng Tư | Botly",
+  title: "Chính Sách & Quyền Riêng Tư",
   description:
     "Chính sách bảo mật và quyền riêng tư của Botly (botly.vn). Cam kết bảo vệ dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP và tiêu chuẩn bảo mật quốc tế.",
   alternates: {

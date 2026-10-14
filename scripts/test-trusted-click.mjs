@@ -1,72 +1,76 @@
-(async () => {
-  const versionRes = await fetch('http://127.0.0.1:9222/json/list');
-  const tabs = await versionRes.json();
-  const pageTab = tabs.find(t => t.type === 'page');
-  const ws = new WebSocket(pageTab.webSocketDebuggerUrl);
-  let id = 1;
-  const send = (method, params = {}) => new Promise((resolve) => {
-    const msgId = id++;
-    const handler = (event) => {
-      const msg = JSON.parse(event.data);
-      if (msg.id === msgId) {
-        ws.removeEventListener('message', handler);
-        resolve(msg.result);
+import http from 'http';
+
+function sendCommand(ws, method, params = {}) {
+  return new Promise((resolve, reject) => {
+    const id = Math.floor(Math.random() * 1000000);
+    const handler = (msg) => {
+      try {
+        const data = JSON.parse(msg.data);
+        if (data.id === id) {
+          ws.removeEventListener('message', handler);
+          if (data.error) reject(data.error);
+          else resolve(data.result);
+        }
+      } catch (e) {
+        reject(e);
       }
     };
     ws.addEventListener('message', handler);
-    ws.send(JSON.stringify({ id: msgId, method, params }));
+    ws.send(JSON.stringify({ id, method, params }));
   });
+}
 
-  ws.addEventListener('open', async () => {
-    // Find coordinates of "Start 60-min sleep journey" button
-    const box = await send('Runtime.evaluate', {
-      expression: `(() => {
-        const btn = Array.from(document.querySelectorAll("button")).find(b => b.innerText.includes("Start 60-min"));
-        if (!btn) return null;
-        const rect = btn.getBoundingClientRect();
-        return JSON.stringify({ x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 });
-      })()`
-    });
-    const coords = JSON.parse(box.result.value);
-    console.log('Button coordinates:', coords);
+http.get('http://127.0.0.1:9222/json', async (res) => {
+  let raw = '';
+  res.on('data', chunk => raw += chunk);
+  res.on('end', async () => {
+    const list = JSON.parse(raw);
+    const target = list.find(t => t.url && t.url.includes('night-companion'));
+    const ws = new WebSocket(target.webSocketDebuggerUrl);
+    ws.onopen = async () => {
+      try {
+        // Find play button coordinates
+        const rect = await sendCommand(ws, 'Runtime.evaluate', {
+          expression: `(() => {
+            const btn = Array.from(document.querySelectorAll('button')).find(b =>
+              b.textContent.includes('Start') && b.textContent.includes('Sleep Journey')
+            );
+            if (!btn) return null;
+            const r = btn.getBoundingClientRect();
+            return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+          })()`,
+          returnByValue: true
+        });
+        console.log('Button pos:', rect.result.value);
 
-    // Dispatch real trusted mouse click via CDP
-    await send('Input.dispatchMouseEvent', {
-      type: 'mousePressed',
-      x: coords.x,
-      y: coords.y,
-      button: 'left',
-      clickCount: 1
-    });
-    await send('Input.dispatchMouseEvent', {
-      type: 'mouseReleased',
-      x: coords.x,
-      y: coords.y,
-      button: 'left',
-      clickCount: 1
-    });
+        if (rect.result.value) {
+          const { x, y } = rect.result.value;
+          await sendCommand(ws, 'Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
+          await sendCommand(ws, 'Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 });
+          await new Promise(r => setTimeout(r, 1000));
 
-    await new Promise(r => setTimeout(r, 2000));
-
-    // Check playback status now
-    const status = await send('Runtime.evaluate', {
-      expression: `JSON.stringify(Array.from(document.querySelectorAll("audio")).map(a => ({
-        src: a.src,
-        paused: a.paused,
-        currentTime: a.currentTime
-      })))`
-    });
-    console.log('PLAYBACK STATUS AFTER TRUSTED CLICK:');
-    const tracks = JSON.parse(status.result.value);
-    tracks.forEach(t => console.log(' -', t.src, '| Paused:', t.paused, '| CurrentTime:', t.currentTime));
-
-    // Capture running screenshot
-    const fs = await import('fs');
-    const ss = await send('Page.captureScreenshot', { format: 'png' });
-    fs.writeFileSync('C:/Users/Admin/.gemini/antigravity/brain/ea2d8329-b86f-4322-b31d-14baa377dafb/night-companion-audit/player-actively-playing-cloned.png', Buffer.from(ss.data, 'base64'));
-    console.log('Saved player-actively-playing-cloned.png!');
-
-    ws.close();
-    process.exit(0);
+          const status = await sendCommand(ws, 'Runtime.evaluate', {
+            expression: `(() => {
+              const orb = document.querySelector('.aura-anim-orb');
+              const playBtn = Array.from(document.querySelectorAll('button')).find(b =>
+                b.textContent.includes('Start') || b.textContent.includes('Pause')
+              );
+              const errP = document.querySelector('p.text-rose-200');
+              return {
+                playBtnText: playBtn ? playBtn.textContent.trim() : null,
+                error: errP ? errP.textContent.trim() : null,
+                orbPlayState: orb ? window.getComputedStyle(orb).animationPlayState : null
+              };
+            })()`,
+            returnByValue: true
+          });
+          console.log('Status after trusted click:', status.result.value);
+        }
+        ws.close();
+      } catch (err) {
+        console.error(err);
+        ws.close();
+      }
+    };
   });
-})();
+});
