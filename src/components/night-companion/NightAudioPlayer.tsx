@@ -462,15 +462,15 @@ export function NightAudioPlayer({
       if (isPlayingRef.current && stageStartedAtRef.current) {
         const stageElapsedSec = (Date.now() - stageStartedAtRef.current) / 1000;
 
-        // Stage 2 (432Hz Theta Drift): Runs for ~19 minutes (1140s) before moving to Stage 3
-        if (playStage === 'theta_drift' && stageElapsedSec >= 19 * 60) {
+        // Stage 2 (432Hz Theta Drift): Runs for 18 minutes (1080s) before moving to Stage 3 (7m + 18m = 25m)
+        if (playStage === 'theta_drift' && stageElapsedSec >= 18 * 60) {
           void advanceToStage('cognitive_pivot');
         }
-        // Stage 3 (Cognitive Pivot): Runs for ~15 minutes (900s) before moving to Stage 4
+        // Stage 3 (Cognitive Pivot): Runs for ~15 minutes (900s) before moving to Stage 4 (25m + 15m = 40m)
         else if (playStage === 'cognitive_pivot' && stageElapsedSec >= 15 * 60) {
           void advanceToStage('delta_immersion');
         }
-        // Stage 4 (1.8Hz Deep Delta): Runs for ~15 minutes (900s) before moving to Stage 5
+        // Stage 4 (1.8Hz Deep Delta): Runs for ~15 minutes (900s) before moving to Stage 5 (40m + 15m = 55m)
         else if (playStage === 'delta_immersion' && stageElapsedSec >= 15 * 60) {
           void advanceToStage('sleep_cocoon');
         }
@@ -638,11 +638,11 @@ export function NightAudioPlayer({
           {/* Gentle Flow Stages (Informative display only - non-clickable to protect uninterrupted sleep progression) */}
           <div className="grid grid-cols-5 gap-1 text-[9px] font-semibold text-center select-none" aria-label="Sleep journey timeline">
             {[
-              { id: 'intro', label: '1. Breath', active: playStage === 'intro' || playStage === 'guided', color: 'teal', hint: 'Khởi đầu & thở' },
-              { id: 'theta_drift', label: '2. 432Hz', active: playStage === 'theta_drift', color: 'amber', hint: 'Sóng 432Hz hạ áp' },
-              { id: 'cognitive_pivot', label: '3. Whisper', active: playStage === 'cognitive_pivot', color: 'purple', hint: 'Thì thầm buông thư' },
-              { id: 'delta_immersion', label: '4. Delta', active: playStage === 'delta_immersion', color: 'blue', hint: 'Sóng Delta 1.8Hz' },
-              { id: 'sleep_cocoon', label: '5. Cocoon', active: playStage === 'sleep_cocoon', color: 'teal', hint: 'Kén ngủ êm dịu' },
+              { id: 'intro', label: '1. Hypnosis', active: playStage === 'intro' || playStage === 'guided', color: 'teal', hint: 'Thôi miên 7 phút' },
+              { id: 'theta_drift', label: '2. 432Hz', active: playStage === 'theta_drift', color: 'amber', hint: 'Sóng 432Hz hạ áp (18 phút)' },
+              { id: 'cognitive_pivot', label: '3. Whisper', active: playStage === 'cognitive_pivot', color: 'purple', hint: 'Thì thầm buông thư (phút 25)' },
+              { id: 'delta_immersion', label: '4. Delta', active: playStage === 'delta_immersion', color: 'blue', hint: 'Sóng Delta 1.8Hz (phút 40)' },
+              { id: 'sleep_cocoon', label: '5. Cocoon', active: playStage === 'sleep_cocoon', color: 'teal', hint: 'Kén ngủ êm dịu (phút 55)' },
             ].map(step => (
               <div
                 key={step.id}
@@ -797,10 +797,10 @@ export function NightAudioPlayer({
               <div className="rounded-lg border border-indigo-900/60 bg-indigo-950/20 p-2 text-xs space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-bold text-indigo-200 text-[11px]">
-                    Breathing Technique
+                    Guided Practice & Voice
                   </span>
                   <span className="rounded bg-[#0c1222] px-1.5 py-0.5 text-[10px] font-semibold text-indigo-300 border border-indigo-800">
-                    {selectedVoice?.pacer_pattern || '5-5'}
+                    {selectedVoice?.pacer_pattern || '7-Min Hypnosis'}
                   </span>
                 </div>
                 <select

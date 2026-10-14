@@ -249,7 +249,7 @@ export interface NightVoiceTrack {
   asset_id: string;
   local_path: string;
   pacer_path: string;
-  pacer_pattern: '5-5' | '4-7-8' | '4-4-4-4' | '4-2-6';
+  pacer_pattern: '5-5' | '4-7-8' | '4-4-4-4' | '4-2-6' | '7-Min Hypnosis';
   pacer_title_en: string;
   pacer_title_vi: string;
   label: string;
@@ -266,12 +266,12 @@ export const NIGHT_ONE_VOICES: Record<string, NightVoiceTrack> = {
     asset_id: 'night1-guided-coherent-5-5',
     local_path: '/audio/night-companion/voice/guided-coherent-5-5.mp3',
     pacer_path: '/audio/night-companion/pacer/pacer-chime-coherent-5-5.mp3',
-    pacer_pattern: '5-5',
-    pacer_title_en: '432Hz Sleep Frequency & 5s In · 5s Out Gentle Waves (Soft volume)',
-    pacer_title_vi: 'Nhạc tần số 432Hz ru ngủ & Sóng thở 5s Hít · 5s Thở (Âm lượng nhỏ dịu)',
-    label: 'Coherent breathing 5–5',
-    label_vi: 'Thở nhịp đều 5–5 (Khuyên dùng)',
-    duration_seconds: 181.348,
+    pacer_pattern: '7-Min Hypnosis',
+    pacer_title_en: '7-Min Clinical Sleep Hypnosis & 432Hz Ambient Waves',
+    pacer_title_vi: 'Thôi miên giấc ngủ 7 phút & Sóng 432Hz',
+    label: 'Clinical sleep hypnosis (7 min)',
+    label_vi: 'Thôi miên giấc ngủ 7 phút (Khuyên dùng)',
+    duration_seconds: 420.0,
     kind: 'voice',
     recommended: true,
     suitable_states: ['MIND_WONT_STOP', 'SLEEP_ANXIETY', 'WOKE_UP', 'STRESS_CARRYOVER', 'NOT_SLEEPY'],
@@ -465,25 +465,25 @@ export const SLEEP_JOURNEY_STAGES: SleepJourneyStageInfo[] = [
     id: 'intro',
     stageNumber: 1,
     timeRange: '0:00 - 0:20',
-    name_en: 'State Intro',
+    name_en: 'Sanctuary Arrival',
     description_en: 'Personalized arrival and phone-down orientation',
     scienceNote_en: 'Initial boundary setting to break daytime momentum',
   },
   {
     id: 'guided',
     stageNumber: 1,
-    timeRange: '0:20 - 6:00',
-    name_en: 'Guided Breathing',
-    description_en: 'Paced somatic downshift with real-time breathing visualizer',
-    scienceNote_en: 'Vagal nerve stimulation; shifts autonomic nervous system to parasympathetic',
+    timeRange: '0:20 - 7:00',
+    name_en: 'Sleep Hypnosis & Downshift',
+    description_en: '7-Min Ericksonian hypnosis: somatic release, 5-stage descent & dissolution',
+    scienceNote_en: 'Neuromuscular release and sensory disengagement from the Default Mode Network',
   },
   {
     id: 'theta_drift',
     stageNumber: 2,
-    timeRange: '6:00 - 25:00',
-    name_en: '432Hz Theta Drift',
-    description_en: 'Harmonic 432Hz chimes and theta wave soundscape',
-    scienceNote_en: 'Encourages transition from Alpha (8-12Hz) to Theta (4-7Hz) hypnagogic state',
+    timeRange: '7:00 - 25:00',
+    name_en: '432Hz Harmonic Drift',
+    description_en: '18 minutes of pure uninterrupted 432Hz theta waves and ambient soundscape',
+    scienceNote_en: 'Encourages physiological transition from Alpha (8-12Hz) to Theta (4-7Hz) hypnagogic state',
   },
   {
     id: 'cognitive_pivot',
@@ -491,7 +491,7 @@ export const SLEEP_JOURNEY_STAGES: SleepJourneyStageInfo[] = [
     timeRange: '25:00 - 40:00',
     name_en: 'Cognitive Pivot',
     description_en: 'Whisper Cognitive Shuffle or Paradoxical Intention',
-    scienceNote_en: 'Breaks the 30-min sleep-effort crisis and dissolves analytical loops',
+    scienceNote_en: 'Breaks the 25-min sleep-effort crisis and dissolves analytical loops',
   },
   {
     id: 'delta_immersion',

@@ -233,7 +233,7 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
                     {a.takeaway && <div className="takeaway"><span>{vi ? 'Ý chính' : 'The takeaway'}</span><p>{a.takeaway}</p></div>}
 
                     {a.sections.map((section, i) => <section key={i}><h2>{section.title}</h2>
-                      {section.paragraphs.map((p, j) => <p key={j}>{p}</p>)}
+                      {section.paragraphs.map((p, j) => <p key={j} dangerouslySetInnerHTML={{ __html: p }} />)}
                       {section.image_url && (
                         <figure className="my-6 overflow-hidden rounded-2xl border border-stone-150 shadow-sm bg-stone-50">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -274,7 +274,7 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
                         loading="eager"
                         referrerPolicy="no-referrer"
                         onError={(e) => {
-                          e.currentTarget.src = '/ebooks/antioxidants/tomato-olive-oil-hero.png';
+                          e.currentTarget.src = 'https://rswmadukvegraxfcdbcb.supabase.co/storage/v1/object/public/articles/the-midnight-math-trap-why-checking-time-hurts-sleep/cover.jpg';
                         }}
                       />
                       {a.cover_image_alt && (
@@ -312,7 +312,7 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
                 )}
 
                 {a.sections.map((section, i) => <section key={i}><h2>{section.title}</h2>
-                  {section.paragraphs.map((p, j) => <p key={j}>{p}</p>)}
+                  {section.paragraphs.map((p, j) => <p key={j} dangerouslySetInnerHTML={{ __html: p }} />)}
                   {section.image_url && (
                     <figure className="my-6 overflow-hidden rounded-2xl border border-stone-150 shadow-sm bg-stone-50">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -346,6 +346,15 @@ export function PublishedArticlePage({ article: a, translationPath, relatedArtic
                 ) : null}
               </>
             )}
+
+            {/* High-Converting Sleep Quiz CTA Banner */}
+            <div className="my-10 rounded-2xl bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 p-6 text-white text-center shadow-xl border border-indigo-500/30">
+              <h3 className="text-xl font-bold text-white mb-2">{vi ? 'Xác Định Căn Nguyên Mất Ngủ Của Bạn' : 'Identify Your Nocturnal Arousal Profile'}</h3>
+              <p className="text-indigo-200 text-sm mb-5 max-w-xl mx-auto">{vi ? 'Làm bài trắc nghiệm 60 giây để khám phá phác đồ phục hồi thể cảm cá nhân hóa dành riêng cho bạn.' : 'Take our free 2-minute clinical assessment to uncover your root cause and receive a personalized bedtime somatic reset.'}</p>
+              <a href="/quiz-insomnia" className="inline-block rounded-xl bg-amber-400 hover:bg-amber-300 text-indigo-950 font-bold px-8 py-3.5 text-sm transition-all shadow-lg hover:scale-105">
+                {vi ? 'Làm Trắc Nghiệm Giấc Ngủ Miễn Phí (60s) →' : 'Take the Free 2-Minute Sleep Quiz →'}
+              </a>
+            </div>
 
             {a.sources.length > 0 && <section className="sources"><h2>{vi ? 'Nguồn tham khảo' : 'Sources'}</h2>
               {a.sources.map((s, i) => <a key={i} href={s.url} target="_blank" rel="noopener noreferrer">{s.label} ↗</a>)}

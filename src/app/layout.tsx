@@ -28,6 +28,7 @@ export const metadata: Metadata = {
     other: {
       "google-site-verification": "fgxRfdqGUzMGmQFxW1WEhlBOLYyUFZanclS2lVBY1VI",
       "mylead-verification": "4d9b36e2182769ce219a6ab4f8104424",
+      "p:domain_verify": "cd2f4da29b085d23bfb6559f67379b64",
     },
   },
   title: {
