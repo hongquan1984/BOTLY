@@ -45,7 +45,12 @@ export function WellnessShell({ locale, children }: { locale: WellnessLocale; ch
           <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#d9f99d]">Explore</p><div className="mt-4 flex flex-col gap-2">{copy.nav.map(([label, href]) => <Link key={href} href={href} className="text-sm text-white/70 hover:text-white">{label}</Link>)}</div></div>
           <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#d9f99d]">Botly</p><Link href={copy.businessHref} className="mt-4 flex items-center gap-2 text-sm text-white/70 hover:text-white">{copy.businessLabel}<ArrowRight className="h-4 w-4" /></Link></div>
         </div>
-        <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3 border-t border-white/10 px-5 py-5 text-xs text-white/45 lg:px-8"><span>© {new Date().getFullYear()} Botly</span><span>Privacy · Editorial policy · Terms</span></div>
+        <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3 border-t border-white/10 px-5 py-5 text-xs text-white/45 lg:px-8">
+          <span>© {new Date().getFullYear()} Botly</span>
+          <span>
+            <Link href="/chinh-sach-quyen-rieng-tu" className="hover:text-white transition">Privacy</Link> · Editorial policy · Terms
+          </span>
+        </div>
       </footer>
     </div>
   );

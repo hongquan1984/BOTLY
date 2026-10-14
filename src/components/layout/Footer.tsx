@@ -22,7 +22,7 @@ const resourceLinks = [
 const companyLinks = [
   { label: "Giới thiệu", href: "#why-us" },
   { label: "Liên hệ", href: "#contact" },
-  { label: "Chính sách bảo mật", href: "#contact" },
+  { label: "Chính sách & Quyền riêng tư", href: "/chinh-sach-quyen-rieng-tu" },
   { label: "Điều khoản sử dụng", href: "#contact" },
 ];
 
