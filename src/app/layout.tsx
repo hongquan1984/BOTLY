@@ -5,7 +5,6 @@ import { siteConfig } from "@/data/site";
 import { JsonLd } from "@/components/sections/JsonLd";
 import { ToastProvider } from "@/components/layout/ToastProvider";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
-import { MonetagInPagePush } from "@/components/monetag/MonetagInPagePush";
 import { LocaleHtmlLang } from "@/components/seo/LocaleHtmlLang";
 import "./globals.css";
 
@@ -95,7 +94,6 @@ export default async function RootLayout({
         <LocaleHtmlLang />
         <JsonLd />
         <AnalyticsTracker />
-        <MonetagInPagePush />
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
