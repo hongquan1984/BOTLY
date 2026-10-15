@@ -368,6 +368,25 @@ export function NightAudioPlayer({
         setError(`Could not transition smoothly to ${nextStage}.`);
       }
     }
+
+    // At minute 7:00 when entering Stage 2 (theta_drift), smoothly fade in background ambience (ocean waves/rain)
+    if (nextStage === 'theta_drift') {
+      selectedBackgrounds.forEach(track => {
+        const audio = backgroundRefs.current[track.asset_id];
+        if (audio) {
+          audio.volume = 0;
+          audio.play().catch(() => {});
+          const startVolTime = Date.now();
+          const fadeDuration = 10_000;
+          const bgFadeTimer = window.setInterval(() => {
+            const elapsed = Date.now() - startVolTime;
+            const progress = Math.min(1, elapsed / fadeDuration);
+            audio.volume = backgroundVolume * progress;
+            if (progress >= 1) window.clearInterval(bgFadeTimer);
+          }, 200);
+        }
+      });
+    }
   };
 
 
@@ -411,17 +430,21 @@ export function NightAudioPlayer({
       }
     }
 
-    selectedBackgrounds.forEach(track => {
-      const audio = backgroundRefs.current[track.asset_id];
-      if (audio) elements.push(audio);
-    });
+    // Only play background sounds (ocean waves/rain) if NOT in the opening 7-minute hypnosis stage
+    const isOpeningHypnosis = guidedOn && (playStage === 'intro' || playStage === 'guided');
+    if (!isOpeningHypnosis) {
+      selectedBackgrounds.forEach(track => {
+        const audio = backgroundRefs.current[track.asset_id];
+        if (audio) elements.push(audio);
+      });
+    }
 
     // Reset volume levels
     [introRef, voiceRef, pacerRef, pivotRef, deltaRef, cocoonRef].forEach(ref => {
       if (ref.current) ref.current.volume = voiceVolume;
     });
     Object.values(backgroundRefs.current).forEach(audio => {
-      if (audio) audio.volume = backgroundVolume;
+      if (audio) audio.volume = isOpeningHypnosis ? 0 : backgroundVolume;
     });
 
     try {
@@ -485,10 +508,11 @@ export function NightAudioPlayer({
     [introRef, voiceRef, pacerRef, pivotRef, deltaRef, cocoonRef].forEach(ref => {
       if (ref.current) ref.current.volume = voiceVolume;
     });
+    const isOpeningHypnosis = guidedOn && (playStage === 'intro' || playStage === 'guided');
     Object.values(backgroundRefs.current).forEach(audio => {
-      if (audio) audio.volume = backgroundVolume;
+      if (audio) audio.volume = isOpeningHypnosis ? 0 : backgroundVolume;
     });
-  }, [voiceVolume, backgroundVolume, retry, selectedVoice?.asset_id, backgroundIds, deadline]);
+  }, [voiceVolume, backgroundVolume, retry, selectedVoice?.asset_id, backgroundIds, deadline, guidedOn, playStage]);
 
   // Ultra-gentle 90-second fade out to silence before deadline
   useEffect(() => {
