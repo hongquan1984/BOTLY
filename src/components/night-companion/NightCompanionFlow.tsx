@@ -12,7 +12,7 @@ import { clearNightCompanionSetupDraft, clearNightCompanionToken, createNightCom
 import { BilingualLine, viForAction, viForModule, viForState } from '@/lib/night-companion-i18n';
 import { createNightProfile, normalizeNightCompanionState, selectNightOnePlan, selectStillAwakePlan, type CompletionStatus, type Helpfulness, type LastHourBehavior, type NightCompanionState, type NightPlan, type NightProfile, type NightReview, type PostListenFeedback, type SleepDoesntCome, type TonightStateId } from '@/lib/night-companion';
 
-type Props = { result?: NightPatternResult; onStarted?: () => void };
+type Props = { result?: NightPatternResult; onStarted?: () => void; autoStartAudio?: boolean };
 const lastHourOptions: Array<[LastHourBehavior, string]> = [['scrolling', 'Scrolling or watching videos'], ['checking_work', 'Checking messages or work'], ['unfinished_thoughts', 'Thinking about unfinished things'], ['relaxing', 'Reading or doing something relaxing'], ['inconsistent_routine', "I don't have a consistent routine"], ['other', 'Other']];
 const tonightOptions: Array<[TonightStateId, string]> = [['MIND_WONT_STOP', "My mind won't stop"], ['SLEEP_ANXIETY', "I'm anxious about sleep"], ['NOT_SLEEPY', "I'm tired but not sleepy"], ['WOKE_UP', 'I woke up again'], ['STRESS_CARRYOVER', "I'm still carrying stress from today"]];
 const quietActivityOptions = ['Read something easy', 'Sit somewhere comfortable', 'Listen to quiet music'];
@@ -24,7 +24,7 @@ function metadata(profile?: NightProfile, state?: TonightStateId, moduleId?: str
 }
 function track(event: string, profile?: NightProfile, state?: TonightStateId, moduleId?: string) { trackClientEvent(event, { locale: 'en', metadata: metadata(profile, state, moduleId) }); }
 
-export function NightCompanionFlow({ result, onStarted }: Props) {
+export function NightCompanionFlow({ result, onStarted, autoStartAudio = false }: Props) {
   const [stage, setStage] = useState<'map' | 'intro' | 'setup' | 'loading' | 'tonight' | 'plan' | 'feedback' | 'resting' | 'review' | 'done'>('loading');
   const [savedResumeStage, setSavedResumeStage] = useState<'setup' | 'intro' | 'tonight' | 'plan' | 'feedback' | 'resting' | 'review' | 'done'>('setup');
   const [postListenFeedback, setPostListenFeedback] = useState<PostListenFeedback | ''>('');
@@ -63,13 +63,30 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
         const companion = normalizeNightCompanionState(saved.profile);
         if (!companion) throw new Error('Your saved Night Profile could not be read. Please retry.');
         setProfile(companion.profile);
-        if (companion.tonight_state) setState(companion.tonight_state.current_state);
-        if (companion.night_one_plan) setPlan(companion.night_one_plan);
+        const resolvedState = companion.tonight_state?.current_state || (
+          result?.primary_pattern === 'RACING_MIND' ? 'MIND_WONT_STOP' :
+          result?.primary_pattern === 'SLEEP_ANXIETY' ? 'SLEEP_ANXIETY' :
+          result?.primary_pattern === 'NIGHT_WAKING' ? 'WOKE_UP' :
+          'MIND_WONT_STOP'
+        );
+        setState(resolvedState);
+        const resolvedPlan = companion.night_one_plan || selectNightOnePlan(companion.profile, { night_number: 1, current_state: resolvedState, selected_at: new Date().toISOString() });
+        setPlan(resolvedPlan);
+        const audioIdx = resolvedPlan.modules.findIndex(m => m.module_id === 'calming_audio');
         if (companion.active_module_index !== undefined) setModuleIndex(companion.active_module_index);
         if (companion.review) { setCompletionStatus(companion.review.completion_status); setReviewSaved(true); }
         if (companion.module_feedback) { setUsedModules(companion.module_feedback.filter(item => item.used).map(item => item.module_id)); setHelpfulness(Object.fromEntries(companion.module_feedback.map(item => [item.module_id, item.helpfulness]))); }
         if (companion.post_listen_feedback) setPostListenFeedback(companion.post_listen_feedback);
-        
+
+        if (autoStartAudio) {
+          setModuleIndex(audioIdx >= 0 ? audioIdx : 0);
+          setSavedResumeStage('plan');
+          trackNightFunnel('night_1_started', { night_number: 1, quick_start: true }, { night_profile_id: companion.profile.profile_id });
+          onStarted?.();
+          setStage('plan');
+          return;
+        }
+
         let targetResume: 'setup' | 'intro' | 'tonight' | 'plan' | 'feedback' | 'resting' | 'review' | 'done' = 'tonight';
         if (companion.review) targetResume = 'done';
         else if (companion.resume_stage === 'feedback' || companion.resume_stage === 'resting' || companion.resume_stage === 'done') targetResume = 'done';
@@ -82,6 +99,52 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
         setStage('map');
         return;
       }
+
+      // If no saved profile but autoStartAudio is requested with result
+      if (autoStartAudio && result) {
+        const effectiveTonightState: TonightStateId = 
+          result.primary_pattern === 'RACING_MIND' ? 'MIND_WONT_STOP' :
+          result.primary_pattern === 'SLEEP_ANXIETY' ? 'SLEEP_ANXIETY' :
+          result.primary_pattern === 'NIGHT_WAKING' ? 'WOKE_UP' :
+          'MIND_WONT_STOP';
+
+        const setup = {
+          desired_bedtime: '23:00',
+          usual_wake_time: '07:00',
+          last_hour_behaviors: ['unfinished_thoughts'] as LastHourBehavior[],
+          sleep_doesnt_come: 'thoughts_busier' as SleepDoesntCome,
+        };
+        const provisional = createNightProfile('quick-' + Date.now().toString(36), result, setup);
+        const tonightState = { night_number: 1 as const, current_state: effectiveTonightState, selected_at: new Date().toISOString() };
+        const quickPlan = selectNightOnePlan(provisional, tonightState);
+        const audioIdx = quickPlan.modules.findIndex(m => m.module_id === 'calming_audio');
+
+        setProfile(provisional);
+        setState(effectiveTonightState);
+        setPlan(quickPlan);
+        setModuleIndex(audioIdx >= 0 ? audioIdx : 0);
+        setSavedResumeStage('plan');
+        setStage('plan');
+
+        void createNightCompanionProfile({
+          profile: provisional,
+          tonight_state: tonightState,
+          night_one_plan: quickPlan,
+          module_feedback: [],
+          resume_stage: 'plan',
+          active_module_index: audioIdx >= 0 ? audioIdx : 0,
+        }).then(created => {
+          if (!cancelled && created?.profile_id) {
+            setProfile(p => p ? { ...p, profile_id: created.profile_id } : null);
+          }
+        }).catch(() => {});
+
+        track('night_profile_created', provisional);
+        trackNightFunnel('night_1_started', { night_number: 1, quick_start: true }, { night_profile_id: provisional.profile_id });
+        onStarted?.();
+        return;
+      }
+
       const draft = readNightCompanionSetupDraft();
       if (draft) { setSetupStep(draft.setupStep); setDesiredBedtime(draft.desiredBedtime); setUsualWakeTime(draft.usualWakeTime); setLastHour(draft.lastHour as LastHourBehavior[]); setSleepDoesntCome(draft.sleepDoesntCome as SleepDoesntCome); }
       setSavedResumeStage('setup');
@@ -92,7 +155,7 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
     };
     void run();
     return () => { cancelled = true; };
-  }, [result, restoreAttempt]);
+  }, [result, restoreAttempt, autoStartAudio]);
 
   useEffect(() => {
     if (stage !== 'setup' || isSaving) return;
@@ -224,7 +287,29 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
             type="button"
             onClick={() => {
               if (!profile) {
-                setStage('setup');
+                const effectiveResult = result || buildNightPatternResult({ gender: '', ageGroup: '', issues: [], frequency: '', duration: '', sleepHours: '', bedtimeTension: '', racingThoughts: '', sleepSupport: '', concerns: [], primaryGoal: '' }, '');
+                const setup = { desired_bedtime: '23:00', usual_wake_time: '07:00', last_hour_behaviors: ['unfinished_thoughts'] as LastHourBehavior[], sleep_doesnt_come: 'thoughts_busier' as SleepDoesntCome };
+                const provisional = createNightProfile('quick-' + Date.now().toString(36), effectiveResult, setup);
+                const tonightState = { night_number: 1 as const, current_state: 'MIND_WONT_STOP' as const, selected_at: new Date().toISOString() };
+                const quickPlan = selectNightOnePlan(provisional, tonightState);
+                const audioIdx = quickPlan.modules.findIndex(m => m.module_id === 'calming_audio');
+                setProfile(provisional);
+                setState('MIND_WONT_STOP');
+                setPlan(quickPlan);
+                setModuleIndex(audioIdx >= 0 ? audioIdx : 0);
+                setSavedResumeStage('plan');
+                setStage('plan');
+                void createNightCompanionProfile({
+                  profile: provisional,
+                  tonight_state: tonightState,
+                  night_one_plan: quickPlan,
+                  module_feedback: [],
+                  resume_stage: 'plan',
+                  active_module_index: audioIdx >= 0 ? audioIdx : 0,
+                }).catch(() => {});
+                track('night_profile_created', provisional);
+                trackNightFunnel('night_1_started', { night_number: 1, quick_start: true }, { night_profile_id: provisional.profile_id });
+                onStarted?.();
               } else if (savedResumeStage === 'plan' && plan) {
                 setStage('plan');
               } else {
@@ -235,8 +320,17 @@ export function NightCompanionFlow({ result, onStarted }: Props) {
             }}
             className="companion-button mt-4"
           >
-            <BilingualLine english="Prepare for tonight" />
+            <BilingualLine english="Start Night 1 Audio Now (Free)" vietnamese="Bắt đầu nghe Đêm 1 ngay (Miễn phí)" />
           </button>
+          {!profile && (
+            <button
+              type="button"
+              onClick={() => setStage('setup')}
+              className="mt-2.5 w-full text-center text-xs font-semibold text-indigo-300 underline underline-offset-4 hover:text-white"
+            >
+              <BilingualLine english="Or customize sleep schedule first" vietnamese="Hoặc tùy chỉnh lịch ngủ & thói quen trước" />
+            </button>
+          )}
 
           <p className="text-center text-xs text-slate-400">
             <BilingualLine

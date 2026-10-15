@@ -269,7 +269,7 @@ export function InsomniaQuizFunnel() {
         )}
         {showNightCompanion && (
           <div id="night-companion-beta">
-            <NightCompanionFlow result={result} />
+            <NightCompanionFlow result={result} autoStartAudio={true} />
           </div>
         )}
       </>

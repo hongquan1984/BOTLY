@@ -7,12 +7,14 @@ import {
   ChevronUp,
   Eye,
   EyeOff,
+  Info,
   MoonStar,
   Pause,
   Play,
   SlidersHorizontal,
   Sparkles,
   Square,
+  X,
 } from 'lucide-react';
 import {
   type NightOneBackgroundPreset,
@@ -230,6 +232,18 @@ export function NightAudioPlayer({
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
+
+  const [isFacebookApp, setIsFacebookApp] = useState(false);
+  const [hideInAppNotice, setHideInAppNotice] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const ua = navigator.userAgent || navigator.vendor || '';
+      if (/FBAN|FBAV|Instagram|FB_IAB|FBSS/i.test(ua)) {
+        setIsFacebookApp(true);
+      }
+    }
+  }, []);
 
   // Keep voiceId valid when effectiveVoices loads or changes
   useEffect(() => {
@@ -604,6 +618,26 @@ export function NightAudioPlayer({
               Tap to wake
             </span>
           </div>
+        </div>
+      )}
+
+      {isFacebookApp && !hideInAppNotice && (
+        <div className="mb-3 rounded-xl border border-sky-500/40 bg-sky-950/50 p-2.5 text-xs text-sky-200 flex items-start gap-2.5 shadow-md">
+          <Info className="h-4 w-4 text-sky-400 shrink-0 mt-0.5" />
+          <div className="flex-1 text-[11px] leading-relaxed">
+            <span className="font-semibold text-white">Mẹo nghe khi tắt màn hình:</span>{' '}
+            <span className="text-slate-300">
+              Bạn đang mở trong ứng dụng Facebook. Hãy bấm biểu tượng <strong className="text-white">•••</strong> ở góc trên và chọn <strong className="text-white">"Mở bằng trình duyệt ngoài"</strong> (Safari / Chrome) để âm thanh không bị ngắt khi khóa máy.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setHideInAppNotice(true)}
+            className="text-slate-400 hover:text-white p-0.5"
+            aria-label="Đóng thông báo"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
         </div>
       )}
 
