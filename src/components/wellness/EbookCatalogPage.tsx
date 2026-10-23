@@ -3,269 +3,91 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  BookOpen,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  Download,
-  FileText,
-  Filter,
-  Microscope,
-  ShieldCheck,
-  Sparkles,
-  Zap,
-} from "lucide-react";
+import { BookOpen, CheckCircle2, ExternalLink, Search, Sparkles } from "lucide-react";
 import type { WellnessLocale } from "@/data/wellness";
-import { wellnessEbooks, type WellnessEbook } from "@/data/wellness-ebooks";
-import { trackWellness } from "@/lib/wellness-analytics";
+import { wellnessEbooks } from "@/data/wellness-ebooks";
+import type { PublicEbook } from "@/lib/ebook-catalog";
 import { WellnessShell } from "./WellnessShell";
 import { EbookLeadCapture } from "./EbookLeadCapture";
 
-export function EbookCatalogPage({ locale }: { locale: WellnessLocale }) {
-  const vi = locale === "vi";
-  const base = vi ? "/vi/song-khoe" : "/en/wellness";
-  const [activeFilter, setActiveFilter] = useState<string>("all");
+const categoryLabels: Record<string, string> = {
+  'food-wellness':'Food & Wellness','healthy-drinks':'Healthy Drinks','wellness-history':'Wellness History',
+  'herbal-traditions':'Herbal Traditions','botanical-reference':'Botanical Reference','heritage-cooking':'Heritage Cooking',
+  'herbal-reference':'Herbal Reference','nutrition':'Nutrition','herbal-tea':'Herbal Tea',
+  'tea-preparation':'Tea Preparation','resource-collection':'Resource Collection',
+  'healthy-recipes':'Healthy Recipes','sleep-support':'Sleep Support','natural-remedies':'Traditional Wellness',
+};
 
-  const filteredEbooks = wellnessEbooks.filter((b) => {
-    if (activeFilter === "all") return true;
-    if (activeFilter === "available") return b.status === "available";
-    if (activeFilter === "blood-sugar") return b.id === "blood-sugar";
-    if (activeFilter === "antioxidants") return b.id === "antioxidants";
-    if (activeFilter === "weight") return b.id === "weight-management";
-    if (activeFilter === "sleep") return b.id === "better-sleep";
-    if (activeFilter === "gout") return b.id === "gout-support";
-    if (activeFilter === "liver") return b.id === "liver-health";
-    return true;
+export function EbookCatalogPage({ locale, ebooks = [] }: { locale: WellnessLocale; ebooks?: PublicEbook[] }) {
+  const [category, setCategory] = useState("All guides");
+  const [search, setSearch] = useState("");
+  const library = ebooks.length ? ebooks.map((ebook) => ({
+    id: ebook.id, slug: ebook.slug, titleEn: ebook.public_display_title, subtitleEn: ebook.public_subtitle,
+    categoryEn: categoryLabels[ebook.category_id] || ebook.category_id.replaceAll('-', ' '), descriptionEn: ebook.summary_short || ebook.summary_long,
+    coverImage: ebook.cover_image_url || '/ebooks/covers/vol3-weight-management.png',
+    status: 'available' as const, pdfUrl: ebook.downloadable_file_url || undefined,
+    sourceUrl: undefined, featured: ebook.featured,
+  })) : wellnessEbooks.map((ebook) => ({
+    id: ebook.id, slug: ebook.slugEn, titleEn: ebook.titleEn, subtitleEn: ebook.subtitleEn,
+    categoryEn: ebook.id === 'better-sleep' ? 'Sleep Support' : ['blood-sugar', 'antioxidants', 'weight-management'].includes(ebook.id) ? 'Healthy Recipes' : 'Traditional Wellness',
+    descriptionEn: ebook.descriptionEn, coverImage: ebook.coverImage, status: ebook.status,
+    pdfUrl: ['blood-sugar', 'antioxidants', 'liver-health'].includes(ebook.id) ? ebook.pdfUrl : undefined,
+    sourceUrl: undefined, featured: ebook.id === 'blood-sugar' || ebook.id === 'antioxidants',
+  }));
+  const categories = ['All guides', ...Array.from(new Set(library.map(ebook => ebook.categoryEn)))];
+  const visible = library.filter((ebook) => {
+    const term = search.trim().toLowerCase();
+    const matchesSearch = !term || `${ebook.titleEn} ${ebook.subtitleEn} ${ebook.categoryEn} ${ebook.descriptionEn}`.toLowerCase().includes(term);
+    const matchesCategory = category === "All guides" || category === ebook.categoryEn;
+    return matchesSearch && matchesCategory;
   });
 
-  return (
-    <WellnessShell locale={locale}>
-      <main className="bg-[#f7faf6] min-h-screen">
-        {/* Top Breadcrumb */}
-        <div className="mx-auto max-w-7xl px-5 pt-8 lg:px-8">
-          <Link
-            href={`${base}/health-tips`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#526b62] hover:text-[#18302b] transition"
-          >
-            <span>← {vi ? "Chuyên mục Mẹo Sức Khỏe (Health Tips)" : "Health Tips Portal"}</span>
-          </Link>
+  return <WellnessShell locale={locale}>
+    <main className="min-h-screen bg-[#f7faf6] text-[#18302b]">
+      <section className="relative overflow-hidden border-b border-[#d8e4d8] bg-gradient-to-br from-[#eaf4e9] via-[#f7faf6] to-[#f7f2e6]">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[1.2fr_.8fr] lg:px-8 lg:py-24">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-700/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-widest text-emerald-900"><Sparkles className="h-4 w-4"/> BOTLY WELLNESS EBOOK LIBRARY</div>
+            <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight tracking-tight sm:text-6xl">Small, thoughtful guides for everyday wellness</h1>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#526b62] sm:text-lg">Explore practical food, drink and wellbeing guides, created to make good information easier to use. Verified ebooks can be downloaded after email capture; other resources open at their original source.</p>
+            <div className="mt-7 flex flex-wrap gap-3 text-sm font-semibold text-[#526b62]"><span className="rounded-full bg-white/80 px-4 py-2">Carefully curated</span><span className="rounded-full bg-white/80 px-4 py-2">Email delivery</span><span className="rounded-full bg-white/80 px-4 py-2">English editions</span></div>
+          </div>
+          <div className="hidden justify-self-end rounded-[2rem] border border-white/80 bg-white/60 p-4 shadow-xl sm:block">
+            <Image src="/ebooks/blood-sugar/lentils-rice-hero.png" alt="A colorful, balanced meal with lentils and rice" width={440} height={340} className="h-[300px] w-[400px] rounded-[1.5rem] object-cover" priority />
+            <div className="px-2 pb-1 pt-4"><p className="text-xs font-bold uppercase tracking-widest text-emerald-800">Featured collection</p><p className="mt-1 text-xl font-extrabold">Everyday food pairings</p></div>
+          </div>
         </div>
+      </section>
 
-        {/* Hero Section & Topic-Based Ebook Hub */}
-        <section className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
-          <div className="max-w-4xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-600/25 bg-emerald-50 px-3.5 py-1 text-xs font-extrabold uppercase tracking-wider text-emerald-900 shadow-sm">
-              <Sparkles className="h-3.5 w-3.5 text-emerald-600 animate-pulse" />
-              <span>HEALTHCLUES · TOPIC-BASED EVIDENCE EBOOKS</span>
-            </div>
-
-            <h1 className="mt-4 text-3xl font-black tracking-tight text-[#18302b] sm:text-5xl lg:text-[3.25rem] leading-[1.1]">
-              {vi ? "Toàn Bộ Cẩm Nang Dinh Dưỡng Theo Chủ Đề" : "The Complete Topic-Based Evidence Handbooks"}
-            </h1>
-
-            <p className="mt-4 text-base sm:text-lg text-[#4e665d] leading-relaxed">
-              {vi
-                ? "Bộ cẩm nang y sinh định dạng PDF in ấn chuẩn quốc tế (100% English Evidence Edition) có thể tải về miễn phí. Được phân loại độc lập theo từng mục tiêu sức khỏe: Đường huyết, Chống oxy hóa, Cân nặng, Giấc ngủ, Axit Uric và Lá gan."
-                : "Comprehensive clinical handbooks in high-resolution printable PDF format. Grounded strictly in human randomized crossover trials and categorized by clinical health goals: Blood Sugar, Antioxidants, Satiety, Sleep, Uric Acid, and Hepatic Longevity."}
-            </p>
-
-            {/* Quick Metrics */}
-            <div className="mt-6 flex flex-wrap gap-5 text-xs font-bold text-[#526b62]">
-              <div className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-800 text-[11px]">✓</span>
-                <span>{vi ? "6 Tập Cẩm Nang Theo Chủ Đề" : "6 Topic-Based Master Volumes"}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-800 text-[11px]">✓</span>
-                <span>{vi ? "Đối chiếu thử nghiệm lâm sàng PubMed" : "PubMed Clinical RCTs"}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-800 text-[11px]">✓</span>
-                <span>{vi ? "Tải miễn phí 1-Click PDF" : "Instant 1-Click PDF Download"}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Topic Filter Pills */}
-          <div className="mt-10 flex flex-wrap items-center gap-2 pt-6 border-t border-[#d8e4d8]">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 mr-2 flex items-center gap-1.5">
-              <Filter className="h-3.5 w-3.5" />
-              {vi ? "Chủ đề:" : "Health Goal:"}
-            </span>
-            {[
-              { id: "all", labelEn: "All Topics (6 Volumes)", labelVi: "Tất cả chủ đề (6 Tập)" },
-              { id: "blood-sugar", labelEn: "Blood Sugar (Vol.01)", labelVi: "Đường Huyết (Tập 1)" },
-              { id: "antioxidants", labelEn: "Antioxidants (Vol.02)", labelVi: "Chống Oxy Hóa (Tập 2)" },
-              { id: "weight", labelEn: "Satiety & Weight (Vol.03)", labelVi: "Cân Nặng & No Lâu (Tập 3)" },
-              { id: "sleep", labelEn: "Sleep & Circadian (Vol.04)", labelVi: "Giấc Ngủ (Tập 4)" },
-              { id: "gout", labelEn: "Uric Acid & Gout (Vol.05)", labelVi: "Axit Uric (Tập 5)" },
-              { id: "liver", labelEn: "Liver & Vascular (Vol.06)", labelVi: "Lá Gan (Tập 6)" },
-            ].map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => setActiveFilter(f.id)}
-                className={`rounded-full px-4 py-2 text-xs font-bold transition cursor-pointer ${
-                  activeFilter === f.id
-                    ? "bg-[#18302b] text-white shadow-sm"
-                    : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-100"
-                }`}
-              >
-                {vi ? f.labelVi : f.labelEn}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Ebooks Grid */}
-        <section className="mx-auto max-w-7xl px-5 pb-20 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filteredEbooks.map((b) => {
-              const isAvailable = b.status === "available";
-              const title = vi ? b.titleVi : b.titleEn;
-              const subtitle = vi ? b.subtitleVi : b.subtitleEn;
-              const desc = vi ? b.descriptionVi : b.descriptionEn;
-              const pairings = vi ? b.featuredPairingsVi : b.featuredPairingsEn;
-              const ebookPageHref = isAvailable
-                ? (b.id === "blood-sugar"
-                    ? (vi ? "/vi/song-khoe/ebooks/duong-huyet" : "/en/wellness/ebooks/blood-sugar-pairings")
-                    : (b.id === "antioxidants"
-                        ? (vi ? "/vi/song-khoe/ebooks/chat-chong-oxy-hoa" : "/en/wellness/ebooks/antioxidants")
-                        : (b.pdfUrl || "#")))
-                : "#";
-
-              return (
-                <div
-                  key={b.id}
-                  className="flex flex-col justify-between rounded-3xl border border-[#d6e3d6] bg-white p-6 shadow-sm transition hover:shadow-xl hover:border-emerald-500"
-                >
-                  <div>
-                    {/* Top Tag & Volume */}
-                    <div className="flex items-center justify-between gap-2 mb-4">
-                      <span className="text-[11px] font-extrabold uppercase tracking-widest text-emerald-800">
-                        {b.volume} · {vi ? b.categoryVi : b.categoryEn}
-                      </span>
-                      {isAvailable ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-900">
-                          <CheckCircle2 className="h-3 w-3 text-emerald-600" />
-                          <span>{vi ? "PDF Đã Có Sẵn" : "Master PDF Ready"}</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-900">
-                          <Clock className="h-3 w-3 text-amber-600" />
-                          <span>{vi ? "Đang nghiên cứu" : "In Progress"}</span>
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Image Preview Box */}
-                    <div className="relative h-48 w-full overflow-hidden rounded-2xl bg-slate-100 mb-5 border border-slate-150">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={b.coverImage}
-                        alt={title}
-                        className="h-full w-full object-cover transition duration-500 hover:scale-105"
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.src = "/ebooks/blood-sugar/lentils-rice-hero.png";
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs font-bold">
-                        <span>{b.pages} {vi ? "Trang PDF" : "Pages Handbook"}</span>
-                        <span>{b.citationsCount} {vi ? "Nguồn PubMed" : "PubMed Citations"}</span>
-                      </div>
-                    </div>
-
-                    {/* Title & Description */}
-                    <h3 className="text-xl font-black text-[#18302b] leading-snug">
-                      {title}
-                    </h3>
-                    <p className="mt-1 text-xs font-bold text-emerald-800">
-                      {subtitle}
-                    </p>
-                    <p className="mt-3 text-xs sm:text-sm text-[#4e665d] leading-relaxed line-clamp-3">
-                      {desc}
-                    </p>
-
-                    {/* Featured Pairings Chips */}
-                    <div className="mt-4 pt-3 border-t border-slate-100">
-                      <span className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-2">
-                        {vi ? "Các cặp thực phẩm y sinh trong tập này:" : "Tested Pairings in this Volume:"}
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {pairings.map((p) => (
-                          <span
-                            key={p}
-                            className="rounded-full bg-[#f2f6f2] px-2.5 py-1 text-[11px] font-semibold text-slate-700"
-                          >
-                            {p}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="mt-6 pt-4 border-t border-slate-100">
-                    {isAvailable ? (
-                      <div className="space-y-2">
-                        {b.pdfUrl && (
-                          <a
-                            href={b.pdfUrl}
-                            download
-                            onClick={() => {
-                              trackWellness("ebook_download", {
-                                ebook: b.id,
-                                method: "direct",
-                                source: "catalog_card",
-                                locale,
-                              });
-                            }}
-                            className="w-full inline-flex justify-center items-center gap-2 rounded-2xl bg-[#18302b] px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-[#25483a] transition cursor-pointer"
-                          >
-                            <Download className="h-4 w-4 text-amber-300" />
-                            <span>{vi ? `Tải Trọn Bộ PDF (${b.volume})` : `Download Full Master PDF (${b.volume})`}</span>
-                          </a>
-                        )}
-                        {(b.id === "blood-sugar" || b.id === "antioxidants") && (
-                          <Link
-                            href={ebookPageHref}
-                            className="w-full inline-flex justify-center items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold text-slate-700 hover:bg-slate-50 transition"
-                          >
-                            <BookOpen className="h-3.5 w-3.5 text-emerald-700" />
-                            <span>{vi ? "Xem bài đọc trực tuyến" : "Read Online Edition"}</span>
-                            <ChevronRight className="h-3.5 w-3.5" />
-                          </Link>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="rounded-2xl bg-amber-50/80 p-3 border border-amber-200/60 text-center">
-                        <p className="text-[11px] font-semibold text-amber-900">
-                          {vi ? "Đang tổng hợp dữ liệu nghiên cứu đối chứng." : "Human trials & evidence synthesis in progress."}
-                        </p>
-                        <span className="block mt-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">
-                          {vi ? "Dự kiến phát hành trong đợt tiếp theo" : "Scheduled in Next Evidence Batch"}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+      <section className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
+        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div><p className="text-xs font-bold uppercase tracking-widest text-emerald-800">Explore the library</p><h2 className="mt-2 text-2xl font-extrabold sm:text-3xl">Guides for your everyday</h2></div>
+          <label className="flex w-full items-center gap-3 rounded-2xl border border-[#d6e3d6] bg-white px-4 py-3 md:max-w-sm"><Search className="h-4 w-4 shrink-0 text-emerald-800"/><span className="sr-only">Search ebooks</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search guides and topics" className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400" /></label>
+        </div>
+        <div className="mt-6 flex gap-2 overflow-x-auto pb-2" role="group" aria-label="Filter ebooks by category">
+          {categories.map((item) => <button key={item} onClick={() => setCategory(item)} aria-pressed={category === item} className={`shrink-0 rounded-full px-4 py-2.5 text-sm font-semibold transition ${category === item ? "bg-[#18302b] text-white" : "border border-[#d6e3d6] bg-white text-[#526b62] hover:border-emerald-700"}`}>{item}</button>)}
+        </div>
+        <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {visible.map((ebook) => {
+            const href = ebook.id === "blood-sugar" ? "/en/wellness/ebooks/blood-sugar-pairings" : ebook.id === "antioxidants" ? "/en/wellness/ebooks/antioxidants" : ebooks.length && ebook.slug ? `/en/wellness/ebooks/${ebook.slug}` : null;
+            return <article key={ebook.id} className="flex flex-col overflow-hidden rounded-3xl border border-[#d6e3d6] bg-white shadow-sm transition-shadow duration-200 hover:shadow-lg">
+              <div className="relative h-56 bg-[#eaf2e8]"><Image src={ebook.coverImage} alt={ebook.titleEn} fill sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" className="object-contain p-3"/><span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-bold capitalize text-emerald-900">{ebook.categoryEn}</span>{ebook.pdfUrl && <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-[#18302b] px-3 py-1.5 text-[11px] font-bold text-white"><CheckCircle2 className="h-3.5 w-3.5"/> Free download</span>}</div>
+              <div className="flex flex-1 flex-col p-6">
+                <h3 className="text-xl font-extrabold leading-snug">{ebook.titleEn}</h3>
+                <p className="mt-2 text-sm font-semibold text-emerald-800">{ebook.subtitleEn}</p>
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-[#526b62]">{ebook.descriptionEn}</p>
+                <div className="mt-6 space-y-2">
+                  {ebook.status === "available" && ebook.pdfUrl && <EbookLeadCapture locale="en" variant="inline" source={`ebook_library:${ebook.id}`} ebookId={ebook.id} ebookTitle={ebook.titleEn} pdfUrl={ebook.pdfUrl} />}
+                  {href && <Link href={href} className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d6e3d6] px-4 py-3 text-sm font-bold text-[#18302b] hover:bg-[#f4f8f4]"><BookOpen className="h-4 w-4"/>{ebook.pdfUrl ? 'Explore this guide' : 'View Source & Credits'}</Link>}
                 </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Global Evidence Dispatch Lead Magnet */}
-        <section className="mx-auto max-w-5xl px-5 pb-20">
-          <EbookLeadCapture
-            locale={locale}
-            variant="inline"
-            source="ebook_library_master"
-          />
-        </section>
-      </main>
-    </WellnessShell>
-  );
+              </div>
+            </article>;
+          })}
+        </div>
+        {visible.length === 0 && <p className="py-16 text-center text-[#526b62]">No guides match that search. Try another topic.</p>}
+        <p className="mx-auto mt-12 max-w-3xl text-center text-xs leading-relaxed text-[#71837b]">Botly’s wellness content is for general educational purposes and is not a substitute for professional medical advice. Historical source material is linked for cultural interest and should not be used as treatment guidance.</p>
+      </section>
+      <section className="mx-auto max-w-5xl px-5 pb-16"><div className="rounded-3xl bg-[#18302b] p-7 text-white sm:p-10"><p className="text-xs font-bold uppercase tracking-widest text-emerald-200">A note on our sources</p><h2 className="mt-3 text-2xl font-extrabold">Thoughtful reading, with context</h2><p className="mt-3 max-w-3xl text-sm leading-relaxed text-emerald-50/80">Some books in our collection are historical works held by libraries and publishers. We keep their source records for review and send readers to the original provider when redistribution terms are unclear or restricted.</p><Link href="/en/wellness/guides" className="mt-5 inline-flex items-center gap-2 font-bold text-amber-300 hover:text-amber-200">Browse wellness articles <ExternalLink className="h-4 w-4"/></Link></div></section>
+    </main>
+  </WellnessShell>;
 }

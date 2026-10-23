@@ -175,7 +175,7 @@ export function BloodSugarEbookHub({ locale }: { locale: WellnessLocale }) {
                 </a>
                 <button
                   type="button"
-                  onClick={() => setShowPdfViewer(!showPdfViewer)}
+                  onClick={() => document.getElementById("download-form")?.scrollIntoView({ behavior: "smooth" })}
                   className="inline-flex items-center gap-2 rounded-2xl border border-[#b7ceba] bg-white px-5 py-3.5 text-sm font-bold text-[#18302b] hover:bg-[#ebf2ea] transition cursor-pointer"
                 >
                   <Eye className="h-4 w-4 text-emerald-700" />

@@ -64,7 +64,7 @@ export const wellnessEbooks: WellnessEbook[] = [
     descriptionEn: "Clinical pairings: how dietary fats enhance carotenoid and curcumin absorption (tomatoes, turmeric, black pepper), catechin gastric dynamics in green tea.",
     descriptionVi: "Các cặp thực phẩm lâm sàng: cách chất béo tốt tăng hấp thu carotenoid và curcumin (cà chua, nghệ, tiêu đen), độ ổn định catechin của trà xanh.",
     coverImage: "/ebooks/antioxidants/tomato-olive-oil-hero.png",
-    pdfUrl: "/ebooks/antioxidants/healthclues-antioxidants-guide.pdf",
+    pdfUrl: "/ebooks/antioxidants/healthclues-antioxidant-guide.pdf",
     pages: 9,
     pairingsCount: 3,
     citationsCount: 18,

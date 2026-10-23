@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/data/site";
 import { wellnessArticles } from "@/data/wellness-articles";
 import { publishedSitemapEntries } from "@/lib/published-articles";
+import { listPublicEbooks } from "@/lib/ebook-catalog";
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -18,6 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
   const articlePaths = wellnessArticles.map((article) => article.locale === "en" ? `/en/wellness/guides/${article.slug}` : `/vi/song-khoe/huong-dan/${article.slug}`);
   const published = await publishedSitemapEntries();
+  const ebooks = await listPublicEbooks();
   const staticEntries: MetadataRoute.Sitemap = [...paths, ...articlePaths].map((path, index) => ({
     url: `${siteConfig.url}${path}`,
     // Do not claim every URL changed on every deploy. Google uses lastmod
@@ -25,6 +27,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: index === 0 ? "weekly" as const : "monthly" as const,
     priority: index === 0 ? 1 : 0.8,
   }));
-  return staticEntries.concat(published.map(a => ({ url: `${siteConfig.url}${a.path}`,
+  const ebookEntries = ebooks.filter(ebook => !['blood-sugar','antioxidants'].includes(ebook.id)).map(ebook => ({
+    url: `${siteConfig.url}/en/wellness/ebooks/${ebook.slug}`, changeFrequency: 'monthly' as const, priority: 0.7,
+  }));
+  return staticEntries.concat(ebookEntries, published.map(a => ({ url: `${siteConfig.url}${a.path}`,
     lastModified: new Date(a.updatedAt), changeFrequency: 'monthly' as const, priority: 0.8 })));
 }

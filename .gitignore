@@ -43,5 +43,11 @@ next-env.d.ts
 
 .vercel
 /scratch/
+/data/private-ebooks/
 Music_Voice/
+*.epub
+*.zip
+.tmp/
+*_legacy.jpg
+*_old_loomind.jpg
 
