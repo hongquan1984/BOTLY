@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import {
   Sparkles,
   MapPin,
@@ -42,6 +42,9 @@ import {
   Clock,
   Hand,
   Coffee,
+  Home,
+  Heart,
+  Users,
 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { colors, fonts, typography, spacing, radius } from "@/theme";
@@ -216,22 +219,22 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
     },
     {
       id: "boss",
-      titleVi: "Đài Khảo Sát Thần Thụ",
-      titleEn: "Ancient Grove Trial",
-      roleVi: "Chiến Thắng Trì Hoãn",
-      roleEn: "Overcome Bedtime Procrastination",
-      IconComponent: Swords,
+      titleVi: "Cổng Làng An Cư (Home)",
+      titleEn: "Home Haven Gate",
+      roleVi: "Khu Phố & Ngôi Nhà Ấm Áp",
+      roleEn: "Neighborhood & Cozy Chalet",
+      IconComponent: Home,
       x: 784,
       y: 252,
       approachX: 784,
       approachY: 414,
-      greetingVi: "Thử thách tri thức: Tại sao nằm lướt điện thoại ban đêm khiến bạn khó vào giấc sâu?",
-      greetingEn: "Trivia Challenge: Why does scrolling in bed prevent restorative deep sleep?",
-      detailsVi: "Vượt qua câu đố thói quen để nhận Chìa Khóa Cổ Vật và tăng điểm kỷ luật bản thân.",
-      detailsEn: "Pass the sleep hygiene challenge to earn the Ancient Key artifact.",
-      actionTextVi: "Bắt đầu thử thách Boss",
-      actionTextEn: "Challenge Grove",
-      badge: "Thử thách",
+      greetingVi: "Cánh cổng đá vòm rợp hoa lá dẫn vào Làng An Cư — nơi tọa lạc ngôi nhà ấm áp của bạn và khu phố những người bạn cùng rèn luyện lối sống khỏe.",
+      greetingEn: "The stone ivy archway leading to Home Haven — your cozy chalet and neighborhood of friends.",
+      detailsVi: "Bước qua cánh cổng để về ngôi nhà ấm cúng của riêng bạn hoặc khám phá bản đồ khu phố minh họa của các cư dân trong làng.",
+      detailsEn: "Pass through to enter your personal home or explore the illustrated player neighborhood.",
+      actionTextVi: "Về Nhà Của Bạn (Home) 🏡",
+      actionTextEn: "Enter Your Home 🏡",
+      badge: "Về Nhà",
     },
     {
       id: "observatory",
@@ -363,22 +366,22 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
     },
     {
       id: "boss",
-      titleVi: "Đấu Trường Thói Quen Lành Mạnh",
-      titleEn: "Habit Arena",
-      roleVi: "Vượt Qua Thử Thách Bia Rượu",
-      roleEn: "Conquer Alcohol Triggers",
-      IconComponent: Swords,
+      titleVi: "Cổng Làng An Cư (Home)",
+      titleEn: "Home Haven Gate",
+      roleVi: "Khu Phố & Ngôi Nhà Ấm Áp",
+      roleEn: "Neighborhood & Cozy Chalet",
+      IconComponent: Home,
       x: 784,
       y: 252,
       approachX: 784,
       approachY: 414,
-      greetingVi: "Thử thách: Đồ uống có cồn ức chế bài tiết acid uric qua thận như thế nào?",
-      greetingEn: "Challenge: How does alcohol competitively inhibit uric acid excretion?",
-      detailsVi: "Chiến thắng thử thách câu đố y khoa để nhận Huy Hiệu Kỷ Luật và +15 EXP.",
-      detailsEn: "Solve the metabolic trivia challenge to earn the Discipline Medal.",
-      actionTextVi: "Vào đấu trường câu hỏi",
-      actionTextEn: "Enter Challenge",
-      badge: "Thử thách",
+      greetingVi: "Cánh cổng đá vòm rợp hoa lá dẫn vào Làng An Cư — nơi tọa lạc ngôi nhà ấm áp của bạn và khu phố những người bạn cùng rèn luyện lối sống khỏe.",
+      greetingEn: "The stone ivy archway leading to Home Haven — your cozy chalet and neighborhood of friends.",
+      detailsVi: "Bước qua cánh cổng để về ngôi nhà ấm cúng của riêng bạn hoặc khám phá bản đồ khu phố minh họa của các cư dân trong làng.",
+      detailsEn: "Pass through to enter your personal home or explore the illustrated player neighborhood.",
+      actionTextVi: "Về Nhà Của Bạn (Home) 🏡",
+      actionTextEn: "Enter Your Home 🏡",
+      badge: "Về Nhà",
     },
     {
       id: "observatory",
@@ -683,7 +686,91 @@ const WorldLandmarksLayer = React.memo(function WorldLandmarksLayer({
   );
 });
 
+interface NeighborHouse {
+  id: string;
+  ownerName: string;
+  role: string;
+  avatarKey: "chibi-anna" | "chibi-leo" | "chibi-mia" | "chibi-ben" | "chibi-lily";
+  houseName: string;
+  houseStyle: string;
+  streakDays: number;
+  habits: string[];
+  welcomeQuote: string;
+  isSelf?: boolean;
+}
+
+const NEIGHBORHOOD_HOUSES: NeighborHouse[] = [
+  {
+    id: "house-player",
+    ownerName: "Bạn (Lãng Khách)",
+    role: "Chủ Nhân Tổ Ấm",
+    avatarKey: "chibi-leo",
+    houseName: "Chalet Gỗ Ấm Áp Của Bạn",
+    houseStyle: "Chalet Phong Cách Bắc Âu · Cấp 2",
+    streakDays: 7,
+    habits: ["Uống đủ 2L nước", "Bài tập thở 4-7-8", "Ngủ trước 23h"],
+    welcomeQuote: "Tổ ấm bình yên của riêng bạn. Sẵn sàng nghỉ ngơi và nhận quà tặng ngày!",
+    isSelf: true,
+  },
+  {
+    id: "house-maianh",
+    ownerName: "Mai Anh",
+    role: "Thảo Dược Viên",
+    avatarKey: "chibi-anna",
+    houseName: "Biệt Thự Vườn Hoa Hồng Leo",
+    houseStyle: "Nhà Vườn Hoa & Trà Thảo Mộc",
+    streakDays: 14,
+    habits: ["Trà cúc La Mã ấm", "Dạo bộ 20 phút sau tối"],
+    welcomeQuote: "Chào bạn! Mình vừa pha một bình trà cúc ấm nóng và cắm hoa tươi đón bạn ghé thăm ✨",
+  },
+  {
+    id: "house-minhtuan",
+    ownerName: "Minh Tuấn",
+    role: "Kiện Tướng Vận Động",
+    avatarKey: "chibi-ben",
+    houseName: "Chalet Gỗ Ven Suối Nguồn",
+    houseStyle: "Kiến Trúc Sinh Thái Ven Hồ",
+    streakDays: 21,
+    habits: ["10,000 bước đi bộ", "Kéo giãn cơ buổi sáng"],
+    welcomeQuote: "Chào người anh em! Suối nguồn buổi sáng rất sảng khoái, cùng nhau giữ vững kỷ luật nhé! 🏃",
+  },
+  {
+    id: "house-bacsi",
+    ownerName: "Bác Sĩ Hoàng",
+    role: "Cố Vấn Sức Khỏe Làng",
+    avatarKey: "chibi-ben",
+    houseName: "Nhà Gỗ Vườn Dược Liệu",
+    houseStyle: "Trạm Sức Khỏe & Vườn Thảo Mộc",
+    streakDays: 30,
+    habits: ["Dinh dưỡng ít purine", "Theo dõi giấc ngủ sâu"],
+    welcomeQuote: "Chào lãng khách! Hãy giữ tinh thần thư thái và thói quen sinh hoạt điều độ mỗi ngày 🩺",
+  },
+  {
+    id: "house-leolucas",
+    ownerName: "Leo & Lucas",
+    role: "Nhà Nghiên Cứu",
+    avatarKey: "chibi-leo",
+    houseName: "Gác Lửng Kính Thiên Văn",
+    houseStyle: "Thư Viện Tri Thức & Kính Thiên Văn",
+    streakDays: 12,
+    habits: ["Đọc sách 30 phút", "Không màn hình trước ngủ"],
+    welcomeQuote: "Chào bạn! Tầng gác mái của tụi mình có kính viễn vọng ngắm bầu trời sao rất đẹp 🔭",
+  },
+  {
+    id: "house-annalily",
+    ownerName: "Anna & Lily",
+    role: "Hướng Dẫn Viên Thiền",
+    avatarKey: "chibi-lily",
+    houseName: "Bungalow Vườn Thiền Yên Bình",
+    houseStyle: "Bungalow Tre & Chuông Gió",
+    streakDays: 18,
+    habits: ["Thở 4-7-8 trước ngủ", "Yoga nhẹ nhàng"],
+    welcomeQuote: "Thả lỏng đôi vai, nhắm mắt và hít thở thật sâu cùng chúng mình nào 🌸",
+  },
+];
+
 export default function WorldScreen() {
+  const router = useRouter();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const strings = t();
   const { isAuthenticated, session } = useAuth();
@@ -695,6 +782,21 @@ export default function WorldScreen() {
     refreshWorld,
     loading: worldLoading,
   } = useWorld(isAuthenticated);
+
+  const [visitedHouses, setVisitedHouses] = useState<Record<string, boolean>>({});
+
+  const handleSendNeighborHeart = useCallback((house: NeighborHouse) => {
+    if (visitedHouses[house.id]) {
+      setActionSuccessMsg(`Bạn đã gửi lời chúc hôm nay tới ${house.ownerName} rồi!`);
+      return;
+    }
+    setVisitedHouses((prev) => ({ ...prev, [house.id]: true }));
+    setExpGain({ visible: true, amount: 5 });
+    setActionSuccessMsg(`Đã ghé thăm và gửi tim ấm áp tới ${house.ownerName} (+5 EXP)!`);
+    try {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {}
+  }, [visitedHouses]);
 
   const [mode, setMode] = useState<RegionMode>("exploration");
   const [activeRegion, setActiveRegion] = useState<ActiveRegion>("healthclues-realm");
@@ -1189,27 +1291,10 @@ export default function WorldScreen() {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       } catch {}
     } else if (landmark.id === "boss") {
-      if (bossQuizPick !== "correct") {
-        setActionSuccessMsg("Hãy chọn đáp án đúng ở thử thách bên trên để mở rương thưởng!");
-        return;
-      }
       setSelectedLandmark(null);
       setActiveTalkLandmark(null);
-      setActionSuccessMsg("Chính xác! Bạn nhận được +15 EXP và Chìa Khóa Cổ!");
-      setExpGain({ visible: true, amount: 15 });
-      setRewardReveal({
-        visible: true,
-        item: {
-          name: "Chìa Khóa Cổ Sleep Valley",
-          icon: "boss:key",
-          tone: "gold",
-          rarity: "Huyền thoại",
-          description: "Mở khóa kho tàng tri thức y khoa và giải thưởng tuần của Thung Lũng.",
-        },
-      });
-      try {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      } catch {}
+      router.push("/(game)/home");
+      return;
     } else {
       setActionSuccessMsg(`Đã hoàn thành tương tác tại ${landmark.titleVi}`);
     }
@@ -1809,20 +1894,50 @@ export default function WorldScreen() {
                   </Text>
                 </View>
 
-                <TouchableOpacity
-                  style={styles.talkActionBtn}
-                  accessibilityRole="button"
-                  accessibilityLabel="open-station-sheet"
-                  onPress={() => {
-                    setActionSuccessMsg(null);
-                    setBossQuizPick(null);
-                    setSelectedLandmark(activeTalkLandmark);
-                  }}
-                  activeOpacity={0.85}
-                >
-                  <Text style={styles.talkActionBtnText}>Khám Phá</Text>
-                  <ArrowRight size={12} color="#061814" />
-                </TouchableOpacity>
+                {activeTalkLandmark.id === "boss" ? (
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                    <TouchableOpacity
+                      style={[styles.talkActionBtn, { backgroundColor: "#10b981", paddingHorizontal: 10 }]}
+                      accessibilityRole="button"
+                      accessibilityLabel="go-home-direct"
+                      onPress={() => {
+                        setActiveTalkLandmark(null);
+                        router.push("/(game)/home");
+                      }}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={[styles.talkActionBtnText, { color: "#ffffff", fontWeight: "700" }]}>Về Nhà 🏡</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.talkActionBtn}
+                      accessibilityRole="button"
+                      accessibilityLabel="open-neighborhood-sheet"
+                      onPress={() => {
+                        setActionSuccessMsg(null);
+                        setSelectedLandmark(activeTalkLandmark);
+                      }}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.talkActionBtnText}>Khu Phố</Text>
+                      <ArrowRight size={12} color="#061814" />
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.talkActionBtn}
+                    accessibilityRole="button"
+                    accessibilityLabel="open-station-sheet"
+                    onPress={() => {
+                      setActionSuccessMsg(null);
+                      setBossQuizPick(null);
+                      setSelectedLandmark(activeTalkLandmark);
+                    }}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={styles.talkActionBtnText}>Khám Phá</Text>
+                    <ArrowRight size={12} color="#061814" />
+                  </TouchableOpacity>
+                )}
 
                 <TouchableOpacity
                   style={styles.talkDismissBtn}
@@ -1990,44 +2105,132 @@ export default function WorldScreen() {
                   </View>
                 )}
 
-                {/* Interactive Arena Quiz Challenge for boss station */}
+                {/* Neighborhood Map & Home Entrance for boss station */}
                 {selectedLandmark.id === "boss" && (
-                  <View style={styles.quizChallengeBox}>
-                    <Text style={styles.quizQuestionText}>
-                      Thử thách: {selectedLandmark.greetingVi.replace(/^Thử thách:\s*/i, "")}
+                  <View style={styles.neighborhoodBox}>
+                    {/* Primary Home Entrance Card */}
+                    <View style={styles.myHomeHeroCard}>
+                      <View style={styles.myHomeHeroTop}>
+                        <View style={styles.myHomeIconRing}>
+                          <Home size={26} color="#34d399" />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <View style={styles.myHomeBadgeRow}>
+                            <Text style={styles.myHomeBadgeText}>⭐ TỔ ẤM CỦA BẠN</Text>
+                            <Text style={styles.myHomeOnlineText}>🟢 Đang mở cửa</Text>
+                          </View>
+                          <Text style={styles.myHomeTitle}>Chalet Gỗ Ấm Áp</Text>
+                          <Text style={styles.myHomeSubtitle}>Phong cách Bắc Âu · Cấp 2 · Đầy đủ nội thất</Text>
+                        </View>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.enterMyHomeBtn}
+                        accessibilityRole="button"
+                        accessibilityLabel="enter-my-home-now"
+                        onPress={() => {
+                          setSelectedLandmark(null);
+                          setActiveTalkLandmark(null);
+                          router.push("/(game)/home");
+                        }}
+                        activeOpacity={0.85}
+                      >
+                        <Text style={styles.enterMyHomeBtnText}>Bước Vào Nhà Của Bạn (Home) 🏡</Text>
+                        <ArrowRight size={16} color="#042f2e" />
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* Section Header: Neighborhood Map */}
+                    <View style={styles.neighborhoodHeaderRow}>
+                      <Users size={16} color="#34d399" />
+                      <Text style={styles.neighborhoodHeading}>BẢN ĐỒ KHU PHỐ CÁC CƯ DÂN (MINH HỌA)</Text>
+                    </View>
+                    <Text style={styles.neighborhoodSubtext}>
+                      Khám phá ngôi nhà của những người bạn cùng rèn luyện lối sống lành mạnh trong làng:
                     </Text>
-                    <TouchableOpacity
-                      style={[
-                        styles.quizOptionBtn,
-                        bossQuizPick === "correct" && styles.quizOptionBtnCorrect,
-                      ]}
-                      accessibilityRole="button"
-                      accessibilityLabel="boss-quiz-correct"
-                      onPress={() => {
-                        setBossQuizPick("correct");
-                        setActionSuccessMsg("Chuẩn y khoa! Bấm nút bên dưới để nhận +15 EXP & Chìa Khóa Cổ.");
-                      }}
-                    >
-                      <Text style={styles.quizOptionText}>
-                        A. Tạo acid lactic cạnh tranh bài tiết acid uric ở ống thận
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.quizOptionBtn,
-                        bossQuizPick === "wrong" && styles.quizOptionBtnWrong,
-                      ]}
-                      accessibilityRole="button"
-                      accessibilityLabel="boss-quiz-wrong"
-                      onPress={() => {
-                        setBossQuizPick("wrong");
-                        setActionSuccessMsg("Chưa chính xác! Cồn làm tăng acid lactic và giảm đào thải acid uric tại ống thận.");
-                      }}
-                    >
-                      <Text style={styles.quizOptionText}>
-                        B. Làm tăng tốc độ lọc và đào thải qua thận gấp đôi
-                      </Text>
-                    </TouchableOpacity>
+
+                    {/* Neighborhood Cottages List */}
+                    <View style={styles.neighborhoodGrid}>
+                      {NEIGHBORHOOD_HOUSES.map((house) => {
+                        const isSelf = house.isSelf;
+                        const spriteSource = AVATAR_SPRITES[house.avatarKey] || AVATAR_SPRITES["chibi-anna"];
+                        const isVisited = visitedHouses[house.id];
+                        return (
+                          <View
+                            key={house.id}
+                            style={[
+                              styles.neighborCard,
+                              isSelf && styles.neighborCardSelf,
+                            ]}
+                          >
+                            <View style={styles.neighborCardHeader}>
+                              <Image source={spriteSource} style={styles.neighborAvatar} contentFit="contain" />
+                              <View style={{ flex: 1 }}>
+                                <View style={styles.neighborNameRow}>
+                                  <Text style={styles.neighborOwnerName}>{house.ownerName}</Text>
+                                  {isSelf ? (
+                                    <View style={styles.selfBadge}><Text style={styles.selfBadgeText}>Nhà của bạn</Text></View>
+                                  ) : (
+                                    <View style={styles.streakBadge}><Text style={styles.streakBadgeText}>🔥 {house.streakDays} ngày</Text></View>
+                                  )}
+                                </View>
+                                <Text style={styles.neighborHouseName}>{house.houseName}</Text>
+                                <Text style={styles.neighborHouseStyle}>{house.houseStyle}</Text>
+                              </View>
+                            </View>
+
+                            <View style={styles.neighborQuoteBox}>
+                              <Text style={styles.neighborQuoteText}>"{house.welcomeQuote}"</Text>
+                            </View>
+
+                            <View style={styles.neighborHabitsRow}>
+                              {house.habits.map((h, i) => (
+                                <View key={i} style={styles.habitTagPill}>
+                                  <Text style={styles.habitTagText}>✓ {h}</Text>
+                                </View>
+                              ))}
+                            </View>
+
+                            <View style={styles.neighborCardActions}>
+                              {isSelf ? (
+                                <TouchableOpacity
+                                  style={styles.neighborEnterBtn}
+                                  accessibilityRole="button"
+                                  accessibilityLabel="enter-home-btn"
+                                  onPress={() => {
+                                    setSelectedLandmark(null);
+                                    setActiveTalkLandmark(null);
+                                    router.push("/(game)/home");
+                                  }}
+                                  activeOpacity={0.85}
+                                >
+                                  <Text style={styles.neighborEnterBtnText}>Vào Nhà Ngay 🏡</Text>
+                                </TouchableOpacity>
+                              ) : (
+                                <TouchableOpacity
+                                  style={[
+                                    styles.neighborVisitBtn,
+                                    isVisited && styles.neighborVisitBtnSent,
+                                  ]}
+                                  accessibilityRole="button"
+                                  accessibilityLabel={`visit-neighbor-${house.id}`}
+                                  onPress={() => handleSendNeighborHeart(house)}
+                                  activeOpacity={0.85}
+                                >
+                                  <Heart
+                                    size={14}
+                                    color={isVisited ? "#f43f5e" : "#fda4af"}
+                                    fill={isVisited ? "#f43f5e" : "transparent"}
+                                  />
+                                  <Text style={styles.neighborVisitBtnText}>
+                                    {isVisited ? "Đã Gửi Lời Chúc ❤️" : "Ghé Thăm & Gửi Tim (+5 EXP)"}
+                                  </Text>
+                                </TouchableOpacity>
+                              )}
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
                   </View>
                 )}
 
@@ -2052,17 +2255,31 @@ export default function WorldScreen() {
 
                 {/* Action CTA Button */}
                 <TouchableOpacity
-                  style={styles.sheetActionBtn}
+                  style={[
+                    styles.sheetActionBtn,
+                    selectedLandmark.id === "boss" && { backgroundColor: "#10b981" },
+                  ]}
                   accessibilityRole="button"
                   accessibilityLabel={selectedLandmark.actionTextVi}
-                  onPress={() => handleActionClick(selectedLandmark)}
+                  onPress={() => {
+                    if (selectedLandmark.id === "boss") {
+                      setSelectedLandmark(null);
+                      setActiveTalkLandmark(null);
+                      router.push("/(game)/home");
+                    } else {
+                      handleActionClick(selectedLandmark);
+                    }
+                  }}
                   activeOpacity={0.85}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                  <Text style={styles.sheetActionBtnText}>
+                  <Text style={[
+                    styles.sheetActionBtnText,
+                    selectedLandmark.id === "boss" && { color: "#ffffff", fontWeight: "700" }
+                  ]}>
                     {selectedLandmark.actionTextVi}
                   </Text>
-                  <ArrowRight size={16} color="#042f2e" />
+                  <ArrowRight size={16} color={selectedLandmark.id === "boss" ? "#ffffff" : "#042f2e"} />
                 </TouchableOpacity>
               </ScrollView>
             )}
@@ -3067,6 +3284,231 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(245, 158, 11, 0.32)",
     gap: 6,
+  },
+  neighborhoodBox: {
+    gap: spacing.sm,
+    marginTop: 4,
+  },
+  myHomeHeroCard: {
+    backgroundColor: "rgba(16, 185, 129, 0.12)",
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    borderWidth: 1.5,
+    borderColor: "rgba(52, 211, 153, 0.45)",
+    gap: spacing.sm,
+  },
+  myHomeHeroTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  myHomeIconRing: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(16, 185, 129, 0.2)",
+    borderWidth: 1,
+    borderColor: "rgba(52, 211, 153, 0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  myHomeBadgeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 2,
+  },
+  myHomeBadgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: colors.goldLight,
+    letterSpacing: 0.5,
+  },
+  myHomeOnlineText: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#6ee7b7",
+  },
+  myHomeTitle: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: colors.textPrimary,
+  },
+  myHomeSubtitle: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginTop: 1,
+  },
+  enterMyHomeBtn: {
+    backgroundColor: "#10b981",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: radius.md,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    shadowColor: "#10b981",
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  enterMyHomeBtnText: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: "#022c22",
+  },
+  neighborhoodHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 6,
+  },
+  neighborhoodHeading: {
+    fontSize: 11.5,
+    fontWeight: "800",
+    color: "#34d399",
+    letterSpacing: 0.5,
+  },
+  neighborhoodSubtext: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    lineHeight: 15,
+  },
+  neighborhoodGrid: {
+    gap: spacing.sm,
+    marginTop: 4,
+  },
+  neighborCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.04)",
+    borderRadius: radius.md,
+    padding: spacing.sm,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.09)",
+    gap: 6,
+  },
+  neighborCardSelf: {
+    backgroundColor: "rgba(16, 185, 129, 0.07)",
+    borderColor: "rgba(52, 211, 153, 0.35)",
+  },
+  neighborCardHeader: {
+    flexDirection: "row",
+    gap: spacing.sm,
+    alignItems: "center",
+  },
+  neighborAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.full,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+  },
+  neighborNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  neighborOwnerName: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: colors.textPrimary,
+  },
+  selfBadge: {
+    backgroundColor: "rgba(245, 158, 11, 0.2)",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: radius.full,
+    borderWidth: 0.5,
+    borderColor: "rgba(245, 158, 11, 0.4)",
+  },
+  selfBadgeText: {
+    fontSize: 9.5,
+    fontWeight: "700",
+    color: colors.goldLight,
+  },
+  streakBadge: {
+    backgroundColor: "rgba(234, 88, 12, 0.2)",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: radius.full,
+  },
+  streakBadgeText: {
+    fontSize: 9.5,
+    fontWeight: "700",
+    color: "#fdba74",
+  },
+  neighborHouseName: {
+    fontSize: 11.5,
+    fontWeight: "700",
+    color: "#6ee7b7",
+    marginTop: 1,
+  },
+  neighborHouseStyle: {
+    fontSize: 10,
+    color: colors.textSecondary,
+  },
+  neighborQuoteBox: {
+    backgroundColor: "rgba(0, 0, 0, 0.25)",
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: radius.sm,
+  },
+  neighborQuoteText: {
+    fontSize: 10.5,
+    fontStyle: "italic",
+    color: "#e2e8f0",
+    lineHeight: 14,
+  },
+  neighborHabitsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 4,
+  },
+  habitTagPill: {
+    backgroundColor: "rgba(16, 185, 129, 0.12)",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  habitTagText: {
+    fontSize: 9.5,
+    fontWeight: "600",
+    color: "#a7f3d0",
+  },
+  neighborCardActions: {
+    marginTop: 2,
+  },
+  neighborEnterBtn: {
+    backgroundColor: "rgba(16, 185, 129, 0.25)",
+    borderWidth: 1,
+    borderColor: "#34d399",
+    paddingVertical: 6,
+    borderRadius: radius.sm,
+    alignItems: "center",
+  },
+  neighborEnterBtnText: {
+    fontSize: 11.5,
+    fontWeight: "700",
+    color: "#34d399",
+  },
+  neighborVisitBtn: {
+    backgroundColor: "rgba(244, 63, 94, 0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(244, 63, 94, 0.25)",
+    paddingVertical: 6,
+    borderRadius: radius.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  neighborVisitBtnSent: {
+    backgroundColor: "rgba(244, 63, 94, 0.18)",
+    borderColor: "rgba(244, 63, 94, 0.45)",
+  },
+  neighborVisitBtnText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#fda4af",
   },
   quizQuestionText: {
     fontSize: 11.5,
