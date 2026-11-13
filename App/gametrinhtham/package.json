@@ -1,0 +1,20 @@
+{
+  "name": "@healthclues/gametrinhtham",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "HealthClues Mystery Detective (Thám tử cơ thể) - Standalone Mini-game Engine & Content System",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "node tests/run-all-tests.mjs"
+  },
+  "keywords": [
+    "healthclues",
+    "mystery",
+    "detective",
+    "rpg",
+    "wellness",
+    "deduction"
+  ],
+  "author": "HealthClues Team",
+  "license": "Private"
+}

@@ -1,0 +1,145 @@
+{
+  "status": "VERIFIED_READY_TO_APPLY",
+  "taskId": "HC-901",
+  "attempts": [
+    {
+      "taskId": "HC-901",
+      "attempt": 1,
+      "developerResult": {
+        "taskId": "HC-901",
+        "attempt": 1,
+        "summary": "Synthetic test fixture patch",
+        "patches": [
+          {
+            "path": "src/hc-901.mjs",
+            "baseSha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+            "content": "export function toSlug(value) { return value.normalize('NFKC').toLowerCase().replace(/&/g, ' and ').replace(/[^\\p{L}\\p{N}]+/gu, '-').replace(/^-|-$/g, ''); }\n"
+          }
+        ],
+        "limitations": []
+      },
+      "changedFiles": [
+        "src/hc-901.mjs"
+      ],
+      "diffByPath": {
+        "src/hc-901.mjs": "--- a/src/hc-901.mjs\n+++ b/src/hc-901.mjs\n@@ full-file replacement @@\n-export function toSlug(value) { return value; }\n+export function toSlug(value) { return value.normalize('NFKC').toLowerCase().replace(/&/g, ' and ').replace(/[^\\p{L}\\p{N}]+/gu, '-').replace(/^-|-$/g, ''); }\n"
+      },
+      "tests": [
+        {
+          "command": "fixture docker test/hc-901.test.mjs",
+          "result": "PASS",
+          "exitCode": 0,
+          "output": "MOCK ONLY"
+        }
+      ],
+      "managerDecision": {
+        "decision": "PASS",
+        "taskId": "HC-901",
+        "reasoning": "Synthetic review fixture",
+        "feedback": [],
+        "dimensions": {
+          "functional": "PASS",
+          "visual": "NOT_APPLICABLE",
+          "data": "NOT_APPLICABLE",
+          "localization": "NOT_APPLICABLE",
+          "security": "PASS",
+          "aiIntegration": "NOT_APPLICABLE"
+        },
+        "nextTask": null,
+        "approvalRequest": null
+      }
+    }
+  ],
+  "snapshotRoot": "D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-57-42.380Z\\runs\\HC-901\\workspace",
+  "initialManifest": {
+    "version": 1,
+    "taskId": "HC-901",
+    "createdAt": "2026-11-02T14:57:43.469Z",
+    "files": [
+      {
+        "path": "src/hc-901.mjs",
+        "sha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "workspaceSha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "bytes": 48,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? src/hc-901.mjs"
+      },
+      {
+        "path": "test/hc-901.test.mjs",
+        "sha256": "32D5DB83444468D922F16222AF40837118FA59855310C60EFF7D0F002BCA332D",
+        "workspaceSha256": "32D5DB83444468D922F16222AF40837118FA59855310C60EFF7D0F002BCA332D",
+        "bytes": 584,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? test/hc-901.test.mjs"
+      }
+    ]
+  },
+  "finalManifest": {
+    "version": 1,
+    "taskId": "HC-901",
+    "createdAt": "2026-11-02T14:57:43.469Z",
+    "files": [
+      {
+        "path": "src/hc-901.mjs",
+        "sha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "workspaceSha256": "AE3AA9A9444AF9AF67A30436CF31F5EA7C4A58C3F2BF9A67F6DB45018346D8F0",
+        "bytes": 158,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? src/hc-901.mjs"
+      },
+      {
+        "path": "test/hc-901.test.mjs",
+        "sha256": "32D5DB83444468D922F16222AF40837118FA59855310C60EFF7D0F002BCA332D",
+        "workspaceSha256": "32D5DB83444468D922F16222AF40837118FA59855310C60EFF7D0F002BCA332D",
+        "bytes": 584,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? test/hc-901.test.mjs"
+      }
+    ]
+  },
+  "tests": [
+    {
+      "command": "fixture docker test/hc-901.test.mjs",
+      "result": "PASS",
+      "exitCode": 0,
+      "output": "MOCK ONLY"
+    }
+  ],
+  "diffByPath": {
+    "src/hc-901.mjs": "--- a/src/hc-901.mjs\n+++ b/src/hc-901.mjs\n@@ full-file replacement @@\n-export function toSlug(value) { return value; }\n+export function toSlug(value) { return value.normalize('NFKC').toLowerCase().replace(/&/g, ' and ').replace(/[^\\p{L}\\p{N}]+/gu, '-').replace(/^-|-$/g, ''); }\n"
+  },
+  "applyPlan": {
+    "status": "VERIFIED_READY_TO_APPLY",
+    "taskId": "HC-901",
+    "approvedFiles": [
+      "src/hc-901.mjs"
+    ],
+    "operations": [
+      {
+        "path": "src/hc-901.mjs",
+        "preconditionSha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "replacementSha256": "AE3AA9A9444AF9AF67A30436CF31F5EA7C4A58C3F2BF9A67F6DB45018346D8F0",
+        "diffSha256": "40639AC20AB2F5735288B4A527C03A8CF506030564AACDBB30567F88A3196030",
+        "backupRequired": true,
+        "backupDestination": "Manager/reports/apply-backups/HC-901/src/hc-901.mjs",
+        "recoveryRule": "Restore only if current file SHA-256 is AE3AA9A9444AF9AF67A30436CF31F5EA7C4A58C3F2BF9A67F6DB45018346D8F0; never overwrite a different checksum."
+      }
+    ],
+    "managerReview": {
+      "decision": "PASS",
+      "taskId": "HC-901"
+    },
+    "tests": [
+      {
+        "command": "fixture docker test/hc-901.test.mjs",
+        "result": "PASS",
+        "exitCode": 0,
+        "artifact": null
+      }
+    ],
+    "ownerApprovalRequired": true,
+    "applyOccurred": false,
+    "note": "Plan only. No project file was written. First real apply requires explicit Owner approval and a fresh checksum precondition check."
+  },
+  "applyOccurred": false
+}

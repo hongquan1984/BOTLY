@@ -1,0 +1,16 @@
+{
+  "decision": "REWORK",
+  "feedback": [
+    "VISUAL_REVIEW_UNVERIFIED: required screenshot is missing or not reviewable with measured dimensions."
+  ],
+  "dimensions": {
+    "visual": "UNVERIFIED"
+  },
+  "reviewedAt": "2026-11-02T16:55:58.224Z",
+  "sourceManifestSha256": "5b968fab3f495c6c3c9aeb033efa808ed5db06eb9c685781a8f41541597eaac2",
+  "developerReportSha256": "f265bcdf0011527f7b2872fe470368f914e042135c6f561ee239839441e60477",
+  "independentSourceCheck": {
+    "ok": true,
+    "changed": []
+  }
+}

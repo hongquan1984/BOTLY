@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HealthClues · Đang tải Hành trình của tôi...</title>
+  <style>
+    body {
+      background: radial-gradient(circle at 50% 40%, #16382b 0%, #0d231a 100%);
+      color: #ffd868;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: grid;
+      place-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: rgba(18, 44, 32, 0.85);
+      border: 2px solid #dfc982;
+      border-radius: 1.5rem;
+      padding: 2rem 2.5rem;
+      text-align: center;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+      max-width: 440px;
+    }
+    h2 { margin: 0 0 0.5rem; font-size: 1.35rem; color: #fff8db; }
+    p { margin: 0; color: #d4e8da; font-size: 0.9rem; line-height: 1.5; }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      margin: 1.25rem auto;
+      border: 3.5px solid rgba(223, 201, 130, 0.25);
+      border-top-color: #f5c84c;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="spinner"></div>
+    <h2>🌿 Đang vào Vương quốc HealthClues</h2>
+    <p>Đang chuẩn bị Bản đồ Hành trình 30 ngày &amp; Mục tiêu sức khỏe của bạn...</p>
+  </div>
+  <script>
+    try {
+      const session = {"access_token":"eyJhbGciOiJFUzI1NiIsImtpZCI6ImI4MTI2OWYxLTIxZDgtNGYyZS1iNzE5LWMyMjQwYTg0MGQ5MCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjU0MzIxL2F1dGgvdjEiLCJzdWIiOiIwODBkNzIxYi1kMWVkLTQ3N2ItODFhZi1lZGYyOWQ0ZDhlMjMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkzOTg0NDU5LCJpYXQiOjE3OTM5ODA4NTksImVtYWlsIjoib3duZXItZGVtby0xNzkzOTgwODU5NTkyQGV4YW1wbGUuaW52YWxpZCIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsInJvbGUiOiJvd25lciIsInN1aXRlIjoib3duZXItZGVtbyJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzkzOTgwODU5fV0sInNlc3Npb25faWQiOiJlZmYxYmRhNy1mMjc5LTRjZmItOWU2Yi0zYzlhYzQyNWE5YTYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.qMkND8H8C0nn_5F1OfrqWksoSa28Of-0aMhRsA9Rms42GQiO41kLizQHqbN0JjBbwvY2FnxxTCprSnk9nbPtgg","refresh_token":"jtqwk2mq6yrb","expires_at":1796572859,"user":{"id":"080d721b-d1ed-477b-81af-edf29d4d8e23","email":"owner-demo-1793980859592@example.invalid","email_confirmed_at":"2026-11-06T16:00:59.907Z","confirmed_at":"2026-11-06T16:00:59.907Z"}};
+      localStorage.setItem('botly-cloud-session', JSON.stringify(session));
+      localStorage.setItem('healthclues-player-locale-v1', 'vi');
+      localStorage.setItem('healthclues-player-locale-owner-v1', '080d721b-d1ed-477b-81af-edf29d4d8e23');
+      localStorage.setItem('healthclues-player-locale-v1:080d721b-d1ed-477b-81af-edf29d4d8e23', 'vi');
+      document.cookie = 'hc_locale=vi; Path=/; Max-Age=2592000';
+    } catch(e) {
+      console.error(e);
+    }
+    const params = new URLSearchParams(window.location.search);
+    const checkinParam = params.get("checkin") === "1" || params.get("panel") === "checkin" ? "&checkin=1" : "";
+    setTimeout(function() {
+      window.location.replace('/vi/wellness/healthclues/world?quest=health-concern' + checkinParam);
+    }, 400);
+  </script>
+</body>
+</html>

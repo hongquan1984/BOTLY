@@ -1,0 +1,42 @@
+{
+  "taskId": "HC-001",
+  "attempt": 2,
+  "status": "READY_FOR_REVIEW",
+  "summary": "Read-only evidence audit complete using supplied text only; the recommendation-quality lead remains INCOMPLETE. PASS: no files changed; source separates server-assigned IDs, bilingual A/B validation and signed goal proofs; reports document synthetic authenticated Plan persistence. UNVERIFIED: current refined-prompt live recommendation quality, persistence of genuine provider output, and visuals in this audit. REWORK: generated-goal safety validation does not gate movement against reported acute pain/activity restrictions, and concern-keyword matching does not establish that claimed habits were actually reported. Historical genuine Gemini success exists, but fixtures and offline mocks cannot close these gaps.",
+  "changedFiles": [],
+  "tests": [],
+  "screenshots": [],
+  "evidence": [
+    "src/features/healthclues/personalized-wellness-plan.ts",
+    "src/features/healthclues/gemini-wellness-plan.ts",
+    "src/features/healthclues/server/wellness-plan-proof.ts",
+    "src/features/healthclues/wellness-plan.ts",
+    "src/features/healthclues/PersonalizedSuggestions.tsx",
+    "scripts/test-healthclues-personalized-plan-contract.mjs",
+    "scripts/test-healthclues-gemini-plan-pipeline.mjs",
+    "scripts/test-healthclues-personalized-recommendations.mjs",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+    "App/reports/HEALTHCLUES_GEMINI_REALTIME_ADVISOR_ACCEPTANCE.md",
+    "App/reports/HEALTHCLUES_UNIVERSAL_WELLNESS_ADVISOR_ACCEPTANCE.md"
+  ],
+  "knownLimitations": [
+    "No filesystem inspection, commands, tests, provider calls or screenshot inspection occurred. Supplied hashes were not independently verified. Historical PASS statements are report evidence, not executions performed in this audit.",
+    "The MP17 report records one genuine simplified-contract Sleep request with provider/application HTTP 200 and four validated goals. It saved no Plan. Subsequent risk-aware prompt refinement was offline only; current live quality remains unknown.",
+    "Older 402/BILLING_REQUIRED and schema-failure checkpoints are historical; they do not establish a current provider outage. The later successful call also does not verify the current refined prompt.",
+    "The supplied generated-goal validator checks urgent safety level and copy patterns but does not inspect acutePainfulJoint or activityRestriction before accepting movement. The separate habit/custom safety gates do not prove this AI path is protected elsewhere; complete route source was not supplied.",
+    "The contract test supplies a Sleep profile without reported phone use yet expects acceptance of a reason claiming the player reported it. Concern matching therefore does not demonstrate factual habit personalization.",
+    "The deterministic ranking test filters demoOnly candidates before invoking the ranker in its production-boundary assertion. That assertion alone does not prove production filtering; ranker and recommendation API implementation were not supplied.",
+    "Reports contain superseded matrices, localization findings and provider requirements. Later bilingual snapshot evidence supersedes the earlier blanket untranslated-content finding for new snapshots; historical rows still retain original text.",
+    "Screenshots are referenced in reports but were not supplied for inspection; no visual PASS is assigned. Current MP20 activation and immediate Plan selection lack authenticated end-to-end evidence in the supplied excerpts.",
+    "Original persisted legacy 96-answer retention and eligible reviewed botanical Save/Equip remain evidence gaps."
+  ],
+  "blockers": [
+    "Acceptance lacks a current refined-prompt genuine-provider quality assessment and a browser lifecycle persisting actual provider output.",
+    "The supplied evidence does not resolve generated movement safety or unsupported reported-habit claims."
+  ],
+  "nextSuggestedSteps": [
+    "Add focused negative cases for generated movement under acute pain/activity restriction and for reasons inventing unreported habits; resolve the demonstrated validation gaps before recommendation-quality acceptance.",
+    "After separate authorization for a live request, assess current refined-prompt output against reported concern/factors, factual reasons, practical distinct A/B options, bilingual consistency and safety. Persist a genuine signed result through authenticated selection, My Journey and reload, with raw execution evidence and inspected captures.",
+    "Reconcile the acceptance report's historical matrices with its later checkpoints, explicitly separating genuine-provider technical success, fixture persistence, current quality unknowns and MP20 coverage."
+  ]
+}

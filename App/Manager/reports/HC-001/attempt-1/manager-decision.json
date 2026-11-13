@@ -1,0 +1,18 @@
+{
+  "decision": "REWORK",
+  "taskId": "HC-001",
+  "reasoning": "Trusted runner rejected narrative evidence entries before independent AI review; this records recovery and is not an AI acceptance review.",
+  "feedback": [
+    "REWORK: evidence[] must contain only exact repository-relative file paths from trusted-evidence-manifest.json; move findings into summary/knownLimitations/nextSuggestedSteps. Attempt 1 was not passed to Manager AI review because citation validation failed."
+  ],
+  "dimensions": {
+    "functional": "REWORK",
+    "visual": "NOT_APPLICABLE",
+    "data": "UNVERIFIED",
+    "localization": "UNVERIFIED",
+    "security": "PASS",
+    "aiIntegration": "UNVERIFIED"
+  },
+  "decisionSource": "trusted-runner-recovery",
+  "reviewedAt": "2026-11-02T15:51:38.340Z"
+}

@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "scenes": [
+    {
+      "scene_id": "scene_overview",
+      "label_vi": "Toàn cảnh ngôi nhà",
+      "label_en": "Chalet Overview",
+      "image_path": "assets/scenes/scene_overview.webp",
+      "width": 1672,
+      "height": 941,
+      "aspect_ratio": "16:9",
+      "description": "Bối cảnh toàn cảnh ngôi nhà Thụy Sĩ bên hồ nước và dãy núi tuyết hùng vĩ.",
+      "default_active": false
+    },
+    {
+      "scene_id": "scene_garden",
+      "label_vi": "Khu vườn & Sân ngoài trời",
+      "label_en": "Garden & Outdoor Terrace",
+      "image_path": "assets/scenes/scene_garden.webp",
+      "width": 1672,
+      "height": 941,
+      "aspect_ratio": "16:9",
+      "description": "Không gian sân vườn cỏ xanh và thềm đá hiên nhà đón ánh nắng ấm ban mai.",
+      "default_active": true
+    },
+    {
+      "scene_id": "scene_interior",
+      "label_vi": "Phòng khách nhìn ra ngoài",
+      "label_en": "Chalet Living Room",
+      "image_path": "assets/scenes/scene_interior.webp",
+      "width": 1672,
+      "height": 941,
+      "aspect_ratio": "16:9",
+      "description": "Không gian nội thất ốp gỗ ấm cúng với khung cửa kính lớn hướng ra thiên nhiên.",
+      "default_active": false
+    },
+    {
+      "scene_id": "scene_interior_wide",
+      "label_vi": "Phòng khách góc rộng",
+      "label_en": "Chalet Grand Panoramic Living Room",
+      "image_path": "assets/scenes/scene_interior_wide.webp",
+      "width": 1672,
+      "height": 941,
+      "aspect_ratio": "16:9",
+      "description": "Toàn cảnh phòng khách góc siêu rộng, sàn gỗ sồi rộng lớn với view hồ núi tuyết bao la.",
+      "default_active": true
+    },
+    {
+      "scene_id": "scene_bedroom",
+      "label_vi": "Phòng ngủ tĩnh dưỡng",
+      "label_en": "Chalet Master Bedroom",
+      "image_path": "assets/scenes/scene_bedroom.webp",
+      "width": 1672,
+      "height": 941,
+      "aspect_ratio": "16:9",
+      "description": "Không gian phòng ngủ tối giản sang trọng với giường ngủ êm ái, view cửa kính lớn nhìn ra đỉnh núi tuyết.",
+      "default_active": false
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "summary": "BLOCKED. The botanical safety defect from the last review is fixed in the current local build. Full player, persistence, and mobile acceptance remain unverified.",
+  "checks": [
+    {
+      "id": "discovery",
+      "status": "UNVERIFIED",
+      "evidence": "scripts/test-healthclues-discovery-matching.mjs passed 37 assertions.",
+      "finding": "The two-question Quiz and preview transition were not completed interactively in this run."
+    },
+    {
+      "id": "overworld",
+      "status": "PASS",
+      "evidence": "Headless Chrome opened http://127.0.0.1:3329/vi/wellness/healthclues/quiz?step=quest; the live DOM showed Sleep Valley with Luna, HealthClues Realm with Lumi, and six “Sắp ra mắt” choices.",
+      "finding": "All eight regions remain visible with only the approved two presented as playable."
+    },
+    {
+      "id": "world_entry",
+      "status": "UNVERIFIED",
+      "evidence": "scripts/healthclues-owner-demo-preflight.mjs confirmed healthclues-owner-demo, loopback Auth, and loopback Mailpit.",
+      "finding": "No account activation or authenticated region entry was performed because this run prohibits database writes."
+    },
+    {
+      "id": "npc_arrival",
+      "status": "UNVERIFIED",
+      "evidence": "scripts/test-healthclues-region-layout.mjs passed connected-path checks for both playable regions.",
+      "finding": "Walk-before-Talk timing, sprite positions, and keyboard or touch arrival were not observed in a current-run authenticated browser."
+    },
+    {
+      "id": "journey_daily_care",
+      "status": "UNVERIFIED",
+      "evidence": "Daily Care hydration and focused regression scripts passed. src/features/healthclues/HealthCluesRpgWorldHud.tsx displays the first three of all active goals and links to the full Journey when more than three exist.",
+      "finding": "The five-goal versus three-card explanation is present in source, but actual check-in save, reopen, reload, and user-facing clarity were not verified."
+    },
+    {
+      "id": "in_region_learning",
+      "status": "UNVERIFIED",
+      "evidence": "src/features/healthclues/WellnessEncyclopediaStation.tsx now uses Catalog items and no longer calls the botanical-advisor endpoint on station open.",
+      "finding": "NPC learning, lessons, quizzes, mini-games, and Boss interaction were not exercised in this run."
+    },
+    {
+      "id": "auth_persistence",
+      "status": "UNVERIFIED",
+      "evidence": "Unauthenticated GET /api/healthclues/world returned 401; /api/healthclues/account/quick-activate returned 410.",
+      "finding": "Magic-link login, returning-player persistence, and cross-account isolation require authenticated state that this run could not create or alter."
+    },
+    {
+      "id": "mobile_ui",
+      "status": "UNVERIFIED",
+      "evidence": "Current-run Chrome window screenshots were opened at App/.tmp/healthclues-tester/run-20261105141420176-15232/quiz-overworld-320x800.png and quiz-overworld-390x844.png. A later Chrome launch exited 21 with a profile lock access-denied error; the 430×932 capture was empty.",
+      "finding": "Window-size captures do not establish the emulated layout viewport. Required screens, touch targets, overlays, safe areas, and overflow at all three sizes remain unverified."
+    },
+    {
+      "id": "safety_privacy",
+      "status": "PASS",
+      "evidence": "Current-run GET on http://127.0.0.1:3329/api/healthclues/botanical-advisor for Gout, Sleep, and Digestion returned NO_REVIEWED_CONTENT with zero herbs and false review and eligibility flags. Unauthenticated POST returned 401. scripts/test-botanical-review-gate.mjs passed six topic cases and confirmed the station has no automatic botanical-advisor call.",
+      "finding": "The previously observed public unreviewed instructions and automatic Botanist provider path are absent in the tested local build; production and cross-account security are outside this PASS."
+    },
+    {
+      "id": "runtime_regression",
+      "status": "UNVERIFIED",
+      "evidence": "Seven safe focused scripts passed, including botanical review gate, Daily Care, discovery, region layout, and RPG quest board.",
+      "finding": "A current-run authenticated browser journey and browser runtime-error audit were not completed."
+    }
+  ],
+  "blocking_items": [
+    "Authenticated journey and persistence testing would write account or progress data, which this run explicitly prohibits.",
+    "Chrome later failed to create a test profile with exit 21 and access denied, preventing reliable three-viewport emulation.",
+    "No human-reviewed botanical content is available to test an eligible Botanist Save or Equip flow."
+  ],
+  "prompt_for_antigravity": "Trong luồng Quiz → World Preview → đăng nhập Mailpit → vùng chơi → NPC → My Journey/Daily Care, bản hiện tại đã trả trạng thái trống an toàn cho Gout, Sleep và Digestion; không tái tạo thảo mộc chưa duyệt. Không sửa sản phẩm dựa trên các mục UNVERIFIED. Hãy kiểm tra khả năng mở Chrome/CDP với profile và ảnh nằm trong D:\\botly\\App\\.tmp, rồi chạy kiểm tra chỉ đọc ở viewport thực bằng Emulation.setDeviceMetricsOverride cho 320×800, 390×844 và 430×932: Quiz, preview, HUD, NPC, Journey, Daily Care, dock, safe area, overflow, nút đóng và mục tiêu chạm. Đối chiếu src/features/healthclues/HealthCluesRpgWorldHud.tsx với App/UI_UX_SPEC.md: ba thẻ HUD là ba mục tiêu đầu trong tổng số năm, bộ đếm dùng cả năm và liên kết mở toàn bộ Journey; xác nhận cách giải thích này thấy rõ trong giao diện. Chạy lại các test tập trung không gọi provider và không ghi DB, nhất là scripts/test-botanical-review-gate.mjs. Vì lệnh hiện tại cấm ghi database, dừng trước khi tạo tài khoản, lưu check-in hoặc chạy E2E có ghi; báo rõ các ca xác thực, persistence, NPC và học trong vùng còn BLOCKED, không dùng báo cáo cũ hoặc ảnh không mở được để tuyên bố PASS.",
+  "next_test": "Restore isolated Chrome profile access, then run a read-only CDP guest Quiz and World Preview audit with Emulation.setDeviceMetricsOverride and inspected captures at 320×800, 390×844, and 430×932.",
+  "release_readiness": "BLOCKED for local playable-scope acceptance. The repaired botanical boundary passes current checks; authenticated and mobile browser gates remain open. Production and clinical release require separate review."
+}

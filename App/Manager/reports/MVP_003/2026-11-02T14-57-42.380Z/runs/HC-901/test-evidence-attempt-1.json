@@ -1,0 +1,8 @@
+[
+  {
+    "command": "fixture docker test/hc-901.test.mjs",
+    "result": "PASS",
+    "exitCode": 0,
+    "output": "MOCK ONLY"
+  }
+]

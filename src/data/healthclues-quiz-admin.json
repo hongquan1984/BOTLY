@@ -1,0 +1,885 @@
+[
+  {
+    "id": "C01",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "Are you 18 or older?",
+    "options": [
+      "Yes",
+      "No"
+    ],
+    "note_vi": "Xác nhận người dùng đủ 18 tuổi. Nếu không, dừng đăng ký tính năng cá nhân hóa V1."
+  },
+  {
+    "id": "C02",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "country",
+    "text": "Which country do you currently live in?",
+    "options": [
+      "Country selector",
+      "Prefer not to say"
+    ],
+    "note_vi": "Để ưu tiên nguồn và nguyên liệu phổ biến theo quốc gia. Không xin GPS hay địa chỉ."
+  },
+  {
+    "id": "C03",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "What language would you prefer for your daily discoveries?",
+    "options": [
+      "English",
+      "Another language"
+    ],
+    "note_vi": "Giai đoạn đầu chỉ xuất bản tiếng Anh; nếu chọn khác, giải thích hiện chỉ hỗ trợ English."
+  },
+  {
+    "id": "C04",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "Which health or wellness topic interests you most right now?",
+    "options": [
+      "Healthy weight",
+      "Gout & uric acid",
+      "Sleep & rest",
+      "Digestion & gut health",
+      "Balanced nutrition",
+      "Stress & relaxation",
+      "Other"
+    ],
+    "note_vi": "Chọn chủ đề muốn tìm hiểu, KHÔNG suy diễn đây là chẩn đoán bệnh. Kích hoạt nhánh câu hỏi tương ứng."
+  },
+  {
+    "id": "C05",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "What best describes why you are exploring this topic?",
+    "options": [
+      "General curiosity",
+      "A condition diagnosed by a healthcare professional",
+      "A concern I have not discussed with a professional",
+      "Researching for someone else",
+      "Prefer not to say"
+    ],
+    "note_vi": "Phân biệt mối quan tâm với bệnh đã được xác nhận. Không kiểm chứng hay tự chẩn đoán."
+  },
+  {
+    "id": "C06",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "multi",
+    "text": "Which kinds of content would you like to discover?",
+    "options": [
+      "Food & recipes",
+      "Natural ingredients and traditions",
+      "Everyday habits",
+      "Research explained",
+      "General treatment information",
+      "Free guides"
+    ],
+    "note_vi": "Phân loại sở thích nội dung. Thuốc/điều trị chỉ là tài liệu giáo dục chung, không đưa chỉ định cá nhân."
+  },
+  {
+    "id": "C07",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "How would you like the information presented?",
+    "options": [
+      "Quick daily cards",
+      "Step-by-step recipes",
+      "Short research summaries",
+      "A mix of everything"
+    ],
+    "note_vi": "Chọn định dạng trình bày ưa thích."
+  },
+  {
+    "id": "C08",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "How much time could you comfortably spend on a small daily activity?",
+    "options": [
+      "5 minutes",
+      "10–15 minutes",
+      "20–30 minutes",
+      "More than 30 minutes",
+      "I only want to read"
+    ],
+    "note_vi": "Để lọc mức độ phức tạp của hoạt động, không tạo bài tập trị bệnh."
+  },
+  {
+    "id": "C09",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "How often would you like your dashboard refreshed?",
+    "options": [
+      "Daily",
+      "Three times a week",
+      "Weekly"
+    ],
+    "note_vi": "Tần suất làm mới dashboard; email là đồng ý riêng, không tự động bật."
+  },
+  {
+    "id": "C10",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "What would make the next two weeks most useful for you?",
+    "options": [
+      "Find interesting new information",
+      "Explore simple recipes",
+      "Build a small routine",
+      "Understand the research better"
+    ],
+    "note_vi": "Mục tiêu ngắn hạn giúp hệ thống chọn ưu tiên, không đặt kết quả điều trị."
+  },
+  {
+    "id": "C11",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How long has this topic been relevant to you?",
+    "options": [
+      "A few days",
+      "Weeks",
+      "Months",
+      "Years",
+      "I am just curious",
+      "Prefer not to say"
+    ],
+    "note_vi": "Ngữ cảnh quan tâm theo thời gian, không dùng xác định bệnh."
+  },
+  {
+    "id": "C12",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How often does this concern come up for you?",
+    "options": [
+      "Most days",
+      "A few times a week",
+      "Occasionally",
+      "Not applicable",
+      "Prefer not to say"
+    ],
+    "note_vi": "Tần suất tự khai báo; chỉ dùng để chọn nội dung thông tin, không phân tầng bệnh."
+  },
+  {
+    "id": "C13",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How much does this concern affect your daily routine?",
+    "options": [
+      "Not at all",
+      "A little",
+      "Moderately",
+      "A lot",
+      "Prefer not to say"
+    ],
+    "note_vi": "Đo mức độ ảnh hưởng tự nhận; nếu ảnh hưởng nhiều, nhắc tham khảo chuyên gia thay vì tự xử lý."
+  },
+  {
+    "id": "C14",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "When is this concern most noticeable?",
+    "options": [
+      "Morning",
+      "After meals",
+      "Afternoon",
+      "Evening or night",
+      "It varies",
+      "Not applicable"
+    ],
+    "note_vi": "Ngữ cảnh thời gian, dùng chọn lịch nội dung chung chứ không suy ra nguyên nhân bệnh."
+  },
+  {
+    "id": "C15",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Have you discussed this concern with a healthcare professional?",
+    "options": [
+      "Yes",
+      "No",
+      "Not applicable",
+      "Prefer not to say"
+    ],
+    "note_vi": "Khuyến khích tìm chuyên gia khi cần; không cố điền khoảng trống bằng suy đoán AI."
+  },
+  {
+    "id": "C16",
+    "group": "core",
+    "stage": "deep",
+    "type": "multi",
+    "text": "What have you already explored or tried?",
+    "options": [
+      "Reading wellness articles",
+      "Changing everyday meals",
+      "Simple daily routines",
+      "Professional advice",
+      "Nothing yet",
+      "Prefer not to say"
+    ],
+    "note_vi": "Hiểu trải nghiệm đã thử theo loại hoạt động, không thu thông tin liều thuốc hoặc tác dụng chữa bệnh."
+  },
+  {
+    "id": "C17",
+    "group": "core",
+    "stage": "deep",
+    "type": "multi",
+    "text": "What usually gets in the way of trying something new?",
+    "options": [
+      "Time",
+      "Cost",
+      "Ingredients unavailable",
+      "Too complicated",
+      "Unsure whether it is safe",
+      "Hard to stay consistent",
+      "Other"
+    ],
+    "note_vi": "Cơ sở gợi ý lựa chọn đơn giản hơn và hỏi lý do chưa thử vào các ngày tiếp theo."
+  },
+  {
+    "id": "C18",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "What kind of encouragement would you prefer?",
+    "options": [
+      "Gentle reminders",
+      "More alternatives",
+      "Short explanations",
+      "Progress summaries",
+      "No reminders"
+    ],
+    "note_vi": "Cá nhân hóa cách phản hồi, tránh gây áp lực."
+  },
+  {
+    "id": "C19",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which description best fits your weekday schedule?",
+    "options": [
+      "Mostly regular hours",
+      "Shift work or changing hours",
+      "Home-based flexible schedule",
+      "Varies a lot",
+      "Prefer not to say"
+    ],
+    "note_vi": "Điều chỉnh thời điểm gợi ý thực hành; không cần lịch làm việc chi tiết."
+  },
+  {
+    "id": "C20",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How often do you prepare food at home?",
+    "options": [
+      "Most days",
+      "A few days a week",
+      "Rarely",
+      "I do not prepare food",
+      "Prefer not to say"
+    ],
+    "note_vi": "Chọn công thức phù hợp khả năng tự nấu."
+  },
+  {
+    "id": "C21",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which eating style sounds most like you?",
+    "options": [
+      "Mostly plant-based",
+      "Mixed meals",
+      "No specific style",
+      "Other",
+      "Prefer not to say"
+    ],
+    "note_vi": "Định hướng khẩu vị, không suy ra chế độ ăn y khoa."
+  },
+  {
+    "id": "C22",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "What is your preferred budget for everyday recipes?",
+    "options": [
+      "Budget-friendly",
+      "Moderate",
+      "Flexible",
+      "Prefer not to say"
+    ],
+    "note_vi": "Ưu tiên công thức theo chi phí, không cần hỏi thu nhập."
+  },
+  {
+    "id": "C23",
+    "group": "core",
+    "stage": "deep",
+    "type": "multi",
+    "text": "Are there foods or ingredients you simply prefer to avoid?",
+    "options": [
+      "Dairy",
+      "Nuts",
+      "Seafood",
+      "Meat",
+      "Spicy foods",
+      "None",
+      "Other"
+    ],
+    "note_vi": "Sở thích tránh nguyên liệu khác với dị ứng; không dùng câu này để đánh giá an toàn."
+  },
+  {
+    "id": "C24",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Do you have any known food allergies?",
+    "options": [
+      "Yes",
+      "No",
+      "Not sure",
+      "Prefer not to say"
+    ],
+    "note_vi": "Nếu Có/Không chắc: không tự đảm bảo công thức an toàn. Yêu cầu xác nhận nguyên liệu từ nhãn và chuyên gia khi cần."
+  },
+  {
+    "id": "C25",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Has a healthcare professional advised you to follow any food or activity restrictions?",
+    "options": [
+      "Yes",
+      "No",
+      "Not sure",
+      "Prefer not to say"
+    ],
+    "note_vi": "Nếu Có/Không chắc: không tự tạo công thức hoặc hoạt động cá nhân hóa có thể xung đột."
+  },
+  {
+    "id": "C26",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How consistent is your sleep schedule?",
+    "options": [
+      "Very consistent",
+      "Somewhat variable",
+      "Highly variable",
+      "I work shifts",
+      "Prefer not to say"
+    ],
+    "note_vi": "Ghi nhận thói quen ngủ, không chẩn đoán mất ngủ."
+  },
+  {
+    "id": "C27",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How would you describe your energy during a typical day?",
+    "options": [
+      "Mostly steady",
+      "Often low",
+      "Goes up and down",
+      "Prefer not to say"
+    ],
+    "note_vi": "Thông tin tự nhận về năng lượng; không suy ra nguyên nhân bệnh."
+  },
+  {
+    "id": "C28",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How stressful does a typical day feel?",
+    "options": [
+      "Low stress",
+      "Some stress",
+      "High stress",
+      "Prefer not to say"
+    ],
+    "note_vi": "Để cân đối tần suất và mức độ phức tạp của nội dung, không chẩn đoán tâm lý."
+  },
+  {
+    "id": "C29",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How active is a typical day for you?",
+    "options": [
+      "Mostly seated",
+      "Light activity",
+      "Moderate activity",
+      "Very active",
+      "Prefer not to say"
+    ],
+    "note_vi": "Bối cảnh sinh hoạt, không kê chế độ tập luyện nhằm điều trị."
+  },
+  {
+    "id": "C30",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Do you usually feel more comfortable in warm or cool environments?",
+    "options": [
+      "Warm",
+      "Cool",
+      "Either",
+      "No preference",
+      "Prefer not to say"
+    ],
+    "note_vi": "Câu lấy cảm hứng từ vấn chẩn Đông y để hiểu sở thích môi trường; tuyệt đối không chấm thể hàn/nhiệt."
+  },
+  {
+    "id": "C31",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How would you describe your usual appetite and digestion?",
+    "options": [
+      "Generally comfortable",
+      "Variable appetite",
+      "Occasional digestive discomfort",
+      "Not sure",
+      "Prefer not to say"
+    ],
+    "note_vi": "Ghi nhận cảm nhận chung, không suy ra tỳ vị hoặc bệnh đường tiêu hóa."
+  },
+  {
+    "id": "C32",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Do you take medicines or supplements that could affect what you choose to try?",
+    "options": [
+      "Yes",
+      "No",
+      "Not sure",
+      "Prefer not to say"
+    ],
+    "note_vi": "Không cần nhập tên thuốc ở V1. Nếu Có/Không chắc: không đề xuất dùng thảo dược hoặc bổ sung theo cá nhân."
+  },
+  {
+    "id": "C33",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Are you experiencing any new, severe, or quickly worsening symptoms?",
+    "options": [
+      "Yes",
+      "No",
+      "Prefer not to say"
+    ],
+    "note_vi": "Nếu Có: hiển thị thông báo cần đánh giá y tế kịp thời; tạm dừng hoạt động tự thử liên quan sức khỏe. Không kết luận nguyên nhân."
+  },
+  {
+    "id": "G01",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Is gout a clinician-confirmed diagnosis for you, or a topic you want to understand?",
+    "options": [
+      "Confirmed diagnosis",
+      "General interest",
+      "I am unsure",
+      "Prefer not to say"
+    ],
+    "note_vi": "Không tự xác nhận gout từ triệu chứng."
+  },
+  {
+    "id": "G02",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Are you currently experiencing a painful or swollen joint episode?",
+    "options": [
+      "Yes",
+      "No",
+      "Unsure",
+      "Prefer not to say"
+    ],
+    "note_vi": "Nếu có vấn đề cấp tính, không gợi ý tự điều trị; hướng dẫn tìm đánh giá chuyên môn."
+  },
+  {
+    "id": "G03",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Do you have a hot, swollen joint together with fever or feeling very unwell?",
+    "options": [
+      "Yes",
+      "No",
+      "Unsure",
+      "Prefer not to say"
+    ],
+    "note_vi": "Nếu Có/Không chắc trong bối cảnh cấp: thông báo cần đánh giá y tế khẩn; không đưa phương án tự chữa."
+  },
+  {
+    "id": "G04",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which gout-related information interests you most?",
+    "options": [
+      "Foods and drinks",
+      "Everyday habits",
+      "Research findings",
+      "General treatment information"
+    ],
+    "note_vi": "Phân loại chủ đề tài liệu, không chọn thuốc hoặc phác đồ."
+  },
+  {
+    "id": "G05",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which food or drink subjects would you like to read about?",
+    "options": [
+      "Seafood",
+      "Red meat",
+      "Sugary drinks",
+      "Alcohol",
+      "Plant-based proteins",
+      "No preference"
+    ],
+    "note_vi": "Hỏi chủ đề muốn đọc, không mặc định cấm hoặc khuyên dùng nhóm thực phẩm nào."
+  },
+  {
+    "id": "G06",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Have you received specific food or drink restrictions from a clinician?",
+    "options": [
+      "Yes",
+      "No",
+      "Unsure",
+      "Prefer not to say"
+    ],
+    "note_vi": "Nếu có hạn chế: không để AI đề xuất trái với hướng dẫn chuyên môn."
+  },
+  {
+    "id": "G07",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "What is your biggest barrier to exploring food-related changes?",
+    "options": [
+      "Cost",
+      "Preparation time",
+      "Taste",
+      "Limited ingredients",
+      "Safety concerns",
+      "Other"
+    ],
+    "note_vi": "Để chọn tài liệu và công thức sinh hoạt thông thường dễ tiếp cận hơn."
+  },
+  {
+    "id": "W01",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "What are you most interested in?",
+    "options": [
+      "Balanced eating",
+      "Easy meal ideas",
+      "Everyday movement",
+      "Long-term habits",
+      "Research explanations"
+    ],
+    "note_vi": "Tập trung thói quen, tránh lời hứa giảm cân nhanh."
+  },
+  {
+    "id": "W02",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "How predictable are your meal times?",
+    "options": [
+      "Mostly regular",
+      "Often irregular",
+      "Shift-based",
+      "Prefer not to say"
+    ],
+    "note_vi": "Để gợi ý nội dung tổ chức bữa ăn."
+  },
+  {
+    "id": "W03",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "How often do you eat meals you prepared yourself?",
+    "options": [
+      "Most days",
+      "Sometimes",
+      "Rarely",
+      "Prefer not to say"
+    ],
+    "note_vi": "Để định dạng công thức thực tế."
+  },
+  {
+    "id": "W04",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which type of recipe would you actually use?",
+    "options": [
+      "Under 10 minutes",
+      "Few ingredients",
+      "Budget-friendly",
+      "Batch cooking"
+    ],
+    "note_vi": "Để học ưu tiên công thức."
+  },
+  {
+    "id": "W05",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "Has a healthcare professional advised you not to pursue weight loss or to follow a specific plan?",
+    "options": [
+      "Yes",
+      "No",
+      "Unsure",
+      "Prefer not to say"
+    ],
+    "note_vi": "Nếu Có/Không chắc: không tạo kế hoạch thay đổi cân nặng; chỉ đưa nội dung giáo dục chung."
+  },
+  {
+    "id": "W06",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "What makes lifestyle changes hardest to keep up?",
+    "options": [
+      "Time",
+      "Cost",
+      "Work schedule",
+      "Motivation",
+      "Too many rules",
+      "Other"
+    ],
+    "note_vi": "Để điều chỉnh mức độ đơn giản và áp lực."
+  },
+  {
+    "id": "W07",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "How would you prefer to measure progress?",
+    "options": [
+      "Activities completed",
+      "New recipes explored",
+      "Consistency of routine",
+      "I prefer not to track"
+    ],
+    "note_vi": "Không đặt mục tiêu cân nặng hoặc calo từ quiz."
+  },
+  {
+    "id": "S01",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "What part of sleep or rest interests you most?",
+    "options": [
+      "Falling asleep",
+      "Staying asleep",
+      "More regular bedtime",
+      "Relaxation",
+      "Research"
+    ],
+    "note_vi": "Chọn nhóm nội dung, không kết luận rối loạn giấc ngủ."
+  },
+  {
+    "id": "S02",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "How often do you have difficulty sleeping or resting?",
+    "options": [
+      "1–2 nights a week",
+      "3–4 nights",
+      "5–7 nights",
+      "Not applicable",
+      "Prefer not to say"
+    ],
+    "note_vi": "Dùng xác định nhu cầu thông tin, không chẩn đoán."
+  },
+  {
+    "id": "S03",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "What time does your evening routine usually begin?",
+    "options": [
+      "Before 8 PM",
+      "8–10 PM",
+      "After 10 PM",
+      "It varies",
+      "Prefer not to say"
+    ],
+    "note_vi": "Để chọn thời điểm gửi checklist nếu người dùng đồng ý."
+  },
+  {
+    "id": "S04",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "Do you work shifts or have a frequently changing sleep schedule?",
+    "options": [
+      "Yes",
+      "No",
+      "Prefer not to say"
+    ],
+    "note_vi": "Phân biệt bối cảnh lịch sinh hoạt."
+  },
+  {
+    "id": "S05",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "What would you enjoy as an evening activity?",
+    "options": [
+      "Short reading",
+      "Calm audio",
+      "Gentle stretching",
+      "Journaling",
+      "Just information"
+    ],
+    "note_vi": "Chọn hoạt động wellness nhẹ, không tự đưa liệu pháp điều trị."
+  },
+  {
+    "id": "S06",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "Have you noticed loud snoring, gasping during sleep, or significant daytime sleepiness?",
+    "options": [
+      "Yes",
+      "No",
+      "Unsure",
+      "Prefer not to say"
+    ],
+    "note_vi": "Nếu Có/Không chắc: nêu rằng nên trao đổi với chuyên gia về vấn đề giấc ngủ; không tự chẩn đoán."
+  },
+  {
+    "id": "S07",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "What usually makes an evening routine hard to follow?",
+    "options": [
+      "Too little time",
+      "Family or work schedule",
+      "Screen time",
+      "Noise",
+      "Hard to stay consistent",
+      "Other"
+    ],
+    "note_vi": "Để chọn nội dung và hoạt động dễ thực hiện hơn."
+  },
+  {
+    "id": "F01",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which daily area would you like to explore first?",
+    "options": [
+      "Food",
+      "Rest",
+      "Movement",
+      "Mindfulness",
+      "General research"
+    ],
+    "note_vi": "Nhánh dự phòng cho chủ đề chưa có bộ chuyên sâu."
+  },
+  {
+    "id": "F02",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "Would you rather read or try something practical?",
+    "options": [
+      "Read",
+      "Try a simple activity",
+      "Both"
+    ],
+    "note_vi": "Chọn loại nội dung."
+  },
+  {
+    "id": "F03",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "What is your preferred recipe style?",
+    "options": [
+      "Simple ingredients",
+      "Fast preparation",
+      "Budget-friendly",
+      "No recipes"
+    ],
+    "note_vi": "Chọn công thức thông thường."
+  },
+  {
+    "id": "F04",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "Would you like research citations in each card?",
+    "options": [
+      "Always",
+      "Only when important",
+      "Open on demand"
+    ],
+    "note_vi": "Chọn cách hiển thị nguồn; nguồn vẫn phải sẵn có."
+  },
+  {
+    "id": "F05",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "How many content cards feel comfortable per day?",
+    "options": [
+      "1",
+      "2",
+      "3"
+    ],
+    "note_vi": "Chống quá tải."
+  },
+  {
+    "id": "F06",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "What would make you return tomorrow?",
+    "options": [
+      "New information",
+      "Continue a routine",
+      "Review saved items",
+      "Weekly summary"
+    ],
+    "note_vi": "Hiểu động lực sử dụng."
+  },
+  {
+    "id": "F07",
+    "group": "general",
+    "stage": "deep",
+    "type": "text_or_none",
+    "text": "Which topic should we avoid suggesting?",
+    "options": [
+      "Free text",
+      "None"
+    ],
+    "note_vi": "Hồ sơ thể hiện sở thích và mục tiêu tìm hiểu, không kết luận thể bệnh Đông y, bệnh y khoa hay phác đồ điều trị."
+  }
+]

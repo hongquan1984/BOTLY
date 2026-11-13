@@ -1,0 +1,101 @@
+diff --git a/src/app/api/admin/analytics/route.ts b/src/app/api/admin/analytics/route.ts
+index da4362f..826b35c 100644
+--- a/src/app/api/admin/analytics/route.ts
++++ b/src/app/api/admin/analytics/route.ts
+@@ -1,10 +1,13 @@
+ import { NextResponse } from 'next/server';
+ import { processInsomniaQuizAnalytics } from '@/lib/quiz-analytics';
++import { isAdminRequest } from '@/lib/admin-auth';
+ 
+ export const runtime = 'nodejs';
+ export const dynamic = 'force-dynamic';
+ 
+ export async function GET(request: Request) {
++  if (!process.env.EBOOK_ADMIN_TOKEN) return NextResponse.json({ ok: false, error: 'Admin analytics is not configured' }, { status: 503 });
++  if (!isAdminRequest(request)) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+   try {
+     const { searchParams } = new URL(request.url);
+     const days = parseInt(searchParams.get('days') || '30', 10);
+@@ -22,7 +25,7 @@ export async function GET(request: Request) {
+         method: 'POST',
+         headers: {
+           apikey: serviceKey,
+-          Authorization: `Bearer ${serviceKey}`,
++          ...(!serviceKey.startsWith('sb_') ? { Authorization: `Bearer ${serviceKey}` } : {}),
+           'Content-Type': 'application/json'
+         },
+         body: JSON.stringify({ p_days: days })
+diff --git a/src/app/api/admin/ebook-library/route.ts b/src/app/api/admin/ebook-library/route.ts
+index 21af7e2..ace4d21 100644
+--- a/src/app/api/admin/ebook-library/route.ts
++++ b/src/app/api/admin/ebook-library/route.ts
+@@ -6,7 +6,8 @@ export const runtime = 'nodejs';
+ export const dynamic = 'force-dynamic';
+ 
+ export async function GET(request: Request) {
+-  const expected = process.env.EBOOK_ADMIN_TOKEN || 'botly_admin_2026';
++  const expected = process.env.EBOOK_ADMIN_TOKEN;
++  if (!expected) return NextResponse.json({ error: 'Admin access is not configured.' }, { status: 503 });
+   const supplied = /^Bearer (.+)$/.exec(request.headers.get('authorization') || '')?.[1] || '';
+   const a = Buffer.from(supplied);
+   const b = Buffer.from(expected);
+diff --git a/src/app/api/admin/night-companion-dispatch/route.ts b/src/app/api/admin/night-companion-dispatch/route.ts
+index 8e3f446..811fc8a 100644
+--- a/src/app/api/admin/night-companion-dispatch/route.ts
++++ b/src/app/api/admin/night-companion-dispatch/route.ts
+@@ -1,9 +1,17 @@
+ import { NextResponse } from 'next/server';
++import { isAdminRequest } from '@/lib/admin-auth';
+ import { processDueReminders } from '@/lib/night-companion-scheduler';
+ 
+ export const runtime = 'nodejs';
+ 
+ export async function POST(request: Request) {
++  if (!process.env.EBOOK_ADMIN_TOKEN) {
++    return NextResponse.json({ ok: false, error: 'Admin dispatch is not configured.' }, { status: 503 });
++  }
++  if (!isAdminRequest(request)) {
++    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
++  }
++
+   try {
+     const body = await request.json().catch(() => ({})) as {
+       fake_clock_now?: string;
+diff --git a/src/app/api/admin/night-companion-funnel/route.ts b/src/app/api/admin/night-companion-funnel/route.ts
+index 44b2877..6e0de47 100644
+--- a/src/app/api/admin/night-companion-funnel/route.ts
++++ b/src/app/api/admin/night-companion-funnel/route.ts
+@@ -1,10 +1,13 @@
+ import { NextResponse } from 'next/server';
+ import { processNightCompanionFunnel } from '@/lib/night-companion-funnel';
++import { isAdminRequest } from '@/lib/admin-auth';
+ 
+ export const runtime = 'nodejs';
+ export const dynamic = 'force-dynamic';
+ 
+-export async function GET() {
++export async function GET(request: Request) {
++  if (!process.env.EBOOK_ADMIN_TOKEN) return NextResponse.json({ ok: false, error: 'Admin analytics is not configured' }, { status: 503 });
++  if (!isAdminRequest(request)) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+   try {
+     const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL)?.replace(/\/$/, '');
+     const serviceKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+diff --git a/src/lib/admin-auth.ts b/src/lib/admin-auth.ts
+new file mode 100644
+index 0000000..18c16be
+--- /dev/null
++++ b/src/lib/admin-auth.ts
+@@ -0,0 +1,12 @@
++import 'server-only';
++import { timingSafeEqual } from 'node:crypto';
++
++export function isAdminRequest(request: Request) {
++  const expected = process.env.EBOOK_ADMIN_TOKEN;
++  if (!expected) return false;
++  const supplied = /^Bearer (.+)$/.exec(request.headers.get('authorization') || '')?.[1] || '';
++  const a = Buffer.from(supplied);
++  const b = Buffer.from(expected);
++  return a.length === b.length && timingSafeEqual(a, b);
++}
++

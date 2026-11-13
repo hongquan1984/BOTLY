@@ -1,0 +1,11 @@
+{
+  "label": "INTENTIONAL_REWORK_FIXTURE",
+  "purpose": "Exercise real rejection using a deliberately incorrect source replacement in synthetic workspace only.",
+  "changed": [
+    {
+      "path": "src/greeting.mjs",
+      "sha256": "806f84aff67e479a28c43cee8a966610e295c5cddbc206d7bcc1fb8b8b4174f1",
+      "patchDigest": "3527892c54b1f54abf2dc87d82fefb10d71a038941abfda4fa778d0c3111c4f4"
+    }
+  ]
+}

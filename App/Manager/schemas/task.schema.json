@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["taskId", "title", "objective", "priority", "sourceRequirements", "dependencies", "allowedScope", "deliverables", "acceptanceCriteria", "requiredTests", "visualEvidence", "retryCount", "status", "previousReviewFeedback", "ownerApprovalRequired", "projectFinalAudit"],
+  "properties": {
+    "taskId": { "type": "string", "pattern": "^HC-[0-9]{3,}$" }, "title": { "type": "string", "minLength": 1 }, "objective": { "type": "string", "minLength": 1 }, "priority": { "enum": ["P0", "P1", "P2", "P3"] },
+    "sourceRequirements": { "type": "array", "items": { "type": "string" } }, "dependencies": { "type": "array", "items": { "type": "string" } }, "allowedScope": { "type": "array", "items": { "type": "string" } }, "deliverables": { "type": "array", "items": { "type": "string" } }, "acceptanceCriteria": { "type": "array", "items": { "type": "string" } }, "requiredTests": { "type": "array", "items": { "type": "string" } }, "visualEvidence": { "type": "array", "items": { "type": "string" } }, "retryCount": { "type": "integer", "minimum": 0 }, "status": { "enum": ["PENDING", "READY", "IN_PROGRESS", "UNDER_REVIEW", "PASS", "REWORK", "BLOCKED", "NEEDS_APPROVAL", "INTERRUPTED", "SKIPPED_WITH_APPROVAL"] }, "previousReviewFeedback": { "type": "array", "items": { "type": "string" } }, "ownerApprovalRequired": { "type": "boolean" }, "projectFinalAudit": { "type": "boolean" }
+  }, "additionalProperties": false
+}

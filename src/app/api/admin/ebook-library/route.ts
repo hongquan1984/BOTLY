@@ -6,7 +6,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const expected = process.env.EBOOK_ADMIN_TOKEN || 'botly_admin_2026';
+  const expected = process.env.EBOOK_ADMIN_TOKEN;
+  if (!expected) return NextResponse.json({ error: 'Admin access is not configured.' }, { status: 503 });
   const supplied = /^Bearer (.+)$/.exec(request.headers.get('authorization') || '')?.[1] || '';
   const a = Buffer.from(supplied);
   const b = Buffer.from(expected);

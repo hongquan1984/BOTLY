@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a19c52-d2bb-7a70-a28c-d45fdf2d1916"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"decision\":\"PAUSE\",\"taskId\":null,\"reasoning\":\"This validates structured CLI output only, not HealthClues acceptance.\",\"feedback\":[],\"dimensions\":{\"functional\":\"NOT_APPLICABLE\",\"visual\":\"NOT_APPLICABLE\",\"data\":\"NOT_APPLICABLE\",\"localization\":\"NOT_APPLICABLE\",\"security\":\"NOT_APPLICABLE\",\"aiIntegration\":\"NOT_APPLICABLE\"},\"nextTask\":null,\"approvalRequest\":null}"}}
+{"type":"turn.completed","usage":{"input_tokens":16493,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":175,"reasoning_output_tokens":76}}

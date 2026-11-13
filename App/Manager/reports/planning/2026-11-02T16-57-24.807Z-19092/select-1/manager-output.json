@@ -1,0 +1,56 @@
+{
+  "decision": "SELECT_TASK",
+  "taskId": "HC-005",
+  "reasoning": "HC-005 is the first highest-priority ready task provided.",
+  "feedback": [],
+  "dimensions": {
+    "functional": "UNVERIFIED",
+    "visual": "UNVERIFIED",
+    "data": "UNVERIFIED",
+    "localization": "UNVERIFIED",
+    "security": "UNVERIFIED",
+    "aiIntegration": "UNVERIFIED"
+  },
+  "nextTask": {
+    "taskId": "HC-005",
+    "title": "Evidence audit: Botanist RPG presentation",
+    "objective": "Factual discovery only. Establish whether the lead is complete, incomplete, blocked, or already verified from current source and artifacts. Do not change product code. Check current Botanist/NPC talk visuals, localization and content against UI_UX and game acceptance.",
+    "priority": "P2",
+    "sourceRequirements": [
+      "MASTER_SPEC.md",
+      "BUSINESS_RULES.md",
+      "ACCEPTANCE_TESTS.md",
+      "CURRENT_STATE.md",
+      "UI_UX_SPEC.md",
+      "reports/HEALTHCLUES_MASTER_PROMPT_16_ACCEPTANCE.md",
+      "reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md"
+    ],
+    "dependencies": [],
+    "allowedScope": [
+      "src",
+      "public"
+    ],
+    "deliverables": [
+      "Evidence citations with repository-relative file paths",
+      "PASS/UNVERIFIED/REWORK dimension summary",
+      "Precise follow-up task only when evidence shows a gap"
+    ],
+    "acceptanceCriteria": [
+      "No product files changed",
+      "Cite existing source/test/evidence file paths in evidence array",
+      "Check source and tests; distinguish mocks from real integrations",
+      "Do not infer visual PASS without screenshot inspection",
+      "Record open conflicts and missing artifacts"
+    ],
+    "requiredTests": [],
+    "visualEvidence": [],
+    "retryCount": 1,
+    "status": "REWORK",
+    "previousReviewFeedback": [
+      "Prior Manager review requested that visual status remain UNVERIFIED unless a reviewable screenshot with viewport dimensions is supplied; do not claim visual PASS. Attempt 4 was interrupted because the live CURRENT_STATE.md watcher changed from SHA-256 50e3fb78a540bc87d865abd48d0d9dbcd70d0b48bae1c4b2ff9a0b37482475b8 to 2e807fec2bdff0b44989d75b76557e2ead70f2c692089fc702dd3592194c0d03 during review. Restart from a fresh manifest, but keep the task input pinned to Owner-approved CURRENT_STATE SHA-256 ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8. If live inputs change again, stop."
+    ],
+    "ownerApprovalRequired": false,
+    "projectFinalAudit": false
+  },
+  "approvalRequest": null
+}

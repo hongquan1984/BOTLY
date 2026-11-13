@@ -1,0 +1,206 @@
+﻿ M .gitignore
+ M .vercelignore
+ M AGENTS.md
+ M README.md
+ M eslint.config.mjs
+ M next.config.ts
+ M package-lock.json
+ M package.json
+ M public/articles/exhausted-body-active-mind-sleep/cover.jpg
+ M public/articles/the-midnight-math-trap-why-checking-time-hurts-sleep/cover.jpg
+ M public/articles/when-your-mind-wont-stop-replaying/cover.jpg
+ M public/articles/why-2am-feels-like-your-only-free-time/cover.jpg
+ M public/articles/why-silence-feels-too-loud-at-night/cover.jpg
+ M scripts/compile-final-stats.mjs
+ M scripts/deep-analytics-report.mjs
+ M scripts/detailed-event-inspection.mjs
+ M scripts/summarize-funnel.mjs
+ M scripts/update-fatty-liver.mjs
+ M src/app/admin/thong-ke/page.tsx
+ M src/app/api/admin/analytics/route.ts
+ M src/app/api/admin/ebook-library/route.ts
+ M src/app/api/admin/night-companion-dispatch/route.ts
+ M src/app/api/admin/night-companion-funnel/route.ts
+ M src/app/api/analytics/track/route.ts
+ M src/app/api/event-ping/route.ts
+ M src/app/en/wellness/auth/callback/page.tsx
+ M src/app/en/wellness/guides/[slug]/page.tsx
+ M src/app/layout.tsx
+ M src/app/vi/song-khoe/auth/callback/page.tsx
+ M src/components/analytics/AnalyticsTracker.tsx
+ M src/components/night-companion/NightAudioPlayer.tsx
+ M src/components/quiz/CompactResultScreen.tsx
+ M src/components/sections/Process.tsx
+ M src/components/wellness/EbookCatalogPage.tsx
+ M src/components/wellness/EbookLeadCapture.tsx
+ M src/components/wellness/WellnessAccount.tsx
+ M src/lib/night-companion-funnel.ts
+ M src/lib/quiz-analytics.ts
+ M src/lib/wellness-cloud.ts
+ M supabase/ARTICLES.md
+ D supabase/migrations/001_wellness.sql
+ D supabase/migrations/002_wellness_articles.sql
+ D supabase/migrations/003_article_publishing.sql
+ D supabase/migrations/004_mindful_haven_widgets.sql
+ D supabase/migrations/005_app_download_analytics.sql
+ D supabase/migrations/006_night_companion.sql
+ D supabase/migrations/007_night_companion_waitlist.sql
+ D supabase/migrations/008_night_companion_reminders.sql
+ D supabase/migrations/009_ebook_library.sql
+ D supabase/migrations/010_enable_verified_ebook_files.sql
+ M tsconfig.json
+?? .githooks/
+?? .next-healthclues-build-20261027/
+?? .next-healthclues-build-clean/
+?? App/
+?? HEALTHCLUES_CODEX_MASTER_PROMPT.md
+?? HEALTHCLUES_QUIZ_BANK_V1.md
+?? docs/SECURITY_SECRET_SCANNING.md
+?? docs/healthclues/
+?? public/articles/4-7-8-breathing-technique-nighttime-anxiety-sleep/
+?? public/healthclues/
+?? scripts/analyze-quiz-yesterday-today.mjs
+?? scripts/build-healthclues-isolated.mjs
+?? scripts/check-all-durations.mjs
+?? scripts/check-audio-ready.mjs
+?? scripts/check-eslint-debt-baseline.mjs
+?? scripts/check-healthclues-docs.mjs
+?? scripts/check-play-status.mjs
+?? scripts/check-time.mjs
+?? scripts/debug-audio-error.mjs
+?? scripts/drilldown-quiz.mjs
+?? scripts/fixtures/
+?? scripts/generate-clinical-hypnosis-demo.py
+?? scripts/generate-sample-hypnosis-30s.py
+?? scripts/healthclues-advisor-response.ps1
+?? scripts/healthclues-gemini-mock-fetch.cjs
+?? scripts/healthclues-owner-demo-preflight.mjs
+?? scripts/healthclues-production-readonly-preflight.mjs
+?? scripts/inspect-24-clicks.mjs
+?? scripts/inspect-circle.mjs
+?? scripts/inspect-first-10.mjs
+?? scripts/inspect-play-status.mjs
+?? scripts/inspect-tab.mjs
+?? scripts/inspect-yesterday-clicks.mjs
+?? scripts/open-player.mjs
+?? scripts/play-pivot-in-browser.mjs
+?? scripts/run-healthclues-game-e2e.mjs
+?? scripts/run-healthclues-review-http-e2e.mjs
+?? scripts/scan-secrets.mjs
+?? scripts/start-healthclues-owner-demo.mjs
+?? scripts/start-healthclues-owner-preview.mjs
+?? scripts/strip-vietnamese.py
+?? scripts/test-blackout-playing.mjs
+?? scripts/test-clean-analytics.mjs
+?? scripts/test-healthclues-adaptive-discovery.mjs
+?? scripts/test-healthclues-advisor-response-capture.mjs
+?? scripts/test-healthclues-advisor-runtime-mock.mjs
+?? scripts/test-healthclues-analytics-consent.mjs
+?? scripts/test-healthclues-dashboard-browser-e2e.mjs
+?? scripts/test-healthclues-discovery-matching.mjs
+?? scripts/test-healthclues-gemini-advisor-unavailable.mjs
+?? scripts/test-healthclues-gemini-plan-pipeline.mjs
+?? scripts/test-healthclues-localization.mjs
+?? scripts/test-healthclues-mp17-goal-first-browser.mjs
+?? scripts/test-healthclues-mp17-plan-selection-browser.mjs
+?? scripts/test-healthclues-owner-auth-demo.mjs
+?? scripts/test-healthclues-personalized-plan-contract.mjs
+?? scripts/test-healthclues-personalized-recommendations.mjs
+?? scripts/test-healthclues-phase10a-browser.mjs
+?? scripts/test-healthclues-playbooks.mjs
+?? scripts/test-healthclues-post-quiz-plan-browser.mjs
+?? scripts/test-healthclues-profile-activity-rest-e2e.mjs
+?? scripts/test-healthclues-quiz-branches.mjs
+?? scripts/test-healthclues-quiz-safety.mjs
+?? scripts/test-healthclues-region-layout.mjs
+?? scripts/test-healthclues-review-http-e2e.mjs
+?? scripts/test-healthclues-skill-levels.mjs
+?? scripts/test-healthclues-wellness-plan.mjs
+?? scripts/test-healthclues-world-db.mjs
+?? scripts/test-player-stages.mjs
+?? scripts/test-quiet-moment-aura.mjs
+?? scripts/test-resting-transition.mjs
+?? scripts/test-transition.mjs
+?? scripts/verify-aura-flow.mjs
+?? scripts/verify-delta-cocoon-live.mjs
+?? scripts/verify-healthclues-owner-preview.mjs
+?? scripts/verify-healthclues-owner-resume-after-restart.mjs
+?? scripts/verify-live-production.mjs
+?? scripts/verify-zen-player-live.mjs
+?? src/app/admin/healthclues-authoring/
+?? src/app/admin/healthclues-community/
+?? src/app/admin/healthclues-content/
+?? src/app/admin/healthclues-diagnostics/
+?? src/app/admin/healthclues-discoveries/
+?? src/app/admin/healthclues-quiz-preview/
+?? src/app/admin/healthclues-rewards/
+?? src/app/api/admin/healthclues-authoring/
+?? src/app/api/admin/healthclues-community/
+?? src/app/api/admin/healthclues-content/
+?? src/app/api/admin/healthclues-diagnostics/
+?? src/app/api/admin/healthclues-discoveries/
+?? src/app/api/admin/healthclues-quiz/
+?? src/app/api/admin/healthclues-rewards/
+?? src/app/api/healthclues/
+?? src/app/api/internal/
+?? src/app/en/wellness/healthclues/
+?? src/app/play/
+?? src/app/vi/wellness/
+?? src/components/healthclues/
+?? src/components/wellness/HealthCluesDataControls.tsx
+?? src/components/wellness/HealthCluesProfileHistory.tsx
+?? src/data/healthclues-content-review-candidates-v1.json
+?? src/data/healthclues-discoveries.ts
+?? src/data/healthclues-quiz-admin.json
+?? src/data/healthclues-quiz-bank.json
+?? src/features/
+?? src/lib/admin-auth.ts
+?? src/lib/healthclues-analytics-consent.ts
+?? src/lib/healthclues-discovery-admin.ts
+?? src/lib/healthclues-funnel.ts
+?? src/lib/healthclues-i18n.ts
+?? src/lib/healthclues-pending-journey.ts
+?? src/lib/healthclues-quiz.ts
+?? supabase/.temp/
+?? supabase/legacy_migrations/
+?? supabase/migrations/20261027070000_botly_existing_schema_baseline.sql
+?? supabase/migrations/20261027080000_healthclues_profiles.sql
+?? supabase/migrations/20261027080100_healthclues_discovery_content.sql
+?? supabase/migrations/20261027080200_healthclues_review_workflow.sql
+?? supabase/migrations/20261027080300_healthclues_review_audit.sql
+?? supabase/migrations/20261027100000_healthclues_discovery_activity.sql
+?? supabase/migrations/20261027110000_healthclues_discovery_activity_privileges.sql
+?? supabase/migrations/20261027120000_healthclues_discovery_skipped_action.sql
+?? supabase/migrations/20261027130000_healthclues_wellness_world.sql
+?? supabase/migrations/20261027140000_healthclues_toolkit_lifecycle.sql
+?? supabase/migrations/20261028100000_healthclues_toolkit_equip.sql
+?? supabase/migrations/20261028110000_healthclues_knowledge_journey.sql
+?? supabase/migrations/20261028120000_healthclues_boss_world_evolution.sql
+?? supabase/migrations/20261028130000_healthclues_reminder_queue.sql
+?? supabase/migrations/20261028140000_healthclues_reminder_retry.sql
+?? supabase/migrations/20261028150000_healthclues_admin_drafts.sql
+?? supabase/migrations/20261028160000_healthclues_reward_configuration.sql
+?? supabase/migrations/20261028170000_healthclues_discovery_reviewer_boundary.sql
+?? supabase/migrations/20261028180000_healthclues_quiz_bank_review.sql
+?? supabase/migrations/20261028190000_healthclues_boss_source_references.sql
+?? supabase/migrations/20261028200000_healthclues_milestone_world_evolution.sql
+?? supabase/migrations/20261028210000_healthclues_boss_cosmetic_rewards.sql
+?? supabase/migrations/20261028220000_healthclues_cosmetic_reward_configuration.sql
+?? supabase/migrations/20261028230000_healthclues_knowledge_currency_ledger.sql
+?? supabase/migrations/20261028240000_healthclues_data_deletion.sql
+?? supabase/migrations/20261028250000_healthclues_profile_history.sql
+?? supabase/migrations/20261028260000_analytics_service_ingestion_only.sql
+?? supabase/migrations/20261028270000_admin_analytics_service_only.sql
+?? supabase/migrations/20261029100000_healthclues_quiz_topic_knowledge.sql
+?? supabase/migrations/20261029110000_healthclues_first_time_guide.sql
+?? supabase/migrations/20261029120000_healthclues_private_care_plan.sql
+?? supabase/migrations/20261029130000_healthclues_region_guide_and_care_plan.sql
+?? supabase/migrations/20261029140000_healthclues_personal_topic_learning.sql
+?? supabase/migrations/20261029150000_healthclues_learning_skills_games.sql
+?? supabase/migrations/20261030100000_healthclues_flexible_backpack.sql
+?? supabase/migrations/20261030110000_healthclues_unsure_checkin_status.sql
+?? supabase/migrations/20261030120000_healthclues_recommendation_history.sql
+?? supabase/migrations/20261030130000_healthclues_guided_summary_reminders.sql
+?? supabase/migrations/20261030140000_healthclues_mailpit_reminder_delivery.sql
+?? supabase/migrations/20261031100000_healthclues_interactive_world_tour.sql
+?? supabase/migrations/20261031110000_healthclues_inventory_discovery_source.sql

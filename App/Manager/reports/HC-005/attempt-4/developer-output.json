@@ -1,0 +1,38 @@
+{
+  "taskId": "HC-005",
+  "attempt": 4,
+  "status": "READY_FOR_REVIEW",
+  "summary": "Read-only audit complete; lead remains INCOMPLETE, not independently visually verified. PASS: supplied source wires Botanist approach→Talk→station and excludes generic suggestions from the nutrition panel. UNVERIFIED: rendered RPG visuals, actual EN/VI translations, botanical eligibility filtering, empty state and Save/Equip. REWORK: evidence package lacks reviewable screenshots and the station implementation needed to substantiate acceptance.",
+  "changedFiles": [],
+  "tests": [],
+  "screenshots": [],
+  "evidence": [
+    "App/UI_UX_SPEC.md: requires the existing Botanist portrait, localized greeting, compact reviewed Journey-eligible botanical cards, separate details and distinct Discovery/Saved/Equipped states; an honest empty state is valid.",
+    "App/BUSINESS_RULES.md: excludes demoOnly/TEST ONLY and unrelated nutrition fixtures from Botanist recommendations; empty eligibility must not invent items or enable Save/Equip.",
+    "src/features/healthclues/RegionMapScene.tsx: both playable regions instantiate Botanist artwork; selecting the NPC starts pathfinding, route completion sets nearby state, and the resulting Talk action opens the landmark. NPC names, greeting, approach label and Talk pass through text(). This establishes source wiring, not runtime or visual acceptance.",
+    "src/features/healthclues/WorldAdventureScene.tsx: nutrition opens the shared encyclopedia station and explicitly omits PersonalizedSuggestions there. The station receives topic, World, token and collection/equipment state. Its internal botanical filtering, greeting, empty state and actions are not supplied for inspection.",
+    "src/components/healthclues/HealthCluesLocaleProvider.tsx: supports EN/VI presentation and account preference requests. Translation dictionary contents are absent, so text() usage alone cannot establish correct Vietnamese output.",
+    "scripts/test-healthclues-region-layout.mjs: defines coordinate/network assertions, not Botanist visual/localization/content assertions. Its NPC approach checks use anchors, whereas RegionMapScene offsets NPC approaches by 112 world units; it does not directly verify those rendered approach coordinates. No execution evidence was supplied.",
+    "scripts/run-healthclues-game-e2e.mjs: supplied harness uses synthetic catalog records, signed test identities, mock Auth/email and local database services. It expects older onboarding screens and contains no supplied current Botanist visual acceptance assertions. Harness source is not an execution result or live integration proof.",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md: reports localized Botanist Talk/empty-state visual PASS on build 3322 and explicitly leaves eligible-item Save/Equip unverified. Referenced screenshots and the focused browser harness are not supplied as reviewable artifacts; these remain report-only claims.",
+    "App/CURRENT_STATE.md: owner-authored visual PASS claims are partially corroborated by scene wiring only. Its later MP20 build 3326 differs from the reported visual build 3322; current-source visual equivalence is unknown.",
+    "App/ACCEPTANCE_TESTS.md: requires direct screenshot comparison at 1440×900 and 390×844; distinguishes accepted empty-state scope from unavailable item Save/Equip coverage. The supplied package cannot satisfy direct visual inspection.",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_16_ACCEPTANCE.md and App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md: provider checkpoints evolve from historical failures to a reported successful synthetic live request. Neither establishes live Botanist integration; fixture Plan results must remain separate."
+  ],
+  "knownLimitations": [
+    "Only supplied excerpts and source blocks were reviewed; no filesystem, Git status, commands, browser or provider was accessed.",
+    "No screenshot pixels or measured image dimensions were supplied. Previous VISUAL_REVIEW_UNVERIFIED feedback remains unresolved.",
+    "Station implementation, translation dictionary, relevant styling and actual artwork bytes are absent; content eligibility and visual quality remain unknown.",
+    "No eligible reviewed botanical item is demonstrated. Its absence is report-only; item details/Save/Equip remain outside demonstrated acceptance.",
+    "Reports contain historical superseded checkpoints; their PASS statements do not independently verify current source."
+  ],
+  "blockers": [
+    "Independent visual acceptance is blocked by missing reviewable desktop/mobile screenshots.",
+    "Full botanical content/action acceptance requires supplied station/filtering evidence and a reviewed Journey-eligible botanical item."
+  ],
+  "nextSuggestedSteps": [
+    "Supply current-build Botanist approach/Talk and station empty-state screenshots in EN/VI at 1440×900 and 390×844, with measured dimensions and build/source identification, for direct visual review.",
+    "Supply the station implementation, translation entries and focused test assertions/results to verify botanical eligibility, fixture exclusion and disabled/absent actions for empty eligibility.",
+    "When a reviewed botanical item qualifies, separately verify details→Save→Equip and reload through existing authenticated APIs; retain explicit synthetic-versus-reviewed provenance."
+  ]
+}

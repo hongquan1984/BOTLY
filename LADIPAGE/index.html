@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HealthClues — Trợ Lý Đồng Hành Sống Khỏe & Game Nhập Vai Dưỡng Sinh</title>
+  <meta name="description" content="Trợ lý đồng hành chiến thắng bệnh tật, rèn luyện sức khỏe, xây dựng lối sống lành mạnh. Biến những bước nhỏ chăm sóc bản thân thành cuộc phiêu lưu kỳ thú cùng Lumi và Luna.">
+  <meta property="og:title" content="HealthClues — Game Nhập Vai Dưỡng Sinh & Chăm Sóc Sức Khỏe">
+  <meta property="og:description" content="Khám phá cơ thể, rèn luyện thói quen và đồng hành cùng linh thú Lumi xua tan mệt mỏi trong thế giới Cozy Fantasy Thụy Sĩ.">
+  <meta property="og:image" content="assets/hero-wellness-world.jpg">
+  <meta property="og:type" content="website">
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Playfair Display (100% Vietnamese Diacritics Support) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css?v=20261109">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+
+  <!-- Ambient Golden Dust Particles Canvas -->
+  <canvas id="ambient-canvas" class="ambient-canvas" aria-hidden="true"></canvas>
+
+  <!-- Navigation Header -->
+  <header class="hc-header" id="top-nav">
+    <div class="hc-container hc-header-inner">
+      <a href="#hero" class="hc-brand">
+        <img src="assets/logo.png" alt="HealthClues Logo" class="hc-logo-img" onerror="this.style.display='none'">
+        <div class="hc-brand-text">
+          <span class="hc-brand-title">HEALTHCLUES</span>
+          <span class="hc-brand-badge">RPG WELLNESS</span>
+        </div>
+      </a>
+
+      <nav class="hc-nav-links" id="nav-links">
+        <a href="#seven-doors" class="hc-nav-link">7 Cánh Cửa</a>
+        <a href="#journey-steps" class="hc-nav-link">Lộ Trình</a>
+      </nav>
+
+      <div class="hc-header-actions">
+        <span class="hc-lang-pill">🇻🇳 VI</span>
+        <a href="/play" class="hc-btn hc-btn-nav" id="nav-cta-btn">
+          <span class="btn-sparkle">✨</span> Chơi Ngay
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 1 — HERO: BƯỚC VÀO THẾ GIỚI HEALTHCLUES                           -->
+  <!-- ========================================================================= -->
+  <section class="hc-hero" id="hero">
+    <!-- Desktop Background -->
+    <div class="hc-hero-bg-container">
+      <img src="assets/hero-wellness-world.jpg" alt="Thế giới HealthClues cùng bé cáo Lumi" class="hc-hero-bg-img" loading="eager">
+      <div class="hc-hero-overlay"></div>
+    </div>
+
+    <div class="hc-container hc-hero-container">
+      <div class="hc-hero-content">
+        
+        <!-- Eyebrow -->
+        <div class="hc-hero-badge">
+          <span class="badge-icon">✨</span>
+          <span class="badge-text">HEALTHCLUES · CUỘC PHIÊU LƯU SỨC KHỎE</span>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="hc-hero-headline">
+          <span class="headline-gold">Vượt qua nỗi lo sức khỏe.</span>
+          <span class="headline-white">Mở khóa hành trình của bạn!</span>
+        </h1>
+
+        <!-- Short Description -->
+        <p class="hc-hero-desc">
+          Dù bạn đang đối mặt với bệnh tật, khó ngủ, stress hay đơn giản muốn sống khỏe hơn — hãy cùng <strong>Lumi & Luna</strong> khám phá kiến thức, thực hiện nhiệm vụ và từng bước chăm sóc bản thân.
+        </p>
+
+        <!-- Dedicated Mobile Game Visual (Lumi & Adventurer in Swiss Alps) -->
+        <div class="hc-hero-mobile-visual" aria-hidden="true">
+          <img src="assets/hero-mobile-visual.jpg" alt="Lumi và người bạn đồng hành trong thế giới HealthClues" class="hero-mobile-img" loading="eager">
+          <div class="mobile-visual-tag">
+            <span class="visual-tag-dot"></span>
+            <span>Bạn đồng hành Lumi & Thế giới Alps</span>
+          </div>
+        </div>
+
+        <!-- Primary & Secondary CTA Buttons -->
+        <div class="hc-hero-cta-group">
+          <a href="/play" class="hc-btn hc-btn-primary hc-btn-glow" id="hero-primary-cta">
+            <span class="btn-icon">🎮</span>
+            <span class="btn-label">Bắt đầu cuộc phiêu lưu →</span>
+            <span class="btn-shine"></span>
+          </a>
+          
+          <a href="#seven-doors" class="hc-btn hc-btn-secondary" id="hero-secondary-cta">
+            <span class="btn-icon">🗺️</span>
+            <span>Khám phá 7 cánh cửa</span>
+          </a>
+        </div>
+
+        <!-- 3 Compact Benefits (Game Icons & Pillars) -->
+        <div class="hc-hero-benefits-strip">
+          <div class="benefit-chip">
+            <span class="benefit-icon">🧭</span>
+            <div class="benefit-label">
+              <strong>Khám phá</strong>
+              <span>Cơ thể & kiến thức</span>
+            </div>
+          </div>
+          <div class="benefit-chip">
+            <span class="benefit-icon">📜</span>
+            <div class="benefit-label">
+              <strong>Nhiệm vụ</strong>
+              <span>Phù hợp với bạn</span>
+            </div>
+          </div>
+          <div class="benefit-chip">
+            <span class="benefit-icon">🎁</span>
+            <div class="benefit-label">
+              <strong>Phần thưởng</strong>
+              <span>Thành tựu trong game</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Microcopy -->
+        <div class="hc-hero-reassurance">
+          <span class="reassurance-icon">⚡</span>
+          <span>Khởi đầu nhẹ nhàng · Tự chọn mục tiêu · Không áp lực phải hoàn hảo</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 2 — BẢY CÁNH CỬA KHÁM PHÁ SỨC KHỎE (3D ROTATING CAROUSEL)         -->
+  <!-- ========================================================================= -->
+  <section class="hc-doors-section" id="seven-doors">
+    <div class="hc-container">
+
+      <div class="hc-section-header">
+        <div class="hc-section-tag">7 PHÂN VÙNG TRẢI NGHIỆM</div>
+        <h2 class="hc-section-title">
+          Mỗi cơ thể có một câu chuyện.<br class="hc-desktop-br">
+          <span class="title-gold">Hành trình của bạn bắt đầu từ đâu?</span>
+        </h2>
+        <p class="hc-section-desc">
+          <span class="hc-desktop-desc">Vuốt hoặc bấm phím mũi tên để xoay vòng khám phá từng cánh cửa:</span>
+          <span class="hc-mobile-desc">Vuốt ngang để khám phá cánh cửa của bạn:</span>
+        </p>
+      </div>
+
+      <!-- 3D ROTATING REVOLVING CAROUSEL -->
+      <div class="hc-carousel-3d-container">
+        
+        <!-- Controls: Prev / Next Buttons -->
+        <button class="carousel-nav-btn carousel-prev-btn" id="carousel-prev" aria-label="Thẻ trước">
+          <span>❮</span>
+        </button>
+        <button class="carousel-nav-btn carousel-next-btn" id="carousel-next" aria-label="Thẻ kế tiếp">
+          <span>❯</span>
+        </button>
+
+        <!-- 3D Carousel Stage Track -->
+        <div class="hc-carousel-3d-track" id="carousel-track">
+
+          <!-- CARD 01: CHIẾN THẮNG BỆNH TẬT -->
+          <article class="carousel-3d-card" data-card-idx="0">
+            <div class="card-media">
+              <img src="assets/card-health-journey.jpg" alt="Chiến Thắng Bệnh Tật" class="card-img" loading="lazy">
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-content">
+              <span class="card-badge badge-shield">🛡️ KIÊN TRÌ & HY VỌNG</span>
+              <h3 class="card-title">Chiến Thắng Bệnh Tật</h3>
+              <p class="card-desc">Cùng bạn tìm hiểu và quản lý gout, tiểu đường, huyết áp, đau nửa đầu theo từng bước khoa học và ấm áp.</p>
+              <div class="card-tags">
+                <span>Quản lý Axit Uric</span>
+                <span>Làm dịu cơn đau</span>
+              </div>
+              <a href="/play" class="hc-btn hc-btn-primary card-cta-btn">
+                <span>Khám Phá Cánh Cửa Này</span>
+                <span class="btn-arrow">→</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- CARD 02: LIỆU PHÁP BÍ ẨN -->
+          <article class="carousel-3d-card" data-card-idx="1">
+            <div class="card-media">
+              <img src="assets/card-herbal-discovery.jpg" alt="Liệu Pháp Bí Ẩn" class="card-img" loading="lazy">
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-content">
+              <span class="card-badge badge-herbal">🌿 TRÍ TUỆ DƯỢC LIỆU</span>
+              <h3 class="card-title">Liệu Pháp Bí Ẩn</h3>
+              <p class="card-desc">Khám phá thảo mộc, phương pháp tự nhiên, trí tuệ cổ truyền và bằng chứng y văn PubMed minh bạch.</p>
+              <div class="card-tags">
+                <span>Tía tô & Cúc La Mã</span>
+                <span>Trích dẫn PubMed</span>
+              </div>
+              <a href="/play" class="hc-btn hc-btn-primary card-cta-btn">
+                <span>Khám Phá Cánh Cửa Này</span>
+                <span class="btn-arrow">→</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- CARD 03: GIẢI MÃ CƠ THỂ -->
+          <article class="carousel-3d-card" data-card-idx="2">
+            <div class="card-media">
+              <img src="assets/card-body-knowledge.jpg" alt="Giải Mã Cơ Thể" class="card-img" loading="lazy">
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-content">
+              <span class="card-badge badge-academy">🔬 HỌC VIỆN TRI THỨC</span>
+              <h3 class="card-title">Giải Mã Cơ Thể</h3>
+              <p class="card-desc">Khám phá cơ thể, dinh dưỡng, nhịp sinh học và những kiến thức sức khỏe thú vị qua mini-game trực quan.</p>
+              <div class="card-tags">
+                <span>Cơ chế tế bào</span>
+                <span>Nhịp sinh học 24h</span>
+              </div>
+              <a href="/play" class="hc-btn hc-btn-primary card-cta-btn">
+                <span>Khám Phá Cánh Cửa Này</span>
+                <span class="btn-arrow">→</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- CARD 04: RÈN LUYỆN BẢN THÂN -->
+          <article class="carousel-3d-card" data-card-idx="3">
+            <div class="card-media">
+              <img src="assets/card-fitness.jpg" alt="Rèn Luyện Bản Thân" class="card-img" loading="lazy">
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-content">
+              <span class="card-badge badge-movement">🏃 VẬN ĐỘNG PHỤC HỒI</span>
+              <h3 class="card-title">Rèn Luyện Bản Thân</h3>
+              <p class="card-desc">Vận động nhẹ nhàng, quản lý cân nặng, xây dựng thể lực và hình thành thói quen bền bỉ không áp lực.</p>
+              <div class="card-tags">
+                <span>Đường mòn 15 phút</span>
+                <span>Giãn cơ mỗi sớm</span>
+              </div>
+              <a href="/play" class="hc-btn hc-btn-primary card-cta-btn">
+                <span>Khám Phá Cánh Cửa Này</span>
+                <span class="btn-arrow">→</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- CARD 05: GIẤC NGỦ & TÂM TRÍ -->
+          <article class="carousel-3d-card" data-card-idx="4">
+            <div class="card-media">
+              <img src="assets/card-sleep-mind.webp" alt="Giấc Ngủ & Tâm Trí" class="card-img" loading="lazy">
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-content">
+              <span class="card-badge badge-sleep">🌙 THUNG LŨNG TĨNH LẶNG</span>
+              <h3 class="card-title">Giấc Ngủ & Tâm Trí</h3>
+              <p class="card-desc">Tìm hiểu giấc ngủ, xua tan căng thẳng và học cách cân bằng cảm xúc cùng Thần thú Luna trong Sleep Valley.</p>
+              <div class="card-tags">
+                <span>Thần thú Luna</span>
+                <span>Hạ màn hình xanh</span>
+              </div>
+              <a href="/play" class="hc-btn hc-btn-primary card-cta-btn">
+                <span>Khám Phá Cánh Cửa Này</span>
+                <span class="btn-arrow">→</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- CARD 06: THẾ GIỚI CỦA BẠN -->
+          <article class="carousel-3d-card" data-card-idx="5">
+            <div class="card-media">
+              <img src="assets/card-dream-home.jpg" alt="Thế Giới Của Bạn" class="card-img" loading="lazy">
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-content">
+              <span class="card-badge badge-home">✨ TÍNH NĂNG ĐANG PHÁT TRIỂN</span>
+              <h3 class="card-title">Thế Giới Của Bạn</h3>
+              <p class="card-desc">Hoàn thành nhiệm vụ, tích lũy EXP, mở Rương Quà Bí Ẩn và trang trí ngôi nhà mơ ước nhìn ra hồ tuyết Alps.</p>
+              <div class="card-tags">
+                <span>Rương Quà Bí Ẩn</span>
+                <span>Cấp độ Hiệp Sĩ</span>
+              </div>
+              <a href="/play" class="hc-btn hc-btn-primary card-cta-btn">
+                <span>Khám Phá Cánh Cửa Này</span>
+                <span class="btn-arrow">→</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- CARD 07: LÀNG ĐỒNG HÀNH -->
+          <article class="carousel-3d-card" data-card-idx="6">
+            <div class="card-media">
+              <img src="assets/community-village.webp" alt="Làng Đồng Hành" class="card-img" loading="lazy">
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-content">
+              <span class="card-badge badge-village">🍵 CỘNG ĐỒNG · MULTIPLAYER</span>
+              <h3 class="card-title">Làng Đồng Hành</h3>
+              <p class="card-desc">Kết nối, chia sẻ hành trình sống khỏe, vẫy tay chào nhau và gửi tặng một tách trà ấm khích lệ tinh thần.</p>
+              <div class="card-tags">
+                <span>Thấy bạn bè online</span>
+                <span>Vẫy tay chào 👋</span>
+              </div>
+              <a href="/play" class="hc-btn hc-btn-primary card-cta-btn">
+                <span>Khám Phá Cánh Cửa Này</span>
+                <span class="btn-arrow">→</span>
+              </a>
+            </div>
+          </article>
+
+        </div>
+
+        <!-- Pagination Dots -->
+        <div class="carousel-indicators" id="carousel-dots"></div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 3 — HÀNH TRÌNH 5 BƯỚC & CHỐT HẠ CTA                               -->
+  <!-- ========================================================================= -->
+  <section class="hc-journey-section" id="journey-steps">
+    <div class="hc-container">
+
+      <div class="hc-section-header">
+        <div class="hc-section-tag">LỘ TRÌNH ĐỒNG HÀNH</div>
+        <h2 class="hc-section-title">
+          Hành trình của bạn trong <span class="title-gold">HealthClues</span>
+        </h2>
+        <p class="hc-section-desc">
+          5 cột mốc đơn giản biến việc chăm sóc sức khỏe thành một cuộc phiêu lưu thú vị:
+        </p>
+      </div>
+
+      <!-- Compact 5-Step Pipeline Strip (Touch scrollable on mobile) -->
+      <div class="hc-pipeline-strip-wrap">
+        <div class="hc-pipeline-strip">
+          
+          <div class="pipeline-item">
+            <div class="pipeline-badge">01</div>
+            <div class="pipeline-icon">🗺️</div>
+            <div class="pipeline-info">
+              <h5>1. Khám Phá</h5>
+              <p>Chọn vấn đề bạn quan tâm</p>
+            </div>
+          </div>
+
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-item">
+            <div class="pipeline-badge">02</div>
+            <div class="pipeline-icon">📜</div>
+            <div class="pipeline-info">
+              <h5>2. Nhận Kế Hoạch</h5>
+              <p>Trang bị 3 nhiệm vụ vừa sức</p>
+            </div>
+          </div>
+
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-item">
+            <div class="pipeline-badge">03</div>
+            <div class="pipeline-icon">🦊</div>
+            <div class="pipeline-info">
+              <h5>3. Làm Nhiệm Vụ</h5>
+              <p>Đồng hành cùng Lumi mỗi sớm</p>
+            </div>
+          </div>
+
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-item">
+            <div class="pipeline-badge">04</div>
+            <div class="pipeline-icon">🎁</div>
+            <div class="pipeline-info">
+              <h5>4. Nhận Thành Tựu</h5>
+              <p>Tích lũy EXP & mở rương quà</p>
+            </div>
+          </div>
+
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-item">
+            <div class="pipeline-badge">05</div>
+            <div class="pipeline-icon">🏡</div>
+            <div class="pipeline-info">
+              <h5>5. Mở Rộng</h5>
+              <p>Không gian mơ ước và cộng đồng</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Master Final CTA Box -->
+      <div class="hc-final-cta-box">
+        <div class="final-cta-ambient-glow"></div>
+        <div class="final-cta-inner">
+          <div class="final-chibi-group">
+            <img src="assets/chibi-wave.png" alt="Hiệp sĩ vẫy tay chào" class="chibi-sprite chibi-bounce" onerror="this.style.display='none'">
+            <img src="assets/step-companion.png" alt="Lumi tinh nghịch" class="chibi-sprite chibi-lumi" onerror="this.style.display='none'">
+            <img src="assets/chibi-heart.png" alt="Hiệp sĩ thả tim" class="chibi-sprite chibi-pulse" onerror="this.style.display='none'">
+          </div>
+
+          <h3 class="final-cta-headline">
+            Sẵn sàng mở khóa phiên bản khỏe mạnh nhất?
+          </h3>
+          
+          <p class="final-cta-sub">
+            Khám phá theo nhịp độ của riêng bạn — <strong>không áp lực phải hoàn hảo</strong>.
+          </p>
+
+          <a href="/play" class="hc-btn hc-btn-primary hc-btn-final hc-btn-glow" id="final-cta-btn">
+            <span class="btn-icon">🎮</span>
+            <span class="btn-label">Bắt đầu cuộc phiêu lưu ngay</span>
+            <span class="btn-shine"></span>
+          </a>
+
+          <p class="final-reassurance">
+            ⚡ Hoàn toàn miễn phí · Chơi ngay trên trình duyệt web
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ========================================================================= -->
+  <!-- FOOTER & MEDICAL DISCLAIMER                                              -->
+  <!-- ========================================================================= -->
+  <footer class="hc-footer">
+    <div class="hc-container hc-footer-container">
+
+      <!-- MANDATORY MEDICAL DISCLAIMER -->
+      <div class="hc-footer-disclaimer">
+        <div class="disclaimer-icon">⚠️</div>
+        <p class="disclaimer-text">
+          <strong>LƯU Ý Y TẾ:</strong> HealthClues là trò chơi đồng hành xây dựng lối sống lành mạnh, không phải phần mềm chẩn đoán, kê đơn hoặc chữa bệnh. Thông điệp "chiến thắng bệnh tật" mang ý nghĩa khích lệ kiên trì và lạc quan; không thay thế tư vấn y tế chuyên nghiệp của bác sĩ.
+        </p>
+      </div>
+
+      <div class="hc-footer-bottom">
+        <div class="footer-left">
+          <span class="footer-brand-name">HEALTHCLUES</span>
+          <span class="footer-copyright">© 2026 · Swiss Alpine Wellness Cozy RPG</span>
+        </div>
+        <div class="footer-right">
+          <a href="/play" class="footer-link">Vào Game</a>
+          <a href="#seven-doors" class="footer-link">7 Cánh Cửa</a>
+          <a href="#top-nav" class="back-to-top">Lên Đầu Trang ↑</a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

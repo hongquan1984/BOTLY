@@ -1,0 +1,186 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-11-09T13:46:57.638Z",
+  "inventory": {
+    "flower_pot_01": {
+      "owned": true,
+      "displayed": true,
+      "active_slot": "slot_garden_01",
+      "acquired_at": "2026-11-09T13:41:03.536Z",
+      "source": "first_time_gift"
+    },
+    "wooden_bench_01": {
+      "owned": true,
+      "displayed": true,
+      "active_slot": "slot_garden_02",
+      "acquired_at": "2026-11-09T13:41:03.536Z",
+      "source": "daily_wellness_streak_3"
+    },
+    "flower_pot_02": {
+      "owned": true,
+      "displayed": false,
+      "active_slot": null,
+      "acquired_at": "2026-11-09T13:41:03.536Z",
+      "source": "mindful_reading_milestone"
+    },
+    "outdoor_chair_01": {
+      "owned": true,
+      "displayed": false,
+      "active_slot": null,
+      "unlock_requirement": "Hoàn thành 5 bài kiểm tra giấc ngủ"
+    },
+    "outdoor_table_01": {
+      "owned": true,
+      "displayed": false,
+      "active_slot": null,
+      "acquired_at": "2026-11-09T13:41:03.536Z",
+      "source": "hydration_champion"
+    },
+    "garden_lantern_01": {
+      "owned": true,
+      "displayed": false,
+      "active_slot": null,
+      "unlock_requirement": "Duy trì chuỗi đi ngủ đúng giờ 5 ngày"
+    },
+    "watering_can_01": {
+      "owned": true,
+      "displayed": false,
+      "active_slot": null,
+      "unlock_requirement": "Đọc 3 cẩm nang sống khỏe thảo mộc"
+    },
+    "rug_01": {
+      "owned": true,
+      "displayed": false,
+      "active_slot": null,
+      "acquired_at": "2026-11-09T13:41:03.536Z",
+      "source": "energy_balance_week"
+    },
+    "armchair_01": {
+      "owned": true,
+      "displayed": false,
+      "active_slot": null,
+      "unlock_requirement": "Đạt mốc 14 ngày thiền định buổi tối"
+    },
+    "table_lamp_01": {
+      "owned": true,
+      "displayed": false,
+      "active_slot": null,
+      "acquired_at": "2026-11-09T13:41:03.536Z",
+      "source": "sweet_dreams_certificate"
+    }
+  },
+  "slots": {
+    "slot_garden_01": "flower_pot_01",
+    "slot_garden_02": "wooden_bench_01",
+    "slot_garden_03": null,
+    "slot_garden_04": null,
+    "slot_garden_05": null,
+    "slot_interior_01": null,
+    "slot_interior_02": null,
+    "slot_interior_03": null,
+    "slot_interior_04": null,
+    "slot_interior_05": null,
+    "slot_overview_01": null
+  },
+  "interior_layers": {
+    "rug": true,
+    "sofa": true,
+    "table": true,
+    "armchair": true,
+    "lamp": false
+  },
+  "active_scene": "scene_interior_wide",
+  "day_night": "night",
+  "custom_items": [
+    {
+      "id": "sofa_luxury",
+      "name": "Bộ Sofa Thụy Sĩ Sang Trọng",
+      "img_src": "assets/uploads/furniture/1794146054057_1qbf6w.png",
+      "scene_id": "scene_interior_wide",
+      "natural_width": 340,
+      "natural_height": 184,
+      "corners": {
+        "tl": [
+          24.31,
+          63.8
+        ],
+        "tr": [
+          62.04,
+          63.8
+        ],
+        "br": [
+          62.31,
+          94.18
+        ],
+        "bl": [
+          24.31,
+          93.26
+        ]
+      },
+      "user_scale": 1.1,
+      "z_index": 734,
+      "displayed": true,
+      "visible": true
+    },
+    {
+      "id": "plant_pot_alps",
+      "name": "Chậu Cây Xanh Alpine",
+      "img_src": "assets/uploads/furniture/1794146788444_zw13y6.png",
+      "scene_id": "scene_interior_wide",
+      "natural_width": 340,
+      "natural_height": 357,
+      "corners": {
+        "tl": [
+          67.01,
+          36.59
+        ],
+        "tr": [
+          75.01,
+          36.59
+        ],
+        "br": [
+          81.63,
+          59.64
+        ],
+        "bl": [
+          67.01,
+          52.59
+        ]
+      },
+      "user_scale": 0.22,
+      "z_index": 1001,
+      "displayed": true,
+      "visible": true
+    },
+    {
+      "id": "bedside_armchair",
+      "name": "Ghế Bành Thư Giãn Đọc Sách",
+      "img_src": "assets/items/armchair_trimmed.png",
+      "scene_id": "scene_bedroom",
+      "natural_width": 240,
+      "natural_height": 260,
+      "corners": {
+        "tl": [
+          12,
+          55
+        ],
+        "tr": [
+          26,
+          55
+        ],
+        "br": [
+          26,
+          80
+        ],
+        "bl": [
+          12,
+          80
+        ]
+      },
+      "user_scale": 0.65,
+      "z_index": 550,
+      "displayed": true,
+      "visible": true
+    }
+  ]
+}

@@ -69,7 +69,7 @@ Sao chép `.env.example` → `.env.local` nếu cần:
 ### Bật cloud sync và newsletter
 
 1. Tạo project Supabase.
-2. Chạy SQL trong `supabase/migrations/001_wellness.sql` bằng SQL Editor.
+2. `supabase/legacy_migrations/001_wellness.sql` is retained as historical reference only; do not run it on an existing database. Use the reviewed timestamped migration set for a new environment.
 3. Điền ba biến Supabase vào `.env.local` hoặc cấu hình hosting.
 4. Thêm callback URLs `/en/wellness/auth/callback` và `/vi/song-khoe/auth/callback` trong Supabase Auth.
 

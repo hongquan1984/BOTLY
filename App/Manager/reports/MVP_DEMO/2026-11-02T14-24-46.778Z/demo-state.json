@@ -1,0 +1,89 @@
+{
+  "runId": "2026-11-02T14-24-46.778Z",
+  "mode": "REAL_CODEX_SYNTHETIC_ONLY",
+  "status": "BLOCKED",
+  "realAiCalls": 4,
+  "queue": [
+    {
+      "taskId": "HC-901",
+      "title": "Synthetic greeting behavior",
+      "objective": "Change greet(name) to return exactly `Hello, ${name}!`.",
+      "priority": "P1",
+      "sourceRequirements": [
+        "synthetic/test/greeting.test.mjs"
+      ],
+      "dependencies": [],
+      "allowedScope": [
+        "src/greeting.mjs"
+      ],
+      "deliverables": [
+        "One source patch",
+        "Passing isolated Node test"
+      ],
+      "acceptanceCriteria": [
+        "greet(\"Ada\") returns \"Hello, Ada!\""
+      ],
+      "requiredTests": [
+        "node --test test/greeting.test.mjs"
+      ],
+      "visualEvidence": [],
+      "retryCount": 1,
+      "status": "REWORK",
+      "previousReviewFeedback": [
+        "Change src/greeting.mjs to: export function greet(name) { return `Hello, ${name}!`; }",
+        "Rerun node --test test/greeting.test.mjs and provide passing evidence with exit code 0."
+      ],
+      "ownerApprovalRequired": false,
+      "projectFinalAudit": false
+    },
+    {
+      "taskId": "HC-902",
+      "title": "Synthetic farewell behavior",
+      "objective": "Change farewell(name) to return exactly `Goodbye, ${name}!`.",
+      "priority": "P1",
+      "sourceRequirements": [
+        "synthetic/test/farewell.test.mjs"
+      ],
+      "dependencies": [],
+      "allowedScope": [
+        "src/farewell.mjs"
+      ],
+      "deliverables": [
+        "One source patch",
+        "Passing isolated Node test"
+      ],
+      "acceptanceCriteria": [
+        "farewell(\"Ada\") returns \"Goodbye, Ada!\""
+      ],
+      "requiredTests": [
+        "node --test test/farewell.test.mjs"
+      ],
+      "visualEvidence": [],
+      "retryCount": 0,
+      "status": "PENDING",
+      "previousReviewFeedback": [],
+      "ownerApprovalRequired": false,
+      "projectFinalAudit": false
+    }
+  ],
+  "history": [
+    {
+      "event": "MANAGER_ASSIGNED",
+      "taskId": "HC-901",
+      "ai": "REAL"
+    },
+    {
+      "event": "MANAGER_REWORK",
+      "taskId": "HC-901",
+      "fixture": "INTENTIONAL_REWORK_FIXTURE",
+      "feedback": [
+        "Change src/greeting.mjs to: export function greet(name) { return `Hello, ${name}!`; }",
+        "Rerun node --test test/greeting.test.mjs and provide passing evidence with exit code 0."
+      ],
+      "ai": "REAL"
+    }
+  ],
+  "currentTaskId": "HC-901",
+  "nextTaskId": null,
+  "blocker": "Assignment to constant variable."
+}

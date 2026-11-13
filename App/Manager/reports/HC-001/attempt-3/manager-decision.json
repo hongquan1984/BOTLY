@@ -1,0 +1,27 @@
+{
+  "decision": "REWORK",
+  "feedback": [
+    "evidence phải là đường dẫn repository-relative: PASS — Audit boundary: assessed only supplied excerpts; no tools, file changes, commands, provider calls or screenshot inspection occurred.",
+    "evidence phải là đường dẫn repository-relative: PASS — Source contract: src/features/healthclues/personalized-wellness-plan.ts defines up to six bilingual goals with two options, numeric consistency checks, duplicate-action rejection and concern matching. src/features/healthclues/gemini-wellness-plan.ts assigns server UUIDs and distinguishes provider, parsing, schema and safety failures. This establishes source behavior, not runtime acceptance.",
+    "evidence phải là đường dẫn repository-relative: PASS — Historical real-provider technical evidence, report-supported: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md records one simplified-contract request with provider/application HTTP 200, request ID 8daba742-033f-499e-b55e-e3e658dd2d28, four goals and completed schema/safety stages. No Plan was saved. This was genuine provider output for a synthetic profile, unlike intercepted fixtures.",
+    "evidence phải là đường dẫn repository-relative: PASS — Historical synthetic persistence, report-supported: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md records authenticated A/B/Custom selection, omitted alternatives, empty Plans, reload, locale stability and account isolation. Advisor requests were intercepted; these results do not establish live recommendation quality.",
+    "evidence phải là đường dẫn repository-relative: UNVERIFIED — Current live quality: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md records offline risk-aware prompt/validator refinement after the successful provider request, with no subsequent inference. The owner withdrew the earlier blanket objection to modest numeric choices; that objection is not a current failure.",
+    "evidence phải là đường dẫn repository-relative: REWORK — Safety boundary: src/features/healthclues/personalized-wellness-plan.ts checks urgent safetyLevel but does not consult acutePainfulJoint or activityRestriction when accepting generated movement goals. Its validatePersistedAiGoal also receives no profile. The supplied route is unavailable, so additional route-level mitigation is unknown.",
+    "evidence phải là đường dẫn repository-relative: REWORK — Personalization evidence: src/features/healthclues/personalized-wellness-plan.ts validates concern keywords rather than grounding reported-habit claims in answers. scripts/test-healthclues-personalized-plan-contract.mjs includes an accepted fixture claiming the player reported bedtime phone use although its supplied profile contains no such report. This is an assertion in test source, not executed evidence.",
+    "evidence phải là đường dẫn repository-relative: UNVERIFIED — Test execution: scripts/test-healthclues-personalized-plan-contract.mjs and scripts/test-healthclues-gemini-plan-pipeline.mjs contain synthetic contracts and mocked request functions. scripts/test-healthclues-personalized-recommendations.mjs uses TEST ONLY candidates. Their PASS console strings are not execution results; no tests were run in this audit.",
+    "evidence phải là đường dẫn repository-relative: UNVERIFIED — Catalog ranking implementation: scripts/test-healthclues-personalized-recommendations.mjs supplies ranking assertions, and src/features/healthclues/PersonalizedSuggestions.tsx supplies client requests and disclosures. The imported ranking implementation and API handlers were not supplied, so their enforcement cannot be independently established.",
+    "evidence phải là đường dẫn repository-relative: UNVERIFIED — Visual acceptance: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md reports inspected desktop/mobile captures, but no image was supplied for this audit. No independent visual PASS is assigned.",
+    "evidence phải là đường dẫn repository-relative: REWORK — Evidence reconciliation: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md retains older NOT STARTED, billing-blocked and NOT RUN matrices alongside later successes. App/reports/HEALTHCLUES_GEMINI_REALTIME_ADVISOR_ACCEPTANCE.md describes an older Catalog-only contract; the supplied current simplified source does not require that gate. Historical failures do not establish today's provider status."
+  ],
+  "dimensions": {
+    "functional": "UNVERIFIED",
+    "visual": "NOT_APPLICABLE"
+  },
+  "reviewedAt": "2026-11-02T15:55:28.629Z",
+  "sourceManifestSha256": "4bff9983cccd863bb01c91fb78b74553a3221c37d7ab150db3640576c825af89",
+  "developerReportSha256": "46d0230bc7778f7373cc60031625305460ae52202428798e474d54881c88c524",
+  "independentSourceCheck": {
+    "ok": true,
+    "changed": []
+  }
+}

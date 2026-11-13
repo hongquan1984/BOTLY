@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "required": ["taskId", "attempt", "status", "summary", "changedFiles", "tests", "screenshots", "evidence", "knownLimitations", "blockers", "nextSuggestedSteps"],
+  "properties": {
+    "taskId": { "type": "string", "pattern": "^HC-[0-9]{3,}$" }, "attempt": { "type": "integer", "minimum": 1 }, "status": { "enum": ["READY_FOR_REVIEW", "BLOCKED", "FAILED"] }, "summary": { "type": "string" }, "changedFiles": { "type": "array", "items": { "type": "string" } },
+    "tests": { "type": "array", "items": { "type": "object", "required": ["command", "result", "artifact"], "properties": { "command": { "type": "string" }, "result": { "enum": ["PASS", "FAIL", "NOT_RUN"] }, "artifact": { "type": ["string", "null"] } }, "additionalProperties": false } }, "screenshots": { "type": "array", "items": { "type": "object", "required": ["path", "viewport"], "properties": { "path": { "type": "string" }, "viewport": { "type": "string" } }, "additionalProperties": false } }, "evidence": { "type": "array", "items": { "type": "string" } }, "knownLimitations": { "type": "array", "items": { "type": "string" } }, "blockers": { "type": "array", "items": { "type": "string" } }, "nextSuggestedSteps": { "type": "array", "items": { "type": "string" } }
+  }, "additionalProperties": false
+}

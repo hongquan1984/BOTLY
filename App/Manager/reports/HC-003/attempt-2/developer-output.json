@@ -1,0 +1,40 @@
+{
+  "taskId": "HC-003",
+  "attempt": 2,
+  "status": "READY_FOR_REVIEW",
+  "summary": "Discovery audit complete from supplied evidence only; HC-003 remains incomplete, not already verified. PASS: visible owner-scoping and persistence controls in supplied routes. UNVERIFIED: current authenticated legacy regression, original 96-answer retention, MP20 persistence lifecycle and live-input stability. REWORK: regression coverage and conflicting acceptance records.",
+  "changedFiles": [],
+  "tests": [],
+  "screenshots": [],
+  "evidence": [
+    "App/MASTER_SPEC.md: approved direction preserves existing accounts and Quiz/Plan/World data without fabricating legacy answers. Approval does not establish implementation or execution success.",
+    "src/app/api/healthclues/profile/route.ts: GET/PATCH check World ownership against authenticated user ID; PATCH requires verified email and merges nickname/locale into existing profile JSON. Authentication helper implementation, database policies and runtime enforcement were not supplied.",
+    "src/app/api/healthclues/plan/route.ts: GET/POST check authenticated World ownership. POST requires verified email, explicit confirmation and valid request UUIDs; supports empty goals, request-key reuse, goal validation and versioned profile persistence capped at 40 historical records. This establishes source controls, not successful database execution.",
+    "src/app/api/healthclues/account/route.ts: deletion status queries filter by authenticated user ID; deletion/cancellation RPC arguments use that ID. RPC bodies and database authorization were not supplied.",
+    "src/features/healthclues/WorldAuthCallback.tsx: callback requires tokens and confirmed email; journey activation checks pending email against authenticated email before saving the session. This does not prove returning legacy World routing.",
+    "scripts/test-healthclues-profile-activity-rest-e2e.mjs: existing assertions cover profile save/revision/history, activity persistence, anonymous denial and cross-user read isolation against dedicated local PostgREST/Postgres. It creates synthetic users and signs JWTs locally, bypassing real Auth/email and application routes. No execution result was supplied.",
+    "scripts/test-healthclues-owner-auth-demo.mjs: browser harness contains local Mailpit/Auth, Plan read/write denial, equipment and reload assertions, but starts with historical onboarding text and ten-question flow. App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md reports this harness stopped before authentication on the newer flow. Its code and printed PASS template are not execution evidence.",
+    "scripts/verify-healthclues-owner-resume-after-restart.mjs: checks retained confirmed session, World route and same World ID across browser reload. It does not restart services or compare against a pre-restart World baseline, Plan, equipment or original answers. App/reports/HEALTHCLUES_FINAL_GAME_ACCEPTANCE.md reports historical restart success; current-source execution remains unverified.",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md: later bilingual/legacy follow-up reports authenticated legacy World/Plan/equipment continuity, superseding earlier untested statements for that sampled account. Supporting harness, raw results, database snapshots and screenshots were not supplied; classify this as report-only. Original authenticated 96-answer preservation remains explicitly unverified.",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md and App/ACCEPTANCE_TESTS.md: report synthetic recommendation UI-to-authenticated-Plan persistence, zero goals, Custom and account isolation. The current fixture harness and execution artifacts were not supplied. Mocked Gemini suites and intercepted recommendations cannot establish live-provider persistence or recommendation quality.",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md: immediate per-goal save/uncheck and current My Journey persistence lack authenticated browser readback/reload acceptance. The report also contains conflicting activation and provider-call statements; an observed Advisor request with uncaptured output leaves provider invocation unknown.",
+    "App/CURRENT_STATE.md: supplied manifest matches the owner-approved SHA-256 ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8. Its progress claims remain report-only where unsupported by supplied source or artifacts. No live hashes were computed."
+  ],
+  "knownLimitations": [
+    "No tools, commands, file inspection, network/provider calls or test execution occurred; only supplied contents were reviewed.",
+    "No screenshots were supplied or inspected; visual acceptance is UNVERIFIED.",
+    "No persisted original 96-answer fixture or underlying Quiz storage implementation was supplied. Historical answer retention cannot be accepted or declared broken.",
+    "Current World routing, MP20 selection components, authentication helpers, database schema/RLS/RPC definitions and current fixture harness were not supplied.",
+    "Sequential JSON read/merge/write is visible in profile and Plan routes; concurrent-write preservation is unknown."
+  ],
+  "blockers": [
+    "The attempt-1 review requirement to verify all live inputs remain unchanged through review cannot be satisfied from a supplied manifest alone; end-of-review integrity evidence is missing.",
+    "Missing execution artifacts prevent promoting reported legacy and synthetic persistence successes to independently verified current-source PASS."
+  ],
+  "nextSuggestedSteps": [
+    "Have the review process compare task-start and review-end hashes for every manifest input, retaining the approved CURRENT_STATE digest; restart review if any input changes.",
+    "Add or adapt a current-flow regression for an existing isolated synthetic legacy account with a saved Plan and equipment. Compare owner/profile/World IDs, Plan versions and goal IDs/choices, equipment and locale before and after login, EN/VI switching and reload; assert no forced onboarding and foreign-owner read/write denial. Preserve raw results and sanitized before/after snapshots.",
+    "Locate a genuine persisted original legacy-answer fixture; if none exists, retain answer preservation as UNVERIFIED and reconcile the requirement without synthesizing historical answers.",
+    "Exercise MP20 immediate A/B/Custom save, uncheck, zero goals, unrelated-goal preservation, API rejection and reload using disclosed recommendation fixtures with provider interception established before World entry. Reconcile conflicting report claims against captured execution artifacts."
+  ]
+}

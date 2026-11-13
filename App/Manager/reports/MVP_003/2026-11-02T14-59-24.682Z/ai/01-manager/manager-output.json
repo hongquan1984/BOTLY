@@ -1,0 +1,48 @@
+{
+  "decision": "SELECT_TASK",
+  "taskId": "HC-901",
+  "reasoning": "HC-901 is dependency-ready because it has no dependencies.",
+  "feedback": [],
+  "dimensions": {
+    "functional": "NOT_APPLICABLE",
+    "visual": "NOT_APPLICABLE",
+    "data": "NOT_APPLICABLE",
+    "localization": "NOT_APPLICABLE",
+    "security": "NOT_APPLICABLE",
+    "aiIntegration": "NOT_APPLICABLE"
+  },
+  "nextTask": {
+    "taskId": "HC-901",
+    "title": "Synthetic Unicode slug behavior",
+    "objective": "Implement toSlug(value): return a lowercase, hyphen-separated slug; normalize compatibility characters, preserve Unicode letters and digits, map ampersand to the word and, collapse separators, and return an empty string for blank input.",
+    "priority": "P1",
+    "sourceRequirements": [
+      "Synthetic acceptance fixture for HC-901"
+    ],
+    "dependencies": [],
+    "allowedScope": [
+      "src/hc-901.mjs"
+    ],
+    "deliverables": [
+      "Structured source patch",
+      "Passing Docker test evidence"
+    ],
+    "acceptanceCriteria": [
+      "toSlug(\"Hello World\") returns \"hello-world\".",
+      "Convert ampersand to the word and; collapse repeated separators to one hyphen.",
+      "Preserve Unicode letters and digits after NFKC normalization.",
+      "Blank input returns an empty string.",
+      "The focused test passes without network access."
+    ],
+    "requiredTests": [
+      "test/hc-901.test.mjs"
+    ],
+    "visualEvidence": [],
+    "retryCount": 0,
+    "status": "READY",
+    "previousReviewFeedback": [],
+    "ownerApprovalRequired": false,
+    "projectFinalAudit": false
+  },
+  "approvalRequest": null
+}

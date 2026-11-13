@@ -1,0 +1,53 @@
+{
+  "taskId": "HC-002",
+  "createdAt": "2026-11-02T16:06:05.739Z",
+  "sourceRoot": "D:\\botly",
+  "files": [
+    {
+      "path": "src/features/healthclues/personalized-wellness-plan.ts",
+      "sha256": "b10f6fd991b76cb883e5f639c6b924b0dafc445d77a6c01b566320de16c35e46",
+      "bytes": 9401
+    },
+    {
+      "path": "src/features/healthclues/PersonalizedSuggestions.tsx",
+      "sha256": "b62f94c364623e77dd653eeede13968182ec8be10367c4b93eecfaa171c8b6d7",
+      "bytes": 11800
+    },
+    {
+      "path": "src/features/healthclues/wellness-plan.ts",
+      "sha256": "098a97680c2df63441eb1ac0b9bbbfb62465519fa5f99e0df2abbf9150474c52",
+      "bytes": 35340
+    },
+    {
+      "path": "scripts/test-healthclues-localization.mjs",
+      "sha256": "5b384adf8489df8b2df294c1e3f1270bc0f4865944edca11a105265fd4c4d240",
+      "bytes": 13942
+    },
+    {
+      "path": "scripts/test-healthclues-personalized-plan-contract.mjs",
+      "sha256": "611e7661ecc6af9d088f836ffba6cd0f1af6d608482927f97f88130faef17b0a",
+      "bytes": 11183
+    },
+    {
+      "path": "scripts/test-healthclues-wellness-plan.mjs",
+      "sha256": "764ffc47769d82fb0b878c84d73a4b50dedca109c03b010837d236d0ce25895e",
+      "bytes": 11061
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_LOCALIZATION_ACCEPTANCE.md",
+      "sha256": "288d23911b235e2d18bac04e9fc8ab3efda8cc2b88eea87fdb736687d26172af",
+      "bytes": 7921
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_16_ACCEPTANCE.md",
+      "sha256": "782ae3640215bc12110931fa525a99146005c2bce91e89db0ac71f9007f284fe",
+      "bytes": 6404
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+      "sha256": "354bddf5754a4fbdf306141b103cf1df0cebb7555953a9b0c77356b19e12c4b0",
+      "bytes": 71482
+    }
+  ],
+  "totalBytes": 178534
+}

@@ -1,0 +1,431 @@
+/* HealthClues Dashboard RPG Theme */
+
+.dashboardShell {
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem 0.85rem 3rem;
+  box-sizing: border-box;
+  color: #f1f5f9;
+}
+
+@media (min-width: 640px) {
+  .dashboardShell {
+    padding: 1.5rem 1.25rem 4rem;
+  }
+}
+
+/* Glassmorphic Container */
+.dashboardCard {
+  background: rgba(8, 22, 17, 0.92);
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  border-radius: 1.25rem;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(16px);
+  padding: 1.15rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .dashboardCard {
+    padding: 1.75rem 2rem;
+    gap: 1.5rem;
+  }
+}
+
+/* Hero Header */
+.heroHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  padding-bottom: 1rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #34d399;
+}
+
+.heroTitle {
+  font-size: 1.45rem;
+  font-weight: 950;
+  color: #ffd868;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+@media (min-width: 640px) {
+  .heroTitle {
+    font-size: 1.85rem;
+  }
+}
+
+.heroSubtitle {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+/* RPG Player Status Bar */
+.playerStatusBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: rgba(16, 38, 28, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 0.85rem;
+  padding: 0.65rem 0.85rem;
+}
+
+.playerIdentity {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.avatarBadge {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+  border: 1.5px solid #ffd868;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.playerTitles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.playerName {
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.playerRank {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.playerStatsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.statChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(7, 19, 14, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.statChip strong {
+  color: #ffd868;
+}
+
+/* Tabs Navigation */
+.tabList {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(10, 25, 18, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 9999px;
+  padding: 0.25rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tabBtn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 2.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 0.76rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0.35rem 0.5rem;
+  white-space: nowrap;
+}
+
+.tabBtnActive {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  font-weight: 900;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.45);
+}
+
+/* Discoveries Grid */
+.discoveriesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+@media (min-width: 768px) {
+  .discoveriesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.discoveryCard {
+  background: rgba(14, 34, 25, 0.85);
+  border: 1.2px solid rgba(212, 175, 55, 0.28);
+  border-radius: 1rem;
+  padding: 0.95rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.discoveryCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.6);
+}
+
+.cardHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.contentTypeTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  padding: 0.18rem 0.45rem;
+  border-radius: 9999px;
+}
+
+.timePill {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cardTitle {
+  font-size: 0.96rem;
+  font-weight: 900;
+  color: #fff8db;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.cardSummary {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #cbd5e1;
+  margin: 0;
+  flex: 1;
+}
+
+.safetyAlert {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.72rem;
+  color: #fef3c7;
+  line-height: 1.35;
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.25rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: linear-gradient(180deg, #ffe59b 0%, #dcae4e 100%);
+  border: 1px solid #fff2c3;
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.75rem;
+  color: #2b210a;
+  font-size: 0.74rem;
+  font-weight: 950;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  text-decoration: none;
+  min-height: 2.1rem;
+}
+
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.65rem;
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+  min-height: 2.1rem;
+}
+
+.btnSecondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* Profile Tab Grid */
+.profileGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .profileGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.profileItem {
+  background: rgba(14, 34, 25, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.85rem;
+}
+
+.profileItem dt {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #34d399;
+}
+
+.profileItem dd {
+  font-size: 0.84rem;
+  font-weight: 850;
+  color: #f8fafc;
+  margin: 0.15rem 0 0;
+}
+
+/* History List */
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-height: 24rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.historyItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: rgba(12, 28, 20, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.76rem;
+}
+
+.historyAction {
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+
+/* Empty / Fallback Card */
+.emptyCard {
+  background: rgba(16, 38, 28, 0.85);
+  border: 1.5px dashed rgba(212, 175, 55, 0.4);
+  border-radius: 1.1rem;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.emptyIcon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.emptyTitle {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffd868;
+  margin: 0;
+}
+
+.emptyDesc {
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  max-width: 28rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.emptyActionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}

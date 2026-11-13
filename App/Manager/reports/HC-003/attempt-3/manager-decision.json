@@ -1,0 +1,16 @@
+{
+  "decision": "BLOCKED",
+  "feedback": [
+    "Required task-start and review-end SHA-256 measurements for all 17 exact manifest paths were not supplied; tool use is prohibited. The integrity gap cannot be closed or mismatches resolved in this audit."
+  ],
+  "dimensions": {
+    "functional": "BLOCKED"
+  },
+  "reviewedAt": "2026-11-02T16:45:12.930Z",
+  "sourceManifestSha256": "acea881f9c86b121cb6cbcdcb1fded2b7a71bb44f7d8efe60e283816e3226431",
+  "developerReportSha256": "670d05fe071944b31a087536672723dcc49522831d53dfdc25e4787ca75b0c2c",
+  "independentSourceCheck": {
+    "ok": true,
+    "changed": []
+  }
+}

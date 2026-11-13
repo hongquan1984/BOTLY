@@ -1,0 +1,42 @@
+{
+  "taskId": "HC-004",
+  "attempt": 3,
+  "status": "READY_FOR_REVIEW",
+  "summary": "HC-004 discovery is complete for the supplied evidence: In-World Plan remains INCOMPLETE, with source-level REWORK and current authenticated/browser acceptance UNVERIFIED. Historical fixture results do not establish current MP20 acceptance or live integration success.",
+  "changedFiles": [],
+  "tests": [],
+  "screenshots": [],
+  "evidence": [
+    "PASS — Read-only audit boundary: only supplied excerpts were reviewed; no tools, commands, edits, tests or provider calls were performed.",
+    "PASS — Selection mechanics in supplied source: src/components/healthclues/WellnessPlanBuilder.tsx initializes unchecked inclusion independently from A/B selection, removes unchecked choices, displays a selected count, supports empty confirmation in standalone mode, and exposes an optional live-selection callback. This establishes code behavior, not executed acceptance.",
+    "REWORK — Custom transition: src/components/healthclues/WellnessPlanBuilder.tsx changes aiModes when Custom is selected but retains the previous aiSelections/choices entry. hasIncompleteAiSelection checks only whether an entry exists. After selecting A/B, switching to unfinished Custom can therefore leave the previous implementation eligible for confirmation or a later callback instead of enforcing completion of Custom.",
+    "PASS — API controls present in source: src/app/api/healthclues/plan/route.ts requires authentication, confirmed email for writes, owned World lookup, explicit confirmed=true, bounded normalized goals and signed or previously accepted AI content. It supports empty goals and request-key reuse. Authentication helpers, proof implementation and actual database enforcement were not supplied.",
+    "UNVERIFIED — Immediate persistence: src/components/healthclues/WellnessPlanBuilder.tsx invokes onSelectionChange but does not itself POST the Plan or await persistence success. The parent integration, unrelated-goal merging, failure recovery and My Journey rendering are described in App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md but their source was not supplied.",
+    "REWORK — Generated movement safety: App/BUSINESS_RULES.md excludes movement with unresolved acute pain/restriction. src/features/healthclues/personalized-wellness-plan.ts checks urgent safety, prohibited copy, relevance and quantities but does not gate generated movement against acutePainfulJoint/activityRestriction. src/app/api/healthclues/plan/route.ts does not independently apply those context checks in its AI-goal branch. Whether omitted signing/provider code supplies an equivalent gate is unknown.",
+    "UNVERIFIED — Current browser coverage: scripts/test-healthclues-mp20-two-question-browser.mjs exercises Gout, Sleep and Weight discovery through preview, asserts no adaptive/Advisor requests, and explicitly excludes account activation. It does not test immediate Plan selection, persistence, uncheck, reload or account isolation. Its source contains no pending-journey submission assertions despite broader run claims in App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md.",
+    "UNVERIFIED — Fixture distinction: scripts/test-healthclues-mp17-plan-selection-browser.mjs intercepts Advisor responses with unsigned synthetic fixtures and exercises the legacy pre-World Builder. scripts/test-healthclues-post-quiz-plan-browser.mjs contains local Auth/database persistence scenarios but expects the older ten-question/deterministic flow. Neither supplied script establishes execution against the current MP20 integration.",
+    "UNVERIFIED — Historical acceptance: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md reports authenticated synthetic A/B/Custom persistence, zero goals, bilingual snapshots and isolation. Those are historical report claims; corresponding execution artifacts and current integration harness content were not supplied. Its later simplified-contract live success supersedes older recorded 402/schema failures, but current provider health and live-result persistence remain unknown.",
+    "REWORK — Conflicting fixture disclosure: src/components/healthclues/WellnessPlanBuilder.tsx displays both 'cannot be saved' and text stating synthetic selections save to the local account. scripts/test-healthclues-mp17-plan-selection-browser.mjs expects a non-persistable fixture, while src/app/api/healthclues/plan/route.ts accommodates signed Owner Demo synthetic goals. Unsigned and signed fixture behavior needs distinct, accurate wording.",
+    "UNVERIFIED — Requirements conflicts: App/BUSINESS_RULES.md rejects numeric targets without baseline context, while App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md records an owner clarification permitting modest numeric experiments; supplied validation permits some prose quantities. App/UI_UX_SPEC.md describes sticky Confirm/Skip and a separate journal, whereas App/ACCEPTANCE_TESTS.md requires immediate selection in central My Journey. The approved precedence and exact current UI acceptance need reconciliation.",
+    "UNVERIFIED — Visual and sequencing acceptance: App/UI_UX_SPEC.md and App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md describe companion introduction, recommendation ordering and desktop/mobile inspection. No screenshot image or World/companion integration source was supplied, so visual PASS, introduction frequency and actual Pet-to-Plan sequencing cannot be established.",
+    "UNVERIFIED — Progress and integrity: App/CURRENT_STATE.md is owner-authored progress, not independent proof. Its supplied manifest hash matches the requested pin ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8. The supplied Builder manifest identifies c6167a43348fb99c853a5ba27c208fe37c6e7c23ae6eae5b24c1726e8eee1f12. No review-end manifest was supplied; hash correctness and stability through review were not independently verified."
+  ],
+  "knownLimitations": [
+    "PASS applies only to explicitly identified source-level findings; no runtime or visual PASS is asserted.",
+    "Only supplied excerpts were reviewed. Manifest entries do not establish inspection of omitted contents or imported dependencies.",
+    "No actual execution evidence was supplied; reported test outcomes remain report-only.",
+    "Current MP20 activation through authenticated World, immediate Plan persistence, rejection handling, reload and isolation remains unverified.",
+    "Historical legacy-answer retention, reviewed botanical availability and current live Gemini quality remain unresolved in the supplied reports."
+  ],
+  "blockers": [
+    "Missing review-end integrity evidence prevents closure of the prior source-stability review requirement.",
+    "Missing current integration source, execution artifacts and screenshot images prevent full In-World Plan acceptance."
+  ],
+  "nextSuggestedSteps": [
+    "Fix the A/B-to-Custom transition so unfinished Custom cannot retain an eligible prior implementation; verify confirmation and immediate-selection modes.",
+    "Trace and enforce generated movement safety for unknown/reported pain and restrictions; cover generation and Plan persistence rejection.",
+    "Reconcile numeric-policy and central-My-Journey UI requirements, and distinguish signed persistable fixtures from unsigned UI-only fixtures in disclosures.",
+    "Supply current parent integration source and matching authenticated MP20 artifacts covering A/B/Custom, unchecked and zero goals, unrelated-goal preservation, API rejection, reload and two-account isolation; inspect desktop/mobile screenshots before assigning visual PASS.",
+    "Have the audit runner verify all task-start hashes against a review-end manifest, retaining the owner-approved CURRENT_STATE pin."
+  ]
+}

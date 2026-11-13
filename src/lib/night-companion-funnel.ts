@@ -97,10 +97,10 @@ function createEmptyBreakdown(): FunnelBreakdown {
 export async function processNightCompanionFunnel(url: string, serviceKey: string): Promise<FunnelReportData> {
   const [eventsRes, waitlistRes] = await Promise.all([
     fetch(`${url}/rest/v1/analytics_events?order=created_at.desc&limit=5000`, {
-      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+      headers: { apikey: serviceKey, ...(!serviceKey.startsWith('sb_') ? { Authorization: `Bearer ${serviceKey}` } : {}) },
     }),
     fetch(`${url}/rest/v1/night_companion_waitlist?order=created_at.desc&limit=1000`, {
-      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+      headers: { apikey: serviceKey, ...(!serviceKey.startsWith('sb_') ? { Authorization: `Bearer ${serviceKey}` } : {}) },
     }),
   ]);
 

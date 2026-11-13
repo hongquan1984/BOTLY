@@ -1,0 +1,65 @@
+# Ứng viên công thức Botly chờ HealthClues review
+
+Bản snapshot được kiểm tra: database PostgreSQL đã restore, cô lập `botly_cli_baseline_acl_test2` vào ngày 2026-10-27. Đây không phải số liệu production hiện tại.
+
+Snapshot có 49 bài `health-tips` tiếng Anh đã xuất bản, kèm cấu trúc nguyên liệu, các bước và ít nhất một nguồn tham khảo. Đây chỉ là **ứng viên đã xuất bản trên Botly**; chưa bài nào được HealthClues review. Mapper đánh dấu chúng `needs_review`/`draft` và để trống thời lượng chuẩn bị. Reviewer cần kiểm tra từng nguồn và tuyên bố; chỉ điền thời gian khi nội dung công thức xác minh được. Không kích hoạt tuyên bố nguy cơ cao về bệnh, bài thuốc, thải độc, liều dùng, tương tác hoặc hiệu quả lâm sàng nếu chưa qua review phù hợp.
+
+Trang Admin Review hiển thị liên kết nguồn và cho sửa nguyên liệu/các bước/thời lượng. ID dưới đây dùng đúng dạng `published-<article_id>` trong danh sách ứng viên HealthClues.
+
+## Initial safety triage
+
+Hãy xem cách đặt tiêu đề là cờ cảnh báo tự động/biên tập, không phải kết luận về bài viết hay bằng chứng. Snapshot có tiêu đề nêu hoặc ngụ ý tác động lên huyết áp, gan, gây ngủ, làm sạch thận, diệt ký sinh trùng, bài thuốc hô hấp, viêm, đường huyết và chủ đề lâm sàng tương tự. Chuyển các bài này cho reviewer đủ chuyên môn trước khi phân phối cá nhân hóa. Có 1–5 liên kết nguồn chỉ chứng minh bài gắn tham khảo, không chứng minh nguồn hỗ trợ tiêu đề hoặc tuyên bố của công thức. Nếu reviewer chưa xác minh được phạm vi và an toàn, hãy từ chối hoặc yêu cầu sửa và không đưa vào Discovery công khai.
+
+| ID review | Slug bài viết | Tiêu đề | Số nguồn | Nguyên liệu | Các bước | Thời lượng |
+|---|---|---|---:|---:|---:|---|
+| `published-3da42533-d60a-4921-bb65-b50618da4890` | `baking-soda-lemon-oral-ph-enamel-safety` | Baking Soda & Lemon Rinse: Oral pH Buffering, Halitosis Reduction & Dental Enamel Safety | 3 | 3 | 4 | Reviewer must verify |
+| `published-a177df33-caee-4c20-a973-74f54a7f5d90` | `beetroot-apple-juice-nitric-oxide-cardiovascular` | Beetroot & Green Apple Elixir: The Enterosalivary Nitrate-Nitric Oxide Cascade & Systolic Blood Pressure Reduction | 3 | 3 | 4 | Reviewer must verify |
+| `published-46309b45-4360-4d1f-b09b-ff3e6866ea7c` | `beetroot-orange-nitric-oxide-synergy-hepatic-health` | Beetroot & Orange Synergy: Unlocking Nitric Oxide for Enhanced Hepatic Health | 3 | 3 | 3 | Reviewer must verify |
+| `published-5b095618-b8ce-4126-9644-447ff7932089` | `beetroot-orange-synergy-guide` | Beetroot + Orange: The Molecular Synergy & Clinical Evidence | 1 | 2 | 3 | Reviewer must verify |
+| `published-6a4cd825-b8cd-412e-88ee-b069d094c741` | `beetroot-apple-celery-lime-phytochemical-synergy` | Beetroot, Apple, Celery & Lime: A Phytochemical Deep Dive into Nitrates, Betalains, and Flavonoids | 4 | 5 | 3 | Reviewer must verify |
+| `published-eda95c66-d163-4fee-9147-783aa558fdfc` | `broccoli-mustard-seeds-synergy-guide` | Broccoli + Mustard Seeds: The Molecular Synergy & Clinical Evidence | 1 | 2 | 3 | Reviewer must verify |
+| `published-22ddb582-4758-4e66-9bad-8ef70b21999a` | `carrot-ginger-lime-anti-inflammatory-antioxidant` | Carrot, Ginger, and Lime Elixir: Unpacking the Anti-inflammatory and Antioxidant Synergy | 3 | 4 | 4 | Reviewer must verify |
+| `published-d58dea5a-e84b-486f-9582-2bedf6aabf4f` | `chamomile-cinnamon-tea-gaba-sleep-glucose` | Chamomile & Ceylon Cinnamon Infusion: Apigenin GABA-A Agonism & Nocturnal Glycemic Stabilization | 3 | 3 | 3 | Reviewer must verify |
+| `published-ceecb171-6040-4583-815e-62edf870157a` | `chia-oats-lime-gut-health-satiety` | Chia, Oats & Lime Elixir: Unpacking the Synergistic Mechanisms for Gut Health and Satiety | 3 | 4 | 3 | Reviewer must verify |
+| `published-3b7b39b4-9bbe-481b-90d8-9be26918e187` | `chia-oats-lime-gut-health-satiety-olwa` | Chia, Oats, and Lime Elixir: Unpacking the Fiber-Rich Synergy for Gut Health and Satiety | 3 | 4 | 3 | Reviewer must verify |
+| `published-dea6442d-b1fa-4e00-995a-01e674319341` | `coffee-spice-wellness-infusions` | Coffee & Spice Infusions: A Scientific Companion to Targeted Wellness | 5 | 6 | 3 | Reviewer must verify |
+| `published-5970b1a4-e76a-4bb4-a048-ac3124916da5` | `cucumber-mint-chia-hydration-gut-detox` | Cucumber, Mint & Chia Fusion: Intestinal Hydration Kinetics, Mucilage Hydrogels & Colon Motility | 3 | 4 | 4 | Reviewer must verify |
+| `published-eac61b3c-6c9a-44a6-b8ab-7faad7f8d4e7` | `dark-roast-coffee-citrus-zest-nrf2-autophagy` | Dark Roast Coffee & Fresh Citrus Zest: Unlocking Hepatic Nrf2 and Autophagy | 4 | 2 | 3 | Reviewer must verify |
+| `published-ae6092f0-5c63-4615-8f64-06e709af6fe3` | `decoding-behavior-scientific-perspective` | Decoding Human Behavior: A Scientific Companion to Pop Psychology Claims | 2 | 3 | 3 | Reviewer must verify |
+| `published-388d8820-8558-4d65-b611-c626d67f5630` | `fermented-garlic-honey-allicin-immune-shield` | Fermented Garlic & Raw Honey: Allicin Molecular Kinetics & Upper Respiratory Epithelial Defense | 3 | 3 | 4 | Reviewer must verify |
+| `published-577a637a-b96b-467e-9c42-69c4904c5c85` | `ginger-clove-tea-digestive-spasm-bloating` | Ginger & Clove Infusion: Smooth Muscle Antispasmodic Mechanism & Gastric Emptying Acceleration | 3 | 4 | 3 | Reviewer must verify |
+| `published-21950d6f-6da3-4d4a-92f0-2aac2b12fdf3` | `ginger-daily-diet-digestion-cellular-defense-0g6y` | Ginger in Your Daily Diet: The Science of Digestion and Cellular Defense | 2 | 2 | 3 | Reviewer must verify |
+| `published-a861b5c7-455c-441c-9e05-225286555223` | `ginger-calamansi-honey-natural-wellness-elixir` | Ginger, Calamansi, and Honey: Unpacking the Science of a Natural Wellness Elixir | 3 | 4 | 4 | Reviewer must verify |
+| `published-9d8e1892-4ee4-4624-bde6-128fe641d319` | `ginger-daily-diet-digestion-cellular-defense` | Ginger's Daily Impact: Molecular Mechanisms for Digestive Support, Anti-Nausea, and Cellular Defense | 2 | 2 | 3 | Reviewer must verify |
+| `published-ae6ebf6b-68c7-4dea-8f8d-b809d9bf3270` | `ginger-therapeutic-potential-biomedical-review` | Ginger's Therapeutic Potential: A Biomedical Review of Digestion, Inflammation, and Cellular Defense | 3 | 3 | 3 | Reviewer must verify |
+| `published-f89f5178-3021-47c5-9b15-545d5c757c56` | `golden-turmeric-black-pepper-curcumin-bioavailability` | Golden Turmeric & Black Pepper: The 2000% Bioavailability Breakthrough & NF-κB Joint Anti-Inflammatory Science | 3 | 4 | 4 | Reviewer must verify |
+| `published-1614845f-1478-46d8-aa37-419aecc1ae3b` | `green-tea-lemon-synergy-guide` | Green Tea + Fresh Lemon: The Molecular Synergy & Clinical Evidence | 1 | 2 | 3 | Reviewer must verify |
+| `published-063b9285-ad6c-4f78-95c9-ed78cbc57081` | `apple-chia-kiwi-gut-health-smoothie` | Gut Microbiome Modulation: The Synergistic Actions of Pectin, Fiber, and Actinidin from Apple, Chia, and Kiwi | 3 | 5 | 3 | Reviewer must verify |
+| `published-73e69644-97ed-452e-bcc9-a917b61c0f5b` | `homemade-coconut-oil-mct-lauric-acid` | Homemade Coconut Oil: Unpacking the Phytochemistry of Medium-Chain Triglycerides | 3 | 3 | 4 | Reviewer must verify |
+| `published-394ce9c7-a4d8-4b72-9a73-0c0d6788fe44` | `homemade-cough-syrup-onion-garlic-lemon-honey` | Homemade Cough Syrup: Unpacking the Science of Onion, Garlic, Lemon, and Honey | 4 | 4 | 3 | Reviewer must verify |
+| `published-fa434729-ffad-48d1-8fce-e243e8a451e6` | `honey-lemon-olive-oil-respiratory-claims` | Honey, Lemon, Olive Oil & Salt: A Critical Biomedical Review of Respiratory Health Claims | 3 | 4 | 3 | Reviewer must verify |
+| `published-23c01e2b-5f98-4574-9da9-f7d2b17d0699` | `honey-lemon-salt-olive-oil-lung-remedy` | Honey, Lemon, Salt, and Olive Oil: A Critical Look at Lung Health Claims | 3 | 4 | 3 | Reviewer must verify |
+| `published-3aa1e44a-74c9-471b-873c-d9f7c870455f` | `matcha-cognitive-enhancement-focus` | Matcha: The Synergistic Science of Sustained Focus and Cognitive Enhancement | 3 | 4 | 3 | Reviewer must verify |
+| `published-ca91642d-21c8-4574-ad65-3476aa49fdcf` | `milk-cinnamon-turmeric-honey-addiction-claims` | Milk, Cinnamon, Turmeric, Honey: Unpacking the Claims for Addiction Cessation | 3 | 4 | 4 | Reviewer must verify |
+| `published-6bb970de-fa37-4be3-bc03-d31c3b584ad0` | `oats-banana-sleep-wellness-support` | Oats and Banana: Exploring Nutritional Support for Sleep Wellness | 3 | 4 | 3 | Reviewer must verify |
+| `published-981bc5b9-0f0f-475f-8450-48456d8710cc` | `papaya-seeds-honey-gut-parasite-cleanse` | Papaya Seeds & Raw Honey: Carpaine Alkaloid, Papain Enzymes & Intestinal Parasite Eradication | 3 | 2 | 4 | Reviewer must verify |
+| `published-c8eee12b-6b20-4895-9935-669870735b20` | `onion-lemon-ginger-garlic-cinnamon-flu-remedy` | Phytocompound Synergy: Unpacking the Anti-Inflammatory & Mucolytic Actions of Onion, Lemon, Ginger, Garlic, and Cinnamon for Respiratory Relief | 4 | 7 | 3 | Reviewer must verify |
+| `published-a50ee214-092a-4e26-a825-33bd5505aaa2` | `pineapple-bromelain-anti-inflammatory-science` | Pineapple & Black Pepper Remedy: The Molecular Science of Bromelain and Inflammation Relief | 4 | 4 | 3 | Reviewer must verify |
+| `published-c0046ad7-a3b2-4ca8-9921-156b145f87af` | `pineapple-cucumber-juice-fatty-liver-claims` | Pineapple & Cucumber Juice for Fatty Liver: Hepatic Lipid Metabolism, Antioxidant Defense & Fructose Warnings | 3 | 5 | 4 | Reviewer must verify |
+| `published-0fc46863-69d8-4ab0-8fb2-cf8297039e34` | `steamed-beetroot-evoo-nitric-oxide-synergy` | Steamed Beetroot & EVOO: Unlocking Vascular Nitric Oxide and Cellular Vitality | 3 | 3 | 3 | Reviewer must verify |
+| `published-facb632a-16d1-437d-a6ec-39ac223dd7ab` | `synergistic-health-benefits-spiced-coffee` | Synergistic Health Benefits of Spiced Coffee: A Biomedical Perspective | 4 | 5 | 3 | Reviewer must verify |
+| `published-0804ce90-e180-4b79-81a7-2ebd68599a99` | `tart-cherry-lemon-water-synergy-enhanced-bioavailability` | Tart Cherry & Lemon Water Synergy: Unlocking Bioavailability and Anti-inflammatory Potential | 3 | 3 | 3 | Reviewer must verify |
+| `published-b7cac449-26ea-461b-a6af-a582f69e8b8f` | `lime-garlic-honey-acv-remedy-biomedical-review` | The 'Vision & Vitality' Elixir: A Biomedical Review of Lime, Garlic, Honey, and ACV | 4 | 4 | 5 | Reviewer must verify |
+| `published-501cd1c9-3d28-42f0-a1a9-e2f3c2dda9ff` | `apple-cucumber-celery-lime-digestive-anti-inflammatory` | The Green Elixir: Unpacking the Science of Apple, Cucumber, Celery & Lime Blend | 3 | 5 | 3 | Reviewer must verify |
+| `published-5083dd06-fa5d-4f4e-93cb-ad4e801e55f3` | `kiwi-spinach-cucumber-lemon-gut-motility-antioxidant` | The Green Gut Elixir: Phytochemical Synergy of Kiwi, Spinach, Cucumber, and Lemon for Digestive Health | 4 | 5 | 3 | Reviewer must verify |
+| `published-663c92c6-9a53-41eb-8792-c035e745eb31` | `multicomponent-smoothie-phytochemical-synergy` | The Multicomponent Elixir: Unpacking the Phytochemical Synergy of Beetroot, Carrot, Watermelon, and Lemon | 4 | 5 | 3 | Reviewer must verify |
+| `published-0e667d7c-5d29-463b-9bb3-4f1fa2cc8d63` | `carrot-lemon-apple-ginger-smoothie-metabolic-skin-health` | The Phytochemical Synergy: Carrot, Lemon, Apple, and Ginger Smoothie for Metabolic and Dermatological Health | 4 | 5 | 3 | Reviewer must verify |
+| `published-f6e24780-1f69-44b2-8e7f-2f36c0023c65` | `vibrant-elixir-carrot-beetroot-watermelon-lemon` | The Vibrant Elixir: Decoding Carotenoids, Betalains, and Nitric Oxide Pathways for Wellness | 2 | 5 | 3 | Reviewer must verify |
+| `published-9258918d-9160-4a36-9816-a3b944305e62` | `turmeric-black-pepper-synergy-guide` | Turmeric + Black Pepper: The Molecular Synergy & Clinical Evidence | 2 | 2 | 3 | Reviewer must verify |
+| `published-4a8f1269-6b6b-4ab5-97ac-63f603023d82` | `turmeric-scientific-companion-inflammation-antioxidant` | Turmeric: A Scientific Companion to Its Anti-inflammatory and Antioxidant Potentials | 3 | 3 | 3 | Reviewer must verify |
+| `published-2cc235fe-9da8-4967-a5e8-0a1e0891819d` | `broccoli-mustard-sulforaphane-synergy` | Unlocking Sulforaphane: The Broccoli-Mustard Seed Synergy for Cellular Vitality | 3 | 2 | 3 | Reviewer must verify |
+| `published-5e15d5e1-c89e-453e-8643-7673ae919846` | `warm-ginger-lemon-foot-soak-sleep-circulation` | Warm Ginger & Lemon Foot Bath: TRPV1 Receptor Activation, Peripheral Vasodilation & Deep Sleep Induction | 3 | 4 | 4 | Reviewer must verify |
+| `published-bfcb5665-5c32-4139-a5e0-4c918aaffd30` | `water-cooked-chicken-healthy-method-reduced-ages` | Water-Cooked Chicken: The Science of Reducing AGEs and Preserving Protein Integrity | 2 | 3 | 3 | Reviewer must verify |
+| `published-ab5f16a0-cf7b-44ac-a461-4ce0289749dc` | `watermelon-seed-citrulline-kidney-cleanse` | Watermelon & Seed Elixir: The L-Citrulline Mechanism for Urinary Alkalization and Renal Flushing | 3 | 4 | 3 | Reviewer must verify |
+
+Đây là danh sách công việc biên tập, không phải đánh giá an toàn, kiểm chứng nguồn, clinical review hay cho phép xuất bản. Snapshot có thể khác production hiện tại; cần cập nhật danh sách sau khi kiểm tra schema/nội dung live chỉ đọc.

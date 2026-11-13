@@ -1,0 +1,9 @@
+[
+  {
+    "command": "docker run --rm --network none --read-only --user 65534:65534 --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 64 --memory 512m --cpus 1 --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m --mount type=bind,source=D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-901\\workspace,target=/workspace,readonly --workdir /workspace node:24-bookworm-slim node test/hc-901.test.mjs",
+    "result": "PASS",
+    "exitCode": 0,
+    "timedOut": false,
+    "output": "✔ normalizes basic text (1.488123ms)\n✔ maps ampersand and collapses separators (0.153433ms)\n✔ preserves Unicode letters (0.134955ms)\n✔ normalizes compatibility characters (0.242457ms)\n✔ blank input becomes empty (1.012038ms)\nℹ tests 5\nℹ suites 0\nℹ pass 5\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 10.762026\n"
+  }
+]

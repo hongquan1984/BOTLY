@@ -1,0 +1,73 @@
+{
+  "summary": "Cycle 2 fixes the focused test failure and the obvious mobile HUD clipping, but local acceptance remains REWORK. Daily Care still reports goal completion incorrectly, and mobile HUD controls are too small. Authenticated flows could not be rerun without changing demo data.",
+  "checks": [
+    {
+      "id": "discovery",
+      "status": "UNVERIFIED",
+      "evidence": "Current headless Chromium loaded http://127.0.0.1:3329/vi/wellness/healthclues/quiz?quest=sleep-better&step=discovery; the two-question Quiz rendered. node scripts/test-healthclues-discovery-matching.mjs passed 37 assertions.",
+      "finding": "Concern selection, age confirmation and the resulting personal Journey were not completed in a current browser session."
+    },
+    {
+      "id": "overworld",
+      "status": "PASS",
+      "evidence": "Current headless Chromium loaded http://127.0.0.1:3329/vi/wellness/healthclues/quiz?step=quest and found eight region cards: two enabled and six disabled. src/components/healthclues/HealthCluesQuiz.tsx retains all eight IDs; the referenced Overworld artwork exists at public/healthclues/assets/world/healthclues-world-overworld.webp.",
+      "finding": "The current selector preserves the eight-region, two-playable scope."
+    },
+    {
+      "id": "world_entry",
+      "status": "UNVERIFIED",
+      "evidence": "",
+      "finding": "No account activation or fresh entry into Sleep Valley or HealthClues Realm was performed in this run."
+    },
+    {
+      "id": "npc_arrival",
+      "status": "UNVERIFIED",
+      "evidence": "node scripts/test-healthclues-region-layout.mjs passed connected-route checks for both regions; src/features/healthclues/RegionMapScene.tsx routes landmark clicks through beginLandmarkTravel.",
+      "finding": "Current authenticated click-to-arrival timing, painted-road alignment, Talk action and keyboard or touch interaction were not observed."
+    },
+    {
+      "id": "journey_daily_care",
+      "status": "FAIL",
+      "evidence": "src/features/healthclues/HealthCluesRpgWorldHud.tsx:150-170 and :379-404: any check-in marks all three displayed goal rows as recorded; completedCount falls back to totalGoals when there are no matching done usage records. src/features/healthclues/WellnessWorldGame.tsx:322-326 submits usage only for equipped toolkit entries, while DailyCheckinDialog.tsx:161-200 handles Plan goals separately.",
+      "finding": "Reproduction from the current data path: with five Plan goals and no equipped tools, record one goal as done and four as not completed. The HUD can display 5/5 completed and mark all three summary rows recorded. The new three-of-five explanation and consecutive-date calculation exist, but per-goal completion is not truthfully recovered."
+    },
+    {
+      "id": "in_region_learning",
+      "status": "UNVERIFIED",
+      "evidence": "",
+      "finding": "Lessons, learning quizzes, mini-games and Boss were not opened in a current authenticated region session."
+    },
+    {
+      "id": "auth_persistence",
+      "status": "UNVERIFIED",
+      "evidence": "node scripts/healthclues-owner-demo-preflight.mjs passed for project healthclues-owner-demo with loopback Auth and Mailpit. GET and POST http://127.0.0.1:3329/api/healthclues/account/quick-activate both returned 410.",
+      "finding": "Mailpit activation, return after reload or login, saved progress and two-account isolation were not retested. This run did not create or alter database records."
+    },
+    {
+      "id": "mobile_ui",
+      "status": "FAIL",
+      "evidence": "Inspected workspace captures D:\\botly\\App\\.tmp\\healthclues-tester\\screenshots\\verified-mobile-320-rpg.png, verified-mobile-390-rpg.png and verified-mobile-430-rpg.png. The prior topbar clipping appears repaired. Current src/features/healthclues/world-adventure.css sets the visible mobile language and profile controls to 32px high, with 32px profile width.",
+      "finding": "The visible language and profile touch targets are smaller than the 44px mobile target in App/UI_UX_SPEC.md. Other requested screens and physical touch behavior remain unverified. A separate Chrome window-size capture was excluded because Chrome used a 500px layout viewport despite a 320px image."
+    },
+    {
+      "id": "safety_privacy",
+      "status": "UNVERIFIED",
+      "evidence": "The read-only Owner Demo preflight passed; quick-activate returned 410 for GET and POST; node scripts/test-healthclues-wellness-plan.mjs passed 42 safety and coverage assertions.",
+      "finding": "Current-run cross-account denial, private Plan persistence and player-facing TEST ONLY or AI provenance were not verified through authenticated actions. Local fixtures do not establish clinical or production approval."
+    },
+    {
+      "id": "runtime_regression",
+      "status": "UNVERIFIED",
+      "evidence": "Current runs of scripts/test-healthclues-rpg-quest-board.mjs, test-healthclues-region-layout.mjs, test-healthclues-discovery-matching.mjs and test-healthclues-wellness-plan.mjs all exited 0.",
+      "finding": "The previously failing title assertion is repaired, but authenticated browser runtime errors and the complete gameplay regression were not checked in this run."
+    }
+  ],
+  "blocking_items": [
+    "Daily Care treats a recorded check-in as completion of every Plan goal, even when goals were marked not completed.",
+    "Visible mobile HUD language and profile controls have 32px touch targets.",
+    "Authenticated Quiz-to-World, persistence, NPC, learning and cross-account paths lack current-run verification."
+  ],
+  "prompt_for_antigravity": "Sửa luồng Daily Care/Check-in trong World. Tái hiện với tài khoản tổng hợp Owner Demo cô lập: lưu 5 mục tiêu Journey, không trang bị tool, ghi check-in với 1 mục tiêu Hoàn thành và 4 mục tiêu Không hoàn thành, rồi tải lại. Hiện HealthCluesRpgWorldHud.tsx có thể báo 5/5 đã hoàn thành và tô cả 3 dòng tóm tắt vì chỉ kiểm tra có check-in; WellnessWorldGame.tsx chỉ gửi usage của equipped entries, còn DailyCheckinDialog.tsx giữ trạng thái goal riêng và ánh xạ goal sang entry theo vị trí. Hãy dùng trạng thái từng goal có nguồn gốc xác thực; không suy ra hoàn thành từ sự tồn tại của check-in, không gán nhầm goal cho tool. Giữ giải thích ‘3 mục tiêu đầu trong số 5’ và liên kết xem đủ 5 mục tiêu; kiểm tra chuỗi ngày liên tiếp qua ngày thiếu và ranh giới timezone. Trên mobile 320x800, 390x844, 430x932, tăng vùng chạm thực của nút Language/Profile trong world-adventure.css lên ít nhất 44px mà không làm HUD tràn; mở và xem ảnh thật của Quiz, World Preview, HUD, NPC modal, Journey và Daily Care, kiểm tra safe area, đóng overlay, bottom navigation và overflow bằng CDP emulation thật. Chạy focused tests cho trạng thái done/not_yet/không ghi, reload, năm mục tiêu, 7-day streak, signed action và title cũ; sau đó E2E local Mailpit cho hai vùng, NPC walk-then-Talk, học/Boss và cách ly hai tài khoản nếu được phép tạo dữ liệu tổng hợp. Nếu cần thay đổi schema hoặc không có môi trường thử được ủy quyền, dừng và báo chính xác blocker; không dùng production, AI thật, commit, push hay deploy.",
+  "next_test": "Run an authenticated isolated Owner Demo check-in with five confirmed goals, zero equipped tools, one done and four not_yet; reload and compare every Daily Care row and the completed count with the saved check-in.",
+  "release_readiness": "REWORK for the local playable scope. Qualified health-content review, privacy/security approval and physical-device testing remain separate release gates."
+}

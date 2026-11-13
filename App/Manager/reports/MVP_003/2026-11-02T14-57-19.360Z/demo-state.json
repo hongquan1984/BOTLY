@@ -1,0 +1,107 @@
+{
+  "runId": "2026-11-02T14-57-19.360Z",
+  "mode": "REAL_CODEX_SYNTHETIC_SNAPSHOT_ONLY",
+  "status": "BLOCKED",
+  "realAiCalls": 2,
+  "maxRealAiCalls": 12,
+  "currentTaskId": "HC-901",
+  "nextTaskId": null,
+  "queue": [
+    {
+      "taskId": "HC-901",
+      "title": "Synthetic Unicode slug behavior",
+      "objective": "Implement toSlug(value): return a lowercase, hyphen-separated slug; normalize compatibility characters, preserve Unicode letters and digits, map ampersand to the word and, collapse separators, and return an empty string for blank input.",
+      "priority": "P1",
+      "sourceRequirements": [
+        "Synthetic acceptance fixture for HC-901"
+      ],
+      "dependencies": [],
+      "allowedScope": [
+        "src/hc-901.mjs"
+      ],
+      "deliverables": [
+        "Structured source patch",
+        "Passing Docker test evidence"
+      ],
+      "acceptanceCriteria": [
+        "toSlug(\"Hello World\") returns \"hello-world\".",
+        "Convert ampersand to the word and; collapse repeated separators to one hyphen.",
+        "Preserve Unicode letters and digits after NFKC normalization.",
+        "Blank input returns an empty string.",
+        "The focused test passes without network access."
+      ],
+      "requiredTests": [
+        "test/hc-901.test.mjs"
+      ],
+      "visualEvidence": [],
+      "retryCount": 0,
+      "status": "IN_PROGRESS",
+      "previousReviewFeedback": [],
+      "ownerApprovalRequired": false,
+      "projectFinalAudit": false
+    },
+    {
+      "taskId": "HC-902",
+      "title": "Synthetic duration label behavior",
+      "objective": "Implement formatDuration(minutes) as a deterministic formatter for non-negative integer minutes. Use singular \"minute\" only for 1 and plural \"minutes\" for all other accepted values; reject invalid values with a TypeError.",
+      "priority": "P1",
+      "sourceRequirements": [
+        "Synthetic acceptance fixture for HC-902"
+      ],
+      "dependencies": [
+        "HC-901"
+      ],
+      "allowedScope": [
+        "src/hc-902.mjs"
+      ],
+      "deliverables": [
+        "Structured source patch",
+        "Passing Docker test evidence"
+      ],
+      "acceptanceCriteria": [
+        "Use singular minute only for exactly 1; use minutes for zero and all other accepted integer values.",
+        "Reject negative, fractional, string, and non-finite input with TypeError.",
+        "The focused test passes without network access."
+      ],
+      "requiredTests": [
+        "test/hc-902.test.mjs"
+      ],
+      "visualEvidence": [],
+      "retryCount": 0,
+      "status": "PENDING",
+      "previousReviewFeedback": [],
+      "ownerApprovalRequired": false,
+      "projectFinalAudit": false
+    }
+  ],
+  "history": [
+    {
+      "event": "MANAGER_ASSIGNED",
+      "taskId": "HC-901",
+      "realAI": true,
+      "at": "2026-11-02T14:57:20.069Z"
+    }
+  ],
+  "callHistory": [
+    {
+      "number": 1,
+      "role": "manager",
+      "status": "COMPLETED",
+      "startedAt": "2026-11-02T14:57:19.662Z",
+      "eventTypes": [],
+      "completedAt": "2026-11-02T14:57:19.925Z"
+    },
+    {
+      "number": 2,
+      "role": "developer",
+      "status": "COMPLETED",
+      "startedAt": "2026-11-02T14:57:26.613Z",
+      "eventTypes": [],
+      "completedAt": "2026-11-02T14:57:26.751Z"
+    }
+  ],
+  "startedAt": "2026-11-02T14:57:19.361Z",
+  "updatedAt": "2026-11-02T14:57:26.995Z",
+  "blocker": "Cannot read properties of undefined (reading 'taskId')",
+  "completedAt": "2026-11-02T14:57:26.995Z"
+}

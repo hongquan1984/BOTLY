@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    cpus: 2,
+  },
+  turbopack: {
+    // Keep builds started from isolated App/.tmp test copies inside that copy.
+    // Next otherwise discovers the workspace lockfile above it and shares the
+    // root .next route types/manifest with unrelated baseline builds.
+    root: path.resolve(process.env.HEALTHCLUES_TURBOPACK_ROOT || process.cwd()),
+  },
   async rewrites() {
     return [
       { source: "/vi/admin/thong-ke", destination: "/admin/thong-ke" },

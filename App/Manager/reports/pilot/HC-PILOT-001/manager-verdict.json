@@ -1,0 +1,42 @@
+﻿{
+    "realCodexSmoke":  "BLOCKED workspace routing",
+    "integrationOutcome":  "NOT_RUN",
+    "dockerBoundary":  "PASS for tested synthetic workspace",
+    "reason":  "Docker recovery and filesystem boundary tests passed, but Linux Codex inference failed workspace routing (chatgpt.com returned HTTP 451; api.openai.com token models endpoint returned 403). Also the second approved target checksum drifted from the preflight baseline without a Manager write; preserve it and require reconciliation. Developer and Apply Gate were not run.",
+    "developerWorkingDirectoryIfLaunched":  "D:/botly",
+    "applicationFilesChangedByPilot":  [
+
+                                       ],
+    "linuxCodexVersion":  "0.166.0",
+    "fullAutonomousModeReady":  false,
+    "taskId":  "HC-PILOT-001",
+    "auth":  "UNVERIFIED",
+    "nextQueuedTask":  "HC-001",
+    "recordedAtUtc":  "20261102T130257Z",
+    "applyGate":  "NOT_RUN",
+    "dockerImageBuild":  "BuildKit export reported success; image inspect/run not verified due containerd I/O",
+    "managerReviewIsolation":  "Docker boundary mechanics verified, AI review not run",
+    "scopeRoots":  [
+                       "D:/botly/src",
+                       "D:/botly/scripts"
+                   ],
+    "configuredSandbox":  "workspace-write",
+    "dockerRuntime":  "BLOCKED",
+    "targetChecksumDrift":  {
+                                "current":  "AD7989393B811B7B244EF6A12822982EADF55ADC49DBC184887D0955B919A9E3",
+                                "path":  "scripts/test-healthclues-personalized-plan-contract.mjs",
+                                "preflight":  "49D41FF6E1EE0C0E1187516E2D3F4252F2BA5809CF20FC0B8C0DD451FF3ABACB"
+                            },
+    "managerTests":  "15/15 PASS",
+    "status":  "AUTH_BLOCKED",
+    "repositoryRoot":  "D:/botly",
+    "phase":  "CODEX_LINUX_SMOKE",
+    "developerLaunched":  false,
+    "linuxAuthStatus":  "Logged in using ChatGPT (local status only)",
+    "sandboxTests":  {
+                         "outsideProbeCleanup":  "PASS",
+                         "insideWrite":  "PASS",
+                         "attempts":  2,
+                         "outsideWriteDenied":  "FAIL"
+                     }
+}

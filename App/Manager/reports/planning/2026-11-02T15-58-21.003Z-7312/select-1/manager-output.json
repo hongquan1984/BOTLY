@@ -1,0 +1,59 @@
+{
+  "decision": "SELECT_TASK",
+  "taskId": "HC-001",
+  "reasoning": "HC-001 is the first highest-priority task in the supplied ready list.",
+  "feedback": [],
+  "dimensions": {
+    "functional": "NOT_APPLICABLE",
+    "visual": "NOT_APPLICABLE",
+    "data": "NOT_APPLICABLE",
+    "localization": "NOT_APPLICABLE",
+    "security": "NOT_APPLICABLE",
+    "aiIntegration": "NOT_APPLICABLE"
+  },
+  "nextTask": {
+    "taskId": "HC-001",
+    "title": "Evidence audit: personalized recommendations",
+    "objective": "Factual discovery only. Establish whether the lead is complete, incomplete, blocked, or already verified from current source and artifacts. Do not change product code. Verify acceptance evidence for recommendation quality, including real-provider versus fixture distinction.",
+    "priority": "P1",
+    "sourceRequirements": [
+      "MASTER_SPEC.md",
+      "BUSINESS_RULES.md",
+      "ACCEPTANCE_TESTS.md",
+      "CURRENT_STATE.md",
+      "UI_UX_SPEC.md",
+      "reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md"
+    ],
+    "dependencies": [],
+    "allowedScope": [
+      "scripts",
+      "src/features/healthclues"
+    ],
+    "deliverables": [
+      "Evidence citations with repository-relative file paths",
+      "PASS/UNVERIFIED/REWORK dimension summary",
+      "Precise follow-up task only when evidence shows a gap"
+    ],
+    "acceptanceCriteria": [
+      "No product files changed",
+      "Cite existing source/test/evidence file paths in evidence array",
+      "Check source and tests; distinguish mocks from real integrations",
+      "Do not infer visual PASS without screenshot inspection",
+      "Record open conflicts and missing artifacts"
+    ],
+    "requiredTests": [],
+    "visualEvidence": [],
+    "retryCount": 1,
+    "status": "REWORK",
+    "previousReviewFeedback": [
+      "SYSTEM NOTE: the trusted runner now extracts exact allowlisted paths from citation statements and stores the original wording in auditFindings; no need to make evidence[] path-only. Keep every finding tied to a supplied manifest path.",
+      "Include src/features/healthclues/server/wellness-plan-proof.ts and its inspected assertions in scripts/test-healthclues-personalized-plan-contract.mjs. The proof binds generated content to a profile digest containing safety fields and checks signature, expiry and selected copy. Explain that these integrity controls do not establish clinical safety or prove API invocation; qualify the persistence finding accordingly.",
+      "Include src/features/healthclues/wellness-plan.ts: its deterministic habit and personal-goal paths contain profile-aware movement gates, and its localized snapshot helper preserves legacy text. Distinguish these paths from the generated-goal validator gap. Use App/reports/HEALTHCLUES_UNIVERSAL_WELLNESS_ADVISOR_ACCEPTANCE.md only as historical deterministic/TEST ONLY evidence, not live Gemini acceptance.",
+      "Record the historical credential-exposure and required-rotation warning in App/reports/HEALTHCLUES_GEMINI_REALTIME_ADVISOR_ACCEPTANCE.md. Later successful requests and configuration checks do not establish whether rotation occurred. Current credential safety remains unknown; correcting this audit requires no credential access or provider call.",
+      "Return a dimension summary explicitly scoped to audit quality. Retain current-quality, genuine-output persistence and screenshot limitations as product findings; do not make product completion a prerequisite for audit PASS."
+    ],
+    "ownerApprovalRequired": false,
+    "projectFinalAudit": false
+  },
+  "approvalRequest": null
+}

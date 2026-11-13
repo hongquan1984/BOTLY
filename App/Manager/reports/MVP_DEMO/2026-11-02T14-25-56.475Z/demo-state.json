@@ -1,0 +1,105 @@
+{
+  "runId": "2026-11-02T14-25-56.475Z",
+  "mode": "REAL_CODEX_SYNTHETIC_ONLY",
+  "status": "DEMO_PASS",
+  "realAiCalls": 8,
+  "queue": [
+    {
+      "taskId": "HC-901",
+      "title": "Synthetic greeting behavior",
+      "objective": "Change greet(name) to return exactly `Hello, ${name}!`.",
+      "priority": "P1",
+      "sourceRequirements": [
+        "synthetic/test/greeting.test.mjs"
+      ],
+      "dependencies": [],
+      "allowedScope": [
+        "src/greeting.mjs"
+      ],
+      "deliverables": [
+        "One source patch",
+        "Passing isolated Node test"
+      ],
+      "acceptanceCriteria": [
+        "greet(\"Ada\") returns \"Hello, Ada!\""
+      ],
+      "requiredTests": [
+        "node --test test/greeting.test.mjs"
+      ],
+      "visualEvidence": [],
+      "retryCount": 1,
+      "status": "PASS",
+      "previousReviewFeedback": [
+        "In src/greeting.mjs, change greet(name) to return exactly `Hello, ${name}!`.",
+        "Rerun `node --test test/greeting.test.mjs` and provide passing evidence with exit code 0. Keep changes within src/greeting.mjs."
+      ],
+      "ownerApprovalRequired": false,
+      "projectFinalAudit": false
+    },
+    {
+      "taskId": "HC-902",
+      "title": "Synthetic farewell behavior",
+      "objective": "Change farewell(name) to return exactly `Goodbye, ${name}!`.",
+      "priority": "P1",
+      "sourceRequirements": [
+        "synthetic/test/farewell.test.mjs"
+      ],
+      "dependencies": [],
+      "allowedScope": [
+        "src/farewell.mjs"
+      ],
+      "deliverables": [
+        "One source patch",
+        "Passing isolated Node test"
+      ],
+      "acceptanceCriteria": [
+        "farewell(\"Ada\") returns \"Goodbye, Ada!\""
+      ],
+      "requiredTests": [
+        "node --test test/farewell.test.mjs"
+      ],
+      "visualEvidence": [],
+      "retryCount": 0,
+      "status": "PASS",
+      "previousReviewFeedback": [],
+      "ownerApprovalRequired": false,
+      "projectFinalAudit": false
+    }
+  ],
+  "history": [
+    {
+      "event": "MANAGER_ASSIGNED",
+      "taskId": "HC-901",
+      "ai": "REAL"
+    },
+    {
+      "event": "MANAGER_REWORK",
+      "taskId": "HC-901",
+      "fixture": "INTENTIONAL_REWORK_FIXTURE",
+      "feedback": [
+        "In src/greeting.mjs, change greet(name) to return exactly `Hello, ${name}!`.",
+        "Rerun `node --test test/greeting.test.mjs` and provide passing evidence with exit code 0. Keep changes within src/greeting.mjs."
+      ],
+      "ai": "REAL"
+    },
+    {
+      "event": "MANAGER_PASS_AFTER_REWORK",
+      "taskId": "HC-901",
+      "ai": "REAL",
+      "testPassed": true
+    },
+    {
+      "event": "MANAGER_ASSIGNED",
+      "taskId": "HC-902",
+      "ai": "REAL"
+    },
+    {
+      "event": "MANAGER_PASS",
+      "taskId": "HC-902",
+      "ai": "REAL",
+      "testPassed": true
+    }
+  ],
+  "currentTaskId": null,
+  "nextTaskId": null
+}

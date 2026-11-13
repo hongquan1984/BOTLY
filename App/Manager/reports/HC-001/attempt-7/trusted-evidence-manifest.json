@@ -1,0 +1,73 @@
+{
+  "taskId": "HC-001",
+  "createdAt": "2026-11-02T16:04:31.444Z",
+  "sourceRoot": "D:\\botly",
+  "files": [
+    {
+      "path": "src/features/healthclues/personalized-wellness-plan.ts",
+      "sha256": "b10f6fd991b76cb883e5f639c6b924b0dafc445d77a6c01b566320de16c35e46",
+      "bytes": 9401
+    },
+    {
+      "path": "src/features/healthclues/gemini-wellness-plan.ts",
+      "sha256": "30fa17ce15258b5554acd0a89956b0c822e37ef4002d29a67e5305b7007faf58",
+      "bytes": 9134
+    },
+    {
+      "path": "src/features/healthclues/server/wellness-plan-proof.ts",
+      "sha256": "30095649c97b993b16890bddf77bc8092162dcc9f95ec85ee52e0e6632a657fe",
+      "bytes": 4613
+    },
+    {
+      "path": "src/features/healthclues/wellness-plan.ts",
+      "sha256": "098a97680c2df63441eb1ac0b9bbbfb62465519fa5f99e0df2abbf9150474c52",
+      "bytes": 35340
+    },
+    {
+      "path": "src/features/healthclues/PersonalizedSuggestions.tsx",
+      "sha256": "b62f94c364623e77dd653eeede13968182ec8be10367c4b93eecfaa171c8b6d7",
+      "bytes": 11800
+    },
+    {
+      "path": "scripts/test-healthclues-personalized-plan-contract.mjs",
+      "sha256": "611e7661ecc6af9d088f836ffba6cd0f1af6d608482927f97f88130faef17b0a",
+      "bytes": 11183
+    },
+    {
+      "path": "scripts/test-healthclues-gemini-plan-pipeline.mjs",
+      "sha256": "4cb636404631aa749935ccd89ee3f8583b7f8c659ac605f9c76a7bbbb44b8a2d",
+      "bytes": 5199
+    },
+    {
+      "path": "scripts/test-healthclues-personalized-recommendations.mjs",
+      "sha256": "3f7a69100388069cfe6b16be39bb81b9e19d02c8f3173572aa6d123914056972",
+      "bytes": 7067
+    },
+    {
+      "path": "App/CURRENT_STATE.md",
+      "sha256": "84deba53fe1649b29698e4c574842049fb17cb019c848532ba0890bd9a233d1a",
+      "bytes": 227143
+    },
+    {
+      "path": "App/ACCEPTANCE_TESTS.md",
+      "sha256": "e2eb248ef60dc51efce9e624c85d96a1d6e6a5781680992f6c57916a97e8fcb3",
+      "bytes": 81481
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+      "sha256": "354bddf5754a4fbdf306141b103cf1df0cebb7555953a9b0c77356b19e12c4b0",
+      "bytes": 71482
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_GEMINI_REALTIME_ADVISOR_ACCEPTANCE.md",
+      "sha256": "8e5c7af34b98e7e8057eb2b3492df1e3adf9a265105054be86dc19688d455632",
+      "bytes": 9479
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_UNIVERSAL_WELLNESS_ADVISOR_ACCEPTANCE.md",
+      "sha256": "4c6f58691e25bce3032822acf756d0b13e55e372316a2b41cdc2db92a22c1514",
+      "bytes": 18131
+    }
+  ],
+  "totalBytes": 501453
+}

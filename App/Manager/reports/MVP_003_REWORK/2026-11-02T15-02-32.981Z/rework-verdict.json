@@ -1,0 +1,44 @@
+{
+  "status": "REWORK_PASS",
+  "taskId": "HC-901",
+  "reworkVerified": true,
+  "passVerified": true,
+  "firstManagerAiDecision": {
+    "decision": "REWORK",
+    "taskId": "HC-901",
+    "reasoning": "Docker tests failed: 2 passed, 3 failed. The patch respects the allowed scope but does not satisfy the Unicode slug objective. The ASCII-only developer brief omits required behavior.",
+    "feedback": [
+      "Map ampersands to the word 'and' before collapsing separators.",
+      "Preserve Unicode letters and digits instead of restricting output to a-z and 0-9.",
+      "Apply compatibility normalization (NFKC) so compatibility characters are retained in normalized form.",
+      "Rerun test/hc-901.test.mjs in the network-disabled Docker environment and provide passing evidence."
+    ],
+    "dimensions": {
+      "functional": "REWORK",
+      "visual": "NOT_APPLICABLE",
+      "data": "NOT_APPLICABLE",
+      "localization": "REWORK",
+      "security": "NOT_APPLICABLE",
+      "aiIntegration": "NOT_APPLICABLE"
+    },
+    "nextTask": null,
+    "approvalRequest": null
+  },
+  "secondManagerAiDecision": {
+    "decision": "PASS",
+    "taskId": "HC-901",
+    "reasoning": "The supplied diff implements compatibility normalization, lowercase conversion, Unicode letter and number preservation, ampersand mapping, separator collapsing, and blank-input handling. Changes stay within the editable file. Docker evidence reports all five focused tests passed without network access, with exit code 0 and no timeout.",
+    "feedback": [],
+    "dimensions": {
+      "functional": "PASS",
+      "visual": "NOT_APPLICABLE",
+      "data": "NOT_APPLICABLE",
+      "localization": "PASS",
+      "security": "NOT_APPLICABLE",
+      "aiIntegration": "NOT_APPLICABLE"
+    },
+    "nextTask": null,
+    "approvalRequest": null
+  },
+  "applyOccurred": false
+}

@@ -1,5 +1,7 @@
-const url = 'https://rswmadukvegraxfcdbcb.supabase.co/rest/v1';
-const key = 'sb_secret_V0mR7XNH85YEwk7bsP9d4Q_XG7nk3ED';
+const supabaseUrl = process.env.SUPABASE_URL;
+const url = supabaseUrl ? `${supabaseUrl.replace(/\/$/, "")}/rest/v1` : "";
+const key = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!supabaseUrl || !key) throw new Error("SUPABASE_URL and server secret are required");
 const articleId = 'c0046ad7-a3b2-4ca8-9921-156b145f87af';
 
 const enData = {

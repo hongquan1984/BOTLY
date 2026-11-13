@@ -1,0 +1,28 @@
+{
+  "decision": "REWORK",
+  "taskId": "HC-003",
+  "reasoning": "The audit accurately distinguishes source inspection, synthetic fixtures, historical reports and unverified runtime behavior. Product incompleteness does not prevent audit acceptance. However, the explicit attempt-2 requirement to verify that all live inputs remain unchanged through review is unsatisfied. The supplied manifest establishes one snapshot only; live integrity could not be checked because the tool host is disabled.",
+  "feedback": [
+    "Repair only the integrity evidence gap; no product implementation or test execution is required for this audit.",
+    "Supply task-start and review-end SHA-256 comparisons for every exact path in the 17-entry trusted manifest. Resolve any mismatch by restarting the affected evidence review.",
+    "Keep App/CURRENT_STATE.md pinned to ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8 using state/source-snapshots/owner-authorized/CURRENT_STATE.ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8.md. Record live-file differences separately rather than replacing the approved snapshot.",
+    "Retain the report-only classification for historical browser successes and UNVERIFIED findings for current legacy regression, original 96-answer retention, MP20 persistence and visual acceptance. No screenshots or execution artifacts were independently inspected."
+  ],
+  "dimensions": {
+    "functional": "UNVERIFIED",
+    "visual": "UNVERIFIED",
+    "data": "UNVERIFIED",
+    "localization": "UNVERIFIED",
+    "security": "UNVERIFIED",
+    "aiIntegration": "UNVERIFIED"
+  },
+  "nextTask": null,
+  "approvalRequest": null,
+  "reviewedAt": "2026-11-02T16:43:22.588Z",
+  "sourceManifestSha256": "acea881f9c86b121cb6cbcdcb1fded2b7a71bb44f7d8efe60e283816e3226431",
+  "developerReportSha256": "1a2f034c497879becbd19fd0209945b137b61fb1b9eab432d3d93adee5c2fd79",
+  "independentSourceCheck": {
+    "ok": true,
+    "changed": []
+  }
+}

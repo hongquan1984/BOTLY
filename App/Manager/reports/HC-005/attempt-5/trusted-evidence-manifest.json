@@ -1,0 +1,196 @@
+{
+  "taskId": "HC-005",
+  "createdAt": "2026-11-02T16:57:38.029Z",
+  "sourceRoot": "D:\\botly",
+  "files": [
+    {
+      "path": "src/features/healthclues/WellnessWorldGame.tsx",
+      "sha256": "261e72ce56e490e173be501c1b2b5a696a433b38d1792c57f4bc66fb85d51086",
+      "bytes": 58479
+    },
+    {
+      "path": "src/features/healthclues/WorldAdventureScene.tsx",
+      "sha256": "186a42ed7edbe98a5bce2de868a195f98f9958b7d892966c2de89fbb64eee2fc",
+      "bytes": 71953
+    },
+    {
+      "path": "src/features/healthclues/RegionMapScene.tsx",
+      "sha256": "8edee10e8e9c1d4b7178e18f446a1ddad37898383ca7898fbe42e1b87fe3034f",
+      "bytes": 40096
+    },
+    {
+      "path": "src/features/healthclues/HealthCluesPet.tsx",
+      "sha256": "fe795de6ff4e3b67423a2f0a20a6f510001c0358f198abbf2a1e4678898afccd",
+      "bytes": 2809
+    },
+    {
+      "path": "src/components/healthclues/HealthCluesGameShell.tsx",
+      "sha256": "05953eccb2461356e24cf6e2db3171294a5e6bb639a042371dbbfcbc2b7ec1eb",
+      "bytes": 3549
+    },
+    {
+      "path": "src/components/healthclues/HealthCluesLocaleProvider.tsx",
+      "sha256": "4126ea49e7fc034e17bbc42ff57258d8d33eefa64a6695f633680ad71bf22545",
+      "bytes": 5656
+    },
+    {
+      "path": "src/app/api/healthclues/npc-chat/route.ts",
+      "sha256": "739707bff52949f3ef0b2deb1fcbdbef65180ac23873ab3f4547b1fd8600b3a5",
+      "bytes": 7741
+    },
+    {
+      "path": "scripts/test-healthclues-region-layout.mjs",
+      "sha256": "7f1a248b94057dbf3d0e59cd1033ed09383481bdf8517baf8e45491bb08e457e",
+      "bytes": 2192
+    },
+    {
+      "path": "scripts/run-healthclues-game-e2e.mjs",
+      "sha256": "b567dbe3cb5f1448936cefe70944dfe379a167b58288832a0fa23a93f9b7f130",
+      "bytes": 170036
+    },
+    {
+      "path": "App/reports/RPG_VISUAL_ACCEPTANCE.md",
+      "sha256": "f2c20c331dc14e6f6c2c4371041e37a55cea36607c9b42eab2bc548cd3285cd4",
+      "bytes": 16269
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_16_ACCEPTANCE.md",
+      "sha256": "782ae3640215bc12110931fa525a99146005c2bce91e89db0ac71f9007f284fe",
+      "bytes": 6404,
+      "modifiedAt": "2026-10-31T17:40:16.000Z"
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+      "sha256": "354bddf5754a4fbdf306141b103cf1df0cebb7555953a9b0c77356b19e12c4b0",
+      "bytes": 71482,
+      "modifiedAt": "2026-11-02T13:43:36.000Z"
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_WORLD_EXPERIENCE_ACCEPTANCE.md",
+      "sha256": "708f1220eb219c8c1e46c163991f9b1aca1f98c21a567f695acb5047d0947540",
+      "bytes": 18419
+    },
+    {
+      "path": "App/MASTER_SPEC.md",
+      "sha256": "184fd017602d81531864657190e88e180a4fd7091eaf1a5c9541937cb8a85ef2",
+      "bytes": 61611,
+      "modifiedAt": "2026-11-02T16:50:10.000Z"
+    },
+    {
+      "path": "App/BUSINESS_RULES.md",
+      "sha256": "bbfc9faf885f854d70b8fdb1ab52af1bb7bbb2283301dcd78bc53ff660c8d0bb",
+      "bytes": 54657,
+      "modifiedAt": "2026-11-02T16:49:04.000Z"
+    },
+    {
+      "path": "App/ACCEPTANCE_TESTS.md",
+      "sha256": "f0602b6c051488912ae452609e19602a863b06d346564b8966678bbe96f0e09e",
+      "bytes": 82763,
+      "modifiedAt": "2026-11-02T16:49:04.000Z"
+    },
+    {
+      "path": "App/CURRENT_STATE.md",
+      "sha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+      "bytes": 227828,
+      "modifiedAt": "2026-11-02T16:09:10.000Z",
+      "snapshotFile": "state/source-snapshots/owner-authorized/CURRENT_STATE.ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8.md"
+    },
+    {
+      "path": "App/UI_UX_SPEC.md",
+      "sha256": "7e0d6a250c799209a2d454651905139aade0ee91a841ccc9e916d9e5f5d51bb7",
+      "bytes": 52916,
+      "modifiedAt": "2026-11-02T16:49:04.000Z"
+    }
+  ],
+  "documents": [
+    {
+      "path": "App/MASTER_SPEC.md",
+      "sha256": "184fd017602d81531864657190e88e180a4fd7091eaf1a5c9541937cb8a85ef2",
+      "bytes": 61611,
+      "modifiedAt": "2026-11-02T16:50:10.000Z"
+    },
+    {
+      "path": "App/BUSINESS_RULES.md",
+      "sha256": "bbfc9faf885f854d70b8fdb1ab52af1bb7bbb2283301dcd78bc53ff660c8d0bb",
+      "bytes": 54657,
+      "modifiedAt": "2026-11-02T16:49:04.000Z"
+    },
+    {
+      "path": "App/ACCEPTANCE_TESTS.md",
+      "sha256": "f0602b6c051488912ae452609e19602a863b06d346564b8966678bbe96f0e09e",
+      "bytes": 82763,
+      "modifiedAt": "2026-11-02T16:49:04.000Z"
+    },
+    {
+      "path": "App/CURRENT_STATE.md",
+      "sha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+      "bytes": 227828,
+      "modifiedAt": "2026-11-02T16:09:10.000Z",
+      "snapshotFile": "state/source-snapshots/owner-authorized/CURRENT_STATE.ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8.md"
+    },
+    {
+      "path": "App/UI_UX_SPEC.md",
+      "sha256": "7e0d6a250c799209a2d454651905139aade0ee91a841ccc9e916d9e5f5d51bb7",
+      "bytes": 52916,
+      "modifiedAt": "2026-11-02T16:49:04.000Z"
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_16_ACCEPTANCE.md",
+      "sha256": "782ae3640215bc12110931fa525a99146005c2bce91e89db0ac71f9007f284fe",
+      "bytes": 6404,
+      "modifiedAt": "2026-10-31T17:40:16.000Z"
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+      "sha256": "354bddf5754a4fbdf306141b103cf1df0cebb7555953a9b0c77356b19e12c4b0",
+      "bytes": 71482,
+      "modifiedAt": "2026-11-02T13:43:36.000Z"
+    }
+  ],
+  "liveWatchDocuments": [
+    {
+      "path": "App/MASTER_SPEC.md",
+      "sha256": "184fd017602d81531864657190e88e180a4fd7091eaf1a5c9541937cb8a85ef2",
+      "modifiedAt": "2026-11-02T16:50:10.000Z"
+    },
+    {
+      "path": "App/BUSINESS_RULES.md",
+      "sha256": "bbfc9faf885f854d70b8fdb1ab52af1bb7bbb2283301dcd78bc53ff660c8d0bb",
+      "modifiedAt": "2026-11-02T16:49:04.000Z"
+    },
+    {
+      "path": "App/ACCEPTANCE_TESTS.md",
+      "sha256": "f0602b6c051488912ae452609e19602a863b06d346564b8966678bbe96f0e09e",
+      "modifiedAt": "2026-11-02T16:49:04.000Z"
+    },
+    {
+      "path": "App/CURRENT_STATE.md",
+      "sha256": "2e807fec2bdff0b44989d75b76557e2ead70f2c692089fc702dd3592194c0d03",
+      "modifiedAt": "2026-11-02T16:56:50.000Z"
+    },
+    {
+      "path": "App/UI_UX_SPEC.md",
+      "sha256": "7e0d6a250c799209a2d454651905139aade0ee91a841ccc9e916d9e5f5d51bb7",
+      "modifiedAt": "2026-11-02T16:49:04.000Z"
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_16_ACCEPTANCE.md",
+      "sha256": "782ae3640215bc12110931fa525a99146005c2bce91e89db0ac71f9007f284fe",
+      "modifiedAt": "2026-10-31T17:40:16.000Z"
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+      "sha256": "354bddf5754a4fbdf306141b103cf1df0cebb7555953a9b0c77356b19e12c4b0",
+      "modifiedAt": "2026-11-02T13:43:36.000Z"
+    }
+  ],
+  "ownerApprovedSnapshots": [
+    {
+      "path": "App/CURRENT_STATE.md",
+      "sha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+      "snapshotFile": "state/source-snapshots/owner-authorized/CURRENT_STATE.ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8.md"
+    }
+  ],
+  "reviewedContextFile": "D:\\botly\\App\\Manager\\reports\\HC-005\\attempt-5\\reviewed-requirements.md",
+  "totalBytes": 475085
+}

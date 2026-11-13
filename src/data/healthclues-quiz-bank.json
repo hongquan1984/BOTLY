@@ -1,0 +1,999 @@
+[
+  {
+    "id": "C01",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "Are you 18 or older?",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "C02",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "country",
+    "text": "Which country do you currently live in?",
+    "options": [
+      "Country selector",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C03",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "What language would you prefer for your daily discoveries?",
+    "options": [
+      "English",
+      "Another language"
+    ]
+  },
+  {
+    "id": "C04",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "Which health or wellness topic interests you most right now?",
+    "options": [
+      "Healthy weight",
+      "Gout & uric acid",
+      "Sleep & rest",
+      "Digestion & gut health",
+      "Balanced nutrition",
+      "Stress & relaxation",
+      "Other"
+    ]
+  },
+  {
+    "id": "C05",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "What best describes why you are exploring this topic?",
+    "options": [
+      "General curiosity",
+      "A condition diagnosed by a healthcare professional",
+      "A concern I have not discussed with a professional",
+      "Researching for someone else",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C06",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "multi",
+    "text": "Which kinds of content would you like to discover?",
+    "options": [
+      "Food & recipes",
+      "Natural ingredients and traditions",
+      "Everyday habits",
+      "Research explained",
+      "General treatment information",
+      "Free guides"
+    ]
+  },
+  {
+    "id": "C07",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "How would you like the information presented?",
+    "options": [
+      "Quick daily cards",
+      "Step-by-step recipes",
+      "Short research summaries",
+      "A mix of everything"
+    ]
+  },
+  {
+    "id": "C08",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "How much time could you comfortably spend on a small daily activity?",
+    "options": [
+      "5 minutes",
+      "10–15 minutes",
+      "20–30 minutes",
+      "More than 30 minutes",
+      "I only want to read"
+    ]
+  },
+  {
+    "id": "C09",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "How often would you like your dashboard refreshed?",
+    "options": [
+      "Daily",
+      "Three times a week",
+      "Weekly"
+    ]
+  },
+  {
+    "id": "C10",
+    "group": "core",
+    "stage": "onboarding",
+    "type": "single",
+    "text": "What would make the next two weeks most useful for you?",
+    "options": [
+      "Find interesting new information",
+      "Explore simple recipes",
+      "Build a small routine",
+      "Understand the research better"
+    ]
+  },
+  {
+    "id": "C11",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How long has this topic been relevant to you?",
+    "options": [
+      "A few days",
+      "Weeks",
+      "Months",
+      "Years",
+      "I am just curious",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C12",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How often does this concern come up for you?",
+    "options": [
+      "Most days",
+      "A few times a week",
+      "Occasionally",
+      "Not applicable",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C13",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How much does this concern affect your daily routine?",
+    "options": [
+      "Not at all",
+      "A little",
+      "Moderately",
+      "A lot",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C14",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "When is this concern most noticeable?",
+    "options": [
+      "Morning",
+      "After meals",
+      "Afternoon",
+      "Evening or night",
+      "It varies",
+      "Not applicable"
+    ]
+  },
+  {
+    "id": "C15",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Have you discussed this concern with a healthcare professional?",
+    "options": [
+      "Yes",
+      "No",
+      "Not applicable",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C16",
+    "group": "core",
+    "stage": "deep",
+    "type": "multi",
+    "text": "What have you already explored or tried?",
+    "options": [
+      "Reading wellness articles",
+      "Changing everyday meals",
+      "Simple daily routines",
+      "Professional advice",
+      "Nothing yet",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C17",
+    "group": "core",
+    "stage": "deep",
+    "type": "multi",
+    "text": "What usually gets in the way of trying something new?",
+    "options": [
+      "Time",
+      "Cost",
+      "Ingredients unavailable",
+      "Too complicated",
+      "Unsure whether it is safe",
+      "Hard to stay consistent",
+      "Other"
+    ]
+  },
+  {
+    "id": "C18",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "What kind of encouragement would you prefer?",
+    "options": [
+      "Gentle reminders",
+      "More alternatives",
+      "Short explanations",
+      "Progress summaries",
+      "No reminders"
+    ]
+  },
+  {
+    "id": "C19",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which description best fits your weekday schedule?",
+    "options": [
+      "Mostly regular hours",
+      "Shift work or changing hours",
+      "Home-based flexible schedule",
+      "Varies a lot",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C20",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How often do you prepare food at home?",
+    "options": [
+      "Most days",
+      "A few days a week",
+      "Rarely",
+      "I do not prepare food",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C21",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which eating style sounds most like you?",
+    "options": [
+      "Mostly plant-based",
+      "Mixed meals",
+      "No specific style",
+      "Other",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C22",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "What is your preferred budget for everyday recipes?",
+    "options": [
+      "Budget-friendly",
+      "Moderate",
+      "Flexible",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C23",
+    "group": "core",
+    "stage": "deep",
+    "type": "multi",
+    "text": "Are there foods or ingredients you simply prefer to avoid?",
+    "options": [
+      "Dairy",
+      "Nuts",
+      "Seafood",
+      "Meat",
+      "Spicy foods",
+      "None",
+      "Other"
+    ]
+  },
+  {
+    "id": "C24",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Do you have any known food allergies?",
+    "options": [
+      "Yes",
+      "No",
+      "Not sure",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C25",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Has a healthcare professional advised you to follow any food or activity restrictions?",
+    "options": [
+      "Yes",
+      "No",
+      "Not sure",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C26",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How consistent is your sleep schedule?",
+    "options": [
+      "Very consistent",
+      "Somewhat variable",
+      "Highly variable",
+      "I work shifts",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C27",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How would you describe your energy during a typical day?",
+    "options": [
+      "Mostly steady",
+      "Often low",
+      "Goes up and down",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C28",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How stressful does a typical day feel?",
+    "options": [
+      "Low stress",
+      "Some stress",
+      "High stress",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C29",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How active is a typical day for you?",
+    "options": [
+      "Mostly seated",
+      "Light activity",
+      "Moderate activity",
+      "Very active",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C30",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Do you usually feel more comfortable in warm or cool environments?",
+    "options": [
+      "Warm",
+      "Cool",
+      "Either",
+      "No preference",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C31",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "How would you describe your usual appetite and digestion?",
+    "options": [
+      "Generally comfortable",
+      "Variable appetite",
+      "Occasional digestive discomfort",
+      "Not sure",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C32",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Do you take medicines or supplements that could affect what you choose to try?",
+    "options": [
+      "Yes",
+      "No",
+      "Not sure",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "C33",
+    "group": "core",
+    "stage": "deep",
+    "type": "single",
+    "text": "Are you experiencing any new, severe, or quickly worsening symptoms?",
+    "options": [
+      "Yes",
+      "No",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "G01",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Is gout a clinician-confirmed diagnosis for you, or a topic you want to understand?",
+    "options": [
+      "Confirmed diagnosis",
+      "General interest",
+      "I am unsure",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "G02",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Are you currently experiencing a painful or swollen joint episode?",
+    "options": [
+      "Yes",
+      "No",
+      "Unsure",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "G03",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Do you have a hot, swollen joint together with fever or feeling very unwell?",
+    "options": [
+      "Yes",
+      "No",
+      "Unsure",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "G04",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which gout-related information interests you most?",
+    "options": [
+      "Foods and drinks",
+      "Everyday habits",
+      "Research findings",
+      "General treatment information"
+    ]
+  },
+  {
+    "id": "G05",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which food or drink subjects would you like to read about?",
+    "options": [
+      "Seafood",
+      "Red meat",
+      "Sugary drinks",
+      "Alcohol",
+      "Plant-based proteins",
+      "No preference"
+    ]
+  },
+  {
+    "id": "G06",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "Have you received specific food or drink restrictions from a clinician?",
+    "options": [
+      "Yes",
+      "No",
+      "Unsure",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "G07",
+    "group": "gout",
+    "stage": "deep",
+    "type": "single",
+    "text": "What is your biggest barrier to exploring food-related changes?",
+    "options": [
+      "Cost",
+      "Preparation time",
+      "Taste",
+      "Limited ingredients",
+      "Safety concerns",
+      "Other"
+    ]
+  },
+  {
+    "id": "W01",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "What are you most interested in?",
+    "options": [
+      "Balanced eating",
+      "Easy meal ideas",
+      "Everyday movement",
+      "Long-term habits",
+      "Research explanations"
+    ]
+  },
+  {
+    "id": "W02",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "How predictable are your meal times?",
+    "options": [
+      "Mostly regular",
+      "Often irregular",
+      "Shift-based",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "W03",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "How often do you eat meals you prepared yourself?",
+    "options": [
+      "Most days",
+      "Sometimes",
+      "Rarely",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "W04",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which type of recipe would you actually use?",
+    "options": [
+      "Under 10 minutes",
+      "Few ingredients",
+      "Budget-friendly",
+      "Batch cooking"
+    ]
+  },
+  {
+    "id": "W05",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "Has a healthcare professional advised you not to pursue weight loss or to follow a specific plan?",
+    "options": [
+      "Yes",
+      "No",
+      "Unsure",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "W06",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "What makes lifestyle changes hardest to keep up?",
+    "options": [
+      "Time",
+      "Cost",
+      "Work schedule",
+      "Motivation",
+      "Too many rules",
+      "Other"
+    ]
+  },
+  {
+    "id": "W07",
+    "group": "weight",
+    "stage": "deep",
+    "type": "single",
+    "text": "How would you prefer to measure progress?",
+    "options": [
+      "Activities completed",
+      "New recipes explored",
+      "Consistency of routine",
+      "I prefer not to track"
+    ]
+  },
+  {
+    "id": "S01",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "What part of sleep or rest interests you most?",
+    "options": [
+      "Falling asleep",
+      "Staying asleep",
+      "More regular bedtime",
+      "Relaxation",
+      "Research"
+    ]
+  },
+  {
+    "id": "S02",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "How often do you have difficulty sleeping or resting?",
+    "options": [
+      "1–2 nights a week",
+      "3–4 nights",
+      "5–7 nights",
+      "Not applicable",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "S03",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "What time does your evening routine usually begin?",
+    "options": [
+      "Before 8 PM",
+      "8–10 PM",
+      "After 10 PM",
+      "It varies",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "S04",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "Do you work shifts or have a frequently changing sleep schedule?",
+    "options": [
+      "Yes",
+      "No",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "S05",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "What would you enjoy as an evening activity?",
+    "options": [
+      "Short reading",
+      "Calm audio",
+      "Gentle stretching",
+      "Journaling",
+      "Just information"
+    ]
+  },
+  {
+    "id": "S06",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "Have you noticed loud snoring, gasping during sleep, or significant daytime sleepiness?",
+    "options": [
+      "Yes",
+      "No",
+      "Unsure",
+      "Prefer not to say"
+    ]
+  },
+  {
+    "id": "S07",
+    "group": "sleep",
+    "stage": "deep",
+    "type": "single",
+    "text": "What usually makes an evening routine hard to follow?",
+    "options": [
+      "Too little time",
+      "Family or work schedule",
+      "Screen time",
+      "Noise",
+      "Hard to stay consistent",
+      "Other"
+    ]
+  },
+  {
+    "id": "F01",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "Which daily area would you like to explore first?",
+    "options": [
+      "Food",
+      "Rest",
+      "Movement",
+      "Mindfulness",
+      "General research"
+    ]
+  },
+  {
+    "id": "F02",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "Would you rather read or try something practical?",
+    "options": [
+      "Read",
+      "Try a simple activity",
+      "Both"
+    ]
+  },
+  {
+    "id": "F03",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "What is your preferred recipe style?",
+    "options": [
+      "Simple ingredients",
+      "Fast preparation",
+      "Budget-friendly",
+      "No recipes"
+    ]
+  },
+  {
+    "id": "F04",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "Would you like research citations in each card?",
+    "options": [
+      "Always",
+      "Only when important",
+      "Open on demand"
+    ]
+  },
+  {
+    "id": "F05",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "How many content cards feel comfortable per day?",
+    "options": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  {
+    "id": "F06",
+    "group": "general",
+    "stage": "deep",
+    "type": "single",
+    "text": "What would make you return tomorrow?",
+    "options": [
+      "New information",
+      "Continue a routine",
+      "Review saved items",
+      "Weekly summary"
+    ]
+  },
+  {
+    "id": "F07",
+    "group": "general",
+    "stage": "deep",
+    "type": "text_or_none",
+    "text": "Which topic should we avoid suggesting?",
+    "options": [
+      "Free text",
+      "None"
+    ]
+  },
+  {
+    "id": "R01", "group": "calm", "stage": "deep", "type": "single",
+    "text": "Which kind of calm-focused content would you like to explore first?",
+    "options": ["Quiet moments", "Breathing and grounding activities", "Restful routines", "Stories and explanations", "Not sure"]
+  },
+  {
+    "id": "R02", "group": "calm", "stage": "deep", "type": "single",
+    "text": "When would a short reset fit best into your day?",
+    "options": ["Morning", "Midday", "Evening", "Whenever I need it", "I prefer to read"]
+  },
+  {
+    "id": "R03", "group": "calm", "stage": "deep", "type": "single",
+    "text": "What kind of setting feels most inviting for a quiet activity?",
+    "options": ["Indoors", "Outdoors", "Either", "I prefer screen-free ideas", "No preference"]
+  },
+  {
+    "id": "R04", "group": "calm", "stage": "deep", "type": "single",
+    "text": "How would you like calm activities to be guided?",
+    "options": ["A short written prompt", "Audio guidance", "A simple visual", "No guidance", "I prefer to read about them"]
+  },
+  {
+    "id": "R05", "group": "calm", "stage": "deep", "type": "single",
+    "text": "Would you rather explore quiet activities alone or with others?",
+    "options": ["On my own", "With someone I choose", "Either", "I prefer learning content", "Prefer not to say"]
+  },
+  {
+    "id": "R06", "group": "calm", "stage": "deep", "type": "single",
+    "text": "How often would you like a calm-focused discovery?",
+    "options": ["A few times a week", "Weekly", "Occasionally", "Only when I choose", "Prefer not to say"]
+  },
+  {
+    "id": "R07", "group": "calm", "stage": "deep", "type": "single",
+    "text": "What should we avoid in your calm-focused suggestions?",
+    "options": ["Guided audio", "Breathing prompts", "Movement activities", "Nothing in particular", "Prefer not to say"]
+  },
+  {
+    "id": "E01", "group": "energy", "stage": "deep", "type": "single",
+    "text": "Which everyday routine would you most like to explore?",
+    "options": ["Morning routines", "Rest and evening routines", "Food and meal routines", "Movement breaks", "Not sure"]
+  },
+  {
+    "id": "E02", "group": "energy", "stage": "deep", "type": "single",
+    "text": "What size of routine feels manageable to explore?",
+    "options": ["A few minutes", "Around 10 minutes", "A flexible longer activity", "Reading only", "Not sure"]
+  },
+  {
+    "id": "E03", "group": "energy", "stage": "deep", "type": "single",
+    "text": "When would you like to explore an everyday routine?",
+    "options": ["Morning", "Afternoon", "Evening", "My schedule varies", "Prefer not to say"]
+  },
+  {
+    "id": "E04", "group": "energy", "stage": "deep", "type": "single",
+    "text": "Which format would help you explore routines?",
+    "options": ["A simple checklist", "A short explanation", "A guided activity", "A weekly plan", "No preference"]
+  },
+  {
+    "id": "E05", "group": "energy", "stage": "deep", "type": "single",
+    "text": "How would you like to keep track of a routine you choose?",
+    "options": ["A quick check-in", "A private note", "A reminder I control", "I do not want to track it", "Not sure"]
+  },
+  {
+    "id": "E06", "group": "energy", "stage": "deep", "type": "single",
+    "text": "How often would you like to see everyday routine ideas?",
+    "options": ["A few times a week", "Weekly", "Occasionally", "Only when I choose", "Prefer not to say"]
+  },
+  {
+    "id": "E07", "group": "energy", "stage": "deep", "type": "single",
+    "text": "What would you prefer we leave out of routine suggestions?",
+    "options": ["Food ideas", "Movement ideas", "Sleep-related content", "Nothing in particular", "Prefer not to say"]
+  },
+  {
+    "id": "N01", "group": "nutrition", "stage": "deep", "type": "single",
+    "text": "Which food-related discovery interests you most?",
+    "options": ["Simple recipes", "Ingredients", "Meal planning ideas", "Food traditions", "Not sure"]
+  },
+  {
+    "id": "N02", "group": "nutrition", "stage": "deep", "type": "single",
+    "text": "What kind of recipe format do you prefer?",
+    "options": ["Very short", "Step by step", "Batch preparation", "No recipes", "No preference"]
+  },
+  {
+    "id": "N03", "group": "nutrition", "stage": "deep", "type": "single",
+    "text": "What matters most when choosing a recipe to explore?",
+    "options": ["Few ingredients", "Preparation time", "Flexible substitutions", "Familiar flavors", "I prefer general information"]
+  },
+  {
+    "id": "N04", "group": "nutrition", "stage": "deep", "type": "single",
+    "text": "How would you like food information presented?",
+    "options": ["A quick card", "A detailed guide", "A comparison", "A shopping list", "No preference"]
+  },
+  {
+    "id": "N05", "group": "nutrition", "stage": "deep", "type": "single",
+    "text": "Which cooking setting best fits the ideas you want to explore?",
+    "options": ["At home", "At work or school", "On the go", "I do not want cooking ideas", "Prefer not to say"]
+  },
+  {
+    "id": "N06", "group": "nutrition", "stage": "deep", "type": "single",
+    "text": "How often would you like food-related discoveries?",
+    "options": ["A few times a week", "Weekly", "Occasionally", "Only when I choose", "Prefer not to say"]
+  },
+  {
+    "id": "N07", "group": "nutrition", "stage": "deep", "type": "single",
+    "text": "What should we avoid suggesting?",
+    "options": ["Recipes", "Specific ingredients", "Meal planning", "Nothing in particular", "Prefer not to say"]
+  },
+  {
+    "id": "M01", "group": "movement", "stage": "deep", "type": "single",
+    "text": "Which kind of movement information interests you?",
+    "options": ["Gentle movement ideas", "Walking routes and prompts", "Stretching information", "Movement breaks", "I prefer reading only"]
+  },
+  {
+    "id": "M02", "group": "movement", "stage": "deep", "type": "single",
+    "text": "Where would you prefer to explore movement ideas?",
+    "options": ["At home", "Outside", "A public space", "It varies", "Prefer not to say"]
+  },
+  {
+    "id": "M03", "group": "movement", "stage": "deep", "type": "single",
+    "text": "What duration would you like an optional movement idea to have?",
+    "options": ["A few minutes", "Around 10 minutes", "Flexible", "I do not want activity prompts", "Not sure"]
+  },
+  {
+    "id": "M04", "group": "movement", "stage": "deep", "type": "single",
+    "text": "How would you prefer movement information to be shown?",
+    "options": ["Written steps", "Illustrations", "A short video link", "A progress checklist", "No preference"]
+  },
+  {
+    "id": "M05", "group": "movement", "stage": "deep", "type": "single",
+    "text": "Would you rather explore movement alone or with others?",
+    "options": ["On my own", "With someone I choose", "Either", "I prefer learning content", "Prefer not to say"]
+  },
+  {
+    "id": "M06", "group": "movement", "stage": "deep", "type": "single",
+    "text": "How often would you like movement-related discoveries?",
+    "options": ["A few times a week", "Weekly", "Occasionally", "Only when I choose", "Prefer not to say"]
+  },
+  {
+    "id": "M07", "group": "movement", "stage": "deep", "type": "single",
+    "text": "What should we leave out of movement suggestions?",
+    "options": ["Outdoor ideas", "Stretching content", "Activity prompts", "Nothing in particular", "Prefer not to say"]
+  },
+  {
+    "id": "L01", "group": "natural", "stage": "deep", "type": "single",
+    "text": "Which natural-living topic would you like to explore?",
+    "options": ["Food traditions", "Gardening and plants", "Everyday routines", "Research and evidence", "Not sure"]
+  },
+  {
+    "id": "L02", "group": "natural", "stage": "deep", "type": "single",
+    "text": "Which type of plant-related content interests you?",
+    "options": ["Botanical identification", "Culinary uses", "Cultural history", "Gardening basics", "I prefer other topics"]
+  },
+  {
+    "id": "L03", "group": "natural", "stage": "deep", "type": "single",
+    "text": "How would you like natural-living information presented?",
+    "options": ["A short introduction", "A source-linked article", "A photo guide", "A practical checklist", "No preference"]
+  },
+  {
+    "id": "L04", "group": "natural", "stage": "deep", "type": "single",
+    "text": "Which setting would you most enjoy learning about?",
+    "options": ["Home kitchen", "Garden", "Woodland", "Community space", "No preference"]
+  },
+  {
+    "id": "L05", "group": "natural", "stage": "deep", "type": "single",
+    "text": "How important are source links in natural-living discoveries?",
+    "options": ["Show sources every time", "Show sources when available", "Let me open sources on demand", "No preference"]
+  },
+  {
+    "id": "L06", "group": "natural", "stage": "deep", "type": "single",
+    "text": "How often would you like natural-living discoveries?",
+    "options": ["A few times a week", "Weekly", "Occasionally", "Only when I choose", "Prefer not to say"]
+  },
+  {
+    "id": "L07", "group": "natural", "stage": "deep", "type": "single",
+    "text": "What should we avoid in natural-living content?",
+    "options": ["Plant topics", "Food traditions", "Gardening activities", "Nothing in particular", "Prefer not to say"]
+  }
+]

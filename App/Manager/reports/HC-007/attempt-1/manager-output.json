@@ -1,0 +1,20 @@
+{
+  "decision": "PASS",
+  "taskId": "HC-007",
+  "reasoning": "The audit is scoped, evidence-backed and candid. Supplied source supports the replacement-dialog finding and narrow spotlight contracts. It distinguishes inspected tests from execution, synthetic fixtures from real integrations, and report claims from current verification. Product gaps do not prevent this audit from passing.",
+  "feedback": [
+    "src/features/healthclues/ToolkitCollection.tsx supports the replacement-state finding: opening or cancelling the dialog does not initialize or clear the occupant ID. Server mutation behavior remains unknown.",
+    "Keep visual behavior, EN/VI completeness, guide persistence and authoritative NPC equipment enforcement UNVERIFIED; screenshots, current execution artifacts and relevant enforcement implementations are absent.",
+    "App/CURRENT_STATE.md and acceptance reports remain report-only evidence. Older browser passes and synthetic lifecycle assertions do not establish current spotlight or eligible botanical Save/Equip acceptance."
+  ],
+  "dimensions": {
+    "functional": "REWORK",
+    "visual": "UNVERIFIED",
+    "data": "UNVERIFIED",
+    "localization": "UNVERIFIED",
+    "security": "UNVERIFIED",
+    "aiIntegration": "NOT_APPLICABLE"
+  },
+  "nextTask": null,
+  "approvalRequest": null
+}

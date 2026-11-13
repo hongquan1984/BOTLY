@@ -1,0 +1,38 @@
+{
+  "taskId": "HC-004",
+  "attempt": 2,
+  "status": "READY_FOR_REVIEW",
+  "summary": "Audit complete using supplied excerpts only; lead remains INCOMPLETE. PASS: source implements independent inclusion, A/B mapping, empty plans and account/World guards. REWORK: unfinished Custom can retain a prior A/B selection, and immediate-save copy claims success without acknowledgment. UNVERIFIED: current authenticated My Journey integration, persistence lifecycle, visuals and live-provider acceptance. Historical report claims do not verify the current snapshot.",
+  "changedFiles": [],
+  "tests": [],
+  "screenshots": [],
+  "evidence": [
+    "App/ACCEPTANCE_TESTS.md: MP20 requires immediate central-My-Journey persistence, rehydration, preservation of unrelated goals, uncheck, zero goals, reload and API rejection without false success; standalone Builder retains global confirmation.",
+    "src/components/healthclues/WellnessPlanBuilder.tsx: PASS at source level—checkbox inclusion is independent from A/B choice; only included configured suggestions enter choices; selected count and incomplete-selection guard exist.",
+    "src/components/healthclues/WellnessPlanBuilder.tsx: REWORK—selecting the Custom radio changes aiModes and opens the input but retains an existing aiSelections/choices entry. After choosing A then Custom without completing it, hasIncompleteAiSelection remains false and the prior A goal remains eligible for confirmation or a later inclusion-triggered callback.",
+    "src/components/healthclues/WellnessPlanBuilder.tsx: REWORK—when onSelectionChange exists, a checked configured card immediately says 'Selected goal is saved to your Plan.' The callback returns void and the component receives no pending, success or failure acknowledgment. Persisted success is therefore not established by this message.",
+    "src/app/api/healthclues/plan/route.ts: PASS at source level—authentication, confirmed-email POST gate, owner-filtered World lookup, confirmed request validation, empty-goal acceptance, request-key reuse, version history and generated-goal proof validation are present. Authentication helpers, proof implementation and database enforcement were not supplied.",
+    "src/features/healthclues/wellness-plan.ts: source supports bilingual persisted snapshots with original-text fallback. src/app/api/healthclues/plan/route.ts copies verified bilingual source into persisted generated goals; the actual My Journey renderer was not supplied.",
+    "scripts/test-healthclues-mp17-plan-selection-browser.mjs: intercepts Advisor responses and uses an unsigned synthetic proof, so it cannot establish live inference or signed-goal persistence. Its fixture title/reason/action values are strings, whereas src/features/healthclues/personalized-wellness-plan.ts and the current Builder expect bilingual objects; current compatibility is unverified.",
+    "scripts/test-healthclues-mp20-two-question-browser.mjs: supplied test source stops at discovery/preview and explicitly excludes account activation; it does not exercise authenticated immediate Plan persistence. scripts/test-healthclues-post-quiz-plan-browser.mjs targets the older ten-question, deterministic pre-World flow and does not establish current MP20 acceptance.",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md: records historical authenticated synthetic Plan successes and one real provider/application-200 inference without Plan saving. These are report-only here; raw execution artifacts and the referenced integrated harness were not supplied. Older provider-402 and 'not started' statements are historical, not current findings.",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md: explicitly leaves immediate authenticated goal persistence and owner UX acceptance pending. It also contains conflicting activation/provider statements: separate activation success and an observed Advisor request coexist with categorical no-activation/no-inference statements. Actual provider invocation and output for that request remain unknown.",
+    "App/UI_UX_SPEC.md: older separate-journal and Confirm/Skip direction conflicts with the newer central-hub immediate-save acceptance in App/ACCEPTANCE_TESTS.md. The current Builder conditionally removes Confirm for callback mode; approved presentation precedence needs reconciliation.",
+    "App/CURRENT_STATE.md: treated as owner-authored progress only, pinned to the supplied manifest SHA-256 ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8. Its integration/build/browser claims were not independently verified."
+  ],
+  "knownLimitations": [
+    "No tools, commands, edits, network calls or test executions were performed.",
+    "Manifest hashes were accepted as supplied identifiers; independent recomputation and start/end source-integrity verification were unavailable.",
+    "Only supplied excerpts were reviewed. Current World/Pet sequencing, central callback POST/merge/error behavior and My Journey rendering cannot be corroborated from their actual source.",
+    "No screenshots were supplied or inspected; visual PASS is unavailable.",
+    "Historical test reports are not current execution evidence. Fixtures and mocked providers do not establish live integration.",
+    "Current live-provider status, recommendation quality, legacy authenticated answer retention and full EN/VI regression remain unknown."
+  ],
+  "blockers": [],
+  "nextSuggestedSteps": [
+    "Fix Custom transition semantics so an unfinished Custom choice cannot confirm or save the previous A/B implementation; verify A→Custom unfinished, completion and reload.",
+    "Connect card save status to authenticated persistence acknowledgment and expose pending/failure states without claiming success on rejection.",
+    "Supply the current central-hub caller and integrated harness, then verify authenticated A/B/Custom, uncheck, zero goals, unrelated-goal preservation, reload and two-account isolation with explicitly labeled fixtures and Advisor interception.",
+    "Reconcile conflicting specification/report statements and attach current execution artifacts, inspected screenshots and start/end manifest hash verification before claiming acceptance."
+  ]
+}

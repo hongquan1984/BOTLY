@@ -1,0 +1,74 @@
+{
+  "summary": "REWORK. Current-run checks found unsafe Botanist content, unrelated Gout advice for a Digestion topic, and a 320px Daily Care layout defect. The previous check-in hydration issue has a source fix, but its real UI persistence remains unverified.",
+  "checks": [
+    {
+      "id": "discovery",
+      "status": "UNVERIFIED",
+      "evidence": "node scripts/test-healthclues-discovery-matching.mjs passed 37 assertions; the guest region chooser loaded in Chrome at http://127.0.0.1:3329/vi/wellness/healthclues/quiz?step=quest.",
+      "finding": "The complete Quiz-to-Journey flow was not exercised in this run."
+    },
+    {
+      "id": "overworld",
+      "status": "PASS",
+      "evidence": "Current-run Chrome DOM at http://127.0.0.1:3329/vi/wellness/healthclues/quiz?step=quest showed Sleep Valley with Luna, HealthClues Realm with Lumi, and six region buttons labeled “Sắp ra mắt”; Chrome exited 0.",
+      "finding": "All eight region choices appear with the expected availability labels."
+    },
+    {
+      "id": "world_entry",
+      "status": "UNVERIFIED",
+      "evidence": "node scripts/healthclues-owner-demo-preflight.mjs passed for loopback project healthclues-owner-demo; inspected region HUD screenshots in App/.tmp/healthclues-tester/screenshots/.",
+      "finding": "Authenticated World creation and region/companion persistence were not exercised directly."
+    },
+    {
+      "id": "npc_arrival",
+      "status": "UNVERIFIED",
+      "evidence": "node scripts/test-healthclues-region-layout.mjs passed 17 connected routes per playable region; inspected mobile NPC modal screenshots at 320, 390, and 430px.",
+      "finding": "The screenshots show an open station but do not establish walk-before-Talk timing, approach position, or keyboard/touch behavior."
+    },
+    {
+      "id": "journey_daily_care",
+      "status": "UNVERIFIED",
+      "evidence": "Current source has a hydration effect in src/features/healthclues/DailyCheckinDialog.tsx; node scripts/test-daily-care-component-hydration.mjs and node scripts/test-daily-care-focused-regression.mjs passed.",
+      "finding": "The new lifecycle test simulates the component logic rather than rendering React. Reopen, unchanged save, and reload of an existing authenticated check-in were not directly verified."
+    },
+    {
+      "id": "in_region_learning",
+      "status": "FAIL",
+      "evidence": "Read-only local GET http://127.0.0.1:3329/api/healthclues/botanical-advisor?topic=Digestion&focusId=health-concern returned category=gout, four herbs, firstId=hc-herb-sake. src/app/api/healthclues/botanical-advisor/route.ts defaults unmatched topics to Gout.",
+      "finding": "An unrelated Digestion topic receives Gout-specific botanical advice instead of a truthful no-content state."
+    },
+    {
+      "id": "auth_persistence",
+      "status": "UNVERIFIED",
+      "evidence": "Owner Demo preflight passed; guest GET /api/healthclues/world returned 401 and GET /api/healthclues/account/quick-activate returned 410.",
+      "finding": "Magic-link activation, return after login, and cross-account isolation were not exercised because this run prohibited database writes."
+    },
+    {
+      "id": "mobile_ui",
+      "status": "FAIL",
+      "evidence": "Opened all 18 workspace images App/.tmp/healthclues-tester/screenshots/mobile-{320,390,430}-{quiz,preview,hud,npc-modal,journey,daily-care}.png. In mobile-320-daily-care.png, the “Không hoàn thành” buttons extend beyond their rounded goal cards. src/features/healthclues/world-adventure.css:2124-2129 keeps the two-button group on one unshrinking flex row.",
+      "finding": "At 320×800, Daily Care actions overflow their card boundaries; the 390px and 430px captures have enough width."
+    },
+    {
+      "id": "safety_privacy",
+      "status": "FAIL",
+      "evidence": "Inspected mobile-320-npc-modal.png, mobile-390-npc-modal.png, and mobile-430-npc-modal.png: herb cards say “AI Đề xuất” and “Nội dung giáo dục đã duyệt · Đủ điều kiện khám phá.” src/features/healthclues/WellnessEncyclopediaStation.tsx maps botanical-advisor results to demoOnly:false and recommendationEligible:true and adds their IDs to eligibleIds. The local GET returned CURATED_KNOWLEDGE; the route contains dosing instructions without review records or source references.",
+      "finding": "Unreviewed botanical advice is presented as reviewed and personally eligible, contrary to the canonical review gate. Guest World access and quick-activate protections passed, but they do not resolve this safety defect."
+    },
+    {
+      "id": "runtime_regression",
+      "status": "UNVERIFIED",
+      "evidence": "Safe focused Daily Care, RPG quest board, discovery, region layout, and wellness-plan suites passed; the guest chooser loaded in current-run Chrome.",
+      "finding": "A full authenticated runtime regression was not run, and the focused suites did not catch the Botanist topic and review-gate defects."
+    }
+  ],
+  "blocking_items": [
+    "Botanist presents unreviewed botanical cards as reviewed and eligible.",
+    "An unsupported Digestion topic receives Gout-specific herbs.",
+    "Daily Care buttons overflow goal cards at 320px.",
+    "Authenticated end-to-end and check-in persistence remain unverified under the no-database-write constraint."
+  ],
+  "prompt_for_antigravity": "Sửa trạm Botanist trong Sleep Valley và HealthClues Realm. Tái hiện an toàn bằng GET cục bộ `/api/healthclues/botanical-advisor?topic=Digestion&focusId=health-concern`: hiện trả `category=gout` và thảo mộc cho Gout. Ảnh `App/.tmp/healthclues-tester/screenshots/mobile-390-npc-modal.png` cho thấy thẻ thảo mộc chưa có hồ sơ duyệt nhưng hiển thị “AI Đề xuất”, “Nội dung giáo dục đã duyệt”, “Đủ điều kiện khám phá”, kèm nội dung hướng dẫn sử dụng. Kiểm tra `src/app/api/healthclues/botanical-advisor/route.ts` và `src/features/healthclues/WellnessEncyclopediaStation.tsx`. Chủ đề không khớp phải hiển thị khoảng trống nội dung trung thực; chỉ phiên bản Catalog được người có thẩm quyền duyệt, còn hiệu lực và qua cổng an toàn mới được mang nhãn đã duyệt, được đề xuất hoặc cho phép Lưu/Trang bị. Không tự coi dữ liệu fallback hay đầu ra AI là đã duyệt; không nhờ mô hình phê duyệt nội dung. Thêm kiểm thử tập trung không gọi provider, không ghi DB cho chủ đề Digestion không có nội dung, nguồn fallback/AI chưa duyệt, và Catalog đã duyệt hợp lệ. Đồng thời sửa nhóm hai nút trong thẻ Daily Care ở 320×800 để nằm trọn trong viền thẻ, giữ vùng chạm dùng được; kiểm tra ảnh và kích thước phần tử ở 320, 390, 430px. Kiểm thử React thực cho việc mở lại check-in với dữ liệu đến muộn và lưu không sửa, vì `test-daily-care-component-hydration.mjs` hiện chỉ mô phỏng logic.",
+  "next_test": "Run a no-provider, no-database botanical review-gate regression asserting that Digestion returns no Gout herbs and that unreviewed fallback cards have no reviewed, eligible, Save, or Equip presentation.",
+  "release_readiness": "REWORK for the local playable scope. Human review of health content, broader privacy/security acceptance, authenticated persistence, and physical-device testing remain separate release gates."
+}

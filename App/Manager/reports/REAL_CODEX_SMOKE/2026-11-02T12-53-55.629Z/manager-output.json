@@ -1,0 +1,1 @@
+{"decision":"PAUSE","taskId":null,"reasoning":"This validates structured CLI output only, not HealthClues acceptance.","feedback":[],"dimensions":{"functional":"NOT_APPLICABLE","visual":"NOT_APPLICABLE","data":"NOT_APPLICABLE","localization":"NOT_APPLICABLE","security":"NOT_APPLICABLE","aiIntegration":"NOT_APPLICABLE"},"nextTask":null,"approvalRequest":null}

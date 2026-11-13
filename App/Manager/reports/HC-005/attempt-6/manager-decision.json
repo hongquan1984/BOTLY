@@ -1,0 +1,17 @@
+{
+  "decision": "BLOCKED",
+  "feedback": [
+    "VISUAL_REVIEW_UNVERIFIED persists: required screenshot artifacts are absent and cannot be inspected or measured.",
+    "Full botanical item-card and Save/Equip acceptance remains unavailable; supplied reports explicitly state that no reviewed eligible item was available."
+  ],
+  "dimensions": {
+    "functional": "BLOCKED"
+  },
+  "reviewedAt": "2026-11-02T17:00:34.277Z",
+  "sourceManifestSha256": "5b968fab3f495c6c3c9aeb033efa808ed5db06eb9c685781a8f41541597eaac2",
+  "developerReportSha256": "b76bfd8ddabfd3640cab309a0a2789aeb8372b714beb998df614b882b5c59d30",
+  "independentSourceCheck": {
+    "ok": true,
+    "changed": []
+  }
+}

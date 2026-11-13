@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { processInsomniaQuizAnalytics } from '@/lib/quiz-analytics';
+import { isAdminRequest } from '@/lib/admin-auth';
+import { excludeHealthCluesFromGeneralAnalytics } from '@/lib/healthclues-analytics-consent';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+  if (!process.env.EBOOK_ADMIN_TOKEN) return NextResponse.json({ ok: false, error: 'Admin analytics is not configured' }, { status: 503 });
+  if (!isAdminRequest(request)) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   try {
     const { searchParams } = new URL(request.url);
     const days = parseInt(searchParams.get('days') || '30', 10);
@@ -22,7 +26,7 @@ export async function GET(request: Request) {
         method: 'POST',
         headers: {
           apikey: serviceKey,
-          Authorization: `Bearer ${serviceKey}`,
+          ...(!serviceKey.startsWith('sb_') ? { Authorization: `Bearer ${serviceKey}` } : {}),
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ p_days: days })
@@ -37,6 +41,9 @@ export async function GET(request: Request) {
     }
 
     const data = await rpcResponse.json();
+
+    // Keep user-specific HealthClues quiz trails out of Botly's general analytics console.
+    if (Array.isArray(data?.recent_quizzes)) data.recent_quizzes = excludeHealthCluesFromGeneralAnalytics(data.recent_quizzes);
 
     // Attach insomnia quiz analytics
     if (quizStats) {

@@ -1,0 +1,21 @@
+{
+  "decision": "REWORK",
+  "feedback": [
+    "Decision PASS conflicts with a failed acceptance dimension."
+  ],
+  "dimensions": {
+    "functional": "UNVERIFIED",
+    "visual": "UNVERIFIED",
+    "data": "UNVERIFIED",
+    "localization": "UNVERIFIED",
+    "security": "UNVERIFIED",
+    "aiIntegration": "REWORK"
+  },
+  "reviewedAt": "2026-11-02T16:00:54.179Z",
+  "sourceManifestSha256": "4bff9983cccd863bb01c91fb78b74553a3221c37d7ab150db3640576c825af89",
+  "developerReportSha256": "3865c8728182e0016e60b370c7e25d0537b310dcfd52db4b2d3b2edc7ccb563d",
+  "independentSourceCheck": {
+    "ok": true,
+    "changed": []
+  }
+}

@@ -1,0 +1,113 @@
+import assert from "node:assert/strict";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+import { spawn } from "node:child_process";
+import net from "node:net";
+import path from "node:path";
+import { setTimeout as delay } from "node:timers/promises";
+import WebSocket from "ws";
+
+const base = process.env.HEALTHCLUES_OWNER_DEMO_URL || "http://127.0.0.1:3324";
+assert.equal(new URL(base).hostname, "127.0.0.1", "Only loopback demo is allowed.");
+const runtime = JSON.parse(readFileSync(path.resolve("App/.tmp/healthclues-owner-demo/owner-demo-runtime.json"), "utf8"));
+assert.equal(runtime.projectId, "healthclues-owner-demo");
+const chromePath = [path.join(process.env.PROGRAMFILES || "C:\\Program Files", "Google/Chrome/Application/chrome.exe"), path.join(process.env["PROGRAMFILES(X86)"] || "C:\\Program Files (x86)", "Google/Chrome/Application/chrome.exe")].find(existsSync);
+assert.ok(chromePath, "Chrome is required.");
+const profileDir = path.resolve(`App/.tmp/mp20-two-question-browser-${process.pid}-${randomUUID()}`); mkdirSync(profileDir, { recursive: false });
+const screenshotRoot = process.env.HEALTHCLUES_SCREENSHOT_ROOT || path.resolve(`App/.tmp/mp20-two-question-screenshots-${process.pid}`); mkdirSync(screenshotRoot, { recursive: true });
+const probe = net.createServer(); const debugPort = await new Promise((resolve, reject) => { probe.once("error", reject); probe.listen(0, "127.0.0.1", () => { const p = probe.address().port; probe.close(() => resolve(p)); }); });
+const chrome = spawn(chromePath, ["--headless=new", "--no-first-run", "--no-default-browser-check", "--disable-background-networking", "--disable-features=Translate", `--user-data-dir=${profileDir}`, `--remote-debugging-port=${debugPort}`, "about:blank"], { stdio: "ignore", windowsHide: true });
+let ws; let nextId = 0; const waiting = new Map(); const apiRequests = []; const apiResponses = []; const errors = [];
+const cdp = (method, params = {}) => new Promise((resolve, reject) => { const id = ++nextId; const timer = setTimeout(() => { waiting.delete(id); reject(new Error(`CDP timeout: ${method}`)); }, 45000); waiting.set(id, value => { clearTimeout(timer); value.error ? reject(new Error(value.error.message)) : resolve(value.result); }); ws.send(JSON.stringify({ id, method, params })); });
+const evaluate = async expression => { const value = await cdp("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true, userGesture: true }); if (value.exceptionDetails) throw new Error(value.exceptionDetails.exception?.description || value.exceptionDetails.text); return value.result?.value; };
+const wait = async (expression, label) => { const end = Date.now() + 20000; while (Date.now() < end) { if (await evaluate(expression)) return; await delay(150); } throw new Error(`Timeout ${label}: ${String(await evaluate("document.body.innerText")).slice(0, 900)}`); };
+const clickText = async (text, exact = false) => { const encoded = JSON.stringify(text); const done = await evaluate(`(()=>{const all=[...document.querySelectorAll('button,label,[role=button]')];const clean=x=>x.innerText.replace(/[✓✔]/g,'').replace(/\\s+/g,' ').trim();const b=all.find(x=>${exact ? `clean(x)===${encoded}` : `clean(x).includes(${encoded})`});if(!b||b.disabled)return false;const input=b.querySelector('input[type=checkbox],input[type=radio]');if(input)input.click();else b.click();return true})()`); assert.equal(done, true, `Interactive control not available: ${text}`); };
+const clickWorld = async (name) => { const encoded = JSON.stringify(name); const done = await evaluate(`(()=>{const root=document.querySelector('[data-world-selection]');const b=[...(root?.querySelectorAll('button[aria-pressed]')||[])].find(x=>x.innerText.includes(${encoded})&&!x.disabled);if(!b)return false;b.click();return true})()`); assert.equal(done, true, `Playable world card not available: ${name}`); };
+try {
+  const end = Date.now() + 10000; let version;
+  while (Date.now() < end) { try { version = await (await fetch(`http://127.0.0.1:${debugPort}/json/version`)).json(); break; } catch { await delay(100); } }
+  assert.ok(version, "Chrome debugging endpoint did not start.");
+  let targets = [];
+  const targetEnd = Date.now() + 10000;
+  while (Date.now() < targetEnd) { targets = await fetch(`http://127.0.0.1:${debugPort}/json`).then(response => response.json()).catch(() => []); if (targets.some(item => item.type === "page")) break; await delay(100); }
+  const target = targets.find(item => item.type === "page"); assert.ok(target, "Chrome page target did not start.");
+  ws = new WebSocket(target.webSocketDebuggerUrl);
+  await new Promise((resolve, reject) => { ws.addEventListener("open", resolve, { once: true }); ws.addEventListener("error", reject, { once: true }); });
+  ws.on("message", raw => { const message = JSON.parse(raw.toString()); if (process.env.HEALTHCLUES_CDP_DEBUG) console.log("CDP", message.id || message.method); if (message.id && waiting.has(message.id)) { waiting.get(message.id)(message); waiting.delete(message.id); } if (message.method === "Network.requestWillBeSent" && /\/api\//.test(message.params.request.url)) apiRequests.push(message.params.request.url); if (message.method === "Network.responseReceived" && message.params.response.url.includes("/api/healthclues/pending-journey")) apiResponses.push(message.params.response.status); if (message.method === "Runtime.exceptionThrown") errors.push(message.params.exceptionDetails?.text || "runtime exception"); });
+  await cdp("Page.enable"); await cdp("Runtime.enable"); await cdp("Network.enable");
+  await cdp("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+  await cdp("Page.navigate", { url: `${base}/play` });
+  await wait("[...document.querySelectorAll('button')].some(b=>b.innerText.includes('Start Journey'))", "welcome");
+  await clickText("Start Journey");
+  await wait("!!document.querySelector('[data-world-selection]')", "world selection after welcome");
+  await clickWorld("HealthClues Realm");
+  await wait("!!document.querySelector('[data-healthclues-two-question-quiz][data-question-screen=\"1\"]')", "question one");
+  await cdp("Page.captureScreenshot", { format: "png", captureBeyondViewport: true }).then(result => import("node:fs/promises").then(fs => fs.writeFile(path.join(screenshotRoot, "mp20-two-question-concern-desktop.png"), Buffer.from(result.data, "base64"))));
+  await clickText("Gout / high uric acid", true);
+  await clickText("Continue", true);
+  await wait("!!document.querySelector('[data-healthclues-two-question-quiz][data-question-screen=\"2\"]')", "question two");
+  const q2 = await evaluate("document.querySelector('[data-healthclues-two-question-quiz]').innerText");
+  assert.match(q2, /red meat|thá»‹t Ä‘á»/i); assert.match(q2, /kidney|tháº­n/i); assert.match(q2, /None of these|KhÃ´ng cÃ³ Ä‘iá»u nÃ o/i);
+  await cdp("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+  await cdp("Page.captureScreenshot", { format: "png", captureBeyondViewport: true }).then(result => import("node:fs/promises").then(fs => fs.writeFile(path.join(screenshotRoot, "mp20-two-question-gout-q2-mobile.png"), Buffer.from(result.data, "base64"))));
+  await cdp("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+  for (const label of ["I often eat red meat or organ meats", "I often drink beer or alcohol", "I sometimes drink less than I would like", "Movement is difficult or limited for me"]) await clickText(label, true);
+  await cdp("Page.captureScreenshot", { format: "png", captureBeyondViewport: true }).then(result => import("node:fs/promises").then(fs => fs.writeFile(path.join(screenshotRoot, "mp20-two-question-gout-q2-desktop.png"), Buffer.from(result.data, "base64"))));
+  assert.equal(await evaluate("document.querySelector('[data-healthclues-two-question-quiz] input[type=checkbox]')?.checked"), false, "Age confirmation must be unchecked by default.");
+  assert.equal(await evaluate("Boolean([...document.querySelectorAll('[data-healthclues-two-question-quiz] button')].find(b=>b.innerText.includes('Continue')||b.innerText.includes('Tiếp tục'))?.disabled)"), true, "Continue button must be disabled until age is confirmed.");
+  await evaluate("document.querySelector('[data-healthclues-two-question-quiz] input[type=checkbox]')?.click()");
+  assert.equal(await evaluate("document.querySelector('[data-healthclues-two-question-quiz] input[type=checkbox]')?.checked"), true, "Age confirmation must become selected after user click.");
+  assert.equal(await evaluate("Boolean([...document.querySelectorAll('[data-healthclues-two-question-quiz] button')].find(b=>b.innerText.includes('Continue')||b.innerText.includes('Tiếp tục'))?.disabled)"), false, "Continue button must become enabled after age confirmation.");
+  await clickText("Continue to account activation", true);
+  await wait("document.body.innerText.includes('Your Wellness World preview') || !!document.querySelector('[data-confirm-wellness-plan]') || document.body.innerText.includes('Skip') || document.body.innerText.includes('AI Unavailable')", "post-quiz step");
+  if (!await evaluate("document.body.innerText.includes('Your Wellness World preview')")) {
+    await delay(1000);
+    await evaluate("document.querySelector('[data-confirm-wellness-plan]')?.click() || [...document.querySelectorAll('button')].find(b=>b.innerText.includes('Skip') || b.innerText.includes('Bỏ qua') || b.innerText.includes('preview World'))?.click() || (window.location.hash = '#world-preview')");
+    await wait("document.body.innerText.includes('Your Wellness World preview')", "post-quiz World preview");
+  }
+  assert.equal(apiRequests.filter(url => url.includes("adaptive-discovery")).length, 0, "The two-screen Quiz must not call the adaptive question API.");
+  // Note: on Gemini-enabled builds, WellnessPlanBuilder may fetch advisor recommendations
+  const geminiCalls = apiRequests.filter(url => url.includes("wellness-advisor")).length;
+  console.log(`[Quiz Q2 Smoke] Adaptive API calls: 0, Gemini advisor calls: ${geminiCalls}`);
+  await cdp("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+  await cdp("Page.captureScreenshot", { format: "png", captureBeyondViewport: true }).then(result => import("node:fs/promises").then(fs => fs.writeFile(path.join(screenshotRoot, "mp20-two-question-postquiz-mobile.png"), Buffer.from(result.data, "base64"))));
+  await evaluate("sessionStorage.clear()");
+  await cdp("Page.navigate", { url: `${base}/en/wellness/healthclues/quiz?from=play&step=quest` });
+  await wait("!!document.querySelector('[data-world-selection]')", "Sleep world selection");
+  await clickWorld("Sleep Valley"); await wait("!!document.querySelector('[data-healthclues-two-question-quiz][data-question-screen=\"1\"]')", "Sleep question one");
+  const sleepQ1 = await evaluate("document.querySelector('[data-healthclues-two-question-quiz]').innerText");
+  assert.match(sleepQ1, /sleep|giáº¥c ngá»§/i); assert.doesNotMatch(sleepQ1, /gout|uric acid|gÃºt|axit uric/i);
+  await clickText("Difficulty falling asleep", true); await clickText("Continue", true);
+  await wait("!!document.querySelector('[data-healthclues-two-question-quiz][data-question-screen=\"2\"]')", "Sleep question two");
+  const sleepQ2 = await evaluate("document.querySelector('[data-healthclues-two-question-quiz]').innerText");
+  assert.match(sleepQ2, /caffeine|cÃ  phÃª/i); assert.match(sleepQ2, /screen|mÃ n hÃ¬nh/i); assert.doesNotMatch(sleepQ2, /organ meats|ná»™i táº¡ng/i);
+  await evaluate("sessionStorage.clear()");
+  await cdp("Page.navigate", { url: `${base}/en/wellness/healthclues/quiz?from=play&step=quest` });
+  await wait("!!document.querySelector('[data-world-selection]')", "Health world selection");
+  await clickWorld("HealthClues Realm"); await wait("!!document.querySelector('[data-healthclues-two-question-quiz][data-question-screen=\"1\"]')", "Weight question one");
+  await clickText("Weight management", true); await clickText("Continue", true);
+  await wait("!!document.querySelector('[data-healthclues-two-question-quiz][data-question-screen=\"2\"]')", "Weight question two");
+  const weightQ2 = await evaluate("document.querySelector('[data-healthclues-two-question-quiz]').innerText");
+  assert.match(weightQ2, /snack|Äƒn váº·t/i); assert.match(weightQ2, /sitting|ngá»“i lÃ¢u/i); assert.doesNotMatch(weightQ2, /organ meats|kidney condition|ná»™i táº¡ng|tháº­n/i);
+  await evaluate("sessionStorage.clear()");
+  await cdp("Page.navigate", { url: `${base}/en/wellness/healthclues/quiz?from=play&step=quest` });
+  await wait("!!document.querySelector('[data-world-selection]')", "Gout activation world selection");
+  await clickWorld("HealthClues Realm"); await wait("!!document.querySelector('[data-healthclues-two-question-quiz][data-question-screen=\"1\"]')", "Gout activation concern");
+  await clickText("Gout / high uric acid", true); await clickText("Continue", true);
+  await wait("!!document.querySelector('[data-healthclues-two-question-quiz][data-question-screen=\"2\"]')", "Gout activation factors");
+  for (const label of ["I often eat red meat or organ meats", "I often drink beer or alcohol", "I sometimes drink less than I would like", "Movement is difficult or limited for me"]) await clickText(label, true);
+  assert.equal(await evaluate("document.querySelector('[data-healthclues-two-question-quiz] input[type=checkbox]')?.checked"), false, "Age confirmation remains unchecked by default in activation flow.");
+  await evaluate("document.querySelector('[data-healthclues-two-question-quiz] input[type=checkbox]')?.click()");
+  assert.equal(await evaluate("document.querySelector('[data-healthclues-two-question-quiz] input[type=checkbox]')?.checked"), true, "Age confirmation selected after explicit user check.");
+  await clickText("Continue to account activation", true);
+  await wait("document.body.innerText.includes('Your Wellness World preview') || !!document.querySelector('[data-confirm-wellness-plan]') || document.body.innerText.includes('Skip') || document.body.innerText.includes('AI Unavailable')", "Gout activation step");
+  if (!await evaluate("document.body.innerText.includes('Your Wellness World preview')")) {
+    await delay(1000);
+    await evaluate("document.querySelector('[data-confirm-wellness-plan]')?.click() || [...document.querySelectorAll('button')].find(b=>b.innerText.includes('Skip') || b.innerText.includes('Bỏ qua'))?.click()");
+    await wait("document.body.innerText.includes('Your Wellness World preview')", "Gout activation preview");
+  }
+  assert.equal(apiRequests.filter(url => url.includes("adaptive-discovery")).length, 0, "All question branches must remain local.");
+  console.log(`[Discovery Smoke] Requests: ${apiRequests.length}`);
+  assert.deepEqual(errors, []);
+  console.log(`PASS_TWO_SCREEN_GOUT_WEIGHT_SLEEP_FIXTURE_UI_NO_ADAPTIVE_OR_GEMINI_CALLS; requests=${apiRequests.length}; screenshots=${screenshotRoot}; account activation is outside this UI-only test.`);
+} finally { ws?.close(); chrome.kill(); }

@@ -1,0 +1,1 @@
+{"taskId":"HC-902","summary":"Updated farewell(name) to return exactly `Goodbye, ${name}!`.","patches":[{"path":"src/farewell.mjs","content":"export function farewell(name) { return `Goodbye, ${name}!`; }\n"}],"limitations":["The provided test was not executed because tool use was prohibited."]}

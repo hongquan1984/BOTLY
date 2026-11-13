@@ -1,0 +1,253 @@
+{
+  "runId": "2026-11-02T14-59-24.682Z",
+  "mode": "REAL_CODEX_SYNTHETIC_SNAPSHOT_ONLY",
+  "status": "DEMO_PASS",
+  "realAiCalls": 6,
+  "maxRealAiCalls": 12,
+  "currentTaskId": null,
+  "nextTaskId": null,
+  "queue": [
+    {
+      "taskId": "HC-901",
+      "title": "Synthetic Unicode slug behavior",
+      "objective": "Implement toSlug(value): return a lowercase, hyphen-separated slug; normalize compatibility characters, preserve Unicode letters and digits, map ampersand to the word and, collapse separators, and return an empty string for blank input.",
+      "priority": "P1",
+      "sourceRequirements": [
+        "Synthetic acceptance fixture for HC-901"
+      ],
+      "dependencies": [],
+      "allowedScope": [
+        "src/hc-901.mjs"
+      ],
+      "deliverables": [
+        "Structured source patch",
+        "Passing Docker test evidence"
+      ],
+      "acceptanceCriteria": [
+        "toSlug(\"Hello World\") returns \"hello-world\".",
+        "Convert ampersand to the word and; collapse repeated separators to one hyphen.",
+        "Preserve Unicode letters and digits after NFKC normalization.",
+        "Blank input returns an empty string.",
+        "The focused test passes without network access."
+      ],
+      "requiredTests": [
+        "test/hc-901.test.mjs"
+      ],
+      "visualEvidence": [],
+      "retryCount": 0,
+      "status": "PASS",
+      "previousReviewFeedback": [],
+      "ownerApprovalRequired": false,
+      "projectFinalAudit": false
+    },
+    {
+      "taskId": "HC-902",
+      "title": "Synthetic duration label behavior",
+      "objective": "Implement formatDuration(minutes) as a deterministic formatter for non-negative integer minutes. Use singular \"minute\" only for 1 and plural \"minutes\" for all other accepted values; reject invalid values with a TypeError.",
+      "priority": "P1",
+      "sourceRequirements": [
+        "Synthetic acceptance fixture for HC-902"
+      ],
+      "dependencies": [
+        "HC-901"
+      ],
+      "allowedScope": [
+        "src/hc-902.mjs"
+      ],
+      "deliverables": [
+        "Structured source patch",
+        "Passing Docker test evidence"
+      ],
+      "acceptanceCriteria": [
+        "Use singular minute only for exactly 1; use minutes for zero and all other accepted integer values.",
+        "Reject negative, fractional, string, and non-finite input with TypeError.",
+        "The focused test passes without network access."
+      ],
+      "requiredTests": [
+        "test/hc-902.test.mjs"
+      ],
+      "visualEvidence": [],
+      "retryCount": 0,
+      "status": "PASS",
+      "previousReviewFeedback": [],
+      "ownerApprovalRequired": false,
+      "projectFinalAudit": false
+    }
+  ],
+  "history": [
+    {
+      "event": "MANAGER_ASSIGNED",
+      "taskId": "HC-901",
+      "realAI": true,
+      "at": "2026-11-02T14:59:37.729Z"
+    },
+    {
+      "event": "ATTEMPT_REVIEWED",
+      "taskId": "HC-901",
+      "attempt": 1,
+      "decision": "PASS",
+      "reportPath": "D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-901\\developer-attempt-1.json",
+      "at": "2026-11-02T15:00:11.698Z"
+    },
+    {
+      "event": "MANAGER_PASS",
+      "taskId": "HC-901",
+      "attempts": 1,
+      "realAI": true,
+      "at": "2026-11-02T15:00:12.110Z"
+    },
+    {
+      "event": "AUTOMATIC_NEXT_TASK_ASSIGNED",
+      "taskId": "HC-902",
+      "afterTaskId": "HC-901",
+      "realAI": true,
+      "at": "2026-11-02T15:00:23.645Z"
+    },
+    {
+      "event": "ATTEMPT_REVIEWED",
+      "taskId": "HC-902",
+      "attempt": 1,
+      "decision": "PASS",
+      "reportPath": "D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-902\\developer-attempt-1.json",
+      "at": "2026-11-02T15:00:51.653Z"
+    },
+    {
+      "event": "MANAGER_PASS",
+      "taskId": "HC-902",
+      "attempts": 1,
+      "realAI": true,
+      "at": "2026-11-02T15:00:51.975Z"
+    }
+  ],
+  "callHistory": [
+    {
+      "number": 1,
+      "role": "manager",
+      "status": "COMPLETED",
+      "startedAt": "2026-11-02T14:59:24.816Z",
+      "eventTypes": [
+        "thread.started",
+        "item.completed",
+        "item:error",
+        "turn.started",
+        "item:agent_message",
+        "turn.completed"
+      ],
+      "blockedToolEvents": [
+        {
+          "type": "error",
+          "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+        }
+      ],
+      "completedAt": "2026-11-02T14:59:37.352Z"
+    },
+    {
+      "number": 2,
+      "role": "developer",
+      "status": "COMPLETED",
+      "startedAt": "2026-11-02T14:59:39.913Z",
+      "eventTypes": [
+        "thread.started",
+        "item.completed",
+        "item:error",
+        "turn.started",
+        "item:agent_message",
+        "turn.completed"
+      ],
+      "blockedToolEvents": [
+        {
+          "type": "error",
+          "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+        }
+      ],
+      "completedAt": "2026-11-02T14:59:53.811Z"
+    },
+    {
+      "number": 3,
+      "role": "manager",
+      "status": "COMPLETED",
+      "startedAt": "2026-11-02T14:59:55.219Z",
+      "eventTypes": [
+        "thread.started",
+        "item.completed",
+        "item:error",
+        "turn.started",
+        "item:agent_message",
+        "turn.completed"
+      ],
+      "blockedToolEvents": [
+        {
+          "type": "error",
+          "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+        }
+      ],
+      "completedAt": "2026-11-02T15:00:11.452Z"
+    },
+    {
+      "number": 4,
+      "role": "manager",
+      "status": "COMPLETED",
+      "startedAt": "2026-11-02T15:00:12.267Z",
+      "eventTypes": [
+        "thread.started",
+        "item.completed",
+        "item:error",
+        "turn.started",
+        "item:agent_message",
+        "turn.completed"
+      ],
+      "blockedToolEvents": [
+        {
+          "type": "error",
+          "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+        }
+      ],
+      "completedAt": "2026-11-02T15:00:23.528Z"
+    },
+    {
+      "number": 5,
+      "role": "developer",
+      "status": "COMPLETED",
+      "startedAt": "2026-11-02T15:00:24.676Z",
+      "eventTypes": [
+        "thread.started",
+        "item.completed",
+        "item:error",
+        "turn.started",
+        "item:agent_message",
+        "turn.completed"
+      ],
+      "blockedToolEvents": [
+        {
+          "type": "error",
+          "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+        }
+      ],
+      "completedAt": "2026-11-02T15:00:34.250Z"
+    },
+    {
+      "number": 6,
+      "role": "manager",
+      "status": "COMPLETED",
+      "startedAt": "2026-11-02T15:00:35.346Z",
+      "eventTypes": [
+        "thread.started",
+        "item.completed",
+        "item:error",
+        "turn.started",
+        "item:agent_message",
+        "turn.completed"
+      ],
+      "blockedToolEvents": [
+        {
+          "type": "error",
+          "message": "Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."
+        }
+      ],
+      "completedAt": "2026-11-02T15:00:51.473Z"
+    }
+  ],
+  "startedAt": "2026-11-02T14:59:24.682Z",
+  "updatedAt": "2026-11-02T15:00:51.975Z",
+  "completedAt": "2026-11-02T15:00:51.975Z"
+}

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthClues — My Wellness Home V1 (Photorealistic Layered Slots)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app" class="app-container">
+    <!-- Top Global Header -->
+    <header class="app-header">
+      <!-- Left: Logo & Room Switcher -->
+      <div class="header-left">
+        <div class="brand">
+          <span class="brand-icon">🏡</span>
+          <div class="brand-info">
+            <h1 class="brand-title">My Wellness Home</h1>
+            <span class="brand-sub">Biệt Thự Sức Khỏe Thụy Sĩ • Hệ Thống Mở Quà Hàng Ngày</span>
+          </div>
+        </div>
+
+        <!-- Room Switcher Nav -->
+        <div class="room-switcher-nav">
+          <button id="btn-scene-living" class="room-nav-btn active" onclick="switchScene('scene_interior_wide')" title="Chuyển sang Phòng Khách Góc Rộng">
+            <span>🏔️</span> Phòng Khách
+          </button>
+          <button id="btn-scene-bedroom" class="room-nav-btn" onclick="switchScene('scene_bedroom')" title="Chuyển sang Phòng Ngủ Tĩnh Dưỡng">
+            <span>🛏️</span> Phòng Ngủ
+          </button>
+        </div>
+
+        <!-- Real-time Clock & Auto Day/Night Badge -->
+        <div class="auto-clock-badge" id="auto-clock-badge" title="Tự động đồng bộ ánh sáng Ngày / Đêm theo giờ thực tế của bạn">
+          <span class="clock-icon">⏰</span>
+          <span id="clock-time-display">22:00</span>
+          <span class="clock-dot">•</span>
+          <span id="clock-status-tag">🌙 Đêm</span>
+        </div>
+
+        <button id="btn-toggle-day-night" class="btn-day-night" onclick="toggleDayNightMode()" title="Chuyển đổi thử nghiệm Ban Ngày / Ban Đêm">
+          <span id="day-night-icon">🌙</span> <span id="day-night-label">Ban Đêm</span>
+        </button>
+      </div>
+
+      <!-- Right: Player Profile Switcher & Gameplay Actions -->
+      <div class="header-right">
+        <!-- Player Switcher Dropdown (Mỗi người chơi có căn nhà riêng) -->
+        <div class="player-select-wrap" title="Chọn tài khoản người chơi để kiểm tra tính độc lập dữ liệu">
+          <span class="player-select-label">👤 Tài khoản:</span>
+          <select id="select-player-profile" class="player-select" onchange="switchPlayerProfile(this.value)">
+            <option value="player_1">Người Chơi 1 (Mới - Ngày 1)</option>
+            <option value="player_2">Người Chơi 2 (Đã có quà)</option>
+            <option value="player_master">👑 Admin (Master Blueprint)</option>
+          </select>
+        </div>
+
+        <!-- Companion Selector Dropdown -->
+        <div class="companion-select-wrap" title="Chọn nhân vật Chibi đồng hành trong biệt thự">
+          <span class="companion-select-label">🐾 Đồng hành:</span>
+          <select id="select-active-companion" class="companion-select" onchange="changeActiveCompanion(this.value)">
+            <option value="mia">Mia (Áo kem dịu dàng)</option>
+            <option value="anna">Anna (Áo xanh vui tươi)</option>
+            <option value="leo">Leo (Áo xanh thám hiểm)</option>
+            <option value="ben">Ben (Áo navy ấm áp)</option>
+            <option value="lily">Lily (Áo tím thả tim)</option>
+          </select>
+        </div>
+
+        <!-- Primary Gameplay Buttons -->
+        <button id="btn-open-welcome-gift" class="btn-welcome-gift" onclick="openWelcomeGiftModal()" style="display: none;" title="Mở hộp quà tân gia ngày đầu tiên">
+          <span>🎁</span> Mở Quà Tân Gia
+        </button>
+
+        <button id="btn-open-daily-reward" class="btn-daily-gift" onclick="openDailyRewardModal()" title="Mở hộp quà nhiệm vụ hôm nay (Chọn 1 trong 2 phòng)">
+          <span>✨</span> Nhận Quà Hôm Nay (1/2)
+        </button>
+
+        <button id="btn-reset-player" class="btn-reset-player" onclick="resetCurrentPlayer()" title="Reset về Ngày 0 (phòng trống) để trải nghiệm lại từ đầu">
+          <span>↺</span> Reset Chơi Lại
+        </button>
+
+        <!-- Admin Specific Tools (Shown only in Admin Master mode) -->
+        <div id="admin-tools-group" class="admin-tools-group" style="display: none;">
+          <button id="btn-toggle-walkable-painter" class="btn-walk-painter" onclick="toggleWalkablePainter()" title="Bôi vùng mặt sàn mà nhân vật có thể đi lại, tránh đè lên đồ vật">
+            <span>🖌️</span> Bôi Mặt Sàn
+          </button>
+          <button id="btn-save-room-state" class="btn-save-room" onclick="saveMasterBlueprintFromAdmin()" title="Lưu Master Blueprint cho toàn bộ người chơi">
+            <span>💾</span> Lưu Blueprint
+          </button>
+          <button id="btn-upload-furniture" class="btn-upload-furniture" onclick="document.getElementById('input-upload-furniture').click()" title="Tải ảnh đồ nội thất mới">
+            <span>📤</span> Tải Đồ
+          </button>
+        </div>
+
+        <button id="btn-toggle-drawer" class="btn-hdr-action" onclick="toggleDecorDrawer()" title="Thu gọn / Mở rộng bảng đồ đạc">
+          <span id="icon-toggle-drawer">🎁</span> <span id="label-toggle-drawer">Đồ Đạc</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hidden File Pickers for Furniture & Background -->
+    <input type="file" id="input-upload-furniture" accept="image/*" multiple style="display: none;" onchange="handleFurnitureUpload(event)">
+    <input type="file" id="input-replace-furniture" accept="image/*" style="display: none;" onchange="handleReplaceFurnitureUpload(event)">
+    <input type="file" id="input-upload-bg" accept="image/*" style="display: none;" onchange="handleBackgroundUpload(event)">
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+      <!-- Main Scene Viewport Stage -->
+      <main class="scene-viewport">
+        <div id="scene-stage" class="scene-stage view-scene_garden">
+          <!-- Dropzone overlay when dragging images over stage -->
+          <div id="stage-drop-overlay" class="stage-drop-overlay">
+            <div class="drop-overlay-box">
+              <span class="drop-icon">📥</span>
+              <h3 class="drop-title">Thả ảnh đồ nội thất vào đây</h3>
+              <p class="drop-sub">Tự động xuất hiện tại vị trí thả • Hỗ trợ PNG trong suốt</p>
+            </div>
+          </div>
+
+          <!-- Container for user-uploaded custom furniture items -->
+          <div id="custom-items-stage" class="custom-items-stage"></div>
+
+          <!-- Perspective Homography SVG Wireframe & Handles -->
+          <svg id="perspective-svg-overlay" class="perspective-wireframe-svg"></svg>
+          <div id="perspective-handles-stage" class="perspective-handles-stage"></div>
+
+          <!-- Floating Perspective Admin Toolbar -->
+          <div id="perspective-toolbar" class="perspective-toolbar" style="display: none;">
+            <div class="ptool-group">
+              <span class="ptool-title">Thao tác:</span>
+              <button id="btn-mode-move" class="ptool-btn active" onclick="setPerspectiveInteractionMode('move')" title="Kéo thân ảnh bất kỳ đâu để di chuyển toàn bộ">✥ Di chuyển</button>
+              <button id="btn-mode-perspective" class="ptool-btn" onclick="setPerspectiveInteractionMode('perspective')" title="Kéo 4 núm tròn (TL, TR, BR, BL) để nắn góc phối cảnh">📐 Nắn 4 góc</button>
+            </div>
+            <div class="ptool-divider"></div>
+            <div class="ptool-group ptool-zoom-group">
+              <button class="ptool-btn ptool-btn-zoom" onclick="scaleSelectedCustomItem(-0.1)" title="Thu nhỏ ảnh (hoặc lăn chuột xuống)">➖ Thu nhỏ</button>
+              <span class="ptool-scale-badge" id="ptool-scale-badge" title="Tỷ lệ kích thước (hoặc lăn chuột trực tiếp trên ảnh)">100%</span>
+              <button class="ptool-btn ptool-btn-zoom" onclick="scaleSelectedCustomItem(0.1)" title="Phóng to ảnh (hoặc lăn chuột lên)">➕ Phóng to</button>
+            </div>
+            <div class="ptool-divider"></div>
+            <div class="ptool-group">
+              <button class="ptool-btn" onclick="undoPerspective()" title="Hoàn tác (Undo)">↶ Undo</button>
+              <button class="ptool-btn" onclick="redoPerspective()" title="Làm lại (Redo)">↷ Redo</button>
+              <button class="ptool-btn" onclick="resetSelectedPerspective()" title="Khôi phục góc chữ nhật">↺ Reset góc</button>
+            </div>
+            <div class="ptool-divider"></div>
+            <div class="ptool-group">
+              <button class="ptool-btn" id="btn-toggle-vis" onclick="toggleSelectedVisibility()" title="Ẩn / Hiện layer">👁️ Ẩn/Hiện</button>
+              <button class="ptool-btn" onclick="triggerReplaceImage()" title="Thay ảnh PNG nhưng giữ cấu hình 4 góc">🖼️ Đổi ảnh</button>
+              <button class="ptool-btn ptool-btn-save" onclick="saveSelectedPerspective()" title="Lưu vị trí cấu hình">💾 Lưu vị trí</button>
+              <button class="ptool-btn ptool-btn-danger" onclick="deleteSelectedPerspectiveItem()" title="Xóa layer">🗑️ Xóa</button>
+            </div>
+          </div>
+          <!-- 1. Overview Scene Layer -->
+          <div class="scene-layer" id="layer-scene_overview">
+            <img src="assets/scenes/scene_overview.webp" alt="Toàn cảnh căn nhà Thụy Sĩ" class="scene-img base-layer">
+            <div id="slots-container-scene_overview" class="slots-container"></div>
+            
+            <div class="overview-hotspots">
+              <button class="hotspot hotspot-garden" onclick="switchScene('scene_garden')">
+                <span class="hotspot-pulse"></span>
+                <span class="hotspot-card">🌿 Vào Khu Vườn</span>
+              </button>
+              <button class="hotspot hotspot-interior" onclick="switchScene('scene_interior')">
+                <span class="hotspot-pulse"></span>
+                <span class="hotspot-card">🛋️ Vào Phòng Khách</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Garden Scene Layer -->
+          <div class="scene-layer" id="layer-scene_garden">
+            <img src="assets/scenes/scene_garden.webp" alt="Khu vườn Thụy Sĩ trống" class="scene-img base-layer">
+            <div id="slots-container-scene_garden" class="slots-container"></div>
+          </div>
+
+          <!-- 3. Interior Scene Layer -->
+          <div class="scene-layer" id="layer-scene_interior">
+            <img src="assets/scenes/scene_interior.webp" alt="Phòng khách gỗ Thụy Sĩ trống" class="scene-img base-layer">
+            <div id="slots-container-scene_interior" class="slots-container"></div>
+          </div>
+
+          <!-- 4. Wide-Angle Panoramic Interior Scene Layer (Mới) -->
+          <div class="scene-layer active" id="layer-scene_interior_wide">
+            <img src="assets/scenes/scene_interior_wide.webp" alt="Phòng khách góc siêu rộng nhìn ra hồ và núi" class="scene-img base-layer">
+            <div id="slots-container-scene_interior_wide" class="slots-container"></div>
+          </div>
+
+          <!-- 5. Luxury Swiss Chalet Bedroom Layer (Chỉ có giường, không đồ thừa) -->
+          <div class="scene-layer" id="layer-scene_bedroom">
+            <img src="assets/scenes/scene_bedroom.webp" alt="Phòng ngủ Chalet Thụy Sĩ nhìn ra đỉnh núi tuyết" class="scene-img base-layer">
+            <div id="slots-container-scene_bedroom" class="slots-container"></div>
+          </div>
+
+          <!-- Interactive Before/After Split Comparison Slider -->
+          <div id="compare-slider-container" class="compare-container" style="display: none;">
+            <div class="compare-before-wrapper" id="compare-before-wrapper">
+              <img id="compare-img-before" src="assets/scenes/scene_garden.webp" alt="Trước - Khung cảnh trống" class="compare-img">
+              <span class="compare-label label-before">TRƯỚC (Cảnh trống nguyên bản)</span>
+            </div>
+            <div class="compare-after-wrapper">
+              <img id="compare-img-after" src="assets/scenes/scene_garden.webp" alt="Sau - Đã trang trí" class="compare-img">
+              <div id="compare-active-items-preview" class="compare-active-overlay"></div>
+              <span class="compare-label label-after">SAU (Đã trang trí theo Slot)</span>
+            </div>
+            <div id="compare-divider" class="compare-divider" style="left: 50%;">
+              <div class="divider-line"></div>
+              <div class="divider-handle">
+                <span>◀ ▶</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Walkable Floor Mask Overlay Canvas (Admin Painter Mode) -->
+          <canvas id="walkable-painter-canvas" class="walkable-painter-canvas" style="display: none !important;"></canvas>
+
+          <!-- Floating Walkable Painter Controls Bar -->
+          <div id="walkable-painter-toolbar" class="walkable-painter-toolbar" style="display: none !important;">
+            <div class="wpt-badge">🖌️ BÔI VÙNG ĐI LẠI</div>
+            <div class="wpt-group">
+              <button id="btn-wbrush-paint" class="wpt-btn active" onclick="setWalkableTool('brush')" title="Bôi màu xanh lên sàn để cho phép nhân vật đi qua">🟢 Cọ Vẽ</button>
+              <button id="btn-wbrush-erase" class="wpt-btn" onclick="setWalkableTool('eraser')" title="Tẩy xoá phần sàn vướng chân đồ đạc, chân bàn, tường">⚪ Cọ Tẩy</button>
+            </div>
+            <div class="wpt-divider"></div>
+            <div class="wpt-group">
+              <span class="wpt-label">Cỡ nét:</span>
+              <button class="wpt-btn-size" data-size="20" onclick="setWalkableBrushSize(20, this)">Nhỏ</button>
+              <button class="wpt-btn-size active" data-size="45" onclick="setWalkableBrushSize(45, this)">Vừa</button>
+              <button class="wpt-btn-size" data-size="80" onclick="setWalkableBrushSize(80, this)">Lớn</button>
+            </div>
+            <div class="wpt-divider"></div>
+            <div class="wpt-group">
+              <button class="wpt-btn-action" onclick="applyDefaultWalkablePreset()" title="Tô sẵn vùng sàn trống tối ưu cho phòng này">🎯 Mẫu Chuẩn</button>
+              <button class="wpt-btn-action" onclick="clearWalkableCanvas()" title="Xóa toàn bộ vùng vẽ">🧹 Xóa Hết</button>
+              <button class="wpt-btn-save" onclick="saveWalkableMaskFromAdmin()" title="Lưu vùng mặt sàn vào hệ thống">💾 Lưu Mặt Sàn</button>
+              <button class="wpt-btn-close" onclick="toggleWalkablePainter(false)" title="Đóng bảng vẽ">✕ Đóng</button>
+            </div>
+          </div>
+
+          <!-- Autonomous Chibi Companion in the Chalet -->
+          <div id="home-chibi-companion" class="home-chibi-companion" onclick="handleCompanionClick(event)" title="Nhấn vào bạn Chibi để tương tác và trò chuyện!">
+            <div class="chibi-shadow"></div>
+            <div id="chibi-sprite-el" class="chibi-sprite"></div>
+            <div id="chibi-speech-bubble" class="chibi-speech-bubble" style="display: none;">
+              <span id="chibi-speech-text" class="chibi-speech-text"></span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Item Inventory & Slot Management Drawer -->
+      <aside class="decor-panel">
+        <div class="decor-header">
+          <div class="decor-title">
+            <span class="decor-title-icon">🎁</span>
+            <div>
+              <h2>Bộ Sưu Tập Phần Thưởng</h2>
+              <span class="decor-desc" id="drawer-subtitle">10 vật phẩm thực tế • Hệ thống Slot V1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="inventory-filters">
+          <button class="filter-tab active" data-filter="custom" onclick="setInventoryFilter('custom')">📤 Tự tải lên (<span id="custom-count-badge">0</span>)</button>
+          <button class="filter-tab" data-filter="all" onclick="setInventoryFilter('all')">✨ Mẫu có sẵn</button>
+        </div>
+
+        <!-- Direct Upload Banner Card in Drawer -->
+        <div class="drawer-upload-card" onclick="document.getElementById('input-upload-furniture').click()">
+          <span class="upload-card-icon">➕</span>
+          <div class="upload-card-text">
+            <strong>Tải thêm đồ nội thất</strong>
+            <span>Kéo thả hoặc chọn file PNG / JPG từ máy</span>
+          </div>
+        </div>
+
+        <!-- Item Cards List -->
+        <div class="inventory-list" id="inventory-list">
+          <!-- Dynamically populated from item-manifest.json & inventory-state -->
+        </div>
+
+        <!-- Panel Footer Stats & Tools -->
+        <div class="decor-footer">
+          <div class="footer-stats">
+            <span id="footer-summary">Đang trưng bày: 1/10 món</span>
+            <span class="rule-hint">🔒 V1: Gắn slot cố định • Không kéo thả tự do</span>
+          </div>
+          <div class="footer-actions">
+            <button class="btn-sub-action" onclick="claimAllTestItems()" title="Nhận thưởng toàn bộ 10 món để test">
+              ⚡ Nhận hết để test
+            </button>
+            <button class="btn-sub-action" onclick="resetToInitialGift()" title="Khôi phục trạng thái ban đầu">
+              ↺ Khôi phục mặc định
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Item Detail & Slot Assignment Modal -->
+    <div id="item-modal" class="modal-overlay" style="display: none;" onclick="closeItemModal(event)">
+      <div class="modal-card modal-item-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 id="modal-item-title">Chi tiết vật phẩm</h3>
+          <button class="btn-close-modal" onclick="closeItemModal()">✕</button>
+        </div>
+        <div class="modal-body modal-item-body">
+          <div class="modal-item-preview-box">
+            <img id="modal-item-img" src="" alt="Vật phẩm" class="modal-item-img">
+            <span id="modal-item-status-badge" class="item-status-badge"></span>
+          </div>
+
+          <div class="modal-item-info">
+            <h4 id="modal-item-name">Tên vật phẩm</h4>
+            <span id="modal-item-en" class="modal-item-en">English Name</span>
+            <p id="modal-item-desc" class="modal-item-desc">Mô tả vật phẩm...</p>
+
+            <div class="modal-spec-grid">
+              <div class="modal-spec-item">
+                <span class="spec-label">Không gian:</span>
+                <span id="modal-item-scene" class="spec-val">Khu vườn</span>
+              </div>
+              <div class="modal-spec-item">
+                <span class="spec-label">Slot chỉ định:</span>
+                <span id="modal-item-slot-name" class="spec-val">Bậc thềm hiên</span>
+              </div>
+              <div class="modal-spec-item">
+                <span class="spec-label">Phong cách:</span>
+                <span class="spec-val">Swiss Alpine Realistic</span>
+              </div>
+              <div class="modal-spec-item">
+                <span class="spec-label">Vision Score:</span>
+                <span id="modal-item-score" class="spec-val score-high">95/100 (PASS)</span>
+              </div>
+            </div>
+
+            <!-- Interactive Scaling Control (Zoom In / Zoom Out) -->
+            <div class="modal-scale-section" id="modal-scale-section">
+              <div class="modal-scale-header">
+                <span class="scale-title">📐 Kích thước vật phẩm (Zoom / Scale)</span>
+                <span id="modal-scale-val" class="modal-scale-badge">100%</span>
+              </div>
+              <div class="modal-scale-slider-row">
+                <button type="button" class="btn-scale-step" onclick="stepCurrentModalScale(-0.1)" title="Thu nhỏ 10%">➖ -10%</button>
+                <input type="range" id="modal-scale-slider" min="40" max="220" step="5" value="100" oninput="onModalScaleInput(this.value)">
+                <button type="button" class="btn-scale-step" onclick="stepCurrentModalScale(0.1)" title="Phóng to 10%">➕ +10%</button>
+                <button type="button" class="btn-scale-step btn-scale-reset" onclick="resetCurrentModalScale()" title="Đặt lại kích thước chuẩn 100%">↺ 100%</button>
+              </div>
+              <div class="modal-scale-hint">💡 Mẹo: Có thể lăn chuột trực tiếp trên vật phẩm hoặc bấm nút ➖ / ➕ ngay trên thanh công cụ để chỉnh nhanh.</div>
+            </div>
+
+            <!-- Interactive Rotation Control (Xoay góc đồ vật) -->
+            <div class="modal-scale-section modal-rotate-section" id="modal-rotate-section" style="border-color: rgba(168, 85, 247, 0.3); background: rgba(88, 28, 135, 0.15);">
+              <div class="modal-scale-header">
+                <span class="scale-title" style="color: #c084fc;">🔄 Góc xoay đồ vật (Rotation)</span>
+                <span id="modal-rotation-val" class="modal-scale-badge" style="color: #c084fc; background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.35);">0°</span>
+              </div>
+              <div class="modal-scale-slider-row">
+                <button type="button" class="btn-scale-step" onclick="stepCurrentModalRotation(-15)" title="Xoay trái 15°" style="border-color: rgba(168, 85, 247, 0.3);">↺ -15°</button>
+                <input type="range" id="modal-rotation-slider" min="-180" max="180" step="5" value="0" oninput="onModalRotationInput(this.value)" style="accent-color: #a855f7;">
+                <button type="button" class="btn-scale-step" onclick="stepCurrentModalRotation(15)" title="Xoay phải 15°" style="border-color: rgba(168, 85, 247, 0.3);">↻ +15°</button>
+                <button type="button" class="btn-scale-step btn-scale-reset" onclick="resetCurrentModalRotation()" title="Đặt lại góc thẳng 0°">↺ 0°</button>
+              </div>
+              <div class="modal-scale-hint">💡 Mẹo: Có thể bấm giữ biểu tượng 🔄 trên đỉnh vật phẩm để xoay trực tiếp trên màn hình.</div>
+            </div>
+
+            <!-- Vision Score Breakdown -->
+            <div class="vision-criteria-box">
+              <div class="criteria-title">Đánh giá AI Vision (6 tiêu chuẩn V1):</div>
+              <div class="criteria-bars" id="modal-criteria-bars"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer modal-item-footer">
+          <div class="modal-actions-left" id="modal-left-actions"></div>
+          <div class="modal-actions-right">
+            <button id="modal-btn-action" class="btn-primary" onclick="handleModalAction()">Trưng bày vào Slot</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot Picker Drawer / Modal (When clicking an empty slot on stage) -->
+    <div id="slot-picker-modal" class="modal-overlay" style="display: none;" onclick="closeSlotPicker(event)">
+      <div class="modal-card modal-slot-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h3 id="slot-picker-title">Chọn vật phẩm cho Slot</h3>
+            <span id="slot-picker-subtitle" class="modal-sub">Vị trí slot</span>
+          </div>
+          <button class="btn-close-modal" onclick="closeSlotPicker()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="slot-picker-items-grid" class="slot-items-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Pipeline Report Modal -->
+    <div id="pipeline-modal" class="modal-overlay" style="display: none;" onclick="closePipelineModal(event)">
+      <div class="modal-card modal-pipeline-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h3>🤖 Báo Cáo AI Asset Pipeline & Vision Review</h3>
+            <span class="modal-sub">Hệ thống đánh giá 6 tiêu chí tự động (Section 6 & 7)</span>
+          </div>
+          <button class="btn-close-modal" onclick="closePipelineModal()">✕</button>
+        </div>
+        <div class="modal-body modal-pipeline-body">
+          <div class="pipeline-summary-cards" id="pipeline-summary-cards"></div>
+          <div class="pipeline-table-wrapper">
+            <table class="pipeline-table" id="pipeline-results-table">
+              <thead>
+                <tr>
+                  <th>Vật phẩm</th>
+                  <th>Slot gắn</th>
+                  <th>Góc nhìn</th>
+                  <th>Tỷ lệ</th>
+                  <th>Ánh sáng</th>
+                  <th>Bóng đổ</th>
+                  <th>Hòa hợp</th>
+                  <th>Vị trí</th>
+                  <th>Tổng điểm</th>
+                  <th>Quyết định</th>
+                </tr>
+              </thead>
+              <tbody id="pipeline-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Homography JSON Save/Config Modal (Section 5) -->
+    <div id="perspective-json-modal" class="modal-overlay" style="display: none;" onclick="closeJsonModal(event)">
+      <div class="modal-card modal-json-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h3>💾 Cấu Hình Tọa Độ 4 Góc (Homography JSON)</h3>
+            <span class="modal-sub">Đã lưu chuẩn xác vào localStorage (Section 5)</span>
+          </div>
+          <button class="btn-close-modal" onclick="closeJsonModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-sub" style="margin-bottom: 0.75rem;">Thông tin cấu hình lưu trữ 4 đỉnh hiển thị chuẩn hóa:</p>
+          <pre id="perspective-json-code" class="perspective-json-pre"></pre>
+          <div class="modal-actions-right" style="margin-top: 1rem; display: flex; gap: 8px; justify-content: flex-end;">
+            <button class="btn-primary" onclick="copyJsonConfig()">📋 Sao chép JSON</button>
+            <button class="btn-sub-action" onclick="closeJsonModal()">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" aria-live="polite"></div>
+  </div>
+
+  <script src="app.js"></script>
+
+    <!-- Modal 1: Hộp Quà Tân Gia (Ngày 1) -->
+    <div id="modal-welcome-gift" class="game-modal-backdrop" style="display: none !important;">
+      <div class="game-modal welcome-modal-box">
+        <div class="modal-decor-sparkles">✨ 🎉 🏡 🎉 ✨</div>
+        <h2 class="modal-title">CHÀO MỪNG ĐẾN VỚI NGÔI NHÀ SỨC KHỎE!</h2>
+        <p class="modal-sub">Bạn vừa dọn vào căn biệt thự nghỉ dưỡng Thụy Sĩ. Để chào mừng bạn bắt đầu hành trình sống khỏe, ban quản trị trân trọng gửi tặng bạn <strong>Hộp Quà Tân Gia</strong> đặc biệt!</p>
+        
+        <div class="welcome-gift-card">
+          <div class="gift-preview-img-wrap">
+            <img src="assets/uploads/furniture/1794146054057_1qbf6w.png" alt="Bộ Sofa Thụy Sĩ" class="gift-preview-img">
+          </div>
+          <div class="gift-details">
+            <span class="gift-room-tag">🏔️ Dành cho: Phòng Khách</span>
+            <h3 class="gift-name">Bộ Ghế Sofa Thụy Sĩ Sang Trọng</h3>
+            <p class="gift-desc">Bộ sofa nỉ êm ái cao cấp đặt tại trung tâm phòng khách, nơi bạn thư giãn ngắm tuyết trắng sau mỗi ngày rèn luyện sức khỏe.</p>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-claim-gift" onclick="claimWelcomeGift()">
+            <span>🎁</span> Nhận & Đặt Vào Phòng Khách
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 2: Hộp Quà Nhiệm Vụ Hàng Ngày (Pick 1 of 2 Choices) -->
+    <div id="modal-daily-reward" class="game-modal-backdrop" style="display: none !important;">
+      <div class="game-modal daily-modal-box">
+        <button class="btn-close-modal" onclick="closeDailyRewardModal()">✕</button>
+        <div class="modal-decor-sparkles">✨ 🏆 HOÀN THÀNH MỤC TIÊU SỨC KHỎE 🏆 ✨</div>
+        <h2 class="modal-title">CHỌN PHẦN THƯỞNG HÔM NAY</h2>
+        <p class="modal-sub">Chúc mừng bạn đã hoàn thành nhiệm vụ sức khỏe! Hôm nay bạn muốn chọn món quà nào để trang hoàng không gian nghỉ dưỡng?</p>
+        
+        <div class="reward-cards-container" id="reward-cards-container">
+          <!-- Card A: Living Room Item -->
+          <div class="reward-card card-living" id="card-choice-a">
+            <div class="card-room-badge">🏔️ Phòng Khách</div>
+            <div class="card-img-wrap">
+              <img id="card-img-a" src="assets/uploads/furniture/1794146108062_75jheq.png" alt="Đàn Piano Cổ Điển" class="card-img">
+            </div>
+            <h3 class="card-title" id="card-title-a">Đàn Grand Piano Cổ Điển</h3>
+            <p class="card-desc" id="card-desc-a">Đàn dương cầm gỗ bóng bẩy, tấu lên những bản nhạc tuyết rơi êm dịu.</p>
+            <button class="btn-choose-reward" id="btn-choose-a" onclick="claimDailyReward('a')">
+              <span>✨</span> Chọn Món Này (Phòng Khách)
+            </button>
+          </div>
+
+          <!-- Card B: Bedroom Item -->
+          <div class="reward-card card-bedroom" id="card-choice-b">
+            <div class="card-room-badge">🛏️ Phòng Ngủ</div>
+            <div class="card-img-wrap">
+              <img id="card-img-b" src="assets/items/luxury_chalet_bed.png" alt="Giường Ngủ Minimalist" class="card-img">
+            </div>
+            <h3 class="card-title" id="card-title-b">Giường Ngủ Minimalist Gỗ Sồi</h3>
+            <p class="card-desc" id="card-desc-b">Giường ngủ cao cấp nệm êm ái, mang lại giấc ngủ sâu phục hồi năng lượng.</p>
+            <button class="btn-choose-reward" id="btn-choose-b" onclick="claimDailyReward('b')">
+              <span>✨</span> Chọn Món Này (Phòng Ngủ)
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-footer-note">
+          <span>💡 Mẹo: Món đồ bạn chưa chọn hôm nay vẫn được lưu trong kho quà để mở trong các ngày tiếp theo!</span>
+        </div>
+      </div>
+    </div>
+    
+</body>
+</html>

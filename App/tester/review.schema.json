@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "summary": { "type": "string" },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "discovery",
+              "overworld",
+              "world_entry",
+              "npc_arrival",
+              "journey_daily_care",
+              "in_region_learning",
+              "auth_persistence",
+              "mobile_ui",
+              "safety_privacy",
+              "runtime_regression"
+            ]
+          },
+          "status": { "type": "string", "enum": ["PASS", "FAIL", "UNVERIFIED"] },
+          "evidence": { "type": "string" },
+          "finding": { "type": "string" }
+        },
+        "required": ["id", "status", "evidence", "finding"]
+      }
+    },
+    "blocking_items": { "type": "array", "items": { "type": "string" } },
+    "prompt_for_antigravity": { "type": "string" },
+    "next_test": { "type": "string" },
+    "release_readiness": { "type": "string" }
+  },
+  "required": ["summary", "checks", "blocking_items", "prompt_for_antigravity", "next_test", "release_readiness"]
+}

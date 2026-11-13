@@ -1,0 +1,206 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "slots": [
+    {
+      "slot_id": "slot_garden_01",
+      "scene_id": "scene_garden",
+      "label": "Bậc thềm hiên nhà",
+      "x": 410,
+      "y": 720,
+      "relative": {
+        "left": "24.52%",
+        "top": "76.51%"
+      },
+      "allowed_types": ["flower_pot", "lantern"],
+      "base_width": 120,
+      "scale_min": 0.85,
+      "scale_max": 1.15,
+      "anchor_point": "bottom_center",
+      "z_index": 25,
+      "note": "Bậc thềm đá lối vào hiên nhà đón nắng, vị trí lý tưởng cho chậu hoa hoặc đèn lồng"
+    },
+    {
+      "slot_id": "slot_garden_02",
+      "scene_id": "scene_garden",
+      "label": "Bãi cỏ ngắm hồ & núi",
+      "x": 1137,
+      "y": 809,
+      "relative": {
+        "left": "68.00%",
+        "top": "86.00%"
+      },
+      "allowed_types": ["bench", "chair", "table"],
+      "base_width": 270,
+      "scale_min": 0.90,
+      "scale_max": 1.20,
+      "anchor_point": "bottom_center",
+      "z_index": 30,
+      "note": "Bãi cỏ ngắm trọn toàn cảnh mặt hồ xanh ngọc và rặng núi tuyết Thụy Sĩ"
+    },
+    {
+      "slot_id": "slot_garden_03",
+      "scene_id": "scene_garden",
+      "label": "Mép hiên nhà đón nắng",
+      "x": 635,
+      "y": 734,
+      "relative": {
+        "left": "38.00%",
+        "top": "78.00%"
+      },
+      "allowed_types": ["bench", "chair", "table"],
+      "base_width": 180,
+      "scale_min": 0.85,
+      "scale_max": 1.10,
+      "anchor_point": "bottom_center",
+      "z_index": 24,
+      "note": "Khu vực hiên nhà râm mát, thích hợp đặt ghế thư giãn đọc sách"
+    },
+    {
+      "slot_id": "slot_garden_04",
+      "scene_id": "scene_garden",
+      "label": "Ven lối đi sỏi nhìn núi",
+      "x": 1080,
+      "y": 740,
+      "relative": {
+        "left": "64.59%",
+        "top": "78.63%"
+      },
+      "allowed_types": ["chair", "table", "lantern"],
+      "base_width": 150,
+      "scale_min": 0.85,
+      "scale_max": 1.10,
+      "anchor_point": "bottom_center",
+      "z_index": 28,
+      "note": "Góc ngắm cảnh bên lối đi đá, nơi đón ánh chiều tà rọi qua rừng thông"
+    },
+    {
+      "slot_id": "slot_garden_05",
+      "scene_id": "scene_garden",
+      "label": "Mép bờ cỏ ven rào",
+      "x": 1320,
+      "y": 710,
+      "relative": {
+        "left": "78.94%",
+        "top": "75.45%"
+      },
+      "allowed_types": ["watering_can", "lantern", "flower_pot"],
+      "base_width": 115,
+      "scale_min": 0.80,
+      "scale_max": 1.05,
+      "anchor_point": "bottom_center",
+      "z_index": 22,
+      "note": "Góc vườn mộc mạc thích hợp bình tưới cây trang trí hoặc đèn lồng"
+    },
+
+    {
+      "slot_id": "slot_interior_01",
+      "scene_id": "scene_interior",
+      "label": "Góc cột đá cạnh cửa kính",
+      "x": 360,
+      "y": 715,
+      "relative": {
+        "left": "21.50%",
+        "top": "76.00%"
+      },
+      "allowed_types": ["plant", "flower_pot"],
+      "base_width": 140,
+      "scale_min": 0.85,
+      "scale_max": 1.15,
+      "anchor_point": "bottom_center",
+      "z_index": 25,
+      "note": "Góc đón ánh sáng tự nhiên qua ô kính sàn-trần, thanh lọc không khí"
+    },
+    {
+      "slot_id": "slot_interior_02",
+      "scene_id": "scene_interior",
+      "label": "Trung tâm phòng khách",
+      "x": 870,
+      "y": 818,
+      "relative": {
+        "left": "52.00%",
+        "top": "87.00%"
+      },
+      "allowed_types": ["rug"],
+      "base_width": 430,
+      "scale_min": 0.95,
+      "scale_max": 1.25,
+      "anchor_point": "center",
+      "z_index": 10,
+      "note": "Mặt sàn gỗ trung tâm, lớp thảm dệt ấm cúng định hình khu vực sinh hoạt"
+    },
+    {
+      "slot_id": "slot_interior_03",
+      "scene_id": "scene_interior",
+      "label": "Bàn trà trên thảm trung tâm",
+      "x": 870,
+      "y": 809,
+      "relative": {
+        "left": "52.00%",
+        "top": "86.00%"
+      },
+      "allowed_types": ["table"],
+      "base_width": 200,
+      "scale_min": 0.85,
+      "scale_max": 1.15,
+      "anchor_point": "bottom_center",
+      "z_index": 22,
+      "note": "Bàn gỗ sồi đặt trang nhã giữa thảm phòng khách, lối đi ra cửa luôn thông thoáng"
+    },
+    {
+      "slot_id": "slot_interior_04",
+      "scene_id": "scene_interior",
+      "label": "Góc đọc sách thư giãn",
+      "x": 1305,
+      "y": 800,
+      "relative": {
+        "left": "78.00%",
+        "top": "85.00%"
+      },
+      "allowed_types": ["armchair", "chair"],
+      "base_width": 230,
+      "scale_min": 0.85,
+      "scale_max": 1.15,
+      "anchor_point": "bottom_center",
+      "z_index": 24,
+      "note": "Góc êm ái nhìn ra ban công hướng hồ, nơi đọc sách và thiền định"
+    },
+    {
+      "slot_id": "slot_interior_05",
+      "scene_id": "scene_interior",
+      "label": "Kệ gỗ âm tường bên trái",
+      "x": 187,
+      "y": 541,
+      "relative": {
+        "left": "11.20%",
+        "top": "57.50%"
+      },
+      "allowed_types": ["lamp", "flower_pot"],
+      "base_width": 68,
+      "scale_min": 0.80,
+      "scale_max": 1.10,
+      "anchor_point": "bottom_center",
+      "z_index": 28,
+      "note": "Kệ gỗ âm tường bên cạnh lò sưởi, nơi đặt đèn gốm ấm áp tỏa sáng không gian"
+    },
+
+    {
+      "slot_id": "slot_overview_01",
+      "scene_id": "scene_overview",
+      "label": "Bậc hiên nhìn từ xa",
+      "x": 550,
+      "y": 690,
+      "relative": {
+        "left": "32.89%",
+        "top": "73.32%"
+      },
+      "allowed_types": ["flower_pot", "lantern"],
+      "base_width": 55,
+      "scale_min": 0.70,
+      "scale_max": 1.00,
+      "anchor_point": "bottom_center",
+      "z_index": 15,
+      "note": "Điểm nhấn trước hiên nhà trong góc nhìn toàn cảnh thu nhỏ"
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { analyticsTrackingKey, hasHealthCluesAnalyticsConsent, isHealthCluesAnalyticsPath, sanitizeHealthCluesAnalyticsPayload, shouldTrackAnalyticsPath, syncHealthCluesAnalyticsConsentCookie } from '@/lib/healthclues-analytics-consent';
 
 function getOrCreateVisitorId(): string {
   if (typeof window === 'undefined') return '';
@@ -64,6 +65,15 @@ export function trackClientEvent(
     return;
   }
 
+  const path = window.location.pathname;
+  const healthCluesPath = isHealthCluesAnalyticsPath(path);
+  if (!shouldTrackAnalyticsPath(path, hasHealthCluesAnalyticsConsent())) return;
+  if (healthCluesPath) syncHealthCluesAnalyticsConsentCookie();
+  const safeHealthCluesPayload = healthCluesPath
+    ? sanitizeHealthCluesAnalyticsPayload(eventType, path, details.metadata)
+    : null;
+  if (healthCluesPath && !safeHealthCluesPayload) return;
+
   // 2. Never track automated browser tests (Puppeteer, Playwright, CDP)
   if (navigator.webdriver) {
     return;
@@ -78,7 +88,6 @@ export function trackClientEvent(
     // ignore storage access error
   }
 
-  const path = window.location.pathname;
   if (path.startsWith('/admin') || path.startsWith('/thong-ke') || path.startsWith('/thongke')) {
     try {
       localStorage.setItem('botly_exclude_tracking', 'true');
@@ -96,15 +105,15 @@ export function trackClientEvent(
   const sessionId = getOrCreateSessionId();
 
   const payload = {
-    event_type: eventType,
-    path,
-    article_slug: details.articleSlug || extractSlugFromPath(path),
+    event_type: safeHealthCluesPayload?.eventType ?? eventType,
+    path: safeHealthCluesPayload?.path ?? path,
+    article_slug: healthCluesPath ? null : details.articleSlug || extractSlugFromPath(path),
     locale: details.locale || (path.startsWith('/vi') ? 'vi' : 'en'),
-    referrer: document.referrer || '',
+    referrer: healthCluesPath ? '' : document.referrer || '',
     device_type: deviceType,
     visitor_id: visitorId,
     session_id: sessionId,
-    metadata: details.metadata || {}
+    metadata: safeHealthCluesPayload?.metadata ?? details.metadata ?? {}
   };
 
   const body = JSON.stringify(payload);
@@ -134,16 +143,25 @@ function extractSlugFromPath(path: string): string | undefined {
 export function AnalyticsTracker() {
   const pathname = usePathname();
   const lastTrackedPath = useRef<string | null>(null);
+  const [consentRevision, setConsentRevision] = useState(0);
 
   useEffect(() => {
-    if (!pathname || pathname === lastTrackedPath.current) return;
-    if (pathname.startsWith('/admin')) return;
+    const updateConsent = () => setConsentRevision(revision => revision + 1);
+    window.addEventListener('botly:analytics-consent', updateConsent);
+    return () => window.removeEventListener('botly:analytics-consent', updateConsent);
+  }, []);
 
-    lastTrackedPath.current = pathname;
+  useEffect(() => {
+    if (!pathname) return;
+    if (pathname.startsWith('/admin')) return;
+    const trackingKey = analyticsTrackingKey(pathname, hasHealthCluesAnalyticsConsent());
+    if (trackingKey === lastTrackedPath.current) return;
+
+    lastTrackedPath.current = trackingKey;
 
     // Track immediately without artificial timeout delays
     trackClientEvent('page_view');
-  }, [pathname]);
+  }, [pathname, consentRevision]);
 
   return null;
 }

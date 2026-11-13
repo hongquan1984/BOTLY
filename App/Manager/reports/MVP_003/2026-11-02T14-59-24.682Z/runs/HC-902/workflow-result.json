@@ -1,0 +1,149 @@
+{
+  "status": "VERIFIED_READY_TO_APPLY",
+  "taskId": "HC-902",
+  "attempts": [
+    {
+      "taskId": "HC-902",
+      "attempt": 1,
+      "developerResult": {
+        "taskId": "HC-902",
+        "attempt": 1,
+        "summary": "Format non-negative integer minutes with correct singular/plural wording and reject invalid inputs with TypeError.",
+        "patches": [
+          {
+            "path": "src/hc-902.mjs",
+            "baseSha256": "0EC59C7B026D84C68031FDA0B3489040115E7404DEC2CE20CB2A70388E1D7FEC",
+            "content": "export function formatDuration(minutes) {\n  if (!Number.isInteger(minutes) || minutes < 0) {\n    throw new TypeError('minutes must be a non-negative integer');\n  }\n\n  return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;\n}\n"
+          }
+        ],
+        "limitations": [
+          "Required test/hc-902.test.mjs was not supplied; tests were not run as instructed."
+        ]
+      },
+      "changedFiles": [
+        "src/hc-902.mjs"
+      ],
+      "diffByPath": {
+        "src/hc-902.mjs": "--- a/src/hc-902.mjs\n+++ b/src/hc-902.mjs\n@@ full-file replacement @@\n-export function formatDuration(minutes) { return String(minutes); }\n+export function formatDuration(minutes) {\n+  if (!Number.isInteger(minutes) || minutes < 0) {\n+    throw new TypeError('minutes must be a non-negative integer');\n+  }\n+\n+  return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;\n+}\n"
+      },
+      "tests": [
+        {
+          "command": "docker run --rm --network none --read-only --user 65534:65534 --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 64 --memory 512m --cpus 1 --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m --mount type=bind,source=D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-902\\workspace,target=/workspace,readonly --workdir /workspace node:24-bookworm-slim node test/hc-902.test.mjs",
+          "result": "PASS",
+          "exitCode": 0,
+          "timedOut": false,
+          "output": "✔ formats singular and plural minutes (0.552974ms)\n✔ rejects negative, fractional and nonnumeric input (0.422161ms)\nℹ tests 2\nℹ suites 0\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 6.206789\n"
+        }
+      ],
+      "managerDecision": {
+        "decision": "PASS",
+        "taskId": "HC-902",
+        "reasoning": "The supplied diff satisfies deterministic formatting, singular/plural behavior, and TypeError rejection of invalid inputs. Changes stay within the editable file. Required Docker tests passed: 2 passed, 0 failed, exit code 0, no timeout.",
+        "feedback": [],
+        "dimensions": {
+          "functional": "PASS",
+          "visual": "NOT_APPLICABLE",
+          "data": "NOT_APPLICABLE",
+          "localization": "NOT_APPLICABLE",
+          "security": "NOT_APPLICABLE",
+          "aiIntegration": "NOT_APPLICABLE"
+        },
+        "nextTask": null,
+        "approvalRequest": null
+      }
+    }
+  ],
+  "snapshotRoot": "D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-902\\workspace",
+  "initialManifest": {
+    "version": 1,
+    "taskId": "HC-902",
+    "createdAt": "2026-11-02T15:00:24.341Z",
+    "files": [
+      {
+        "path": "src/hc-902.mjs",
+        "sha256": "0EC59C7B026D84C68031FDA0B3489040115E7404DEC2CE20CB2A70388E1D7FEC",
+        "workspaceSha256": "0EC59C7B026D84C68031FDA0B3489040115E7404DEC2CE20CB2A70388E1D7FEC",
+        "bytes": 68,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? src/hc-902.mjs"
+      },
+      {
+        "path": "test/hc-902.test.mjs",
+        "sha256": "37A7F7FF7596BC71174B37E5B870B23DCE3E8AF7736C1446C6A65F8D14B2473C",
+        "workspaceSha256": "37A7F7FF7596BC71174B37E5B870B23DCE3E8AF7736C1446C6A65F8D14B2473C",
+        "bytes": 493,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? test/hc-902.test.mjs"
+      }
+    ]
+  },
+  "finalManifest": {
+    "version": 1,
+    "taskId": "HC-902",
+    "createdAt": "2026-11-02T15:00:24.341Z",
+    "files": [
+      {
+        "path": "src/hc-902.mjs",
+        "sha256": "0EC59C7B026D84C68031FDA0B3489040115E7404DEC2CE20CB2A70388E1D7FEC",
+        "workspaceSha256": "F3588C10030C7A7B4B93C772822D35A92D0082B15B24C54683B6ADD19D12F1A2",
+        "bytes": 230,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? src/hc-902.mjs"
+      },
+      {
+        "path": "test/hc-902.test.mjs",
+        "sha256": "37A7F7FF7596BC71174B37E5B870B23DCE3E8AF7736C1446C6A65F8D14B2473C",
+        "workspaceSha256": "37A7F7FF7596BC71174B37E5B870B23DCE3E8AF7736C1446C6A65F8D14B2473C",
+        "bytes": 493,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? test/hc-902.test.mjs"
+      }
+    ]
+  },
+  "tests": [
+    {
+      "command": "docker run --rm --network none --read-only --user 65534:65534 --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 64 --memory 512m --cpus 1 --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m --mount type=bind,source=D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-902\\workspace,target=/workspace,readonly --workdir /workspace node:24-bookworm-slim node test/hc-902.test.mjs",
+      "result": "PASS",
+      "exitCode": 0,
+      "timedOut": false,
+      "output": "✔ formats singular and plural minutes (0.552974ms)\n✔ rejects negative, fractional and nonnumeric input (0.422161ms)\nℹ tests 2\nℹ suites 0\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 6.206789\n"
+    }
+  ],
+  "diffByPath": {
+    "src/hc-902.mjs": "--- a/src/hc-902.mjs\n+++ b/src/hc-902.mjs\n@@ full-file replacement @@\n-export function formatDuration(minutes) { return String(minutes); }\n+export function formatDuration(minutes) {\n+  if (!Number.isInteger(minutes) || minutes < 0) {\n+    throw new TypeError('minutes must be a non-negative integer');\n+  }\n+\n+  return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;\n+}\n"
+  },
+  "applyPlan": {
+    "status": "VERIFIED_READY_TO_APPLY",
+    "taskId": "HC-902",
+    "approvedFiles": [
+      "src/hc-902.mjs"
+    ],
+    "operations": [
+      {
+        "path": "src/hc-902.mjs",
+        "preconditionSha256": "0EC59C7B026D84C68031FDA0B3489040115E7404DEC2CE20CB2A70388E1D7FEC",
+        "replacementSha256": "F3588C10030C7A7B4B93C772822D35A92D0082B15B24C54683B6ADD19D12F1A2",
+        "diffSha256": "35F4FA894805B792DF3F0D5235CBC7F0EDB7C305FB8D7C9F12C1621DB782625C",
+        "backupRequired": true,
+        "backupDestination": "Manager/reports/apply-backups/HC-902/src/hc-902.mjs",
+        "recoveryRule": "Restore only if current file SHA-256 is F3588C10030C7A7B4B93C772822D35A92D0082B15B24C54683B6ADD19D12F1A2; never overwrite a different checksum."
+      }
+    ],
+    "managerReview": {
+      "decision": "PASS",
+      "taskId": "HC-902"
+    },
+    "tests": [
+      {
+        "command": "docker run --rm --network none --read-only --user 65534:65534 --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 64 --memory 512m --cpus 1 --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m --mount type=bind,source=D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-902\\workspace,target=/workspace,readonly --workdir /workspace node:24-bookworm-slim node test/hc-902.test.mjs",
+        "result": "PASS",
+        "exitCode": 0,
+        "artifact": null
+      }
+    ],
+    "ownerApprovalRequired": true,
+    "applyOccurred": false,
+    "note": "Plan only. No project file was written. First real apply requires explicit Owner approval and a fresh checksum precondition check."
+  },
+  "applyOccurred": false
+}

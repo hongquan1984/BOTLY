@@ -1,0 +1,59 @@
+{
+  "taskId": "HC-003",
+  "attempt": 1,
+  "status": "READY_FOR_REVIEW",
+  "summary": "Read-only audit complete; lead remains INCOMPLETE, not already verified. PASS for explicit owner/World checks and persistence logic in supplied route source. UNVERIFIED for current runtime isolation, authenticated original 96-answer retention, restart durability and MP20 immediate Plan persistence. Existing reports describe synthetic integration successes, including sampled legacy continuity, but execution artifacts were not supplied. REWORK is needed to reconcile conflicting acceptance statements and close evidence gaps.",
+  "changedFiles": [],
+  "tests": [],
+  "screenshots": [],
+  "evidence": [
+    "src/app/api/healthclues/account/route.ts",
+    "src/app/api/healthclues/profile/route.ts",
+    "src/app/api/healthclues/plan/route.ts",
+    "src/features/healthclues/WorldAuthCallback.tsx",
+    "src/components/healthclues/HealthCluesGameShell.tsx",
+    "src/components/healthclues/HealthCluesDashboard.tsx",
+    "scripts/test-healthclues-profile-activity-rest-e2e.mjs",
+    "scripts/test-healthclues-owner-auth-demo.mjs",
+    "scripts/verify-healthclues-owner-resume-after-restart.mjs",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md",
+    "App/reports/HEALTHCLUES_FINAL_GAME_ACCEPTANCE.md",
+    "App/MASTER_SPEC.md",
+    "App/BUSINESS_RULES.md",
+    "App/ACCEPTANCE_TESTS.md",
+    "App/CURRENT_STATE.md",
+    "App/UI_UX_SPEC.md"
+  ],
+  "knownLimitations": [
+    "Only supplied excerpts and code blocks were reviewed; no filesystem, Git status, commands, network calls or provider calls were used.",
+    "No actual test execution evidence was supplied; tests is intentionally empty.",
+    "Manifest hashes identify supplied evidence but were not independently recomputed.",
+    "Authentication helpers, database RLS/RPC definitions, full legacy routing/storage code, raw test outputs, screenshots and pre/post-restart snapshots were not supplied.",
+    "A reported genuine Gemini response elsewhere in the MP17 report was not saved to a Plan; fixture persistence does not prove persistence of live provider output.",
+    "Same-day report ordering is not sufficient to establish which build matches all current source."
+  ],
+  "blockers": [
+    "Original authenticated 96-question answer preservation cannot be accepted without an authoritative persisted answer source or an explicit clarification of the legacy retention requirement.",
+    "Current-build runtime acceptance cannot be independently established from report narratives and test definitions alone."
+  ],
+  "nextSuggestedSteps": [
+    "Provide an authenticated legacy-account regression artifact for an isolated synthetic existing account: compare baseline profile, World ID, Plan versions/goals and equipment before and after login, EN/VI switching and reload; assert no forced new onboarding or duplicate goals. Identify the authoritative original-answer source, or explicitly retain that dimension as unverified.",
+    "Exercise the current MP20 immediate Plan flow with Advisor intercepted before World entry: A/B/Custom save/readback, unrelated-goal preservation, uncheck, zero goals, reload, rejected writes and cross-account profile/Plan access. Supply build identity and sanitized assertion output.",
+    "For restart durability, capture owner/World/Plan/equipment identifiers before a controlled isolated restart and compare them afterward; do not rely solely on same-ID checks between two post-restart reads.",
+    "Reconcile the activation/inference contradictions and historical answer-retention claims in the affected acceptance reports using dated, build-specific evidence."
+  ],
+  "auditFindings": [
+    "PASS — source authorization boundary: src/app/api/healthclues/profile/route.ts checks the authenticated user's ownership of the requested World before GET/PATCH, scopes profile access to auth.id, requires confirmed email for PATCH and merges preferences into existing profile JSON. The imported authentication/service helpers and database policies were not supplied; their behavior remains unverified.",
+    "PASS — source persistence contract: src/app/api/healthclues/plan/route.ts checks owner/World access on GET/POST, requires verified email and explicit confirmation for writes, supports empty goals, reuses matching request keys and appends versioned Plans to profile JSON while retaining at most 40 history records. Generated goals require signed proof or matching previously accepted content. This establishes implemented logic, not successful runtime persistence or concurrent-write safety.",
+    "PASS — source account scoping: src/app/api/healthclues/account/route.ts scopes deletion-status reads and deletion/cancellation RPC parameters to auth.id. RPC implementations and deletion lifecycle execution were not supplied, so purge/recovery behavior is UNVERIFIED.",
+    "PASS — existing automated test coverage is present: scripts/test-healthclues-profile-activity-rest-e2e.mjs defines direct local PostgREST/database integration assertions for consented profile save/revision/history/delete, activity persistence, anonymous denial and cross-user reads. It creates synthetic database users and signs JWTs locally; it does not exercise real email authentication, Next routes, World/Plan continuity or original 96-answer retention. Its success log is code, not execution evidence.",
+    "REWORK — scripts/test-healthclues-owner-auth-demo.mjs defines local Chromium/Mailpit authentication, Plan read/write rejection across accounts, World/equipment reload and broader regression assertions, but begins with the historical 'Two adventures are open' onboarding expectation. App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md explicitly reports that this harness stopped before authentication on the newer flow. Historical successes in App/reports/HEALTHCLUES_FINAL_GAME_ACCEPTANCE.md do not verify the current build.",
+    "UNVERIFIED — restart coverage: scripts/verify-healthclues-owner-resume-after-restart.mjs searches retained browser profiles, checks confirmed session/direct World routing and compares World IDs across reload. It neither restarts services nor compares against a recorded pre-restart World ID, and it does not check Plan, equipment or Quiz answers. App/reports/HEALTHCLUES_FINAL_GAME_ACCEPTANCE.md reports an external restart and successful verifier run; no raw run artifact was supplied.",
+    "UNVERIFIED — legacy continuity: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md later reports an authenticated synthetic legacy profile preserving its World, ten Plan versions and two practice rows across locale/reload without new onboarding. This supersedes earlier report statements that no legacy login occurred for that sampled slice. The temporary harness, account snapshots and execution output were not supplied. The same report says answers/quizAnswers were missing; original authenticated 96-answer retention remains unverified.",
+    "UNVERIFIED — fixture integration claims: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md reports two synthetic authenticated accounts exercising A/B/Custom, omitted goals, zero goals, reload, locale stability and profile/Plan isolation through the actual local Plan API with intercepted Advisor responses. App/CURRENT_STATE.md repeats these claims. Supplied Plan source supports the intended contract, but the relevant fixture harness and raw execution artifacts were not supplied. These remain report-only successes, not independently verified integration or live Gemini persistence.",
+    "REWORK — current-flow acceptance: App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md says immediate My Journey selection/unselection persistence lacks authenticated click/readback/reload evidence. It also contains conflicting activation and inference statements: a separate verified account/World entry and an observed Advisor request are described alongside statements denying activation or live inference. App/ACCEPTANCE_TESTS.md requires immediate save, unrelated-goal preservation, deactivation, zero goals and rejection handling. Older MP17 confirmation-flow reports cannot establish these MP20 cases.",
+    "UNVERIFIED — UI and callback scope: src/features/healthclues/WorldAuthCallback.tsx requires tokens and confirmed email, checks pending-journey email matching during activation and selects activation versus legacy World redirects. src/components/healthclues/HealthCluesGameShell.tsx provides localized navigation. src/components/healthclues/HealthCluesDashboard.tsx loads saved profile/activity through unsupplied helpers. These files do not establish the complete returning-player routing or storage implementation. No screenshot was supplied or inspected; visual PASS claims in App/UI_UX_SPEC.md and the reports remain report-only.",
+    "REWORK — requirements/evidence conflict: App/MASTER_SPEC.md requires legacy-compatible existing accounts without fabricated answers. App/BUSINESS_RULES.md requires verified owner/World authorization and explicit goal selection. App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md historically says stored old answers remain intact, while later sections report no saved answer arrays. The supplied evidence cannot establish whether a separate persistent answer source exists or whether the requirement concerns only retained tab drafts."
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "projectRoot": "D:\\botly",
+  "docsRoot": "D:\\botly\\App",
+  "codexCommand": "node",
+  "codexEntrypoint": "C:\\Users\\Admin\\AppData\\Roaming\\npm\\node_modules\\@openai\\codex\\bin\\codex.js",
+  "manager": { "model": "gpt-6.1-sol", "reasoningEffort": "high", "sandbox": "read-only" },
+  "developer": { "model": "gpt-6.1-sol", "reasoningEffort": "medium", "sandbox": "workspace-write" },
+  "limits": { "maxCyclesPerSession": 10, "maxReworkAttempts": 3, "timeoutMinutes": 90 }
+}

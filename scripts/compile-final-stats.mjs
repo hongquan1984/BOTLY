@@ -1,7 +1,8 @@
 import fs from 'fs';
 
-const SUPABASE_URL = 'https://rswmadukvegraxfcdbcb.supabase.co';
-const SERVICE_KEY = 'sb_secret_V0mR7XNH85YEwk7bsP9d4Q_XG7nk3ED';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SERVICE_KEY = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!SUPABASE_URL || !SERVICE_KEY) throw new Error("SUPABASE_URL and server secret are required");
 
 async function fetchAllEvents() {
   let allEvents = [];

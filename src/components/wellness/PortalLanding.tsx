@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, ShieldCheck, BookOpen } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, BookOpen, Sparkles } from "lucide-react";
 import type { WellnessLocale } from "@/data/wellness";
 import { portals } from "@/data/wellness-portals";
 import { WellnessShell } from "./WellnessShell";
@@ -78,6 +78,39 @@ export async function PortalLanding({ locale }: { locale: WellnessLocale }) {
                 : "Everyday wellness—no diagnosis or miracle-cure promises."}
             </p>
           </div>
+        </section>
+
+        {/* HealthClues RPG Adventure Featured Banner */}
+        <section className="mx-auto max-w-7xl px-5 pt-2 pb-10 lg:px-8">
+          <Link
+            href="/healthclues"
+            className="group relative block overflow-hidden rounded-3xl border border-emerald-900/30 bg-gradient-to-r from-[#071f19] via-[#0f3428] to-[#09221b] p-6 text-white shadow-xl shadow-emerald-950/20 transition-all hover:scale-[1.01] hover:border-emerald-500/40 hover:shadow-2xl sm:p-8"
+          >
+            <div className="relative z-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+              <div className="max-w-2xl">
+                <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-300">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-300 animate-pulse" />
+                  {vi ? "Game Sức Khỏe & Dưỡng Sinh Mới" : "New Wellness RPG Adventure"}
+                </div>
+                <h2 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  {vi
+                    ? "HealthClues — Vượt qua nỗi lo sức khỏe. Mở khóa hành trình của bạn!"
+                    : "HealthClues — Beyond health worries. Unlock your wellness journey!"}
+                </h2>
+                <p className="mt-2 text-sm text-emerald-100/80 sm:text-base">
+                  {vi
+                    ? "Cùng Bé Cáo Lumi & Thần Thú Luna khám phá kiến thức khoa học, hoàn thành thử thách dưỡng sinh và xây dựng không gian sống mơ ước nhìn ra hồ tuyết Thụy Sĩ."
+                    : "Join Lumi the Fox & Luna to solve body mysteries, complete mindful habits, and build your tranquil dream sanctuary overlooking Swiss Alpine lakes."}
+                </p>
+              </div>
+              <div className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-emerald-400 px-6 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/20 transition-all group-hover:scale-105">
+                <span>{vi ? "Khám phá HealthClues" : "Explore HealthClues"}</span>
+                <ArrowRight className="h-4 w-4" />
+              </div>
+            </div>
+            {/* Background ambient glow */}
+            <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
+          </Link>
         </section>
 
         {/* 01: Starting Tools */}

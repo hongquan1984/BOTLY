@@ -1,0 +1,73 @@
+{
+  "summary": "Cycle 3 fixes the earlier Daily Care count calculation and mobile touch-target sizes, but local acceptance remains REWORK. Source review found a check-in status mismatch that can record usage for an unrelated tool, and inspected mobile captures show unreadable EXP text.",
+  "checks": [
+    {
+      "id": "discovery",
+      "status": "UNVERIFIED",
+      "evidence": "node scripts/test-healthclues-discovery-matching.mjs passed 37 assertions; current Quiz source retains the two-question and age-confirmation controls.",
+      "finding": "A current browser session did not complete concern selection, age confirmation and the resulting personal Journey."
+    },
+    {
+      "id": "overworld",
+      "status": "PASS",
+      "evidence": "Current headless Chromium loaded http://127.0.0.1:3329/vi/wellness/healthclues/quiz?step=quest and found eight cards: two enabled and six disabled. The artwork at D:\\botly\\public\\healthclues\\assets\\world\\healthclues-world-overworld.webp was opened and inspected.",
+      "finding": "The eight-region artwork and two-playable selector scope are present."
+    },
+    {
+      "id": "world_entry",
+      "status": "UNVERIFIED",
+      "evidence": "",
+      "finding": "Quiz-to-Mailpit activation and entry into each selected region were not performed in this run."
+    },
+    {
+      "id": "npc_arrival",
+      "status": "UNVERIFIED",
+      "evidence": "node scripts/test-healthclues-region-layout.mjs passed connected-route checks for both regions. RegionMapScene.tsx routes NPC clicks through beginLandmarkTravel and opens Talk after arrival.",
+      "finding": "Current authenticated walking, approach-point timing, painted-road alignment and keyboard or touch interaction were not exercised."
+    },
+    {
+      "id": "journey_daily_care",
+      "status": "FAIL",
+      "evidence": "DailyCheckinDialog.tsx:183-195 changes local status to not_yet on a second Done tap but still sends done to onStatus; it also maps Plan goal position i to unrelated equipped entries[i]. WellnessWorldGame.tsx:322-328 persists those equipped-entry statuses as toolkit usage. The existing scripts/test-daily-care-truthful-reproduction.mjs posts a compiled note directly, so it does not exercise this UI path.",
+      "finding": "With a Plan goal and an unrelated equipped tool at the same list position, tapping Done twice leaves the goal marked not_yet locally while the parent retains done for that tool. Saving can record false tool usage. The new five-goal count and three-goal summary need an actual UI-driven save and reload check."
+    },
+    {
+      "id": "in_region_learning",
+      "status": "UNVERIFIED",
+      "evidence": "",
+      "finding": "Knowledge lessons, quizzes, mini-games and Boss were not opened in a current authenticated region session."
+    },
+    {
+      "id": "auth_persistence",
+      "status": "UNVERIFIED",
+      "evidence": "node scripts/healthclues-owner-demo-preflight.mjs passed for healthclues-owner-demo with loopback Auth and Mailpit. GET and POST http://127.0.0.1:3329/api/healthclues/account/quick-activate each returned 410.",
+      "finding": "Mailpit activation, return after login or reload, saved progress and cross-account isolation were not retested. This run did not change database records."
+    },
+    {
+      "id": "mobile_ui",
+      "status": "FAIL",
+      "evidence": "Opened D:\\botly\\App\\.tmp\\healthclues-tester\\screenshots\\verified-mobile-320-rpg.png, verified-mobile-390-rpg.png and verified-mobile-430-rpg.png. At all three emulated widths the EXP number is dark and vertically clipped within the narrow progress track. world-adventure.css:2623-2653 gives the number dark text; its mobile rule reduces the track to 7px while the number remains about 9–10px high.",
+      "finding": "Players cannot clearly read the EXP value on the mobile HUD. Touch targets appear enlarged, but Quiz, preview, NPC modal, Journey and Daily Care layouts still lack current-run visual inspection."
+    },
+    {
+      "id": "safety_privacy",
+      "status": "UNVERIFIED",
+      "evidence": "The read-only Owner Demo preflight passed; quick-activate returned 410; node scripts/test-healthclues-wellness-plan.mjs passed 42 safety and coverage assertions.",
+      "finding": "Current-run account isolation, private Plan access and player-facing TEST ONLY or AI provenance were not checked through authenticated actions. Local fixture success does not establish reviewed content."
+    },
+    {
+      "id": "runtime_regression",
+      "status": "UNVERIFIED",
+      "evidence": "Current runs of scripts/test-healthclues-rpg-quest-board.mjs, test-healthclues-region-layout.mjs, test-healthclues-discovery-matching.mjs and test-healthclues-wellness-plan.mjs exited 0.",
+      "finding": "These focused tests do not exercise the failing check-in interaction or establish a browser run without runtime errors."
+    }
+  ],
+  "blocking_items": [
+    "The check-in dialog can persist Done usage for an unrelated equipped tool while its Plan goal is shown as not completed.",
+    "EXP text is unreadable in the inspected 320×800, 390×844 and 430×932 emulated mobile captures.",
+    "The authenticated end-to-end, learning, persistence and account-isolation paths remain unverified in this run."
+  ],
+  "prompt_for_antigravity": "Sửa luồng Daily Care và check-in bằng thao tác UI thật. Tái hiện trong Owner Demo cô lập: có ít nhất một Plan goal và một equipped tool không liên quan ở cùng vị trí danh sách; mở Today, chạm Hoàn thành hai lần cho goal rồi lưu. Hiện DailyCheckinDialog.tsx đổi localStatuses sang not_yet nhưng vẫn gọi onStatus(..., done), và ánh xạ goal theo chỉ số sang entries[itemIdx]; WellnessWorldGame.tsx có thể lưu usage Done cho tool khác. Tách trạng thái goal khỏi toolkit usage, chỉ ghi usage khi người chơi chọn đúng tool, đồng bộ toggle với giá trị thực sẽ lưu. Kiểm tra 5 goal với 1 done/4 not_yet, ba dòng Daily Care và liên kết xem đủ 5, sửa check-in rồi reload; dùng UI chứ không POST note dựng sẵn trong test. Trên mobile, sửa HealthCluesRpgWorldHud.tsx và world-adventure.css để số EXP có màu tương phản và nằm trọn trong hoặc ngoài progress track tại 320×800, 390×844, 430×932; mở ảnh CDP emulation để kiểm tra. Chạy focused regression cho toggle hai lần, goal/tool không tương ứng, 0 equipped tools, edit sau check-in, XP không thưởng trùng, parser note cũ và mới, streak theo timezone; sau đó nghiệm thu Quiz→Mailpit→World, NPC walk-then-Talk, Knowledge/Boss, reload và cách ly hai tài khoản nếu môi trường thử được phép. Báo rõ lệnh, URL, kết quả và ảnh; không dùng production, AI thật, commit, push hoặc deploy.",
+  "next_test": "Use an authenticated isolated demo UI to tap Done twice on a Plan goal while an unrelated tool is equipped, save, then read the private check-in detail and reload to compare goal status with toolkit usage.",
+  "release_readiness": "REWORK for the local playable scope. Qualified health-content review, privacy/security approval and physical-device testing remain separate release gates."
+}

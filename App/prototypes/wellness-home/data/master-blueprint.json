@@ -1,0 +1,209 @@
+{
+  "version": "1.0.0",
+  "name": "Swiss Alpine Chalet Master Blueprint",
+  "last_updated": "2026-11-08T22:05:00.000Z",
+  "scenes": {
+    "scene_interior_wide": {
+      "name": "Phòng Khách Góc Siêu Rộng",
+      "day_img": "assets/scenes/scene_interior_wide.webp",
+      "night_img": "assets/scenes/scene_interior_wide_night.webp"
+    },
+    "scene_bedroom": {
+      "name": "Phòng Ngủ Tĩnh Dưỡng Minimalist",
+      "day_img": "assets/scenes/scene_bedroom.webp",
+      "night_img": "assets/scenes/scene_bedroom_night.webp"
+    }
+  },
+  "items": [
+    {
+      "id": "sofa_luxury",
+      "name": "Bộ Sofa Thụy Sĩ Sang Trọng",
+      "room": "scene_interior_wide",
+      "is_starter": true,
+      "tag": "Phòng Khách",
+      "desc": "Món quà tân gia sang trọng, êm ái ngắm toàn cảnh tuyết trắng dãy Alps.",
+      "img_src": "assets/uploads/furniture/1794146054057_1qbf6w.png",
+      "natural_width": 340,
+      "natural_height": 184,
+      "user_scale": 1.1,
+      "z_index": 734,
+      "corners": {
+        "tl": [24.31, 63.8],
+        "tr": [62.04, 63.8],
+        "br": [62.31, 94.18],
+        "bl": [24.31, 93.26]
+      }
+    },
+    {
+      "id": "piano_grand",
+      "name": "Đàn Grand Piano Cổ Điển",
+      "room": "scene_interior_wide",
+      "is_starter": false,
+      "tag": "Phòng Khách",
+      "desc": "Đàn dương cầm gỗ bóng bẩy, tấu lên những bản nhạc tuyết rơi êm dịu.",
+      "img_src": "assets/uploads/furniture/1794146108062_75jheq.png",
+      "natural_width": 340,
+      "natural_height": 365,
+      "user_scale": 0.4,
+      "z_index": 908,
+      "corners": {
+        "tl": [61.13, 49.79],
+        "tr": [76.85, 49.79],
+        "br": [76.85, 74.45],
+        "bl": [61.13, 74.45]
+      }
+    },
+    {
+      "id": "painting_fireplace",
+      "name": "Tranh Dãy Alps Uốn Góc Lò Sưởi",
+      "room": "scene_interior_wide",
+      "is_starter": false,
+      "tag": "Phòng Khách",
+      "desc": "Bức tranh danh họa dãy Alps gắn hoàn hảo trên trụ lò sưởi đá nguyên khối.",
+      "img_src": "assets/uploads/furniture/1794146016363_zegyir.png",
+      "natural_width": 307,
+      "natural_height": 420,
+      "user_scale": 0.4,
+      "z_index": 906,
+      "corners": {
+        "tl": [13.56, 8.63],
+        "tr": [25.94, 8.63],
+        "br": [26.03, 36.72],
+        "bl": [13.56, 33.09]
+      }
+    },
+    {
+      "id": "table_coffee",
+      "name": "Bàn Trà Gỗ Sồi Thụy Sĩ",
+      "room": "scene_interior_wide",
+      "is_starter": false,
+      "tag": "Phòng Khách",
+      "desc": "Bàn trà mộc mạc phong cách Alpine để thưởng thức trà thảo mộc ấm.",
+      "img_src": "assets/items/table_trimmed.png",
+      "natural_width": 280,
+      "natural_height": 160,
+      "user_scale": 0.8,
+      "z_index": 850,
+      "corners": {
+        "tl": [36.0, 72.0],
+        "tr": [52.0, 72.0],
+        "br": [52.0, 88.0],
+        "bl": [36.0, 88.0]
+      }
+    },
+    {
+      "id": "plant_pot_alps",
+      "name": "Chậu Cây Xanh Alpine",
+      "room": "scene_interior_wide",
+      "is_starter": false,
+      "tag": "Phòng Khách",
+      "desc": "Chậu cây thanh lọc không khí tươi mát từ sườn núi Matterhorn.",
+      "img_src": "assets/uploads/furniture/1794146788444_zw13y6.png",
+      "natural_width": 340,
+      "natural_height": 357,
+      "user_scale": 0.22,
+      "z_index": 1001,
+      "corners": {
+        "tl": [22.0, 68.0],
+        "tr": [30.0, 68.0],
+        "br": [30.0, 84.0],
+        "bl": [22.0, 84.0]
+      }
+    },
+    {
+      "id": "luxury_chalet_bed",
+      "name": "Giường Ngủ Minimalist Gỗ Sồi",
+      "room": "scene_bedroom",
+      "is_starter": false,
+      "tag": "Phòng Ngủ",
+      "desc": "Giường ngủ cao cấp đệm êm ái, mang lại giấc ngủ sâu phục hồi năng lượng.",
+      "img_src": "assets/items/luxury_chalet_bed.png",
+      "natural_width": 700,
+      "natural_height": 450,
+      "user_scale": 0.95,
+      "z_index": 600,
+      "corners": {
+        "tl": [32.0, 48.0],
+        "tr": [72.0, 48.0],
+        "br": [72.0, 86.0],
+        "bl": [32.0, 86.0]
+      }
+    },
+    {
+      "id": "bedside_lamp",
+      "name": "Đèn Ngủ Tinh Dầu Ấm Cúng",
+      "room": "scene_bedroom",
+      "is_starter": false,
+      "tag": "Phòng Ngủ",
+      "desc": "Ánh sáng vàng ấm 2700K dịu mắt kích hoạt hormone ngủ tự nhiên Melatonin.",
+      "img_src": "assets/items/lamp_trimmed.png",
+      "natural_width": 120,
+      "natural_height": 220,
+      "user_scale": 0.45,
+      "z_index": 700,
+      "corners": {
+        "tl": [22.0, 52.0],
+        "tr": [30.0, 52.0],
+        "br": [30.0, 72.0],
+        "bl": [22.0, 72.0]
+      }
+    },
+    {
+      "id": "bedroom_rug",
+      "name": "Thảm Lông Cừu Thụy Sĩ",
+      "room": "scene_bedroom",
+      "is_starter": false,
+      "tag": "Phòng Ngủ",
+      "desc": "Thảm lông mềm mại giữ ấm đôi chân mỗi buổi sáng bước xuống giường.",
+      "img_src": "assets/items/rug_trimmed.png",
+      "natural_width": 600,
+      "natural_height": 300,
+      "user_scale": 1.05,
+      "z_index": 200,
+      "corners": {
+        "tl": [24.0, 68.0],
+        "tr": [80.0, 68.0],
+        "br": [80.0, 93.0],
+        "bl": [24.0, 93.0]
+      }
+    },
+    {
+      "id": "painting_bedroom",
+      "name": "Tranh Núi Alps Ban Mai",
+      "room": "scene_bedroom",
+      "is_starter": false,
+      "tag": "Phòng Ngủ",
+      "desc": "Tranh phong cảnh thiên nhiên thanh bình, tạo cảm giác thư thái trước khi ngủ.",
+      "img_src": "assets/items/painting-alps-01.png",
+      "natural_width": 600,
+      "natural_height": 420,
+      "user_scale": 1.0,
+      "z_index": 210,
+      "corners": {
+        "tl": [78.98, 27.83],
+        "tr": [93.28, 21.84],
+        "br": [94.12, 69.0],
+        "bl": [78.14, 60.09]
+      }
+    },
+    {
+      "id": "bedside_armchair",
+      "name": "Ghế Bành Thư Giãn Đọc Sách",
+      "room": "scene_bedroom",
+      "is_starter": false,
+      "tag": "Phòng Ngủ",
+      "desc": "Góc đọc sách tĩnh lặng ngắm sao trời bên khung cửa sổ phòng ngủ.",
+      "img_src": "assets/items/armchair_trimmed.png",
+      "natural_width": 240,
+      "natural_height": 260,
+      "user_scale": 0.65,
+      "z_index": 550,
+      "corners": {
+        "tl": [12.0, 55.0],
+        "tr": [26.0, 55.0],
+        "br": [26.0, 80.0],
+        "bl": [12.0, 80.0]
+      }
+    }
+  ]
+}

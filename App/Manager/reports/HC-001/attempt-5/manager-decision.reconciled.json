@@ -1,0 +1,32 @@
+{
+  "decision": "REWORK",
+  "taskId": "HC-001",
+  "reasoning": "The audit correctly separates historical provider success, fixture persistence and unverified visuals. Two supplied evidence items remain materially unaddressed: MP20 source drift and historical credential exposure. These require audit clarification, not product completion.",
+  "feedback": [
+    "Reconcile App/CURRENT_STATE.md and App/ACCEPTANCE_TESTS.md MP20 excerpts with App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md. Explicitly state that historical confirmation-based fixture acceptance does not verify the current immediate-selection flow, including rehydration, unchecking, preservation of unrelated goals, zero goals and API-failure behavior. Record current authenticated acceptance as UNVERIFIED.",
+    "Address App/reports/HEALTHCLUES_GEMINI_REALTIME_ADVISOR_ACCEPTANCE.md, which records credential exposure and required rotation. Rotation evidence is absent from the supplied material; later configuration checks and provider success do not establish rotation. Record this historical security uncertainty without asserting an active compromise or current blocker, and add the exact manifest report path to the evidence array."
+  ],
+  "dimensions": {
+    "functional": "UNVERIFIED",
+    "visual": "UNVERIFIED",
+    "data": "UNVERIFIED",
+    "localization": "UNVERIFIED",
+    "security": "UNVERIFIED",
+    "aiIntegration": "REWORK"
+  },
+  "nextTask": null,
+  "approvalRequest": null,
+  "reviewedAt": "2026-11-02T16:03:27.682Z",
+  "decisionSource": "AI review plus corrected deterministic audit gate",
+  "evidenceCheck": {
+    "ok": true,
+    "issues": [],
+    "checkedFiles": [],
+    "visual": "NOT_APPLICABLE",
+    "screenshots": []
+  },
+  "sourceCheck": {
+    "ok": true,
+    "changed": []
+  }
+}

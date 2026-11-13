@@ -47,13 +47,11 @@ export function Process() {
             return (
               <ScrollReveal key={step.step} delay={i * 0.03} className="w-full">
                 <li
-                  className={`relative grid w-full gap-4 md:grid-cols-2 ${
-                    left ? "" : "md:[&>*:first-child]:order-2"
-                  }`}
+                  className="relative grid w-full gap-4 md:grid-cols-2"
                 >
                   <div
                     className={`w-full rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6 ${
-                      left ? "md:mr-8" : "md:ml-8"
+                      left ? "md:mr-8" : "md:ml-8 md:order-2"
                     }`}
                   >
                     <div className="mb-3 flex items-center gap-3">

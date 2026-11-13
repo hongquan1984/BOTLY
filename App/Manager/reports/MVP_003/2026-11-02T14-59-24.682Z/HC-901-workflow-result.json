@@ -1,0 +1,149 @@
+{
+  "status": "VERIFIED_READY_TO_APPLY",
+  "taskId": "HC-901",
+  "attempts": [
+    {
+      "taskId": "HC-901",
+      "attempt": 1,
+      "developerResult": {
+        "taskId": "HC-901",
+        "attempt": 1,
+        "summary": "Implement Unicode-aware slug generation with compatibility normalization, lowercase conversion, ampersand expansion, and collapsed separators.",
+        "patches": [
+          {
+            "path": "src/hc-901.mjs",
+            "baseSha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+            "content": "export function toSlug(value) {\n  return String(value ?? '')\n    .normalize('NFKC')\n    .toLowerCase()\n    .replace(/&/g, ' and ')\n    .replace(/[^\\p{L}\\p{N}]+/gu, '-')\n    .replace(/^-+|-+$/g, '');\n}\n"
+          }
+        ],
+        "limitations": [
+          "Tests were not run as instructed; test/hc-901.test.mjs was not supplied."
+        ]
+      },
+      "changedFiles": [
+        "src/hc-901.mjs"
+      ],
+      "diffByPath": {
+        "src/hc-901.mjs": "--- a/src/hc-901.mjs\n+++ b/src/hc-901.mjs\n@@ full-file replacement @@\n-export function toSlug(value) { return value; }\n+export function toSlug(value) {\n+  return String(value ?? '')\n+    .normalize('NFKC')\n+    .toLowerCase()\n+    .replace(/&/g, ' and ')\n+    .replace(/[^\\p{L}\\p{N}]+/gu, '-')\n+    .replace(/^-+|-+$/g, '');\n+}\n"
+      },
+      "tests": [
+        {
+          "command": "docker run --rm --network none --read-only --user 65534:65534 --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 64 --memory 512m --cpus 1 --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m --mount type=bind,source=D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-901\\workspace,target=/workspace,readonly --workdir /workspace node:24-bookworm-slim node test/hc-901.test.mjs",
+          "result": "PASS",
+          "exitCode": 0,
+          "timedOut": false,
+          "output": "✔ normalizes basic text (1.488123ms)\n✔ maps ampersand and collapses separators (0.153433ms)\n✔ preserves Unicode letters (0.134955ms)\n✔ normalizes compatibility characters (0.242457ms)\n✔ blank input becomes empty (1.012038ms)\nℹ tests 5\nℹ suites 0\nℹ pass 5\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 10.762026\n"
+        }
+      ],
+      "managerDecision": {
+        "decision": "PASS",
+        "taskId": "HC-901",
+        "reasoning": "The supplied diff satisfies all stated requirements: NFKC normalization, lowercase output, Unicode letter and number preservation, ampersand expansion, collapsed hyphen separators, and empty output for blank input. Changes stay within the permitted source file. Required Docker tests passed: 5 passed, 0 failed, exit code 0, no timeout.",
+        "feedback": [],
+        "dimensions": {
+          "functional": "PASS",
+          "visual": "NOT_APPLICABLE",
+          "data": "NOT_APPLICABLE",
+          "localization": "PASS",
+          "security": "NOT_APPLICABLE",
+          "aiIntegration": "NOT_APPLICABLE"
+        },
+        "nextTask": null,
+        "approvalRequest": null
+      }
+    }
+  ],
+  "snapshotRoot": "D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-901\\workspace",
+  "initialManifest": {
+    "version": 1,
+    "taskId": "HC-901",
+    "createdAt": "2026-11-02T14:59:39.602Z",
+    "files": [
+      {
+        "path": "src/hc-901.mjs",
+        "sha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "workspaceSha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "bytes": 48,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? src/hc-901.mjs"
+      },
+      {
+        "path": "test/hc-901.test.mjs",
+        "sha256": "32D5DB83444468D922F16222AF40837118FA59855310C60EFF7D0F002BCA332D",
+        "workspaceSha256": "32D5DB83444468D922F16222AF40837118FA59855310C60EFF7D0F002BCA332D",
+        "bytes": 584,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? test/hc-901.test.mjs"
+      }
+    ]
+  },
+  "finalManifest": {
+    "version": 1,
+    "taskId": "HC-901",
+    "createdAt": "2026-11-02T14:59:39.602Z",
+    "files": [
+      {
+        "path": "src/hc-901.mjs",
+        "sha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "workspaceSha256": "7563BD204278F888D7A91DD3FF2283848D6EA1928614E0121BEB1378FE623E30",
+        "bytes": 201,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? src/hc-901.mjs"
+      },
+      {
+        "path": "test/hc-901.test.mjs",
+        "sha256": "32D5DB83444468D922F16222AF40837118FA59855310C60EFF7D0F002BCA332D",
+        "workspaceSha256": "32D5DB83444468D922F16222AF40837118FA59855310C60EFF7D0F002BCA332D",
+        "bytes": 584,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? test/hc-901.test.mjs"
+      }
+    ]
+  },
+  "tests": [
+    {
+      "command": "docker run --rm --network none --read-only --user 65534:65534 --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 64 --memory 512m --cpus 1 --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m --mount type=bind,source=D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-901\\workspace,target=/workspace,readonly --workdir /workspace node:24-bookworm-slim node test/hc-901.test.mjs",
+      "result": "PASS",
+      "exitCode": 0,
+      "timedOut": false,
+      "output": "✔ normalizes basic text (1.488123ms)\n✔ maps ampersand and collapses separators (0.153433ms)\n✔ preserves Unicode letters (0.134955ms)\n✔ normalizes compatibility characters (0.242457ms)\n✔ blank input becomes empty (1.012038ms)\nℹ tests 5\nℹ suites 0\nℹ pass 5\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 10.762026\n"
+    }
+  ],
+  "diffByPath": {
+    "src/hc-901.mjs": "--- a/src/hc-901.mjs\n+++ b/src/hc-901.mjs\n@@ full-file replacement @@\n-export function toSlug(value) { return value; }\n+export function toSlug(value) {\n+  return String(value ?? '')\n+    .normalize('NFKC')\n+    .toLowerCase()\n+    .replace(/&/g, ' and ')\n+    .replace(/[^\\p{L}\\p{N}]+/gu, '-')\n+    .replace(/^-+|-+$/g, '');\n+}\n"
+  },
+  "applyPlan": {
+    "status": "VERIFIED_READY_TO_APPLY",
+    "taskId": "HC-901",
+    "approvedFiles": [
+      "src/hc-901.mjs"
+    ],
+    "operations": [
+      {
+        "path": "src/hc-901.mjs",
+        "preconditionSha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "replacementSha256": "7563BD204278F888D7A91DD3FF2283848D6EA1928614E0121BEB1378FE623E30",
+        "diffSha256": "0BC08EA0C76826BCAB79902FCC709E792435313242AE5692DE85379B71A42704",
+        "backupRequired": true,
+        "backupDestination": "Manager/reports/apply-backups/HC-901/src/hc-901.mjs",
+        "recoveryRule": "Restore only if current file SHA-256 is 7563BD204278F888D7A91DD3FF2283848D6EA1928614E0121BEB1378FE623E30; never overwrite a different checksum."
+      }
+    ],
+    "managerReview": {
+      "decision": "PASS",
+      "taskId": "HC-901"
+    },
+    "tests": [
+      {
+        "command": "docker run --rm --network none --read-only --user 65534:65534 --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 64 --memory 512m --cpus 1 --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m --mount type=bind,source=D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-901\\workspace,target=/workspace,readonly --workdir /workspace node:24-bookworm-slim node test/hc-901.test.mjs",
+        "result": "PASS",
+        "exitCode": 0,
+        "artifact": null
+      }
+    ],
+    "ownerApprovalRequired": true,
+    "applyOccurred": false,
+    "note": "Plan only. No project file was written. First real apply requires explicit Owner approval and a fresh checksum precondition check."
+  },
+  "applyOccurred": false
+}

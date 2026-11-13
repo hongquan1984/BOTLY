@@ -1,0 +1,45 @@
+{
+  "decision": "SELECT_TASK",
+  "taskId": "SMOKE-STRUCTURED-OUTPUT",
+  "reasoning": "Select a harmless, read-only smoke task. This validates structured CLI output only, not HealthClues acceptance.",
+  "feedback": [],
+  "dimensions": {
+    "functional": "NOT_APPLICABLE",
+    "visual": "NOT_APPLICABLE",
+    "data": "NOT_APPLICABLE",
+    "localization": "NOT_APPLICABLE",
+    "security": "NOT_APPLICABLE",
+    "aiIntegration": "NOT_APPLICABLE"
+  },
+  "nextTask": {
+    "taskId": "SMOKE-STRUCTURED-OUTPUT",
+    "title": "Validate structured CLI output",
+    "objective": "Check that this response parses as JSON and conforms to the decision schema without modifying files or external state.",
+    "priority": "P3",
+    "sourceRequirements": [
+      "User-requested read-only smoke check"
+    ],
+    "dependencies": [],
+    "allowedScope": [
+      "In-memory validation of this CLI response only"
+    ],
+    "deliverables": [
+      "Schema-valid SELECT_TASK response"
+    ],
+    "acceptanceCriteria": [
+      "Response parses as JSON and matches the decision schema.",
+      "Validation is explicitly limited to structured CLI output, not HealthClues acceptance.",
+      "No files or external state are modified."
+    ],
+    "requiredTests": [
+      "Parse response as JSON and validate against the supplied schema."
+    ],
+    "visualEvidence": [],
+    "retryCount": 0,
+    "status": "READY",
+    "previousReviewFeedback": [],
+    "ownerApprovalRequired": false,
+    "projectFinalAudit": false
+  },
+  "approvalRequest": null
+}

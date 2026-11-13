@@ -1,0 +1,7 @@
+﻿diff --git "a/workspaces\\mvp-demo\\2026-11-02T14-25-56.475Z\\.baseline\\src\\greeting.mjs" "b/workspaces\\mvp-demo\\2026-11-02T14-25-56.475Z\\src\\greeting.mjs"
+index 73ee4a4..786609c 100644
+--- "a/workspaces\\mvp-demo\\2026-11-02T14-25-56.475Z\\.baseline\\src\\greeting.mjs"
++++ "b/workspaces\\mvp-demo\\2026-11-02T14-25-56.475Z\\src\\greeting.mjs"
+@@ -1 +1 @@
+-export function greet(name) { return `Hi ${name}`; }
++export function greet(name) { return `Hello, ${name}!`; }

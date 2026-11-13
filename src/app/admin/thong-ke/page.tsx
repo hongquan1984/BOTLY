@@ -397,14 +397,26 @@ export default function AdminAnalyticsPage() {
   const [filterLocale, setFilterLocale] = useState<string>('all');
   const [maskEmails, setMaskEmails] = useState<boolean>(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
+  const [adminToken, setAdminToken] = useState('');
+  const [tokenInput, setTokenInput] = useState('');
 
   // Fetch data
-  const fetchData = async (days: number) => {
+  const fetchData = async (days: number, credential = adminToken) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/analytics?days=${days}`);
-      if (!res.ok) throw new Error(`Lỗi kết nối máy chủ (${res.status})`);
+      const res = await fetch(`/api/admin/analytics?days=${days}`, { headers: { Authorization: `Bearer ${credential}` }, cache: 'no-store' });
+      if (!res.ok) {
+        if (res.status === 401) {
+          sessionStorage.removeItem('botly-admin-token');
+          setAdminToken('');
+          throw new Error('Mã token quản trị không hợp lệ. Vui lòng thử lại.');
+        }
+        if (res.status === 503) {
+          throw new Error('Hệ thống máy chủ chưa hoàn tất cấu hình token phân tích.');
+        }
+        throw new Error(`Lỗi kết nối máy chủ (${res.status})`);
+      }
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || 'Không thể tải dữ liệu thống kê');
       setData(json.data);
@@ -417,8 +429,10 @@ export default function AdminAnalyticsPage() {
   };
 
   useEffect(() => {
-    fetchData(selectedDays);
-  }, [selectedDays]);
+    const token = sessionStorage.getItem('botly-admin-token') || '';
+    if (token) setTimeout(() => setAdminToken(token), 0);
+  }, []);
+  useEffect(() => { if (adminToken) void fetchData(selectedDays, adminToken); }, [selectedDays, adminToken]);
 
   // Filtered app downloads daily
   const filteredAppDaily = useMemo(() => {
@@ -588,6 +602,64 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-[#0d1614] text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-white">
+      {!adminToken ? (
+        <main className="mx-auto max-w-md px-5 py-24">
+          <div className="rounded-2xl border border-emerald-900/60 bg-[#12221e] p-8 shadow-2xl">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 font-bold text-white shadow-md shadow-emerald-950/40">
+                B
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Botly Analytics</h1>
+                <p className="text-xs text-emerald-400 font-medium">Bảng điều khiển quản trị nội bộ</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-300">
+              Vui lòng nhập mã bảo mật quản trị (EBOOK_ADMIN_TOKEN) để xem báo cáo thống kê.
+            </p>
+
+            {error && (
+              <div className="mt-4 rounded-xl border border-red-800/60 bg-red-950/50 px-4 py-3 text-xs text-red-200">
+                {error}
+              </div>
+            )}
+
+            <form
+              className="mt-6 space-y-4"
+              onSubmit={event => {
+                event.preventDefault();
+                const value = tokenInput.trim();
+                if (!value) return;
+                setError(null);
+                sessionStorage.setItem('botly-admin-token', value);
+                setAdminToken(value);
+                setTokenInput('');
+              }}
+            >
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-emerald-400/90 mb-1.5">
+                  Mã Quản Trị
+                </label>
+                <input
+                  type="password"
+                  placeholder="Nhập mã bí mật..."
+                  autoComplete="current-password"
+                  value={tokenInput}
+                  onChange={event => setTokenInput(event.target.value)}
+                  className="w-full rounded-xl border border-emerald-900 bg-[#0a1613] px-4 py-3 text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 px-5 py-3 font-semibold text-white shadow-lg shadow-emerald-950/40 hover:from-emerald-500 hover:to-teal-400 transition"
+              >
+                Đăng nhập thống kê
+              </button>
+            </form>
+          </div>
+        </main>
+      ) : <>
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-30 border-b border-emerald-900/40 bg-[#0d1614]/90 backdrop-blur-md px-4 py-3 sm:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
@@ -658,6 +730,18 @@ export default function AdminAnalyticsPage() {
             >
               {maskEmails ? <Lock className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
               {maskEmails ? 'Đang che' : 'Che email'}
+            </button>
+
+            {/* Logout button */}
+            <button
+              onClick={() => {
+                sessionStorage.removeItem('botly-admin-token');
+                setAdminToken('');
+              }}
+              title="Đăng xuất khỏi trang quản trị"
+              className="flex items-center gap-1.5 rounded-xl border border-emerald-900/60 bg-[#13221f] px-2.5 py-1.5 text-xs font-medium text-emerald-300 hover:bg-rose-950/40 hover:text-rose-300 hover:border-rose-800/60 transition-all"
+            >
+              Đăng xuất
             </button>
           </div>
         </div>
@@ -2836,6 +2920,7 @@ export default function AdminAnalyticsPage() {
           <p>Botly Wellness Real-time Analytics System • Dữ liệu cập nhật lúc: {lastRefreshed.toLocaleTimeString('vi-VN')}</p>
         </div>
       </main>
+      </>}
     </div>
   );
 }

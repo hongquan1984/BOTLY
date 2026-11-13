@@ -1,0 +1,56 @@
+{
+  "decision": "SELECT_TASK",
+  "taskId": "HC-001",
+  "reasoning": "HC-001 is the first highest-priority task in the supplied ready list.",
+  "feedback": [],
+  "dimensions": {
+    "functional": "UNVERIFIED",
+    "visual": "UNVERIFIED",
+    "data": "UNVERIFIED",
+    "localization": "UNVERIFIED",
+    "security": "UNVERIFIED",
+    "aiIntegration": "UNVERIFIED"
+  },
+  "nextTask": {
+    "taskId": "HC-001",
+    "title": "Evidence audit: personalized recommendations",
+    "objective": "Factual discovery only. Establish whether the lead is complete, incomplete, blocked, or already verified from current source and artifacts. Do not change product code. Verify acceptance evidence for recommendation quality, including real-provider versus fixture distinction.",
+    "priority": "P1",
+    "sourceRequirements": [
+      "MASTER_SPEC.md",
+      "BUSINESS_RULES.md",
+      "ACCEPTANCE_TESTS.md",
+      "CURRENT_STATE.md",
+      "UI_UX_SPEC.md",
+      "reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md"
+    ],
+    "dependencies": [],
+    "allowedScope": [
+      "scripts",
+      "src/features/healthclues"
+    ],
+    "deliverables": [
+      "Evidence citations with repository-relative file paths",
+      "PASS/UNVERIFIED/REWORK dimension summary",
+      "Precise follow-up task only when evidence shows a gap"
+    ],
+    "acceptanceCriteria": [
+      "No product files changed",
+      "Cite existing source/test/evidence file paths in evidence array",
+      "Check source and tests; distinguish mocks from real integrations",
+      "Do not infer visual PASS without screenshot inspection",
+      "Record open conflicts and missing artifacts"
+    ],
+    "requiredTests": [],
+    "visualEvidence": [],
+    "retryCount": 2,
+    "status": "REWORK",
+    "previousReviewFeedback": [
+      "Reconcile App/CURRENT_STATE.md and App/ACCEPTANCE_TESTS.md MP20 excerpts with App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md. Explicitly state that historical confirmation-based fixture acceptance does not verify the current immediate-selection flow, including rehydration, unchecking, preservation of unrelated goals, zero goals and API-failure behavior. Record current authenticated acceptance as UNVERIFIED.",
+      "Address App/reports/HEALTHCLUES_GEMINI_REALTIME_ADVISOR_ACCEPTANCE.md, which records credential exposure and required rotation. Rotation evidence is absent from the supplied material; later configuration checks and provider success do not establish rotation. Record this historical security uncertainty without asserting an active compromise or current blocker, and add the exact manifest report path to the evidence array."
+    ],
+    "ownerApprovalRequired": false,
+    "projectFinalAudit": false
+  },
+  "approvalRequest": null
+}

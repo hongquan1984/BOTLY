@@ -1,0 +1,20 @@
+{
+  "assets": [
+    {
+      "file": "healthclues-world-overworld.webp",
+      "purpose": "Master illustrated terrain artwork for the interactive HealthClues Wellness World map. UI labels, routes, current location, landmarks, and progress are rendered separately in SVG/HTML.",
+      "dimensions": "1672x941",
+      "regions": ["sleep-better", "feel-calmer", "more-energy", "eat-healthier", "move-more", "healthy-weight", "natural-wellness", "health-concern"],
+      "source": "Original AI-generated illustration created for this project with OpenAI image_gen on 2026-10-27, using App/references/healthclues_game_ui_reference.png only as art-direction reference.",
+      "license": "Project-created asset. No third-party stock artwork used. Generated asset; not a medical or geographic depiction. Optimized to WebP with sharp at quality 88."
+    },
+    {
+      "file": "healthclues-world-overworld.png",
+      "purpose": "Preserved original generated master artwork for future editing and re-optimization.",
+      "dimensions": "1672x941",
+      "regions": ["sleep-better", "feel-calmer", "more-energy", "eat-healthier", "move-more", "healthy-weight", "natural-wellness", "health-concern"],
+      "source": "Original AI-generated illustration created for this project with OpenAI image_gen on 2026-10-27.",
+      "license": "Project-created asset. No third-party stock artwork used. Generated asset; not a medical or geographic depiction."
+    }
+  ]
+}

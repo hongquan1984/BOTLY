@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BookOpen, CheckCircle2, ExternalLink, Search, Sparkles } from "lucide-react";
@@ -9,6 +9,8 @@ import { wellnessEbooks } from "@/data/wellness-ebooks";
 import type { PublicEbook } from "@/lib/ebook-catalog";
 import { WellnessShell } from "./WellnessShell";
 import { EbookLeadCapture } from "./EbookLeadCapture";
+import { getHealthCluesQuizUrl, trackHealthCluesFunnel } from "@/lib/healthclues-funnel";
+import { AnalyticsConsent } from "@/components/healthclues/AnalyticsConsent";
 
 const categoryLabels: Record<string, string> = {
   'food-wellness':'Food & Wellness','healthy-drinks':'Healthy Drinks','wellness-history':'Wellness History',
@@ -21,6 +23,10 @@ const categoryLabels: Record<string, string> = {
 export function EbookCatalogPage({ locale, ebooks = [] }: { locale: WellnessLocale; ebooks?: PublicEbook[] }) {
   const [category, setCategory] = useState("All guides");
   const [search, setSearch] = useState("");
+  useEffect(() => {
+    trackHealthCluesFunnel("ebook_library_view");
+    trackHealthCluesFunnel("quiz_hero_view");
+  }, []);
   const library = ebooks.length ? ebooks.map((ebook) => ({
     id: ebook.id, slug: ebook.slug, titleEn: ebook.public_display_title, subtitleEn: ebook.public_subtitle,
     categoryEn: categoryLabels[ebook.category_id] || ebook.category_id.replaceAll('-', ' '), descriptionEn: ebook.summary_short || ebook.summary_long,
@@ -45,10 +51,33 @@ export function EbookCatalogPage({ locale, ebooks = [] }: { locale: WellnessLoca
   return <WellnessShell locale={locale}>
     <main className="min-h-screen bg-[#f7faf6] text-[#18302b]">
       <section className="relative overflow-hidden border-b border-[#d8e4d8] bg-gradient-to-br from-[#eaf4e9] via-[#f7faf6] to-[#f7f2e6]">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 lg:grid-cols-[1.15fr_.85fr] lg:px-8 lg:py-16">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-800">HEALTHCLUES · YOUR PERSONAL WELLNESS COMPANION</p>
+            <h1 className="mt-4 max-w-3xl text-3xl font-black leading-tight tracking-tight sm:text-5xl">Discover Wellness Ideas Tailored to You</h1>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#526b62]">Everyone&apos;s lifestyle is different. Tell us about your wellness interests, everyday habits, and preferences. HealthClues helps you discover recipes, practical activities, and evidence-informed resources that fit your life.</p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <a href={getHealthCluesQuizUrl("", "hero")} onClick={() => trackHealthCluesFunnel("quiz_hero_click", { entry: "hero" })} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#18302b] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#25483a]">Start My Free Wellness Quiz</a>
+              <a href="#ebook-library" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[#b8cbbb] bg-white/80 px-6 py-3 text-sm font-bold text-[#18302b] hover:bg-white">Explore Free Ebooks</a>
+            </div>
+            <p className="mt-4 text-xs leading-relaxed text-[#60746d]">Free to explore · Personalized to your interests · No diagnosis or medical advice</p>
+            <div className="mt-3 max-w-lg"><AnalyticsConsent compact/></div>
+          </div>
+          <div aria-hidden="true" className="hidden justify-self-end sm:block">
+            <div className="w-full max-w-sm rounded-[2rem] border border-white bg-white/80 p-6 shadow-xl">
+              <div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#e6eddd] text-xl">✦</span><div><p className="text-xs font-bold uppercase tracking-wider text-emerald-800">Your discovery profile</p><p className="mt-1 font-extrabold">Explore what fits you</p></div></div>
+              <div className="mt-5 space-y-3"><p className="rounded-xl bg-[#f2f6ef] px-4 py-3 text-sm font-semibold">Everyday recipes</p><p className="ml-5 rounded-xl bg-[#f8f2e6] px-4 py-3 text-sm font-semibold">Small, practical activities</p><p className="rounded-xl bg-[#edf3f1] px-4 py-3 text-sm font-semibold">Evidence-informed reads</p></div>
+              <p className="mt-4 text-xs text-[#71837b]">A personal starting point, shaped by your interests.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ebook-library" className="scroll-mt-24 relative overflow-hidden border-b border-[#d8e4d8] bg-gradient-to-br from-[#eaf4e9] via-[#f7faf6] to-[#f7f2e6]">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[1.2fr_.8fr] lg:px-8 lg:py-24">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-700/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-widest text-emerald-900"><Sparkles className="h-4 w-4"/> BOTLY WELLNESS EBOOK LIBRARY</div>
-            <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight tracking-tight sm:text-6xl">Small, thoughtful guides for everyday wellness</h1>
+            <h2 className="mt-6 max-w-3xl text-4xl font-black leading-tight tracking-tight sm:text-6xl">Small, thoughtful guides for everyday wellness</h2>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#526b62] sm:text-lg">Explore practical food, drink and wellbeing guides, created to make good information easier to use. Verified ebooks can be downloaded after email capture; other resources open at their original source.</p>
             <div className="mt-7 flex flex-wrap gap-3 text-sm font-semibold text-[#526b62]"><span className="rounded-full bg-white/80 px-4 py-2">Carefully curated</span><span className="rounded-full bg-white/80 px-4 py-2">Email delivery</span><span className="rounded-full bg-white/80 px-4 py-2">English editions</span></div>
           </div>

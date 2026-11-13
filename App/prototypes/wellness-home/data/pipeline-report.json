@@ -1,0 +1,189 @@
+{
+  "generated_at": "2026-11-08T01:56:48.564Z",
+  "total_items": 10,
+  "passed_items": 10,
+  "pass_rate": "100%",
+  "max_retries_allowed": 3,
+  "results": [
+    {
+      "item_id": "flower_pot_01",
+      "name_vi": "Chậu hoa đất nung phong lữ",
+      "slot_id": "slot_garden_01",
+      "scene_id": "scene_garden",
+      "final_attempt": 1,
+      "decision": "PASS",
+      "overall_score": 94,
+      "criteria": {
+        "perspective_fit": 94,
+        "scale_fit": 93,
+        "lighting_fit": 94,
+        "shadow_fit": 93,
+        "visual_harmony": 95,
+        "slot_fit": 96
+      },
+      "status": "approved"
+    },
+    {
+      "item_id": "wooden_bench_01",
+      "name_vi": "Băng ghế gỗ sồi ngoài trời",
+      "slot_id": "slot_garden_02",
+      "scene_id": "scene_garden",
+      "final_attempt": 1,
+      "decision": "PASS",
+      "overall_score": 94,
+      "criteria": {
+        "perspective_fit": 94,
+        "scale_fit": 93,
+        "lighting_fit": 94,
+        "shadow_fit": 93,
+        "visual_harmony": 95,
+        "slot_fit": 96
+      },
+      "status": "approved"
+    },
+    {
+      "item_id": "outdoor_chair_01",
+      "name_vi": "Ghế bành gỗ ngoài hiên",
+      "slot_id": "slot_garden_04",
+      "scene_id": "scene_garden",
+      "final_attempt": 1,
+      "decision": "PASS",
+      "overall_score": 94,
+      "criteria": {
+        "perspective_fit": 94,
+        "scale_fit": 93,
+        "lighting_fit": 94,
+        "shadow_fit": 93,
+        "visual_harmony": 95,
+        "slot_fit": 96
+      },
+      "status": "approved"
+    },
+    {
+      "item_id": "outdoor_table_01",
+      "name_vi": "Bàn trà tròn gỗ sồi",
+      "slot_id": "slot_interior_03",
+      "scene_id": "scene_interior",
+      "final_attempt": 1,
+      "decision": "PASS",
+      "overall_score": 94,
+      "criteria": {
+        "perspective_fit": 94,
+        "scale_fit": 93,
+        "lighting_fit": 91,
+        "shadow_fit": 93,
+        "visual_harmony": 95,
+        "slot_fit": 96
+      },
+      "status": "approved"
+    },
+    {
+      "item_id": "garden_lantern_01",
+      "name_vi": "Đèn lồng sắt đen sân vườn",
+      "slot_id": "slot_garden_05",
+      "scene_id": "scene_garden",
+      "final_attempt": 1,
+      "decision": "PASS",
+      "overall_score": 94,
+      "criteria": {
+        "perspective_fit": 94,
+        "scale_fit": 93,
+        "lighting_fit": 94,
+        "shadow_fit": 93,
+        "visual_harmony": 95,
+        "slot_fit": 96
+      },
+      "status": "approved"
+    },
+    {
+      "item_id": "watering_can_01",
+      "name_vi": "Bình tưới cây kẽm cổ điển",
+      "slot_id": "slot_garden_05",
+      "scene_id": "scene_garden",
+      "final_attempt": 1,
+      "decision": "PASS",
+      "overall_score": 94,
+      "criteria": {
+        "perspective_fit": 94,
+        "scale_fit": 93,
+        "lighting_fit": 94,
+        "shadow_fit": 93,
+        "visual_harmony": 95,
+        "slot_fit": 96
+      },
+      "status": "approved"
+    },
+    {
+      "item_id": "flower_pot_02",
+      "name_vi": "Chậu cây Monstera trong nhà",
+      "slot_id": "slot_interior_01",
+      "scene_id": "scene_interior",
+      "final_attempt": 1,
+      "decision": "PASS",
+      "overall_score": 94,
+      "criteria": {
+        "perspective_fit": 94,
+        "scale_fit": 93,
+        "lighting_fit": 91,
+        "shadow_fit": 93,
+        "visual_harmony": 95,
+        "slot_fit": 96
+      },
+      "status": "approved"
+    },
+    {
+      "item_id": "rug_01",
+      "name_vi": "Thảm len dệt Bắc Âu",
+      "slot_id": "slot_interior_02",
+      "scene_id": "scene_interior",
+      "final_attempt": 1,
+      "decision": "PASS",
+      "overall_score": 94,
+      "criteria": {
+        "perspective_fit": 94,
+        "scale_fit": 93,
+        "lighting_fit": 91,
+        "shadow_fit": 93,
+        "visual_harmony": 95,
+        "slot_fit": 96
+      },
+      "status": "approved"
+    },
+    {
+      "item_id": "armchair_01",
+      "name_vi": "Ghế bành bọc len Thụy Sĩ",
+      "slot_id": "slot_interior_04",
+      "scene_id": "scene_interior",
+      "final_attempt": 1,
+      "decision": "PASS",
+      "overall_score": 94,
+      "criteria": {
+        "perspective_fit": 94,
+        "scale_fit": 93,
+        "lighting_fit": 91,
+        "shadow_fit": 93,
+        "visual_harmony": 95,
+        "slot_fit": 96
+      },
+      "status": "approved"
+    },
+    {
+      "item_id": "table_lamp_01",
+      "name_vi": "Đèn bàn gốm vải linen",
+      "slot_id": "slot_interior_05",
+      "scene_id": "scene_interior",
+      "final_attempt": 1,
+      "decision": "PASS",
+      "overall_score": 94,
+      "criteria": {
+        "perspective_fit": 94,
+        "scale_fit": 93,
+        "lighting_fit": 91,
+        "shadow_fit": 93,
+        "visual_harmony": 95,
+        "slot_fit": 96
+      },
+      "status": "approved"
+    }
+  ]
+}

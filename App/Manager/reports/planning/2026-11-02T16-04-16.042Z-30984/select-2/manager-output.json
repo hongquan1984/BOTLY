@@ -1,0 +1,54 @@
+{
+  "decision": "SELECT_TASK",
+  "taskId": "HC-002",
+  "reasoning": "HC-002 is the first listed ready task at the highest available priority, P2.",
+  "feedback": [],
+  "dimensions": {
+    "functional": "UNVERIFIED",
+    "visual": "UNVERIFIED",
+    "data": "UNVERIFIED",
+    "localization": "UNVERIFIED",
+    "security": "UNVERIFIED",
+    "aiIntegration": "UNVERIFIED"
+  },
+  "nextTask": {
+    "taskId": "HC-002",
+    "title": "Evidence audit: bilingual consistency",
+    "objective": "Factual discovery only. Establish whether the lead is complete, incomplete, blocked, or already verified from current source and artifacts. Do not change product code. Check current EN/VI acceptance and known regression coverage across approved user-facing flows.",
+    "priority": "P2",
+    "sourceRequirements": [
+      "MASTER_SPEC.md",
+      "BUSINESS_RULES.md",
+      "ACCEPTANCE_TESTS.md",
+      "CURRENT_STATE.md",
+      "UI_UX_SPEC.md",
+      "reports/HEALTHCLUES_LOCALIZATION_ACCEPTANCE.md",
+      "reports/HEALTHCLUES_MASTER_PROMPT_16_ACCEPTANCE.md"
+    ],
+    "dependencies": [],
+    "allowedScope": [
+      "src",
+      "scripts"
+    ],
+    "deliverables": [
+      "Evidence citations with repository-relative file paths",
+      "PASS/UNVERIFIED/REWORK dimension summary",
+      "Precise follow-up task only when evidence shows a gap"
+    ],
+    "acceptanceCriteria": [
+      "No product files changed",
+      "Cite existing source/test/evidence file paths in evidence array",
+      "Check source and tests; distinguish mocks from real integrations",
+      "Do not infer visual PASS without screenshot inspection",
+      "Record open conflicts and missing artifacts"
+    ],
+    "requiredTests": [],
+    "visualEvidence": [],
+    "retryCount": 0,
+    "status": "PENDING",
+    "previousReviewFeedback": [],
+    "ownerApprovalRequired": false,
+    "projectFinalAudit": false
+  },
+  "approvalRequest": null
+}

@@ -1,0 +1,20 @@
+{
+  "taskId": "HC-999",
+  "attempt": 1,
+  "status": "READY_FOR_REVIEW",
+  "summary": "Read package.json only. No files modified.",
+  "changedFiles": [],
+  "tests": [],
+  "screenshots": [],
+  "evidence": [
+    "Get-Content -LiteralPath 'D:\\botly\\package.json' completed with exit code 0.",
+    "Package: aiflow-automation; version: 0.1.0; private: true.",
+    "Declared dependencies include Next.js 16.3.0, React 19.2.8, and React DOM 19.2.8.",
+    "Build script: node scripts/build-healthclues-isolated.mjs."
+  ],
+  "knownLimitations": [
+    "Metadata was read without validating installed dependencies or executing scripts."
+  ],
+  "blockers": [],
+  "nextSuggestedSteps": []
+}

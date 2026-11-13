@@ -91,7 +91,7 @@ export function CompactResultScreen({
               Bạn đang mở trong ứng dụng Facebook
             </p>
             <p className="text-slate-300 text-[11px] mt-0.5">
-              Để âm thanh tiếp tục phát êm dịu khi tắt màn hình điện thoại, hãy bấm biểu tượng <strong className="text-white">•••</strong> ở góc trên bên phải và chọn <strong className="text-white">"Mở bằng trình duyệt ngoài"</strong> (Safari / Chrome).
+              Để âm thanh tiếp tục phát êm dịu khi tắt màn hình điện thoại, hãy bấm biểu tượng <strong className="text-white">•••</strong> ở góc trên bên phải và chọn <strong className="text-white">&quot;Mở bằng trình duyệt ngoài&quot;</strong> (Safari / Chrome).
             </p>
           </div>
           <button

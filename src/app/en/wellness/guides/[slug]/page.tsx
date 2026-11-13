@@ -16,7 +16,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const title = ('seo_title' in a && a.seo_title) || a.title;
   const description = ('seo_description' in a && a.seo_description) || a.description;
   const canonicalUrl = `${siteConfig.url}${articlePath('en', slug)}`;
-  const translatedPath = await translatedArticlePath(a as any);
+  const translatedPath = 'translationSlug' in a && typeof a.translationSlug === 'string'
+    ? articlePath('vi', a.translationSlug)
+    : 'article_id' in a
+      ? await translatedArticlePath(a)
+      : null;
   const coverUrl = ('wellness_articles' in a && a.wellness_articles?.cover_image_url)
     || ('heroImage' in a && a.heroImage)
     || '/og-image.jpg';

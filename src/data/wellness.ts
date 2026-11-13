@@ -5,6 +5,7 @@ export type WellnessLocale = "en" | "vi";
 export const wellnessCopy = {
   en: {
     nav: [
+      ["HealthClues 🎮", "/healthclues"],
       ["Weight Loss", "/en/wellness/weight-management"],
       ["Healing", "/en/wellness/healing"],
       ["Health Tips", "/en/wellness/health-tips"],
@@ -35,6 +36,7 @@ export const wellnessCopy = {
   },
   vi: {
     nav: [
+      ["HealthClues 🎮", "/healthclues"],
       ["Giảm cân", "/vi/song-khoe/giam-can"],
       ["Chữa lành", "/vi/song-khoe/chua-lanh"],
       ["Mẹo sức khỏe", "/vi/song-khoe/meo-suc-khoe"],

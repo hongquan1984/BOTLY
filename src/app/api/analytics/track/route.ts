@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { hasHealthCluesAnalyticsConsentCookie, isHealthCluesAnalyticsPath, sanitizeHealthCluesAnalyticsPayload } from '@/lib/healthclues-analytics-consent';
 
 export const runtime = 'nodejs';
 
@@ -24,6 +25,15 @@ export async function POST(request: Request) {
     if (!event_type || !reqPath || typeof event_type !== 'string' || typeof reqPath !== 'string') {
       return NextResponse.json({ ok: false, error: 'Missing event_type or path' }, { status: 400 });
     }
+
+    const healthCluesPath = isHealthCluesAnalyticsPath(reqPath);
+    if (healthCluesPath && !hasHealthCluesAnalyticsConsentCookie(request.headers.get('cookie') || '')) {
+      return NextResponse.json({ ok: true, ignored: true });
+    }
+    const healthCluesPayload = healthCluesPath
+      ? sanitizeHealthCluesAnalyticsPayload(event_type, reqPath, metadata)
+      : null;
+    if (healthCluesPath && !healthCluesPayload) return NextResponse.json({ ok: true, ignored: true });
 
     // Ignore admin and stat dashboard visits
     if (reqPath.startsWith('/admin') || reqPath.startsWith('/thong-ke') || reqPath.startsWith('/thongke')) {
@@ -108,15 +118,15 @@ export async function POST(request: Request) {
         Prefer: 'return=minimal'
       },
       body: JSON.stringify({
-        event_type: String(event_type).slice(0, 50),
-        path: String(reqPath).slice(0, 500),
-        article_slug: article_slug ? String(article_slug).slice(0, 200) : null,
+        event_type: String(healthCluesPayload?.eventType ?? event_type).slice(0, 50),
+        path: String(healthCluesPayload?.path ?? reqPath).slice(0, 500),
+        article_slug: healthCluesPath ? null : article_slug ? String(article_slug).slice(0, 200) : null,
         locale: locale === 'en' ? 'en' : 'vi',
-        referrer: String(referrer).slice(0, 500),
+        referrer: healthCluesPath ? '' : String(referrer).slice(0, 500),
         device_type: String(device_type).slice(0, 50),
         visitor_id: finalVisitorId.slice(0, 100),
         session_id: finalSessionId.slice(0, 100),
-        metadata: typeof metadata === 'object' && metadata !== null ? metadata : {},
+        metadata: healthCluesPayload?.metadata ?? (typeof metadata === 'object' && metadata !== null ? metadata : {}),
         created_at: new Date().toISOString()
       })
     });

@@ -627,7 +627,7 @@ export function NightAudioPlayer({
           <div className="flex-1 text-[11px] leading-relaxed">
             <span className="font-semibold text-white">Mẹo nghe khi tắt màn hình:</span>{' '}
             <span className="text-slate-300">
-              Bạn đang mở trong ứng dụng Facebook. Hãy bấm biểu tượng <strong className="text-white">•••</strong> ở góc trên và chọn <strong className="text-white">"Mở bằng trình duyệt ngoài"</strong> (Safari / Chrome) để âm thanh không bị ngắt khi khóa máy.
+              Bạn đang mở trong ứng dụng Facebook. Hãy bấm biểu tượng <strong className="text-white">•••</strong> ở góc trên và chọn <strong className="text-white">&quot;Mở bằng trình duyệt ngoài&quot;</strong> (Safari / Chrome) để âm thanh không bị ngắt khi khóa máy.
             </span>
           </div>
           <button

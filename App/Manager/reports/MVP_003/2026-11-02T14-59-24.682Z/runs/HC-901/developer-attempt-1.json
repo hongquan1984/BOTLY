@@ -1,0 +1,50 @@
+{
+  "taskId": "HC-901",
+  "attempt": 1,
+  "developerResult": {
+    "taskId": "HC-901",
+    "attempt": 1,
+    "summary": "Implement Unicode-aware slug generation with compatibility normalization, lowercase conversion, ampersand expansion, and collapsed separators.",
+    "patches": [
+      {
+        "path": "src/hc-901.mjs",
+        "baseSha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "content": "export function toSlug(value) {\n  return String(value ?? '')\n    .normalize('NFKC')\n    .toLowerCase()\n    .replace(/&/g, ' and ')\n    .replace(/[^\\p{L}\\p{N}]+/gu, '-')\n    .replace(/^-+|-+$/g, '');\n}\n"
+      }
+    ],
+    "limitations": [
+      "Tests were not run as instructed; test/hc-901.test.mjs was not supplied."
+    ]
+  },
+  "changedFiles": [
+    "src/hc-901.mjs"
+  ],
+  "diffByPath": {
+    "src/hc-901.mjs": "--- a/src/hc-901.mjs\n+++ b/src/hc-901.mjs\n@@ full-file replacement @@\n-export function toSlug(value) { return value; }\n+export function toSlug(value) {\n+  return String(value ?? '')\n+    .normalize('NFKC')\n+    .toLowerCase()\n+    .replace(/&/g, ' and ')\n+    .replace(/[^\\p{L}\\p{N}]+/gu, '-')\n+    .replace(/^-+|-+$/g, '');\n+}\n"
+  },
+  "tests": [
+    {
+      "command": "docker run --rm --network none --read-only --user 65534:65534 --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 64 --memory 512m --cpus 1 --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m --mount type=bind,source=D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-59-24.682Z\\runs\\HC-901\\workspace,target=/workspace,readonly --workdir /workspace node:24-bookworm-slim node test/hc-901.test.mjs",
+      "result": "PASS",
+      "exitCode": 0,
+      "timedOut": false,
+      "output": "✔ normalizes basic text (1.488123ms)\n✔ maps ampersand and collapses separators (0.153433ms)\n✔ preserves Unicode letters (0.134955ms)\n✔ normalizes compatibility characters (0.242457ms)\n✔ blank input becomes empty (1.012038ms)\nℹ tests 5\nℹ suites 0\nℹ pass 5\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 10.762026\n"
+    }
+  ],
+  "managerDecision": {
+    "decision": "PASS",
+    "taskId": "HC-901",
+    "reasoning": "The supplied diff satisfies all stated requirements: NFKC normalization, lowercase output, Unicode letter and number preservation, ampersand expansion, collapsed hyphen separators, and empty output for blank input. Changes stay within the permitted source file. Required Docker tests passed: 5 passed, 0 failed, exit code 0, no timeout.",
+    "feedback": [],
+    "dimensions": {
+      "functional": "PASS",
+      "visual": "NOT_APPLICABLE",
+      "data": "NOT_APPLICABLE",
+      "localization": "PASS",
+      "security": "NOT_APPLICABLE",
+      "aiIntegration": "NOT_APPLICABLE"
+    },
+    "nextTask": null,
+    "approvalRequest": null
+  }
+}

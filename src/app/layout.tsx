@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/data/site";
 import { JsonLd } from "@/components/sections/JsonLd";
 import { ToastProvider } from "@/components/layout/ToastProvider";
+import { HealthCluesBanner } from "@/components/layout/HealthCluesBanner";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 import { LocaleHtmlLang } from "@/components/seo/LocaleHtmlLang";
 import "./globals.css";
@@ -25,6 +26,7 @@ export const metadata: Metadata = {
   verification: {
     google: "fgxRfdqGUzMGmQFxW1WEhlBOLYyUFZanclS2lVBY1VI",
     other: {
+      "facebook-domain-verification": "c51g9m2u04iqj44oglaykkhpdqnrmr",
       "google-site-verification": "fgxRfdqGUzMGmQFxW1WEhlBOLYyUFZanclS2lVBY1VI",
       "mylead-verification": "4d9b36e2182769ce219a6ab4f8104424",
       "p:domain_verify": "cd2f4da29b085d23bfb6559f67379b64",
@@ -94,7 +96,10 @@ export default async function RootLayout({
         <LocaleHtmlLang />
         <JsonLd />
         <AnalyticsTracker />
-        <ToastProvider>{children}</ToastProvider>
+        <ToastProvider>
+          <HealthCluesBanner />
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

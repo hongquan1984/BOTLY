@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["taskId", "attempt", "summary", "patches", "limitations"],
+  "properties": {
+    "taskId": { "type": "string", "minLength": 3, "maxLength": 80 },
+    "attempt": { "type": "integer", "minimum": 1 },
+    "summary": { "type": "string" },
+    "patches": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "baseSha256"],
+        "oneOf": [
+          { "required": ["content"], "not": { "required": ["delete"] } },
+          { "required": ["delete"], "properties": { "delete": { "const": true } }, "not": { "required": ["content"] } }
+        ],
+        "properties": {
+          "path": { "type": "string" },
+          "baseSha256": { "type": ["string", "null"], "pattern": "^[A-Fa-f0-9]{64}$" },
+          "content": { "type": "string" },
+          "delete": { "const": true }
+        }
+      }
+    },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  }
+}

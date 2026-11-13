@@ -1,0 +1,19 @@
+{
+  "decision": "REWORK",
+  "taskId": "HC-901",
+  "reasoning": "The diff returns \"Hola, Ada!\" instead of the required \"Hello, Ada!\". The captured test failed with exit code 1, so the acceptance criterion is unmet.",
+  "feedback": [
+    "Change src/greeting.mjs to: export function greet(name) { return `Hello, ${name}!`; }",
+    "Rerun node --test test/greeting.test.mjs and provide passing evidence with exit code 0."
+  ],
+  "dimensions": {
+    "functional": "REWORK",
+    "visual": "NOT_APPLICABLE",
+    "data": "NOT_APPLICABLE",
+    "localization": "NOT_APPLICABLE",
+    "security": "PASS",
+    "aiIntegration": "NOT_APPLICABLE"
+  },
+  "nextTask": null,
+  "approvalRequest": null
+}

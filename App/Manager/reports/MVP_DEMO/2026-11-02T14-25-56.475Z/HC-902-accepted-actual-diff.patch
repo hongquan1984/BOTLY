@@ -1,0 +1,7 @@
+﻿diff --git "a/workspaces\\mvp-demo\\2026-11-02T14-25-56.475Z\\.baseline\\src\\farewell.mjs" "b/workspaces\\mvp-demo\\2026-11-02T14-25-56.475Z\\src\\farewell.mjs"
+index d8379e6..a6df2f7 100644
+--- "a/workspaces\\mvp-demo\\2026-11-02T14-25-56.475Z\\.baseline\\src\\farewell.mjs"
++++ "b/workspaces\\mvp-demo\\2026-11-02T14-25-56.475Z\\src\\farewell.mjs"
+@@ -1 +1 @@
+-export function farewell(name) { return `Bye ${name}`; }
++export function farewell(name) { return `Goodbye, ${name}!`; }

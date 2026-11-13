@@ -1,0 +1,134 @@
+[
+  {
+    "kind": "clue",
+    "id": "hc-v1-sleep-clue",
+    "version": 1,
+    "topicKey": "sleep-better",
+    "chapterId": "sleep-basics",
+    "title": "Sleep duration is one clue, not the whole story",
+    "content": "The CDC says most adults need at least seven hours of sleep each night. Sleep needs differ by age, and one number cannot describe every person's experience. This is a general learning note, not a personal sleep target or assessment.",
+    "sourceReferences": [
+      { "label": "CDC: About Sleep and Your Heart Health", "url": "https://www.cdc.gov/heart-disease/about/sleep-and-heart-health.html" }
+    ],
+    "relatedCatalogIds": [],
+    "questionPrompt": "According to the CDC, which statement is accurate for most adults?",
+    "questionOptions": [
+      { "id": "adult-seven", "label": "Most adults need at least seven hours of sleep each night." },
+      { "id": "exact-eight", "label": "Every adult needs exactly eight hours, with no individual variation." },
+      { "id": "sleep-age-same", "label": "Sleep needs are the same at every age." }
+    ],
+    "answerKey": {
+      "correctOptionId": "adult-seven",
+      "explanation": "The CDC says most adults need at least seven hours, while needs vary by age. This general fact does not determine an individual's needs."
+    }
+  },
+  {
+    "kind": "clue",
+    "id": "hc-v1-calm-clue",
+    "version": 1,
+    "topicKey": "feel-calmer",
+    "chapterId": "calm-everyday-self-care",
+    "title": "Self-care can look different from person to person",
+    "content": "The National Institute of Mental Health lists examples such as relaxation activities, time in nature, low-stress hobbies, and staying connected with supportive people. Its guidance notes that self-care differs between people; these examples are options to explore, not a treatment plan.",
+    "sourceReferences": [
+      { "label": "NIMH: Caring for Your Mental Health", "url": "https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health" }
+    ],
+    "relatedCatalogIds": [],
+    "questionPrompt": "Which choice is listed by NIMH as an example of self-care?",
+    "questionOptions": [
+      { "id": "low-stress-hobby", "label": "Making time for a low-stress hobby you enjoy." },
+      { "id": "one-method", "label": "Using one identical self-care method that must work for everyone." },
+      { "id": "replace-help", "label": "Replacing professional support with a wellness activity." }
+    ],
+    "answerKey": {
+      "correctOptionId": "low-stress-hobby",
+      "explanation": "NIMH includes enjoyable low-stress hobbies among its examples and says self-care differs from person to person. It does not replace professional care."
+    }
+  },
+  {
+    "kind": "clue",
+    "id": "hc-v1-nutrition-clue",
+    "version": 1,
+    "topicKey": "eat-healthier",
+    "chapterId": "reading-food-labels",
+    "title": "Total sugars and added sugars are not the same label entry",
+    "content": "The FDA explains that Total Sugars includes sugars naturally present in foods such as fruit and milk, as well as added sugars. The Nutrition Facts label shows Added Sugars separately so shoppers can compare packaged foods. A label is one source of information, not a personalized diet rule.",
+    "sourceReferences": [
+      { "label": "FDA: Added Sugars on the Nutrition Facts Label", "url": "https://www.fda.gov/food/nutrition-facts-label/added-sugars-nutrition-facts-label" }
+    ],
+    "relatedCatalogIds": [],
+    "questionPrompt": "What does the FDA say about Total Sugars on a Nutrition Facts label?",
+    "questionOptions": [
+      { "id": "total-includes", "label": "It includes naturally occurring sugars and any added sugars in the product." },
+      { "id": "fruit-excluded", "label": "It excludes sugars naturally present in fruit and milk." },
+      { "id": "added-same", "label": "It is another name for Added Sugars only." }
+    ],
+    "answerKey": {
+      "correctOptionId": "total-includes",
+      "explanation": "The FDA says Total Sugars includes naturally occurring sugars and any added sugars; Added Sugars is shown as a separate amount."
+    }
+  },
+  {
+    "kind": "boss",
+    "id": "night-owl",
+    "version": 1,
+    "topicKey": "sleep-better",
+    "title": "The Night Owl",
+    "intro": "A quiet knowledge checkpoint about general sleep information. This challenge is optional and does not assess sleep health.",
+    "questionPrompt": "Which statement matches the CDC's general information for adults?",
+    "questionOptions": [
+      { "id": "seven-hours", "label": "Most adults need at least seven hours of sleep each night." },
+      { "id": "exact-eight", "label": "All adults need exactly eight hours each night." },
+      { "id": "same-age", "label": "Sleep needs do not change with age." }
+    ],
+    "sourceReferences": [
+      { "label": "CDC: About Sleep and Your Heart Health", "url": "https://www.cdc.gov/heart-disease/about/sleep-and-heart-health.html" }
+    ],
+    "answerKey": {
+      "correctOptionId": "seven-hours",
+      "explanation": "The CDC says most adults need at least seven hours; needs vary by age. This is general education, not an individual assessment."
+    }
+  },
+  {
+    "kind": "boss",
+    "id": "chaos-spirit",
+    "version": 1,
+    "topicKey": "feel-calmer",
+    "title": "The Chaos Spirit",
+    "intro": "A calm knowledge checkpoint about examples of everyday self-care. It is not a mental health assessment or treatment recommendation.",
+    "questionPrompt": "Which statement reflects the NIMH self-care guidance?",
+    "questionOptions": [
+      { "id": "varies-by-person", "label": "Self-care differs between people; relaxing activities and supportive connection are examples." },
+      { "id": "one-fits-all", "label": "One self-care activity should work the same way for everyone." },
+      { "id": "replace-clinician", "label": "Self-care activities replace professional support when someone needs help." }
+    ],
+    "sourceReferences": [
+      { "label": "NIMH: Caring for Your Mental Health", "url": "https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health" }
+    ],
+    "answerKey": {
+      "correctOptionId": "varies-by-person",
+      "explanation": "NIMH says self-care looks different for everyone and includes examples such as relaxation and staying connected. It does not say self-care replaces professional help."
+    }
+  },
+  {
+    "kind": "boss",
+    "id": "sugar-dragon",
+    "version": 1,
+    "topicKey": "eat-healthier",
+    "title": "The Sugar Dragon",
+    "intro": "A food-label knowledge checkpoint about how Total Sugars and Added Sugars are displayed. It does not prescribe a diet or judge foods.",
+    "questionPrompt": "On the Nutrition Facts label, what does the Total Sugars amount include?",
+    "questionOptions": [
+      { "id": "natural-and-added", "label": "Naturally occurring sugars and any added sugars in the product." },
+      { "id": "only-added", "label": "Only sugars added during processing." },
+      { "id": "no-natural", "label": "It excludes sugars naturally present in fruit and milk." }
+    ],
+    "sourceReferences": [
+      { "label": "FDA: Added Sugars on the Nutrition Facts Label", "url": "https://www.fda.gov/food/nutrition-facts-label/added-sugars-nutrition-facts-label" }
+    ],
+    "answerKey": {
+      "correctOptionId": "natural-and-added",
+      "explanation": "FDA describes Total Sugars as including naturally occurring sugars plus any added sugars. Added Sugars appears separately."
+    }
+  }
+]

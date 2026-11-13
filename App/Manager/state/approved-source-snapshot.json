@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "authorization": "Owner instruction in current conversation",
+  "authorizedAt": "2026-11-02T16:34:36.402Z",
+  "sourcePath": "D:\\botly\\App\\CURRENT_STATE.md",
+  "projectRelativePath": "App/CURRENT_STATE.md",
+  "snapshotFile": "state/source-snapshots/owner-authorized/CURRENT_STATE.ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8.md",
+  "sha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+  "bytes": 227828,
+  "sourceMtimeUtc": "2026-11-02T16:09:10.000Z",
+  "approvedTaskIds": [
+    "HC-003",
+    "HC-004",
+    "HC-005",
+    "HC-006",
+    "HC-007",
+    "HC-008"
+  ],
+  "notApplicableToHistoricalPasses": [
+    "HC-001",
+    "HC-002"
+  ],
+  "notProductTruthApproval": true,
+  "automaticFutureVersions": false
+}

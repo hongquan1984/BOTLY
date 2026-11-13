@@ -1,0 +1,1 @@
+{"taskId":"HC-901","summary":"Changed greet(name) to return exactly `Hello, ${name}!`.","patches":[{"path":"src/greeting.mjs","content":"export function greet(name) { return `Hello, ${name}!`; }\n"}],"limitations":["Test execution was prohibited by the no-tools instruction; passing evidence and exit code 0 cannot be provided."]}

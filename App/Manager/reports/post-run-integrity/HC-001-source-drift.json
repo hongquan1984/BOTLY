@@ -1,0 +1,16 @@
+{
+  "detectedAt": "2026-11-02T16:08:48.546Z",
+  "taskId": "HC-001",
+  "manifest": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-7\\trusted-evidence-manifest.json",
+  "expectedSha256": "84deba53fe1649b29698e4c574842049fb17cb019c848532ba0890bd9a233d1a",
+  "currentSha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+  "expectedBytes": 227143,
+  "currentBytes": 227828,
+  "currentMtimeUtc": "2026-11-02T16:06:24.000Z",
+  "gitStatus": "?? App/CURRENT_STATE.md (current read-only status)",
+  "unchanged": false,
+  "changed": [
+    "App/CURRENT_STATE.md"
+  ],
+  "interpretation": "Hash matched at Manager review time; changed after review. Actor and cause are unknown. No baseline was updated."
+}

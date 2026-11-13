@@ -1,0 +1,22 @@
+{
+  "name": "healthclues-local-manager",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "manager:start": "node src/cli.mjs start",
+    "manager:status": "node src/cli.mjs status",
+    "manager:stop": "node src/cli.mjs stop",
+    "manager:resume": "node src/cli.mjs resume",
+    "manager": "node src/cli.mjs run",
+    "status": "node src/cli.mjs status",
+    "stop": "node src/cli.mjs stop",
+    "resume": "node src/cli.mjs resume",
+    "dry-run": "node src/cli.mjs dry-run",
+    "mvp-demo": "node src/cli.mjs mvp-demo",
+    "mvp003-demo": "node src/cli.mjs mvp003-demo",
+    "mvp003-rework": "node src/cli.mjs mvp003-rework",
+    "test": "node --test tests/*.test.mjs",
+    "index": "node src/cli.mjs index"
+  }
+}

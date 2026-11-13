@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "taskId": "HC-901",
+  "status": "VERIFIED_READY_TO_APPLY",
+  "phase": "VERIFIED_RESULT_SAVED",
+  "currentAttempt": 2,
+  "snapshotRoot": "D:\\botly\\App\\Manager\\reports\\MVP_003_REWORK\\2026-11-02T15-02-32.981Z\\runs\\HC-901\\workspace",
+  "initialManifest": {
+    "version": 1,
+    "taskId": "HC-901",
+    "createdAt": "2026-11-02T15:02:33.936Z",
+    "files": [
+      {
+        "path": "src/hc-901.mjs",
+        "sha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "workspaceSha256": "A0916026D8CBCE2CDE485BFFBB1DEAA4F7EDE5BD3798660DDC046D96B69D8F79",
+        "bytes": 48,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? src/hc-901.mjs"
+      },
+      {
+        "path": "test/hc-901.test.mjs",
+        "sha256": "32D5DB83444468D922F16222AF40837118FA59855310C60EFF7D0F002BCA332D",
+        "workspaceSha256": "32D5DB83444468D922F16222AF40837118FA59855310C60EFF7D0F002BCA332D",
+        "bytes": 584,
+        "sourceStatus": "untracked",
+        "gitStatus": "?? test/hc-901.test.mjs"
+      }
+    ]
+  },
+  "attemptHistory": [
+    {
+      "attempt": 1,
+      "reportPath": "D:\\botly\\App\\Manager\\reports\\MVP_003_REWORK\\2026-11-02T15-02-32.981Z\\runs\\HC-901\\developer-attempt-1.json",
+      "managerDecision": {
+        "decision": "REWORK",
+        "taskId": "HC-901",
+        "reasoning": "Docker tests failed: 2 passed, 3 failed. The patch respects the allowed scope but does not satisfy the Unicode slug objective. The ASCII-only developer brief omits required behavior.",
+        "feedback": [
+          "Map ampersands to the word 'and' before collapsing separators.",
+          "Preserve Unicode letters and digits instead of restricting output to a-z and 0-9.",
+          "Apply compatibility normalization (NFKC) so compatibility characters are retained in normalized form.",
+          "Rerun test/hc-901.test.mjs in the network-disabled Docker environment and provide passing evidence."
+        ],
+        "dimensions": {
+          "functional": "REWORK",
+          "visual": "NOT_APPLICABLE",
+          "data": "NOT_APPLICABLE",
+          "localization": "REWORK",
+          "security": "NOT_APPLICABLE",
+          "aiIntegration": "NOT_APPLICABLE"
+        },
+        "nextTask": null,
+        "approvalRequest": null
+      },
+      "testPass": false,
+      "changedFiles": [
+        "src/hc-901.mjs"
+      ]
+    },
+    {
+      "attempt": 2,
+      "reportPath": "D:\\botly\\App\\Manager\\reports\\MVP_003_REWORK\\2026-11-02T15-02-32.981Z\\runs\\HC-901\\developer-attempt-2.json",
+      "managerDecision": {
+        "decision": "PASS",
+        "taskId": "HC-901",
+        "reasoning": "The supplied diff implements compatibility normalization, lowercase conversion, Unicode letter and number preservation, ampersand mapping, separator collapsing, and blank-input handling. Changes stay within the editable file. Docker evidence reports all five focused tests passed without network access, with exit code 0 and no timeout.",
+        "feedback": [],
+        "dimensions": {
+          "functional": "PASS",
+          "visual": "NOT_APPLICABLE",
+          "data": "NOT_APPLICABLE",
+          "localization": "PASS",
+          "security": "NOT_APPLICABLE",
+          "aiIntegration": "NOT_APPLICABLE"
+        },
+        "nextTask": null,
+        "approvalRequest": null
+      },
+      "testPass": true,
+      "changedFiles": [
+        "src/hc-901.mjs"
+      ]
+    }
+  ],
+  "updatedAt": "2026-11-02T15:03:26.409Z",
+  "lastDeveloperResult": {
+    "taskId": "HC-901",
+    "attempt": 2,
+    "summary": "Normalize slugs with NFKC, lowercase text, expand ampersands to 'and', preserve Unicode letters and digits, and collapse separators into trimmed hyphens.",
+    "patches": [
+      {
+        "path": "src/hc-901.mjs",
+        "baseSha256": "0261B36AD203A96C73A38FD845B9A9CCF4D465D7B043394DF6C2170C16890A87",
+        "content": "export function toSlug(value) {\n  return value\n    .normalize('NFKC')\n    .toLowerCase()\n    .replace(/&/g, ' and ')\n    .replace(/[^\\p{L}\\p{N}]+/gu, '-')\n    .replace(/^-+|-+$/g, '');\n}\n"
+      }
+    ],
+    "limitations": [
+      "Unicode preservation follows prior review feedback despite the objective's ASCII-only wording.",
+      "Tests were not run because tool use and command execution were prohibited; passing evidence for test/hc-901.test.mjs in network-disabled Docker is unavailable."
+    ]
+  },
+  "changedFiles": [
+    "src/hc-901.mjs"
+  ],
+  "testEvidence": [
+    {
+      "command": "docker run --rm --network none --read-only --user 65534:65534 --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 64 --memory 512m --cpus 1 --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m --mount type=bind,source=D:\\botly\\App\\Manager\\reports\\MVP_003_REWORK\\2026-11-02T15-02-32.981Z\\runs\\HC-901\\workspace,target=/workspace,readonly --workdir /workspace node:24-bookworm-slim node test/hc-901.test.mjs",
+      "result": "PASS",
+      "exitCode": 0,
+      "timedOut": false,
+      "output": "✔ normalizes basic text (1.262074ms)\n✔ maps ampersand and collapses separators (0.14162ms)\n✔ preserves Unicode letters (0.089654ms)\n✔ normalizes compatibility characters (0.13365ms)\n✔ blank input becomes empty (0.897481ms)\nℹ tests 5\nℹ suites 0\nℹ pass 5\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 7.667755\n"
+    }
+  ],
+  "actualDiff": {
+    "src/hc-901.mjs": "--- a/src/hc-901.mjs\n+++ b/src/hc-901.mjs\n@@ full-file replacement @@\n-export function toSlug(value) { return value; }\n+export function toSlug(value) {\n+  return value\n+    .normalize('NFKC')\n+    .toLowerCase()\n+    .replace(/&/g, ' and ')\n+    .replace(/[^\\p{L}\\p{N}]+/gu, '-')\n+    .replace(/^-+|-+$/g, '');\n+}\n"
+  },
+  "lastManagerDecision": {
+    "decision": "PASS",
+    "taskId": "HC-901",
+    "reasoning": "The supplied diff implements compatibility normalization, lowercase conversion, Unicode letter and number preservation, ampersand mapping, separator collapsing, and blank-input handling. Changes stay within the editable file. Docker evidence reports all five focused tests passed without network access, with exit code 0 and no timeout.",
+    "feedback": [],
+    "dimensions": {
+      "functional": "PASS",
+      "visual": "NOT_APPLICABLE",
+      "data": "NOT_APPLICABLE",
+      "localization": "PASS",
+      "security": "NOT_APPLICABLE",
+      "aiIntegration": "NOT_APPLICABLE"
+    },
+    "nextTask": null,
+    "approvalRequest": null
+  },
+  "resultPath": "D:\\botly\\App\\Manager\\reports\\MVP_003_REWORK\\2026-11-02T15-02-32.981Z\\runs\\HC-901\\workflow-result.json"
+}

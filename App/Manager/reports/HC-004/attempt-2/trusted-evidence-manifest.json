@@ -1,0 +1,164 @@
+{
+  "taskId": "HC-004",
+  "createdAt": "2026-11-02T16:47:26.388Z",
+  "sourceRoot": "D:\\botly",
+  "files": [
+    {
+      "path": "src/components/healthclues/WellnessPlanBuilder.tsx",
+      "sha256": "47194f85c30056ea3afc61e48b46ac4e087491b8309588ec78406057ed7ef3d5",
+      "bytes": 52158
+    },
+    {
+      "path": "src/features/healthclues/personalized-wellness-plan.ts",
+      "sha256": "b10f6fd991b76cb883e5f639c6b924b0dafc445d77a6c01b566320de16c35e46",
+      "bytes": 9401
+    },
+    {
+      "path": "src/features/healthclues/wellness-plan.ts",
+      "sha256": "098a97680c2df63441eb1ac0b9bbbfb62465519fa5f99e0df2abbf9150474c52",
+      "bytes": 35340
+    },
+    {
+      "path": "src/app/api/healthclues/plan/route.ts",
+      "sha256": "6488a36fbd281a0bdd5b8804a41a5678339021f27ad648cf0f1f58c24d0d1872",
+      "bytes": 17330
+    },
+    {
+      "path": "scripts/test-healthclues-mp17-plan-selection-browser.mjs",
+      "sha256": "bc1789840533df567eaf522fefb1df0a3fc8c2b2fc804262ca36e56cb290d364",
+      "bytes": 14842
+    },
+    {
+      "path": "scripts/test-healthclues-mp20-two-question-browser.mjs",
+      "sha256": "e2fd191fcc6d10fc5287ad0722ab46c1447a25f7b860f5bb4d0912c168ce118b",
+      "bytes": 12144
+    },
+    {
+      "path": "scripts/test-healthclues-post-quiz-plan-browser.mjs",
+      "sha256": "0f9e7e42e776c0f196ee9effa092518f7bde9fa451ec02e01f09774295e1e47d",
+      "bytes": 58349
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+      "sha256": "354bddf5754a4fbdf306141b103cf1df0cebb7555953a9b0c77356b19e12c4b0",
+      "bytes": 71482,
+      "modifiedAt": "2026-11-02T13:43:36.000Z"
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md",
+      "sha256": "a23cccb47a9877b74f77a4da3a6de76fd084df1b1fb84c2072a3fff92e39a2d9",
+      "bytes": 10413
+    },
+    {
+      "path": "App/MASTER_SPEC.md",
+      "sha256": "6a62ec114e35881e4e65cff88aa2acd33eaf132e55605ba74a6ecf5c60045136",
+      "bytes": 60943,
+      "modifiedAt": "2026-11-02T16:36:18.000Z"
+    },
+    {
+      "path": "App/BUSINESS_RULES.md",
+      "sha256": "99838d7e688b16a46f98c548dd79b374fd345d544cff509100c8d76cdc3bab68",
+      "bytes": 53502,
+      "modifiedAt": "2026-11-02T15:52:24.000Z"
+    },
+    {
+      "path": "App/ACCEPTANCE_TESTS.md",
+      "sha256": "e2eb248ef60dc51efce9e624c85d96a1d6e6a5781680992f6c57916a97e8fcb3",
+      "bytes": 81481,
+      "modifiedAt": "2026-11-02T15:51:54.000Z"
+    },
+    {
+      "path": "App/CURRENT_STATE.md",
+      "sha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+      "bytes": 227828,
+      "modifiedAt": "2026-11-02T16:09:10.000Z",
+      "snapshotFile": "state/source-snapshots/owner-authorized/CURRENT_STATE.ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8.md"
+    },
+    {
+      "path": "App/UI_UX_SPEC.md",
+      "sha256": "6c675ee9c707477a018226ac560b75e23b519fcab638129b5d06717478d2c401",
+      "bytes": 52245,
+      "modifiedAt": "2026-11-02T16:36:18.000Z"
+    }
+  ],
+  "documents": [
+    {
+      "path": "App/MASTER_SPEC.md",
+      "sha256": "6a62ec114e35881e4e65cff88aa2acd33eaf132e55605ba74a6ecf5c60045136",
+      "bytes": 60943,
+      "modifiedAt": "2026-11-02T16:36:18.000Z"
+    },
+    {
+      "path": "App/BUSINESS_RULES.md",
+      "sha256": "99838d7e688b16a46f98c548dd79b374fd345d544cff509100c8d76cdc3bab68",
+      "bytes": 53502,
+      "modifiedAt": "2026-11-02T15:52:24.000Z"
+    },
+    {
+      "path": "App/ACCEPTANCE_TESTS.md",
+      "sha256": "e2eb248ef60dc51efce9e624c85d96a1d6e6a5781680992f6c57916a97e8fcb3",
+      "bytes": 81481,
+      "modifiedAt": "2026-11-02T15:51:54.000Z"
+    },
+    {
+      "path": "App/CURRENT_STATE.md",
+      "sha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+      "bytes": 227828,
+      "modifiedAt": "2026-11-02T16:09:10.000Z",
+      "snapshotFile": "state/source-snapshots/owner-authorized/CURRENT_STATE.ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8.md"
+    },
+    {
+      "path": "App/UI_UX_SPEC.md",
+      "sha256": "6c675ee9c707477a018226ac560b75e23b519fcab638129b5d06717478d2c401",
+      "bytes": 52245,
+      "modifiedAt": "2026-11-02T16:36:18.000Z"
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+      "sha256": "354bddf5754a4fbdf306141b103cf1df0cebb7555953a9b0c77356b19e12c4b0",
+      "bytes": 71482,
+      "modifiedAt": "2026-11-02T13:43:36.000Z"
+    }
+  ],
+  "liveWatchDocuments": [
+    {
+      "path": "App/MASTER_SPEC.md",
+      "sha256": "6a62ec114e35881e4e65cff88aa2acd33eaf132e55605ba74a6ecf5c60045136",
+      "modifiedAt": "2026-11-02T16:36:18.000Z"
+    },
+    {
+      "path": "App/BUSINESS_RULES.md",
+      "sha256": "99838d7e688b16a46f98c548dd79b374fd345d544cff509100c8d76cdc3bab68",
+      "modifiedAt": "2026-11-02T15:52:24.000Z"
+    },
+    {
+      "path": "App/ACCEPTANCE_TESTS.md",
+      "sha256": "e2eb248ef60dc51efce9e624c85d96a1d6e6a5781680992f6c57916a97e8fcb3",
+      "modifiedAt": "2026-11-02T15:51:54.000Z"
+    },
+    {
+      "path": "App/CURRENT_STATE.md",
+      "sha256": "50e3fb78a540bc87d865abd48d0d9dbcd70d0b48bae1c4b2ff9a0b37482475b8",
+      "modifiedAt": "2026-11-02T16:39:32.000Z"
+    },
+    {
+      "path": "App/UI_UX_SPEC.md",
+      "sha256": "6c675ee9c707477a018226ac560b75e23b519fcab638129b5d06717478d2c401",
+      "modifiedAt": "2026-11-02T16:36:18.000Z"
+    },
+    {
+      "path": "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+      "sha256": "354bddf5754a4fbdf306141b103cf1df0cebb7555953a9b0c77356b19e12c4b0",
+      "modifiedAt": "2026-11-02T13:43:36.000Z"
+    }
+  ],
+  "ownerApprovedSnapshots": [
+    {
+      "path": "App/CURRENT_STATE.md",
+      "sha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+      "snapshotFile": "state/source-snapshots/owner-authorized/CURRENT_STATE.ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8.md"
+    }
+  ],
+  "reviewedContextFile": "D:\\botly\\App\\Manager\\reports\\HC-004\\attempt-2\\reviewed-requirements.md",
+  "totalBytes": 281459
+}

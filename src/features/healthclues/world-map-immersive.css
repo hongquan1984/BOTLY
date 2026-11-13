@@ -1,0 +1,56 @@
+[data-world-canvas="immersive"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-world-canvas="immersive"] > div:first-child,
+[data-world-canvas="immersive"] > div:nth-child(4),
+[data-world-canvas="immersive"] > div:nth-child(5) {
+  display: none;
+}
+
+[data-world-canvas="immersive"] .hc-world-viewport {
+  touch-action: none;
+}
+
+[data-world-canvas="immersive"] .hc-world-scene {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, calc((100dvh - 4.25rem) * 1.777778));
+  height: max(100%, 56.25vw);
+  aspect-ratio: 16 / 9;
+  transform: translate(-50%, -50%);
+}
+
+@media (min-width: 681px) {
+  [data-world-canvas="immersive"] .hc-world-scene {
+    width: min(100%, calc((100dvh - 4.25rem) * 1.777778));
+    height: min(100%, 56.25vw);
+  }
+}
+
+[data-world-canvas="immersive"] .hc-world-scene > svg {
+  touch-action: none;
+}
+
+[data-world-canvas="immersive"] .hc-world-scene > div {
+  display: none;
+}
+
+@media (max-width: 680px) {
+  [data-world-canvas="immersive"] .hc-world-scene {
+    width: max(100%, calc((100dvh - 8rem - env(safe-area-inset-bottom, 0px)) * 1.777778));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-world-canvas="immersive"] .hc-world-scene > svg {
+    transition: none !important;
+  }
+}

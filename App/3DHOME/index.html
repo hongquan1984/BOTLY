@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Swiss Alpine Chalet 3D — Interactive World</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🏔️</text></svg>"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="scene-canvas"></canvas>
+
+      <!-- Top Viewpoint & Mode Bar -->
+      <header class="hud-top">
+        <div class="brand-pill">
+          <span class="brand-dot"></span>
+          <span>Alpine Chalet 3D</span>
+        </div>
+
+        <nav class="view-tabs" aria-label="Chế độ xem">
+          <button class="hud-btn active" data-view="overview" id="btn-view-overview" title="Phòng khách ven hồ">
+            🏠 Khách
+          </button>
+          <button class="hud-btn" data-view="kitchen" id="btn-view-kitchen" title="Bếp đảo & bàn ăn">
+            🍳 Bếp & Ăn
+          </button>
+          <button class="hud-btn" data-view="bedroom" id="btn-view-bedroom" title="Phòng ngủ Master view rừng thông">
+            🛏️ Phòng ngủ
+          </button>
+          <button class="hud-btn" data-view="bathroom" id="btn-view-bathroom" title="Phòng tắm Spa & WC">
+            🛁 Phòng tắm
+          </button>
+          <button class="hud-btn" data-view="view34" id="btn-view-34" title="Góc 3/4 mặt cắt biệt thự">
+            🏛️ Góc 3/4
+          </button>
+          <button class="hud-btn" data-view="character" id="btn-view-character" title="Điều khiển nhân vật">
+            🚶 Nhân vật
+          </button>
+          <button class="hud-btn" id="btn-reset-view" title="Trở về góc toàn cảnh mặc định">
+            ↺ Toàn cảnh
+          </button>
+        </nav>
+
+        <div class="hud-actions">
+          <button class="hud-btn" id="btn-decorate" title="Đặt đồ trang trí">
+            🪑 Đặt đồ
+          </button>
+          <button class="hud-btn" id="btn-door" title="Đóng / Mở cửa kính trượt">
+            🚪 Cửa kính: Mở
+          </button>
+          <button class="hud-btn" id="btn-lights" title="Bật / Tắt đèn lồng & lò sưởi">
+            🔥 Đèn & Lửa
+          </button>
+          <select class="hud-select" id="select-quality" aria-label="Chất lượng đồ họa">
+            <option value="high">Desktop — HIGH</option>
+            <option value="balanced">Mobile — BALANCED</option>
+          </select>
+          <button class="hud-btn icon-only" id="btn-toggle-hud" title="Ẩn/Hiện giao diện">
+            👁️
+          </button>
+        </div>
+      </header>
+
+      <!-- Decorate Palette -->
+      <aside class="decorate-panel hidden" id="decorate-panel">
+        <div class="panel-header">
+          <h3>Trang trí không gian</h3>
+          <button class="close-btn" id="btn-close-decorate">✕</button>
+        </div>
+        <p class="panel-hint">
+          Chọn món đồ rồi <b>Click</b> vào sàn nhà / hiên gỗ / bãi cỏ để đặt. Click vào đồ đã đặt để chọn xoay/đổi cỡ. <b>Chuột phải</b> để xóa nhanh.
+        </p>
+        <div class="item-grid" id="decorate-items"></div>
+
+        <div class="scale-row">
+          <span>Tỷ lệ:</span>
+          <button class="hud-btn small scale-btn" data-scale="0.85">0.85x</button>
+          <button class="hud-btn small scale-btn active" data-scale="1">1.0x</button>
+          <button class="hud-btn small scale-btn" data-scale="1.2">1.2x</button>
+        </div>
+
+        <div class="panel-footer">
+          <button class="hud-btn small" id="btn-rotate-item">↻ Xoay (R)</button>
+          <button class="hud-btn small danger" id="btn-delete-selected">✕ Xóa chọn</button>
+          <button class="hud-btn small danger" id="btn-clear-items">🗑 Hết</button>
+        </div>
+      </aside>
+
+      <!-- Controls Hint & Status -->
+      <footer class="hud-bottom" id="hud-bottom">
+        <div class="controls-hint" id="controls-hint">
+          <span><b>Kéo chuột / Vuốt</b> xoay góc nhìn</span>
+          <span><b>Cuộn / Chụm</b> zoom quang học</span>
+          <span><b>R</b> hoặc <b>↺ Toàn cảnh</b> đặt lại góc</span>
+          <span><b>WASD</b> đi lại (Chế độ Nhân vật)</span>
+          <span><b>E</b> cửa / đèn</span>
+        </div>
+        <div class="status-pill" id="status-pill">Đang tải...</div>
+      </footer>
+
+      <!-- Mobile Touch Controls -->
+      <div class="mobile-controls hidden" id="mobile-controls">
+        <div class="joystick-zone" id="joystick-zone">
+          <div class="joystick-base">
+            <div class="joystick-knob" id="joystick-knob"></div>
+          </div>
+        </div>
+        <div class="mobile-buttons">
+          <button class="mobile-action-btn" id="btn-mobile-jump">Nhảy</button>
+          <button class="mobile-action-btn" id="btn-mobile-interact">Cửa</button>
+        </div>
+      </div>
+
+      <!-- Restore HUD floating pill when hidden -->
+      <button class="hud-restore hidden" id="btn-restore-hud">Hiện HUD</button>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,92 @@
+{
+  "runId": "2026-11-02T14-58-24.548Z",
+  "mode": "REAL_CODEX_SYNTHETIC_SNAPSHOT_ONLY",
+  "status": "BLOCKED",
+  "realAiCalls": 1,
+  "maxRealAiCalls": 12,
+  "currentTaskId": null,
+  "nextTaskId": null,
+  "queue": [
+    {
+      "taskId": "HC-901",
+      "title": "Synthetic Unicode slug behavior",
+      "objective": "Implement toSlug(value): return a lowercase, hyphen-separated slug; normalize compatibility characters, preserve Unicode letters and digits, map ampersand to the word and, collapse separators, and return an empty string for blank input.",
+      "priority": "P1",
+      "sourceRequirements": [
+        "Synthetic acceptance fixture for HC-901"
+      ],
+      "dependencies": [],
+      "allowedScope": [
+        "src/hc-901.mjs"
+      ],
+      "deliverables": [
+        "Structured source patch",
+        "Passing Docker test evidence"
+      ],
+      "acceptanceCriteria": [
+        "toSlug(\"Hello World\") returns \"hello-world\".",
+        "Convert ampersand to the word and; collapse repeated separators to one hyphen.",
+        "Preserve Unicode letters and digits after NFKC normalization.",
+        "Blank input returns an empty string.",
+        "The focused test passes without network access."
+      ],
+      "requiredTests": [
+        "test/hc-901.test.mjs"
+      ],
+      "visualEvidence": [],
+      "retryCount": 0,
+      "status": "PENDING",
+      "previousReviewFeedback": [],
+      "ownerApprovalRequired": false,
+      "projectFinalAudit": false
+    },
+    {
+      "taskId": "HC-902",
+      "title": "Synthetic duration label behavior",
+      "objective": "Implement formatDuration(minutes) as a deterministic formatter for non-negative integer minutes. Use singular \"minute\" only for 1 and plural \"minutes\" for all other accepted values; reject invalid values with a TypeError.",
+      "priority": "P1",
+      "sourceRequirements": [
+        "Synthetic acceptance fixture for HC-902"
+      ],
+      "dependencies": [
+        "HC-901"
+      ],
+      "allowedScope": [
+        "src/hc-902.mjs"
+      ],
+      "deliverables": [
+        "Structured source patch",
+        "Passing Docker test evidence"
+      ],
+      "acceptanceCriteria": [
+        "Use singular minute only for exactly 1; use minutes for zero and all other accepted integer values.",
+        "Reject negative, fractional, string, and non-finite input with TypeError.",
+        "The focused test passes without network access."
+      ],
+      "requiredTests": [
+        "test/hc-902.test.mjs"
+      ],
+      "visualEvidence": [],
+      "retryCount": 0,
+      "status": "PENDING",
+      "previousReviewFeedback": [],
+      "ownerApprovalRequired": false,
+      "projectFinalAudit": false
+    }
+  ],
+  "history": [],
+  "callHistory": [
+    {
+      "number": 1,
+      "role": "manager",
+      "status": "FAILED",
+      "startedAt": "2026-11-02T14:58:24.682Z",
+      "error": "Codex output could not be parsed as JSON: Structured-only Codex invocation emitted tool events: error; D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-58-24.548Z\\ai\\01-manager\\manager.jsonl",
+      "completedAt": "2026-11-02T14:58:36.620Z"
+    }
+  ],
+  "startedAt": "2026-11-02T14:58:24.548Z",
+  "updatedAt": "2026-11-02T14:58:36.678Z",
+  "blocker": "Codex output could not be parsed as JSON: Structured-only Codex invocation emitted tool events: error; D:\\botly\\App\\Manager\\reports\\MVP_003\\2026-11-02T14-58-24.548Z\\ai\\01-manager\\manager.jsonl",
+  "completedAt": "2026-11-02T14:58:36.678Z"
+}

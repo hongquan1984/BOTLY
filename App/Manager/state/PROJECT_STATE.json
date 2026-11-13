@@ -1,0 +1,539 @@
+{
+  "version": 1,
+  "status": "BLOCKED",
+  "phase": "AI_MANAGER_DEVELOPER_REVIEW",
+  "cycle": 20,
+  "acceptedTasks": [
+    "HC-001",
+    "HC-002",
+    "HC-007"
+  ],
+  "currentTaskId": null,
+  "activeAttempt": null,
+  "lastDecision": {
+    "decision": "PASS",
+    "taskId": "HC-007",
+    "reasoning": "The audit is scoped, evidence-backed and candid. Supplied source supports the replacement-dialog finding and narrow spotlight contracts. It distinguishes inspected tests from execution, synthetic fixtures from real integrations, and report claims from current verification. Product gaps do not prevent this audit from passing.",
+    "feedback": [
+      "src/features/healthclues/ToolkitCollection.tsx supports the replacement-state finding: opening or cancelling the dialog does not initialize or clear the occupant ID. Server mutation behavior remains unknown.",
+      "Keep visual behavior, EN/VI completeness, guide persistence and authoritative NPC equipment enforcement UNVERIFIED; screenshots, current execution artifacts and relevant enforcement implementations are absent.",
+      "App/CURRENT_STATE.md and acceptance reports remain report-only evidence. Older browser passes and synthetic lifecycle assertions do not establish current spotlight or eligible botanical Save/Equip acceptance."
+    ],
+    "dimensions": {
+      "functional": "REWORK",
+      "visual": "UNVERIFIED",
+      "data": "UNVERIFIED",
+      "localization": "UNVERIFIED",
+      "security": "UNVERIFIED",
+      "aiIntegration": "NOT_APPLICABLE"
+    },
+    "nextTask": null,
+    "approvalRequest": null
+  },
+  "lastDeveloperResult": {
+    "taskId": "HC-004",
+    "attempt": 3,
+    "status": "READY_FOR_REVIEW",
+    "summary": "HC-004 discovery is complete for the supplied evidence: In-World Plan remains INCOMPLETE, with source-level REWORK and current authenticated/browser acceptance UNVERIFIED. Historical fixture results do not establish current MP20 acceptance or live integration success.",
+    "changedFiles": [],
+    "tests": [],
+    "screenshots": [],
+    "evidence": [
+      "src/components/healthclues/WellnessPlanBuilder.tsx",
+      "src/features/healthclues/personalized-wellness-plan.ts",
+      "src/app/api/healthclues/plan/route.ts",
+      "scripts/test-healthclues-mp17-plan-selection-browser.mjs",
+      "scripts/test-healthclues-mp20-two-question-browser.mjs",
+      "scripts/test-healthclues-post-quiz-plan-browser.mjs",
+      "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md",
+      "App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md",
+      "App/BUSINESS_RULES.md",
+      "App/ACCEPTANCE_TESTS.md",
+      "App/CURRENT_STATE.md",
+      "App/UI_UX_SPEC.md"
+    ],
+    "knownLimitations": [
+      "PASS applies only to explicitly identified source-level findings; no runtime or visual PASS is asserted.",
+      "Only supplied excerpts were reviewed. Manifest entries do not establish inspection of omitted contents or imported dependencies.",
+      "No actual execution evidence was supplied; reported test outcomes remain report-only.",
+      "Current MP20 activation through authenticated World, immediate Plan persistence, rejection handling, reload and isolation remains unverified.",
+      "Historical legacy-answer retention, reviewed botanical availability and current live Gemini quality remain unresolved in the supplied reports."
+    ],
+    "blockers": [
+      "Missing review-end integrity evidence prevents closure of the prior source-stability review requirement.",
+      "Missing current integration source, execution artifacts and screenshot images prevent full In-World Plan acceptance."
+    ],
+    "nextSuggestedSteps": [
+      "Fix the A/B-to-Custom transition so unfinished Custom cannot retain an eligible prior implementation; verify confirmation and immediate-selection modes.",
+      "Trace and enforce generated movement safety for unknown/reported pain and restrictions; cover generation and Plan persistence rejection.",
+      "Reconcile numeric-policy and central-My-Journey UI requirements, and distinguish signed persistable fixtures from unsigned UI-only fixtures in disclosures.",
+      "Supply current parent integration source and matching authenticated MP20 artifacts covering A/B/Custom, unchecked and zero goals, unrelated-goal preservation, API rejection, reload and two-account isolation; inspect desktop/mobile screenshots before assigning visual PASS.",
+      "Have the audit runner verify all task-start hashes against a review-end manifest, retaining the owner-approved CURRENT_STATE pin."
+    ],
+    "auditFindings": [
+      "PASS — Read-only audit boundary: only supplied excerpts were reviewed; no tools, commands, edits, tests or provider calls were performed.",
+      "PASS — Selection mechanics in supplied source: src/components/healthclues/WellnessPlanBuilder.tsx initializes unchecked inclusion independently from A/B selection, removes unchecked choices, displays a selected count, supports empty confirmation in standalone mode, and exposes an optional live-selection callback. This establishes code behavior, not executed acceptance.",
+      "REWORK — Custom transition: src/components/healthclues/WellnessPlanBuilder.tsx changes aiModes when Custom is selected but retains the previous aiSelections/choices entry. hasIncompleteAiSelection checks only whether an entry exists. After selecting A/B, switching to unfinished Custom can therefore leave the previous implementation eligible for confirmation or a later callback instead of enforcing completion of Custom.",
+      "PASS — API controls present in source: src/app/api/healthclues/plan/route.ts requires authentication, confirmed email for writes, owned World lookup, explicit confirmed=true, bounded normalized goals and signed or previously accepted AI content. It supports empty goals and request-key reuse. Authentication helpers, proof implementation and actual database enforcement were not supplied.",
+      "UNVERIFIED — Immediate persistence: src/components/healthclues/WellnessPlanBuilder.tsx invokes onSelectionChange but does not itself POST the Plan or await persistence success. The parent integration, unrelated-goal merging, failure recovery and My Journey rendering are described in App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md but their source was not supplied.",
+      "REWORK — Generated movement safety: App/BUSINESS_RULES.md excludes movement with unresolved acute pain/restriction. src/features/healthclues/personalized-wellness-plan.ts checks urgent safety, prohibited copy, relevance and quantities but does not gate generated movement against acutePainfulJoint/activityRestriction. src/app/api/healthclues/plan/route.ts does not independently apply those context checks in its AI-goal branch. Whether omitted signing/provider code supplies an equivalent gate is unknown.",
+      "UNVERIFIED — Current browser coverage: scripts/test-healthclues-mp20-two-question-browser.mjs exercises Gout, Sleep and Weight discovery through preview, asserts no adaptive/Advisor requests, and explicitly excludes account activation. It does not test immediate Plan selection, persistence, uncheck, reload or account isolation. Its source contains no pending-journey submission assertions despite broader run claims in App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md.",
+      "UNVERIFIED — Fixture distinction: scripts/test-healthclues-mp17-plan-selection-browser.mjs intercepts Advisor responses with unsigned synthetic fixtures and exercises the legacy pre-World Builder. scripts/test-healthclues-post-quiz-plan-browser.mjs contains local Auth/database persistence scenarios but expects the older ten-question/deterministic flow. Neither supplied script establishes execution against the current MP20 integration.",
+      "UNVERIFIED — Historical acceptance: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md reports authenticated synthetic A/B/Custom persistence, zero goals, bilingual snapshots and isolation. Those are historical report claims; corresponding execution artifacts and current integration harness content were not supplied. Its later simplified-contract live success supersedes older recorded 402/schema failures, but current provider health and live-result persistence remain unknown.",
+      "REWORK — Conflicting fixture disclosure: src/components/healthclues/WellnessPlanBuilder.tsx displays both 'cannot be saved' and text stating synthetic selections save to the local account. scripts/test-healthclues-mp17-plan-selection-browser.mjs expects a non-persistable fixture, while src/app/api/healthclues/plan/route.ts accommodates signed Owner Demo synthetic goals. Unsigned and signed fixture behavior needs distinct, accurate wording.",
+      "UNVERIFIED — Requirements conflicts: App/BUSINESS_RULES.md rejects numeric targets without baseline context, while App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md records an owner clarification permitting modest numeric experiments; supplied validation permits some prose quantities. App/UI_UX_SPEC.md describes sticky Confirm/Skip and a separate journal, whereas App/ACCEPTANCE_TESTS.md requires immediate selection in central My Journey. The approved precedence and exact current UI acceptance need reconciliation.",
+      "UNVERIFIED — Visual and sequencing acceptance: App/UI_UX_SPEC.md and App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md describe companion introduction, recommendation ordering and desktop/mobile inspection. No screenshot image or World/companion integration source was supplied, so visual PASS, introduction frequency and actual Pet-to-Plan sequencing cannot be established.",
+      "UNVERIFIED — Progress and integrity: App/CURRENT_STATE.md is owner-authored progress, not independent proof. Its supplied manifest hash matches the requested pin ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8. The supplied Builder manifest identifies c6167a43348fb99c853a5ba27c208fe37c6e7c23ae6eae5b24c1726e8eee1f12. No review-end manifest was supplied; hash correctness and stability through review were not independently verified."
+    ]
+  },
+  "blockers": [
+    "HC-005 attempt 2: Source changed during Manager review; fail closed: src/features/healthclues/WorldAdventureScene.tsx",
+    "HC-005 attempt 4: Source changed during task; fail closed: App/CURRENT_STATE.md",
+    "VISUAL_REVIEW_UNVERIFIED persists: required screenshot artifacts are absent and cannot be inspected or measured.",
+    "Full botanical item-card and Save/Equip acceptance remains unavailable; supplied reports explicitly state that no reviewed eligible item was available.",
+    "HC-004 attempt 3: Source changed during task; fail closed: src/components/healthclues/WellnessPlanBuilder.tsx",
+    "HC-003: audit blocked because the saved packet lacks independently measured per-file review-end hashes for its 17 evidence inputs; current runner must emit this evidence before an allowed retry.",
+    "HC-004: concurrent changes to WellnessPlanBuilder.tsx invalidated three audit attempts; latest attempt hash differs from current source.",
+    "HC-005: visual review cannot pass without reviewable screenshots/dimensions; eligible Botanist Save/Equip evidence is also absent.",
+    "HC-006: held because it reads the source file that changed during HC-004; no HC-006 audit was launched."
+  ],
+  "approvalRequests": [],
+  "history": [
+    {
+      "kind": "REAL_CODEX_SMOKE",
+      "manager": "PASS",
+      "developer": "PASS",
+      "at": "2026-11-02T12:37:18.009Z",
+      "report": "D:\\botly\\App\\Manager\\reports\\REAL_CODEX_SMOKE\\2026-11-02T12-36-43.751Z\\developer-result.json"
+    },
+    {
+      "kind": "REAL_CODEX_SMOKE",
+      "manager": "PASS",
+      "developer": "PASS",
+      "at": "2026-11-02T12:41:47.385Z",
+      "report": "D:\\botly\\App\\Manager\\reports\\REAL_CODEX_SMOKE\\2026-11-02T12-41-14.096Z\\developer-result.json"
+    },
+    {
+      "kind": "REAL_CODEX_SMOKE",
+      "manager": "PASS",
+      "developer": "PASS",
+      "at": "2026-11-02T12:54:22.627Z",
+      "report": "D:\\botly\\App\\Manager\\reports\\REAL_CODEX_SMOKE\\2026-11-02T12-53-55.629Z\\developer-result.json"
+    },
+    {
+      "taskId": "HC-PILOT-001",
+      "kind": "PILOT_BLOCKED_PREFLIGHT",
+      "at": "20261102T130257Z",
+      "report": "reports/pilot/HC-PILOT-001/manager-verdict.json",
+      "developerLaunched": false
+    },
+    {
+      "taskId": "HC-PILOT-001",
+      "kind": "SANDBOX_BOUNDARY_FAILED",
+      "at": "2026-11-02T13:08:01.0575821Z",
+      "report": "reports/pilot/HC-PILOT-001/sandbox-boundary-test.md",
+      "developerLaunched": false
+    },
+    {
+      "taskId": "HC-PILOT-001",
+      "kind": "DOCKER_RUNTIME_BLOCKED",
+      "at": "2026-11-02T13:21:14.2806291Z",
+      "report": "reports/pilot/HC-PILOT-001/docker-isolation-status.md",
+      "developerLaunched": false,
+      "managerTests": "15/15 PASS"
+    },
+    {
+      "taskId": "HC-PILOT-001",
+      "kind": "AUTH_BLOCKED",
+      "at": "2026-11-02T13:47:29.1478555Z",
+      "report": "reports/pilot/HC-PILOT-001/docker-isolation-status.md",
+      "developerLaunched": false,
+      "dockerBoundary": "PASS",
+      "managerTests": "15/15 PASS"
+    },
+    {
+      "taskId": "HC-001",
+      "attempt": 1,
+      "decision": "REWORK",
+      "decisionSource": "trusted-runner-recovery",
+      "at": "2026-11-02T15:51:38.381Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-1\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-1\\manager-decision.json",
+      "note": "Attempt output inspected; exact evidence path schema mismatch prevented AI review."
+    },
+    {
+      "taskId": "HC-001",
+      "attempt": 2,
+      "decision": "REWORK",
+      "at": "2026-11-02T15:53:17.704Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-2\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-2\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-2\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-001",
+      "attempt": 3,
+      "decision": "REWORK",
+      "at": "2026-11-02T15:55:28.686Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-3\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-3\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-3\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-001",
+      "attempt": 3,
+      "decision": "REWORK",
+      "at": "2026-11-02T15:57:08.752Z",
+      "decisionSource": "AI review plus corrected deterministic verifier",
+      "reconciled": true,
+      "note": "Attempts 1-2 had runner/verifier defects (narrative citations and audit UNVERIFIED semantics), not Developer REWORK verdicts; preserved their raw reports. This is the first genuine AI REWORK and the retry budget count is 1."
+    },
+    {
+      "taskId": "HC-001",
+      "kind": "REWORK_FEEDBACK_NORMALIZED",
+      "at": "2026-11-02T15:58:04.736Z",
+      "note": "Removed feedback caused solely by the evidence-array presentation defect; substantive AI coverage feedback retained."
+    },
+    {
+      "taskId": "HC-001",
+      "attempt": 4,
+      "decision": "REWORK",
+      "at": "2026-11-02T16:00:54.248Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-4\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-4\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-4\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-001",
+      "attempt": 5,
+      "decision": "REWORK",
+      "at": "2026-11-02T16:02:51.077Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-5\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-5\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-5\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-001",
+      "kind": "SYSTEM_GATE_DEFECT_RECONCILIATION",
+      "at": "2026-11-02T16:03:28.123Z",
+      "excludedAttempts": [
+        1,
+        2,
+        4
+      ],
+      "effectiveReworkCount": 2,
+      "note": "Attempts 1-2 had report citation/dimension gate defects; attempt 4 had a false REWORK because audit product dimensions were incorrectly treated as task failures. Recomputed attempt 4 as AI PASS and attempt 5 as latest genuine AI REWORK. Raw AI outputs retained."
+    },
+    {
+      "taskId": "HC-001",
+      "kind": "PRECHECK_LIMIT_ADJUSTED",
+      "at": "2026-11-02T16:04:15.215Z",
+      "note": "Trusted reader capped individual files at 180 KB; CURRENT_STATE.md measured 227143 bytes. No Developer launched, no attempt consumed. Per-file cap raised to 300 KB under 900 KB total cap."
+    },
+    {
+      "taskId": "HC-001",
+      "attempt": 7,
+      "decision": "PASS",
+      "at": "2026-11-02T16:05:52.977Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-7\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-7\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-7\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-002",
+      "attempt": 1,
+      "decision": "PASS",
+      "at": "2026-11-02T16:07:32.902Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-002\\attempt-1\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-002\\attempt-1\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-002\\attempt-1\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-001",
+      "kind": "POST_REVIEW_SOURCE_DRIFT",
+      "at": "2026-11-02T16:08:48.546Z",
+      "manifest": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-7\\trusted-evidence-manifest.json",
+      "report": "D:\\botly\\App\\Manager\\reports\\post-run-integrity\\HC-001-source-drift.json",
+      "changed": [
+        "App/CURRENT_STATE.md"
+      ]
+    },
+    {
+      "taskId": "HC-003",
+      "kind": "OWNER_SNAPSHOT_MISMATCH_PRECHECK",
+      "at": "2026-11-02T16:35:48.488Z",
+      "expected": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+      "actual": "209e951cc14b31e06d0a9a54f95dc883267ec17e1bb17fc3d786405015dd8ac0",
+      "taskLaunched": false,
+      "report": "D:\\botly\\App\\Manager\\reports\\post-run-integrity\\owner-approved-snapshot-drift.json"
+    },
+    {
+      "taskId": "HC-003",
+      "kind": "INTERRUPTED_RECONCILED_TO_REWORK",
+      "at": "2026-11-02T16:41:33.050Z",
+      "reason": "Attempt 1 Manager verdict was not persisted because deterministic source check detected concurrent changes to App/CURRENT_STATE.md and App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md. No PASS was recorded. Re-run read-only audit from a fresh input manifest. Continue to use the exact Owner-approved CURRENT_STATE snapshot ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8; this reconciliation does not approve later CURRENT_STATE versions.",
+      "observedSources": [
+        {
+          "file": "D:/botly/App/CURRENT_STATE.md",
+          "sha256": "50e3fb78a540bc87d865abd48d0d9dbcd70d0b48bae1c4b2ff9a0b37482475b8",
+          "mtime": "2026-11-02T16:39:32.000Z",
+          "bytes": 230550
+        },
+        {
+          "file": "D:/botly/App/reports/HEALTHCLUES_MASTER_PROMPT_20_ACCEPTANCE.md",
+          "sha256": "a23cccb47a9877b74f77a4da3a6de76fd084df1b1fb84c2072a3fff92e39a2d9",
+          "mtime": "2026-11-02T16:39:32.000Z",
+          "bytes": 10413
+        }
+      ]
+    },
+    {
+      "taskId": "HC-003",
+      "attempt": 2,
+      "decision": "REWORK",
+      "at": "2026-11-02T16:43:22.660Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-003\\attempt-2\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-003\\attempt-2\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-003\\attempt-2\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-003",
+      "attempt": 3,
+      "decision": "BLOCKED",
+      "at": "2026-11-02T16:45:12.995Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-003\\attempt-3\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-003\\attempt-3\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-003\\attempt-3\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-004",
+      "kind": "INTERRUPTED_RECONCILED_TO_REWORK",
+      "at": "2026-11-02T16:47:11.579Z",
+      "reason": "Source changed during attempt; current file hash remained stable across reconciliation check; start a fresh evidence snapshot.",
+      "observedSource": {
+        "path": "D:/botly/src/components/healthclues/WellnessPlanBuilder.tsx",
+        "sha256": "47194f85c30056ea3afc61e48b46ac4e087491b8309588ec78406057ed7ef3d5",
+        "bytes": 52158,
+        "mtime": "2026-11-02T16:46:38.000Z"
+      }
+    },
+    {
+      "taskId": "HC-004",
+      "kind": "CONCURRENT_SOURCE_CHANGE_RECONCILED",
+      "at": "2026-11-02T16:48:21.670Z",
+      "taskStartHash": "47194f85c30056ea3afc61e48b46ac4e087491b8309588ec78406057ed7ef3d5",
+      "current": {
+        "path": "D:/botly/src/components/healthclues/WellnessPlanBuilder.tsx",
+        "sha256": "a89a3a17034fd10daef84683511d51ef0cf4807adc11319e5809e69ec8fd4ebf",
+        "bytes": 52210,
+        "mtime": "2026-11-02T16:48:02.000Z"
+      },
+      "stableAcrossProbe": true,
+      "affectedTaskIds": [
+        "HC-004",
+        "HC-006"
+      ]
+    },
+    {
+      "taskId": "HC-005",
+      "kind": "INTERRUPTED_RECONCILED_TO_REWORK",
+      "at": "2026-11-02T16:49:46.656Z",
+      "reason": "Task inputs changed during attempt; current requirement documents verified stable across reconciliation probe; fresh evidence manifest required.",
+      "observedSources": [
+        {
+          "path": "App/BUSINESS_RULES.md",
+          "sha256": "bbfc9faf885f854d70b8fdb1ab52af1bb7bbb2283301dcd78bc53ff660c8d0bb"
+        },
+        {
+          "path": "App/ACCEPTANCE_TESTS.md",
+          "sha256": "f0602b6c051488912ae452609e19602a863b06d346564b8966678bbe96f0e09e"
+        },
+        {
+          "path": "App/UI_UX_SPEC.md",
+          "sha256": "7e0d6a250c799209a2d454651905139aade0ee91a841ccc9e916d9e5f5d51bb7"
+        }
+      ]
+    },
+    {
+      "taskId": "HC-005",
+      "kind": "INTERRUPTED_RECONCILED_TO_REWORK",
+      "at": "2026-11-02T16:53:32.111Z",
+      "reason": "Manager verdict not persisted after review-end source change; current path hash stable across reconciliation probe.",
+      "source": {
+        "path": "src/features/healthclues/WorldAdventureScene.tsx",
+        "startSha256": "e339c542aa0fb008594c224680ca518f7b82ecd7d1a5434e7624865bc9ada6d5",
+        "currentSha256": "186a42ed7edbe98a5bce2de868a195f98f9958b7d892966c2de89fbb64eee2fc"
+      }
+    },
+    {
+      "taskId": "HC-005",
+      "attempt": 3,
+      "decision": "REWORK",
+      "at": "2026-11-02T16:55:58.364Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-005\\attempt-3\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-005\\attempt-3\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-005\\attempt-3\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-005",
+      "kind": "INTERRUPTED_RECONCILED_TO_REWORK",
+      "at": "2026-11-02T16:57:22.308Z",
+      "reason": "Attempt 4 review rejected by concurrent CURRENT_STATE live-watcher change; new live watcher hash stable, task content remains Owner-approved snapshot.",
+      "liveWatcher": {
+        "path": "App/CURRENT_STATE.md",
+        "attemptSha256": "50e3fb78a540bc87d865abd48d0d9dbcd70d0b48bae1c4b2ff9a0b37482475b8",
+        "currentSha256": "2e807fec2bdff0b44989d75b76557e2ead70f2c692089fc702dd3592194c0d03"
+      },
+      "approvedInputSha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8"
+    },
+    {
+      "taskId": "HC-005",
+      "attempt": 5,
+      "decision": "REWORK",
+      "at": "2026-11-02T16:59:05.532Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-005\\attempt-5\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-005\\attempt-5\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-005\\attempt-5\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-005",
+      "attempt": 6,
+      "decision": "BLOCKED",
+      "at": "2026-11-02T17:00:34.424Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-005\\attempt-6\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-005\\attempt-6\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-005\\attempt-6\\trusted-evidence-manifest.json"
+    },
+    {
+      "taskId": "HC-007",
+      "attempt": 1,
+      "decision": "PASS",
+      "at": "2026-11-02T17:02:34.995Z",
+      "developerReport": "D:\\botly\\App\\Manager\\reports\\HC-007\\attempt-1\\developer-result.json",
+      "managerReview": "D:\\botly\\App\\Manager\\reports\\HC-007\\attempt-1\\manager-decision.json",
+      "evidenceManifest": "D:\\botly\\App\\Manager\\reports\\HC-007\\attempt-1\\trusted-evidence-manifest.json"
+    },
+    {
+      "kind": "TASKS_REOPENED_AFTER_SOURCE_STABILITY_CHECK",
+      "taskIds": [
+        "HC-004",
+        "HC-006"
+      ],
+      "at": "2026-11-02T17:03:25.459Z",
+      "sourcePath": "src/components/healthclues/WellnessPlanBuilder.tsx",
+      "sourceSha256": "c6167a43348fb99c853a5ba27c208fe37c6e7c23ae6eae5b24c1726e8eee1f12",
+      "stableForMs": 3000,
+      "approvedCurrentStateSha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8"
+    },
+    {
+      "kind": "QUEUE_STOPPED_ON_REAL_BLOCKERS",
+      "at": "2026-11-02T17:04:56.780Z",
+      "scope": [
+        "HC-003",
+        "HC-008"
+      ],
+      "blockers": [
+        "HC-003: audit blocked because the saved packet lacks independently measured per-file review-end hashes for its 17 evidence inputs; current runner must emit this evidence before an allowed retry.",
+        "HC-004: concurrent changes to WellnessPlanBuilder.tsx invalidated three audit attempts; latest attempt hash differs from current source.",
+        "HC-005: visual review cannot pass without reviewable screenshots/dimensions; eligible Botanist Save/Equip evidence is also absent.",
+        "HC-006: held because it reads the source file that changed during HC-004; no HC-006 audit was launched."
+      ],
+      "readyTaskIds": []
+    }
+  ],
+  "models": {
+    "manager": "gpt-6.1-sol",
+    "developer": "gpt-6.1-sol"
+  },
+  "updatedAt": "2026-11-02T17:04:25.514Z",
+  "activeProcess": null,
+  "lastSession": {
+    "runId": "2026-11-02T17-00-54.784Z-33576",
+    "acceptedThisRun": 1,
+    "maxTasks": 1,
+    "maxCycles": 8,
+    "acceptedAtStart": [
+      "HC-001",
+      "HC-002"
+    ],
+    "nextTask": null,
+    "stoppedAt": "2026-11-02T17:02:35.069Z",
+    "reason": "SESSION_TASK_LIMIT"
+  },
+  "staleEvidence": {
+    "acceptedTasks": [
+      {
+        "taskId": "HC-001",
+        "manifest": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-7\\trusted-evidence-manifest.json",
+        "changed": [
+          "App/CURRENT_STATE.md",
+          "App/ACCEPTANCE_TESTS.md"
+        ]
+      }
+    ],
+    "changedSources": [
+      "App/CURRENT_STATE.md",
+      "App/ACCEPTANCE_TESTS.md",
+      "src/features/healthclues/WellnessWorldGame.tsx",
+      "src/app/api/healthclues/world/route.ts"
+    ],
+    "affectedTasks": [
+      "HC-001",
+      "HC-002",
+      "HC-003",
+      "HC-004",
+      "HC-005",
+      "HC-006",
+      "HC-007",
+      "HC-008"
+    ],
+    "affectedAcceptedTasks": [
+      "HC-001",
+      "HC-002",
+      "HC-007"
+    ],
+    "affectedPendingTasks": [
+      "HC-003",
+      "HC-004",
+      "HC-005",
+      "HC-006",
+      "HC-008"
+    ],
+    "detectedAt": "2026-11-02T17:03:28.866Z",
+    "policy": "Historical PASS and original manifests are preserved. New audit tasks snapshot stable inputs at task start. CURRENT_STATE is never refreshed automatically; only the exact Owner-approved snapshot is used, and tasks without applicable approval remain held.",
+    "historicalAcceptedTasks": [
+      {
+        "taskId": "HC-001",
+        "manifest": "D:\\botly\\App\\Manager\\reports\\HC-001\\attempt-7\\trusted-evidence-manifest.json",
+        "changed": [
+          "App/CURRENT_STATE.md",
+          "App/ACCEPTANCE_TESTS.md"
+        ]
+      },
+      {
+        "taskId": "HC-007",
+        "manifest": "D:\\botly\\App\\Manager\\reports\\HC-007\\attempt-1\\trusted-evidence-manifest.json",
+        "changed": [
+          "src/features/healthclues/WellnessWorldGame.tsx",
+          "src/app/api/healthclues/world/route.ts",
+          "App/CURRENT_STATE.md"
+        ]
+      }
+    ]
+  },
+  "sourceDriftResolution": {
+    "ownerAuthorization": "D:\\botly\\App\\Manager\\state\\approved-source-snapshot.json",
+    "path": "App/CURRENT_STATE.md",
+    "sha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+    "appliesToTaskIds": [
+      "HC-003",
+      "HC-004",
+      "HC-005",
+      "HC-006",
+      "HC-007",
+      "HC-008"
+    ],
+    "historicalAcceptedStatusesPreserved": true,
+    "resolvedForContinuationAt": "2026-11-02T17:03:28.866Z"
+  }
+}

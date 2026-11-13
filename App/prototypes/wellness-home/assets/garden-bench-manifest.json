@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "itemId": "garden-bench-wood-01",
+  "sceneId": "garden",
+  "placementId": "garden_terrace_bench",
+  "name": "Băng ghế gỗ sồi ngoài trời",
+  "description": "Băng ghế gỗ sồi tự nhiên phong cách chalet Thụy Sĩ, đặt trên thềm cỏ hiên nhà nhìn ra hồ và núi tuyết.",
+  "assetPath": "assets/garden-bench-overlay.png",
+  "previewPath": "assets/garden-bench-preview.webp",
+  "originalPath": "assets/garden-original.webp",
+  "maskPath": "assets/garden-bench-mask.png",
+  "category": "garden",
+  "displayOrder": 1,
+  "canvasSize": {
+    "width": 1672,
+    "height": 941,
+    "aspectRatio": "16:9"
+  },
+  "placement": {
+    "x": 520,
+    "y": 560,
+    "width": 320,
+    "height": 296,
+    "groundContactY": 855,
+    "relative": {
+      "left": "31.10%",
+      "top": "59.51%",
+      "width": "19.14%",
+      "height": "31.46%"
+    }
+  },
+  "visualProperties": {
+    "lighting": "Alpine morning warm ambient sunlight (upper-left angle)",
+    "shadowType": "Directional soft contact + ambient occlusion",
+    "material": "Weathered oak timber with visible natural grain",
+    "pixelDriftOutsideBench": 0
+  },
+  "state": {
+    "owned": true,
+    "displayed": true
+  }
+}

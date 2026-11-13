@@ -1,3 +1,5 @@
+import { isHealthCluesAnalyticsPath } from '@/lib/healthclues-analytics-consent';
+
 export interface InsomniaQuizEvent {
   id: string;
   event_type: string;
@@ -277,17 +279,18 @@ export async function processInsomniaQuizAnalytics(url: string, serviceKey: stri
   try {
     const [eventsRes, subsRes, waitlistRes] = await Promise.all([
       fetch(`${url}/rest/v1/analytics_events?or=(path.like.*quiz*,metadata->>funnel.eq.quiz_insomnia,metadata->>funnel.eq.night_pattern,event_type.like.*quiz*,event_type.in.(night_1_card_clicked,onboarding_app_download_click,waitlist_signup,beta_cta_click,start_plan_click,store_redirect,recommendation_click))&order=created_at.desc&limit=2500`, {
-        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
+        headers: { apikey: serviceKey, ...(!serviceKey.startsWith('sb_') ? { Authorization: `Bearer ${serviceKey}` } : {}) }
       }),
       fetch(`${url}/rest/v1/newsletter_subscribers?source=eq.quiz_insomnia&order=consented_at.desc&limit=200`, {
-        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
+        headers: { apikey: serviceKey, ...(!serviceKey.startsWith('sb_') ? { Authorization: `Bearer ${serviceKey}` } : {}) }
       }).catch(() => ({ ok: false, json: async () => [] })),
       fetch(`${url}/rest/v1/night_waitlist?order=created_at.desc&limit=200`, {
-        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
+        headers: { apikey: serviceKey, ...(!serviceKey.startsWith('sb_') ? { Authorization: `Bearer ${serviceKey}` } : {}) }
       }).catch(() => ({ ok: false, json: async () => [] }))
     ]);
 
     const rawEvents: InsomniaQuizEvent[] = eventsRes.ok ? await eventsRes.json() : [];
+    const generalAnalyticsEvents = rawEvents.filter(event => !isHealthCluesAnalyticsPath(String(event.path || '')));
 
     // Collect all visitor IDs that belong to admin, test scripts, or internal development
     const internalVisitorIds = new Set<string>([
@@ -299,7 +302,7 @@ export async function processInsomniaQuizAnalytics(url: string, serviceKey: stri
       '6ab4030b-ce93-4d4f-9287-e07736ae51a3', // Admin local test profile
     ]);
 
-    rawEvents.forEach(e => {
+    generalAnalyticsEvents.forEach(e => {
       const ref = String(e.referrer || '');
       const path = String(e.path || '');
       const meta = (e.metadata || {}) as Record<string, unknown>;
@@ -317,7 +320,7 @@ export async function processInsomniaQuizAnalytics(url: string, serviceKey: stri
     });
 
     // Strictly filter out test traffic (admin visits, dev/test sessions, agent automation)
-    const events: InsomniaQuizEvent[] = rawEvents.filter(e => {
+    const events: InsomniaQuizEvent[] = generalAnalyticsEvents.filter(e => {
       const vid = String(e.visitor_id || '');
       if (vid && internalVisitorIds.has(vid)) return false;
       const ref = String(e.referrer || '');

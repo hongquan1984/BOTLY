@@ -1,0 +1,14 @@
+{
+  "detectedAt": "2026-11-02T16:35:48.488Z",
+  "taskId": "HC-003",
+  "taskLaunched": false,
+  "projectFile": "App/CURRENT_STATE.md",
+  "ownerApprovedSnapshotSha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+  "ownerSnapshotSha256Verified": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+  "currentSha256": "209e951cc14b31e06d0a9a54f95dc883267ec17e1bb17fc3d786405015dd8ac0",
+  "currentBytes": 229609,
+  "currentMtimeUtc": "2026-11-02T16:35:20.000Z",
+  "stableDuringDiagnostic": true,
+  "changeStatus": "UNAPPROVED_POST_SNAPSHOT_VERSION",
+  "decision": "No new snapshot or baseline accepted. No AI task launched."
+}

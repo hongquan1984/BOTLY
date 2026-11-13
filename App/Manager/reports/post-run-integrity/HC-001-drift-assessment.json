@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-11-02T16:30:39.680Z",
+  "path": "App/CURRENT_STATE.md",
+  "current": {
+    "sha256": "ea2cfc73853f7a43e75adad8959ccd18c82ff3654c1a2ec9b0d3da73926c99f8",
+    "bytes": 227828,
+    "mtimeUtc": "2026-11-02T16:09:10.000Z",
+    "gitStatus": "untracked"
+  },
+  "reviewedVersion": {
+    "sha256": "84deba53fe1649b29698e4c574842049fb17cb019c848532ba0890bd9a233d1a",
+    "bytes": 227143,
+    "projectIndexHash": null
+  },
+  "historicalCopySearch": {
+    "result": "No prior content snapshot found; only current file was present in App and Manager workspace listings. The Git path is untracked, so no committed blob is available.",
+    "searched": "App and App/Manager paths for CURRENT_STATE backup/history names; Manager reports/manifests"
+  },
+  "contentAssessment": {
+    "currentMp20Lines": "App/CURRENT_STATE.md lines 827-839",
+    "currentClaims": [
+      "MP20 two-question source is implemented and focused synthetic UI test passed.",
+      "Immediate signed Plan save, uncheck removal and preservation of unrelated goals are described as implemented.",
+      "The same section states the new profile activation, authenticated Plan persistence/rehydration/uncheck readback and full EN/VI account acceptance are not yet verified."
+    ],
+    "comparison": "These current statements are consistent with the HC-001 and HC-002 conclusions that authenticated current-flow acceptance remains UNVERIFIED. Exact additions since the reviewed bytes cannot be identified without the prior content."
+  },
+  "impact": {
+    "HC001": "Source requirement and accepted evidence manifest directly include CURRENT_STATE.md. The current text does not overturn its conclusion, but exact delta cannot be established; keep PASS as historical and request Owner decision before treating it as current.",
+    "HC002": "Its task source requirements included CURRENT_STATE.md, and the Project Index at session initialization recorded the old 84de? hash. The HC-002 task manifest did not itself hash this document. Its audit finding remains consistent with the current MP20 text, but exact input-version verification is incomplete; preserve the historical PASS and do not claim a byte-for-byte source binding."
+  },
+  "affectedTasks": [
+    "HC-001",
+    "HC-002",
+    "HC-003",
+    "HC-004",
+    "HC-005",
+    "HC-006",
+    "HC-007",
+    "HC-008"
+  ],
+  "recommendation": "Preserve HC-001 and HC-002 PASS statuses and their original hashes. Do not update either manifest/baseline automatically. Owner should choose whether to authorize a focused HC-001 re-review of current-state evidence or accept these historical PASS records and explicitly reconcile the current document for future queue tasks."
+}

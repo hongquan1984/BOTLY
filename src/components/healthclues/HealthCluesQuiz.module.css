@@ -1,0 +1,224 @@
+.screen {
+  --quest-glow: rgba(93, 132, 199, 0.28);
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100dvh - 4.25rem);
+  overflow: clip;
+  padding: clamp(1rem, 3vw, 2.75rem);
+  color: #f7f0dc;
+}
+
+.screen[data-quest="feel-calmer"] { --quest-glow: rgba(160, 137, 211, 0.3); }
+.screen[data-quest="more-energy"] { --quest-glow: rgba(237, 177, 88, 0.3); }
+.screen[data-quest="eat-healthier"] { --quest-glow: rgba(138, 185, 105, 0.3); }
+.screen[data-quest="move-more"] { --quest-glow: rgba(127, 188, 216, 0.3); }
+.screen[data-quest="healthy-weight"] { --quest-glow: rgba(205, 162, 202, 0.3); }
+.screen[data-quest="natural-wellness"] { --quest-glow: rgba(117, 183, 146, 0.3); }
+.screen[data-quest="health-concern"] { --quest-glow: rgba(199, 162, 115, 0.3); }
+
+.worldArt,
+.sceneShade {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  pointer-events: none;
+}
+
+.worldArt {
+  background-image: radial-gradient(ellipse at 25% 44%, var(--quest-glow), transparent 52%), url("/healthclues/assets/world/healthclues-world-overworld.webp");
+  background-position: center, center 52%;
+  background-size: cover;
+  filter: saturate(0.88);
+  transform: scale(1.02);
+}
+
+.sceneShade {
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(7, 18, 23, 0.82), rgba(8, 20, 24, 0.48) 43%, rgba(8, 20, 24, 0.74)), linear-gradient(180deg, rgba(5, 16, 19, 0.22), rgba(5, 16, 19, 0.72));
+}
+
+.scene {
+  display: grid;
+  width: min(100%, 78rem);
+  min-height: calc(100dvh - 9rem);
+  grid-template-columns: minmax(13rem, 0.68fr) minmax(0, 1.32fr);
+  align-items: center;
+  gap: clamp(1.25rem, 4vw, 4rem);
+  margin: 0 auto;
+}
+
+.adventureRail {
+  position: sticky;
+  top: 6rem;
+  display: flex;
+  min-height: 28rem;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(1rem, 2vw, 2rem) 0;
+}
+
+.chapter {
+  color: #f1d48e;
+  font-size: 0.65rem;
+  font-weight: 950;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 12px #071316;
+}
+
+.regionName {
+  max-width: 20rem;
+  margin-top: 0.7rem;
+  color: #fff4d5;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.6rem, 3vw, 2.7rem);
+  font-weight: 700;
+  line-height: 1.08;
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.72);
+}
+
+.railCopy {
+  max-width: 20rem;
+  margin-top: 0.65rem;
+  color: rgba(248, 241, 221, 0.8);
+  font-size: 0.88rem;
+  line-height: 1.65;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+
+.railCharacter {
+  width: clamp(9rem, 18vw, 16rem);
+  margin: 0.7rem 0 -0.75rem -0.7rem;
+  filter: drop-shadow(0 1rem 1.2rem rgba(0, 0, 0, 0.46));
+}
+
+.content {
+  width: 100%;
+  max-width: 50rem;
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.panel {
+  overflow: hidden;
+  border: 1px solid rgba(232, 199, 128, 0.66);
+  border-radius: 1.8rem;
+  background: linear-gradient(145deg, rgba(251, 243, 219, 0.97), rgba(230, 218, 184, 0.96));
+  color: #20332e;
+  box-shadow: 0 1.4rem 3.4rem rgba(0, 0, 0, 0.38), inset 0 1px rgba(255, 255, 255, 0.74);
+}
+
+.questPanel { padding: clamp(1.2rem, 2.8vw, 2.4rem); }
+
+.questCard {
+  position: relative;
+  isolation: isolate;
+  min-height: 11rem;
+  overflow: hidden;
+  border-color: rgba(255, 235, 183, 0.62);
+  background: linear-gradient(125deg, #102727, #284b42);
+  box-shadow: 0 0.6rem 1.3rem rgba(9, 22, 25, 0.24);
+}
+
+.questLandscape {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-image: linear-gradient(90deg, rgba(5, 15, 21, 0.12), rgba(5, 15, 21, 0.6)), url("/healthclues/assets/world/healthclues-world-overworld.webp");
+  background-size: 100% 100%, 320% auto;
+  transition: transform 400ms ease, filter 400ms ease;
+}
+
+.questCard::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(5, 15, 21, 0.12), rgba(5, 15, 21, 0.28)), linear-gradient(0deg, rgba(5, 15, 21, 0.94), rgba(5, 15, 21, 0.08) 90%);
+  content: "";
+  pointer-events: none;
+}
+
+.questCard:hover .questLandscape,
+.questCard:focus-visible .questLandscape { transform: scale(1.06); filter: saturate(1.12) brightness(1.08); }
+
+.questCopy, .questSummary { position: relative; z-index: 1; color: #fff8e8; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.72); }
+.questRegion { color: #ffe7aa; }
+
+.progressTrack {
+  height: 0.55rem;
+  overflow: hidden;
+  border: 1px solid rgba(84, 99, 77, 0.22);
+  border-radius: 999px;
+  background: #d7d0b8;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #5b9076, #b4b96b 75%, #e6bd64);
+  box-shadow: 0 0 0.8rem rgba(105, 157, 112, 0.38);
+  transition: width 220ms ease;
+}
+
+.eligibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1.1rem;
+  border: 1px solid rgba(173, 126, 44, 0.42);
+  border-radius: 999px;
+  background: rgba(232, 207, 147, 0.44);
+  padding: 0.45rem 0.75rem;
+  color: #674d25;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.resultBanner {
+  border: 1px solid rgba(232, 199, 128, 0.55);
+  background: linear-gradient(135deg, #153b35, #2f6654 65%, #507650);
+  box-shadow: 0 0.8rem 1.8rem rgba(11, 37, 31, 0.24);
+}
+
+.actionPrimary {
+  border: 1px solid rgba(255, 233, 177, 0.7);
+  background: linear-gradient(180deg, #f0d084, #c38e43);
+  color: #2f2a1c;
+  box-shadow: 0 0.45rem 0 #77582f, 0 0.8rem 1.5rem rgba(33, 30, 19, 0.2);
+}
+
+.actionPrimary:hover { filter: brightness(1.05); }
+
+@media (max-width: 760px) {
+  .screen { padding: 0.5rem 0.65rem calc(5.2rem + env(safe-area-inset-bottom, 0px)); }
+  .scene { min-height: initial; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
+  .adventureRail {
+    position: relative;
+    top: auto;
+    min-height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.35rem 0.65rem;
+    background: rgba(7, 23, 19, 0.65);
+    border: 1px solid rgba(241, 212, 142, 0.22);
+    border-radius: 1rem;
+    backdrop-filter: blur(8px);
+  }
+  .railCharacter { width: 2.75rem !important; height: 4.1rem !important; margin: 0; flex-shrink: 0; }
+  .railText { min-width: 0; flex: 1; }
+  .chapter { font-size: 0.52rem; letter-spacing: 0.12em; line-height: 1.2; }
+  .regionName { margin-top: 0.1rem; font-size: 1.05rem; line-height: 1.2; }
+  .railCopy { display: none; }
+  .panel { border-radius: 1.3rem; }
+  .questPanel { padding: 1.1rem; }
+  .questCard { min-height: 8.7rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressFill,
+  .questLandscape { transition: none; }
+}

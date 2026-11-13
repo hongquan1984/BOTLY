@@ -5,8 +5,8 @@ Hướng dẫn cấu hình/cấp token mới nhất: `PUBLISHING-SETUP.md`.
 
 ## Áp dụng
 
-Chạy `migrations/002_wellness_articles.sql` một lần trong Supabase SQL Editor.
-Migration độc lập với hai bảng kế hoạch/newsletter của `001_wellness.sql`.
+Legacy migration `legacy_migrations/002_wellness_articles.sql` is retained for reference only; do not execute it again.
+The timestamped Botly schema baseline in `supabase/migrations/` represents the current application schema.
 File chạy trong transaction: nếu lỗi, toàn bộ thay đổi trong migration được rollback.
 Chưa áp dụng migration lên Supabase từ workspace này.
 

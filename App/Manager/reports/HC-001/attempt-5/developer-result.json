@@ -1,0 +1,48 @@
+{
+  "taskId": "HC-001",
+  "attempt": 5,
+  "status": "READY_FOR_REVIEW",
+  "summary": "Audit complete from supplied excerpts only. HC-001 remains INCOMPLETE: historical real Gemini technical success is documented, but current recommendation quality and live-output persistence are UNVERIFIED. Safety enforcement requires REWORK. This is not an overall acceptance PASS.",
+  "changedFiles": [],
+  "tests": [],
+  "screenshots": [],
+  "evidence": [
+    "src/features/healthclues/personalized-wellness-plan.ts",
+    "src/features/healthclues/gemini-wellness-plan.ts",
+    "src/features/healthclues/server/wellness-plan-proof.ts",
+    "src/features/healthclues/wellness-plan.ts",
+    "scripts/test-healthclues-personalized-plan-contract.mjs",
+    "scripts/test-healthclues-gemini-plan-pipeline.mjs",
+    "scripts/test-healthclues-personalized-recommendations.mjs",
+    "App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md"
+  ],
+  "knownLimitations": [
+    "No filesystem or Git inspection occurred. Supplied hashes were not independently verified.",
+    "Historical report matrices conflict with later checkpoints: older NOT STARTED/NOT RUN entries are superseded within their documented scope by later synthetic acceptance. They do not negate the recorded genuine HTTP 200 request.",
+    "Historical HTTP 402 and schema failures are not evidence of a current billing blocker; current provider availability is unknown.",
+    "Later report sections supersede the older numeric prohibition and describe bilingual snapshot persistence and sampled legacy continuity. Original authenticated 96-answer retention remains unverified.",
+    "No raw provider response, correlated runtime log artifact or current browser harness content was supplied for independent verification of reported execution.",
+    "Canonical specification excerpts are incomplete, including truncated current-state next steps. Full document consistency cannot be established."
+  ],
+  "blockers": [
+    "Overall recommendation acceptance cannot pass while current live quality, real-output persistence and the identified safety/grounding gaps remain unresolved."
+  ],
+  "nextSuggestedSteps": [
+    "Add server-side AI movement gating for reported restrictions and unresolved acute-pain context; add focused synthetic rejection cases while retaining safe sibling goals.",
+    "Require reported-habit claims to be supported by supplied answers, or use neutral concern-based wording. Add a regression rejecting the unsupported phone-use assertion in the existing synthetic case.",
+    "After those gaps are resolved and a separate live request is authorized, evaluate current real-provider output for concern and answer grounding, practical distinct A/B choices, bilingual consistency and safety; then verify selected genuine output through authenticated Plan save/read/reload. Keep fixture and provider evidence separate."
+  ],
+  "auditFindings": [
+    "PASS — Read-only audit: no tools, commands, provider calls or file changes were performed. Findings use only supplied content.",
+    "PASS — Source contract inspection: src/features/healthclues/personalized-wellness-plan.ts defines up to six bilingual goals, distinct A/B action checks, bilingual digit consistency, concern matching and selected safety filters. src/features/healthclues/gemini-wellness-plan.ts assigns server UUIDs, classifies provider failures and can omit individually rejected goals.",
+    "PASS, historical technical scope only — App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md records one genuine simplified-contract Sleep request with provider/application HTTP 200, request ID 8daba742-033f-499e-b55e-e3e658dd2d28, four goals and completed schema/safety stages. No Plan was saved. The subsequent owner clarification withdrew the assessment that modest numeric choices alone were a quality defect.",
+    "UNVERIFIED — Current real-provider quality: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md explicitly records no live inference after risk-aware prompt/validator refinement. The earlier successful Sleep request does not verify current output quality or other concerns.",
+    "PASS, reported fixture scope only — App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md records authenticated synthetic UI-to-Plan persistence, A/B/Custom selection, omitted goals, zero goals, reload and account isolation. Advisor requests were intercepted; these results do not establish real Gemini recommendation quality or persistence of real output.",
+    "PASS, test-content inspection only — scripts/test-healthclues-personalized-plan-contract.mjs contains synthetic Sleep/Gout/Weight cases, signed-proof tampering checks, bilingual display assertions and selected safety cases. scripts/test-healthclues-gemini-plan-pipeline.mjs uses constructed responses and mocked request callbacks/statuses. Neither supplied script establishes live integration success; neither was executed during this audit.",
+    "REWORK — AI movement safety: src/features/healthclues/personalized-wellness-plan.ts checks urgent safety level but does not gate generated movement against acutePainfulJoint or activityRestriction. src/features/healthclues/wellness-plan.ts contains those gates for other goal paths. The supplied AI contract tests use explicitly unrestricted profiles and do not cover restricted or unresolved movement context.",
+    "REWORK — Grounding acceptance: src/features/healthclues/personalized-wellness-plan.ts validates concern keywords rather than verifying claimed habits against answers. scripts/test-healthclues-personalized-plan-contract.mjs accepts a reason asserting reported bedtime phone use even though its constructed profile contains no such report. This demonstrates a grounding-check gap, not evidence that live Gemini invented that habit.",
+    "UNVERIFIED — Deterministic ranking implementation: scripts/test-healthclues-personalized-recommendations.mjs contains synthetic ranking/history/safety assertions, but its imported ranker implementation was not supplied. Its production-boundary assertion removes all demo candidates before calling the ranker; it does not independently prove production filtering.",
+    "UNVERIFIED — Visual acceptance: App/reports/HEALTHCLUES_MASTER_PROMPT_17_ACCEPTANCE.md reports inspected screenshots, but no screenshot image was supplied or inspected in this audit. No independent visual PASS is assigned.",
+    "PASS, source boundary only — src/features/healthclues/server/wellness-plan-proof.ts binds signed bilingual goal copy to a profile digest, expiry and selected option. The actual Advisor and Plan route implementations were not supplied, so route enforcement and current runtime configuration remain independently unverified."
+  ]
+}

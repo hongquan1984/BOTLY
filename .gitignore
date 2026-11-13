@@ -1,7 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
+**/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -13,9 +14,11 @@
 # testing
 /coverage
 /secrets/
+/App/secrets/
 
 # next.js
-/.next/
+.next/
+**/.next/
 /out/
 
 # production
@@ -48,6 +51,19 @@ Music_Voice/
 *.epub
 *.zip
 .tmp/
+.tmp*/
 *_legacy.jpg
 *_old_loomind.jpg
+
+# Next.js custom builds & test artifacts
+.next-*/
+.tmp_3dhome/
+
+# Expo / React Native Mobile build artifacts
+.expo/
+**/.expo/
+**/dist/
+**/dist-web/
+*.log
+
 
