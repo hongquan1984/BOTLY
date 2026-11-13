@@ -481,14 +481,22 @@ const WorldHalosOverlay = React.memo(function WorldHalosOverlay({
 // WorldScreen parent.
 
 const VisitorLayer = React.memo(function VisitorLayer({
-  visitors,
   diorama25D,
-  onTapVisitor,
+  isScreenFocused,
+  zoomMode,
+  mode,
 }: {
-  visitors: SimulatedVisitor[];
   diorama25D: boolean;
-  onTapVisitor: (id: string) => void;
+  isScreenFocused: boolean;
+  zoomMode: "close" | "overview";
+  mode: RegionMode;
 }) {
+  const { visitors, handleTapVisitor } = useLivingVillageVisitors({
+    isScreenFocused,
+    zoomMode,
+    mode,
+  });
+
   return (
     <>
       {visitors.map((v) => {
@@ -515,7 +523,7 @@ const VisitorLayer = React.memo(function VisitorLayer({
               accessibilityRole="button"
               accessibilityLabel={`Simulated villager ${v.name}`}
               onPress={() => {
-                onTapVisitor(v.id);
+                handleTapVisitor(v.id);
                 try {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 } catch {}
@@ -532,6 +540,7 @@ const VisitorLayer = React.memo(function VisitorLayer({
             {v.speech && (
               <View style={styles.visitorSpeechBubble} pointerEvents="none">
                 <Text style={styles.visitorSpeechText}>{v.speech}</Text>
+                <View style={styles.speechBubbleTail} />
               </View>
             )}
           </View>
@@ -594,6 +603,7 @@ const RemotePlayersLayer = React.memo(function RemotePlayersLayer({
             {peer.speech && (
               <View style={styles.visitorSpeechBubble} pointerEvents="none">
                 <Text style={styles.visitorSpeechText}>{peer.speech}</Text>
+                <View style={styles.speechBubbleTail} />
               </View>
             )}
           </View>
@@ -799,12 +809,6 @@ export default function WorldScreen() {
   const broadcastPositionRef = useRef(broadcastPosition);
   broadcastPositionRef.current = broadcastPosition;
 
-  const { visitors, handleTapVisitor } = useLivingVillageVisitors({
-    isScreenFocused,
-    zoomMode,
-    mode,
-  });
-
   const centerCameraOn = useCallback(
     (targetX: number, targetY: number, animated = false) => {
       if (zoomMode !== "close") return;
@@ -942,12 +946,11 @@ export default function WorldScreen() {
     const tick = (nowArg?: number) => {
       if (cancelled) return;
       const now = typeof nowArg === "number" ? nowArg : (typeof performance !== "undefined" ? performance.now() : Date.now());
-      const dt = Math.min(0.05, Math.max(0.004, (now - lastTime) / 1000));
+      const dt = Math.min(0.04, Math.max(0.005, (now - lastTime) / 1000));
       lastTime = now;
 
       const route = activeRouteRef.current;
-      const wp = route[0];
-      if (!wp) {
+      if (!route || route.length === 0) {
         setIsMoving(false);
         setTargetPos(null);
         setWaypointQueue([]);
@@ -955,60 +958,63 @@ export default function WorldScreen() {
       }
 
       const curr = playerPosRef.current;
-      const safeX = Number.isNaN(curr.x) ? 430 : curr.x;
-      const safeY = Number.isNaN(curr.y) ? 660 : curr.y;
-      const dx = wp.x - safeX;
-      const dy = wp.y - safeY;
-      const dist = Math.hypot(dx, dy);
+      let currX = Number.isNaN(curr.x) ? 430 : curr.x;
+      let currY = Number.isNaN(curr.y) ? 660 : curr.y;
+      let remainingStep = speed * dt;
 
-      if (dx > 2) {
-        facingDirRef.current = "right";
-        facingScaleAnim.setValue(1);
-        petOffsetXAnim.setValue(-24);
-        petShadowOffsetXAnim.setValue(-24);
-      } else if (dx < -2) {
-        facingDirRef.current = "left";
-        facingScaleAnim.setValue(-1);
-        petOffsetXAnim.setValue(42);
-        petShadowOffsetXAnim.setValue(42);
+      // Continuous multi-waypoint steering: consumes remaining step distance smoothly through waypoints without pauses
+      while (remainingStep > 0 && route.length > 0) {
+        const targetWp = route[0];
+        const segDx = targetWp.x - currX;
+        const segDy = targetWp.y - currY;
+        const segDist = Math.hypot(segDx, segDy);
+
+        if (segDx > 1.5) {
+          facingDirRef.current = "right";
+          facingScaleAnim.setValue(1);
+          petOffsetXAnim.setValue(-24);
+          petShadowOffsetXAnim.setValue(-24);
+        } else if (segDx < -1.5) {
+          facingDirRef.current = "left";
+          facingScaleAnim.setValue(-1);
+          petOffsetXAnim.setValue(42);
+          petShadowOffsetXAnim.setValue(42);
+        }
+
+        if (segDist <= remainingStep) {
+          // Reached this waypoint in current frame: snap to it, consume distance, advance to next waypoint!
+          currX = targetWp.x;
+          currY = targetWp.y;
+          remainingStep -= segDist;
+          route.shift();
+        } else {
+          // Move smoothly along current segment
+          currX += (segDx / segDist) * remainingStep;
+          currY += (segDy / segDist) * remainingStep;
+          remainingStep = 0;
+        }
       }
 
-      if (dist <= 9) {
-        playerPosRef.current = { x: wp.x, y: wp.y };
-        playerAnimX.setValue(wp.x);
-        playerAnimY.setValue(wp.y);
-        playerScaleAnim.setValue(getWorldDepthScale(wp.y, diorama25DRef.current));
-        if (cameraFollowRef.current) {
-          centerCameraOnRef.current(wp.x, wp.y, false);
-        }
+      playerPosRef.current = { x: currX, y: currY };
+      playerAnimX.setValue(currX);
+      playerAnimY.setValue(currY);
+      playerScaleAnim.setValue(getWorldDepthScale(currY, diorama25DRef.current));
 
-        route.shift();
-        if (route.length === 0) {
-          setPlayerPos({ x: wp.x, y: wp.y });
-          setIsMoving(false);
-          setTargetPos(null);
-          setWaypointQueue([]);
-          checkArrivalNearLandmark(wp.x, wp.y, true);
-          broadcastPositionRef.current(wp.x, wp.y, false, facingDirRef.current);
-          return;
-        }
-        rafId = requestAnimationFrame(tick);
+      if (cameraFollowRef.current) {
+        centerCameraOnRef.current(currX, currY, false);
+      }
+
+      if (route.length === 0) {
+        setPlayerPos({ x: currX, y: currY });
+        setIsMoving(false);
+        setTargetPos(null);
+        setWaypointQueue([]);
+        checkArrivalNearLandmark(currX, currY, true);
+        broadcastPositionRef.current(currX, currY, false, facingDirRef.current);
         return;
       }
 
-      const step = Math.min(dist, speed * dt);
-      const nextX = safeX + (dx / dist) * step;
-      const nextY = safeY + (dy / dist) * step;
-      playerPosRef.current = { x: nextX, y: nextY };
-
-      playerAnimX.setValue(nextX);
-      playerAnimY.setValue(nextY);
-      playerScaleAnim.setValue(getWorldDepthScale(nextY, diorama25DRef.current));
-      if (cameraFollowRef.current) {
-        centerCameraOnRef.current(nextX, nextY, false);
-      }
-      broadcastPositionRef.current(nextX, nextY, true, facingDirRef.current);
-
+      broadcastPositionRef.current(currX, currY, true, facingDirRef.current);
       rafId = requestAnimationFrame(tick);
     };
 
@@ -1030,19 +1036,19 @@ export default function WorldScreen() {
     petShadowOffsetXAnim,
   ]);
 
-  // Walking bob animation
+  // Subtle natural walking step bob (smooth 3.5px gait without violent shaking)
   useEffect(() => {
     if (isMoving) {
       Animated.loop(
         Animated.sequence([
           Animated.timing(walkBobAnim, {
-            toValue: -8,
-            duration: 160,
+            toValue: -3.5,
+            duration: 180,
             useNativeDriver: true,
           }),
           Animated.timing(walkBobAnim, {
             toValue: 0,
-            duration: 160,
+            duration: 180,
             useNativeDriver: true,
           }),
         ])
@@ -1606,11 +1612,12 @@ export default function WorldScreen() {
                       onSelectLandmark={handleSelectLandmark}
                     />
 
-                    {/* 6 SIMULATED LIVING VILLAGE ADVENTURERS — memo-isolated layer */}
+                    {/* 6 SIMULATED LIVING VILLAGE ADVENTURERS — self-contained isolated layer */}
                     <VisitorLayer
-                      visitors={visitors}
                       diorama25D={diorama25D}
-                      onTapVisitor={handleTapVisitor}
+                      isScreenFocused={isScreenFocused}
+                      zoomMode={zoomMode}
+                      mode={mode}
                     />
 
                     {/* REAL ONLINE ADVENTURERS LAYER — memo-isolated layer */}
@@ -1709,6 +1716,7 @@ export default function WorldScreen() {
                       {mySpeech && (
                         <View style={styles.mySpeechBubble} pointerEvents="none">
                           <Text style={styles.mySpeechText}>{mySpeech}</Text>
+                          <View style={styles.mySpeechBubbleTail} />
                         </View>
                       )}
                     </Animated.View>
@@ -3201,21 +3209,36 @@ const styles = StyleSheet.create({
   },
   visitorSpeechBubble: {
     position: "absolute",
-    top: -38,
+    bottom: 50, // Anchored 50px above foot/bottom anchor -> floats cleanly above head!
+    alignSelf: "center",
     backgroundColor: "rgba(6, 24, 19, 0.96)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: radius.sm,
-    borderWidth: 1,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
     borderColor: colors.emeraldLight,
     maxWidth: 180,
-    minWidth: 90,
+    minWidth: 85,
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.45,
+    shadowRadius: 5,
+    elevation: 8,
+    zIndex: 150,
+  },
+  speechBubbleTail: {
+    position: "absolute",
+    bottom: -5,
+    alignSelf: "center",
+    width: 0,
+    height: 0,
+    borderLeftWidth: 5,
+    borderRightWidth: 5,
+    borderTopWidth: 5,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderTopColor: colors.emeraldLight,
   },
   visitorSpeechText: {
     fontFamily: fonts.uiSemiBold,
@@ -3226,20 +3249,36 @@ const styles = StyleSheet.create({
   },
   mySpeechBubble: {
     position: "absolute",
-    top: -38,
+    bottom: 56, // Anchored 56px above foot/bottom anchor -> floats cleanly above player head!
+    alignSelf: "center",
     backgroundColor: "rgba(6, 24, 19, 0.96)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: radius.sm,
-    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
     borderColor: colors.goldLight,
-    maxWidth: 200,
+    maxWidth: 195,
+    minWidth: 90,
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 9,
+    zIndex: 160,
+  },
+  mySpeechBubbleTail: {
+    position: "absolute",
+    bottom: -5,
+    alignSelf: "center",
+    width: 0,
+    height: 0,
+    borderLeftWidth: 5,
+    borderRightWidth: 5,
+    borderTopWidth: 5,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderTopColor: colors.goldLight,
   },
   mySpeechText: {
     fontFamily: fonts.uiBold,

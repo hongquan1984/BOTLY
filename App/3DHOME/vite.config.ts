@@ -6,7 +6,7 @@ export default defineConfig({
     port: 5179,
     strictPort: false,
     watch: {
-      ignored: ['**/reports/**', '**/scripts/**'],
+      ignored: ['**/reports/**', '**/scripts/**', '**/glb_public/**', '**/public/**'],
     },
   },
   build: {

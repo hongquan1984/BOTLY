@@ -1023,7 +1023,8 @@ export function buildSwissChalet(assets?: HybridAssetLoader): ChaletBuildResult 
   // Fireplace mantel styling & Hallway pier console + gallery art + sconces
   placeGltfHero('ceramic_vase_01', fpX + 0.14, floorY + 1.55, fpZ - 0.35, 0.5, 0.32, true, '#f2e8da', 0.35);
   placeGltfHero('ClassicConsole_01', 0.0, floorY, -3.96, 0, 0.80, true, '#c99c72', 0.34);
-  placeGltfHero('brass_vase_01', 0.22, floorY + 0.80, -3.96, 0.2, 0.30, true, undefined, 0.68);
+  placeGltfHero('potted_plant_02', -0.35, floorY + 0.80, -3.96, 0.2, 0.32, true, undefined, 0.45);
+  placeGltfHero('brass_vase_01', 0.28, floorY + 0.80, -3.96, 0.2, 0.30, true, undefined, 0.68);
   placeGltfHero('hanging_picture_frame_01', 0.0, floorY + 1.55, -4.16, 0, 0.78, true);
   placeGltfHero('industrial_wall_sconce', -0.62, floorY + 1.68, -4.15, 0, 0.34, false, undefined, 0.55);
   placeGltfHero('industrial_wall_sconce', 0.62, floorY + 1.68, -4.15, 0, 0.34, false, undefined, 0.55);
@@ -1207,15 +1208,15 @@ export function buildSwissChalet(assets?: HybridAssetLoader): ChaletBuildResult 
     placeGltfHero('throw_pillows_01', 0.58, floorY + 0.38, -7.80, Math.PI / 2, 0.34, true, '#efe6d8', 0.30, group, secAssets);
     placeGltfHero('ClassicNightstand_01', 0.48, floorY, -9.22, Math.PI / 2, 0.62, true, '#c2986e', 0.34, group, secAssets);
     placeGltfHero('ClassicNightstand_01', 0.48, floorY, -6.38, Math.PI / 2, 0.62, true, '#c2986e', 0.34, group, secAssets);
-    placeGltfHero('brass_candleholders', 0.48, floorY + 0.62, -9.22, 0.2, 0.24, true, undefined, 0.65, group, secAssets);
+    placeGltfHero('potted_plant_02', 0.48, floorY + 0.62, -9.22, 0.3, 0.32, true, undefined, 0.45, group, secAssets);
     placeGltfHero('brass_candleholders', 0.48, floorY + 0.62, -6.38, -0.2, 0.24, true, undefined, 0.65, group, secAssets);
     placeGltfHero('drawer_cabinet', 3.92, floorY, -5.50, -Math.PI / 2, 0.86, true, '#caa076', 0.34, group, secAssets);
     placeGltfHero('ornate_mirror_01', 4.30, floorY + 1.52, -5.50, -Math.PI / 2, 0.92, false, undefined, 0.65, group, secAssets);
     placeGltfHero('brass_vase_01', 3.92, floorY + 0.86, -5.50, 0.1, 0.28, true, undefined, 0.68, group, secAssets);
     placeGltfHero('modern_arm_chair_01', 3.22, floorY, -10.12, Math.PI * 0.86, 0.84, true, '#efe5d6', 0.32, group, secAssets);
     placeGltfHero('Ottoman_01', 2.66, floorY, -10.48, 0.2, 0.42, true, '#efe5d6', 0.32, group, secAssets);
-    // Replace ugly potted_plant_02 with potted_plant_04 (denser, more elegant)
-    placeGltfHero('potted_plant_04', 0.78, floorY, -10.75, 0.4, 0.95, true, undefined, 0.38, group, secAssets);
+    // Real potted plant (potted_plant_02 from 3dsky / Poly Haven) placed at its authentic tabletop/corner scale
+    placeGltfHero('potted_plant_02', 0.78, floorY, -10.75, 0.4, 0.46, true, undefined, 0.45, group, secAssets);
     placeGltfHero('modern_ceiling_lamp_01', 2.25, floorY + 2.75, -7.80, 0, 0.48, false, undefined, 0.55, roofCutawayGroup, secAssets);
     // Art on bedroom wall — framed painting above the bed headboard
     placeGltfHero('hanging_picture_frame_01', 1.22, floorY + 1.72, -4.44, 0, 0.72, false, undefined, 0.65, group, secAssets);
@@ -1227,9 +1228,8 @@ export function buildSwissChalet(assets?: HybridAssetLoader): ChaletBuildResult 
     placeGltfHero('ornate_mirror_01', -0.14, floorY + 1.62, -7.80, -Math.PI / 2, 0.90, false, undefined, 0.65, group, secAssets);
     placeGltfHero('industrial_wall_sconce', -0.16, floorY + 1.78, -9.58, -Math.PI / 2, 0.32, false, undefined, 0.55, group, secAssets);
     placeGltfHero('industrial_wall_sconce', -0.16, floorY + 1.78, -7.12, -Math.PI / 2, 0.32, false, undefined, 0.55, group, secAssets);
-    placeGltfHero('brass_vase_01', -0.46, floorY + 0.88, -8.35, 0.3, 0.26, true, undefined, 0.68, group, secAssets);
+    placeGltfHero('potted_plant_02', -0.46, floorY + 0.88, -8.35, 0.3, 0.30, true, undefined, 0.45, group, secAssets);
     placeGltfHero('brass_candleholders', -2.06, floorY + 0.56, -10.30, 0.5, 0.24, true, undefined, 0.68, group, secAssets);
-    // Replace ugly sparse potted_plant_02 with ceramic vase + small fern instead
     placeGltfHero('fern_02', -3.95, floorY, -10.65, -0.4, 0.42, true, undefined, 0.38, group, secAssets);
     placeGltfHero('ceramic_vase_01', -2.06, floorY + 0.60, -10.30, 0.3, 0.16, true, undefined, 0.65, group, secAssets);
   };

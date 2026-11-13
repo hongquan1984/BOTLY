@@ -619,4 +619,14 @@ export const HYBRID_ASSET_REGISTRY: HybridAssetSpec[] = [
     triangles: 3600,
     notes: 'Tall luxury indoor greenery for corner & bedroom',
   },
+  {
+    id: 'tree_small_02',
+    tier: 'hero',
+    loadPhase: 1,
+    url: '/assets/glb/tree_small_02.glb',
+    source: 'Poly Haven / 3DSky CC0',
+    license: 'CC0',
+    triangles: 12000,
+    notes: 'Slender curved trunk outdoor garden & yard tree',
+  },
 ];

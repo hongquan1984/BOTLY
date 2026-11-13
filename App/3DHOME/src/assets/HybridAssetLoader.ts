@@ -79,7 +79,13 @@ export class HybridAssetLoader {
             if (m && 'envMapIntensity' in m) {
               const std = m as THREE.MeshStandardMaterial;
               std.envMapIntensity = 0.42;
-              if (spec.tier === 'secondary' && std.transparent) {
+              const isLeaves = m.name && m.name.toLowerCase().includes('leaves');
+              if (isLeaves) {
+                std.alphaTest = 0.45;
+                std.transparent = false;
+                std.depthWrite = true;
+                std.side = THREE.DoubleSide;
+              } else if (spec.tier === 'secondary' && std.transparent) {
                 std.alphaTest = Math.max(0.38, std.alphaTest || 0.42);
                 std.transparent = false;
                 std.depthWrite = true;
@@ -91,7 +97,8 @@ export class HybridAssetLoader {
 
       this.cache.set(spec.id, { id: spec.id, template: root, size });
       loaded.push(spec.id);
-    } catch {
+    } catch (err) {
+      console.error(`[HybridAssetLoader] Failed loading ${spec.id} (${spec.url}):`, err);
       this.failed.add(spec.id);
       missing.push(spec.id);
     }

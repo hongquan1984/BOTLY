@@ -128,8 +128,28 @@ export function useWorldPresence({
         const data = await res.json();
         if (data && Array.isArray(data.players)) {
           const others = data.players.filter((p: any) => p.id !== sid);
-          setRemotePlayers(others);
-          setOnlineCount(data.onlineCount || others.length + 1);
+          // Only update remote players state if there is a material change (avoids React re-render churn during walking)
+          setRemotePlayers((prev) => {
+            if (isWalk && prev.length === others.length) {
+              // During active walk strides, preserve current peer positions to avoid micro-stutters
+              return prev;
+            }
+            if (prev.length !== others.length) return others;
+            let changed = false;
+            for (let i = 0; i < others.length; i++) {
+              const op = prev[i];
+              const np = others[i];
+              if (!op || op.id !== np.id || Math.abs(op.x - np.x) > 3 || Math.abs(op.y - np.y) > 3 || op.speech !== np.speech || op.facing !== np.facing) {
+                changed = true;
+                break;
+              }
+            }
+            return changed ? others : prev;
+          });
+          setOnlineCount((prev) => {
+            const nextCount = data.onlineCount || others.length + 1;
+            return prev === nextCount ? prev : nextCount;
+          });
         }
       } catch {
         // Ignore network / offline errors gracefully

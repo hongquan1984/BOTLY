@@ -1,9 +1,7 @@
 import * as THREE from 'three';
 import { HybridAssetLoader } from '../assets/HybridAssetLoader';
 import {
-  createBarkTexture,
   createGraniteTextures,
-  createLeafClusterTexture,
   createSoftShadowTexture,
   loadPolyHavenPBR,
 } from '../textures/proceduralTextures';
@@ -409,43 +407,10 @@ export function buildAlpineEnvironment(
   buildInstancedGltfBotanicals(group, isMobile, assets);
   buildPathBollards(group);
 
-  // 6. Broadleaf & Deciduous Trees Near House — procedural primary (GLB fallback)
-  const tx = -12.4;
-  const tz = 12.1;
-  const heroTreeGltf = assets?.cloneNormalized('island_tree_02', 6.8);
-  const treeGroup = heroTreeGltf ?? buildHeroDeciduousTree();
-  treeGroup.position.set(tx, getGroundHeight(tx, tz) - 0.05, tz);
-  treeGroup.rotation.y = 0.65;
-  group.add(treeGroup);
-  const treeShadow = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 3.4), contactShadowMat);
-  treeShadow.rotation.x = -Math.PI / 2;
-  treeShadow.position.set(tx, getGroundHeight(tx, tz) + 0.015, tz);
-  group.add(treeShadow);
-  colliders.push({ minX: -13.1, maxX: -11.7, minZ: 11.4, maxZ: 12.8, tag: 'hero-tree' });
+  // 6. Real CC0 Deciduous Trees (Tree Small 02 from 3DSky / Poly Haven replicated across entire garden & yard)
+  buildSmallDeciduousTrees(group, isMobile, assets, colliders);
 
-  // Side accent evergreen near right patio/fireplace window — Real CC0 GLB
-  const sideTree = assets?.cloneNormalized('fir_sapling', 4.8) ?? assets?.cloneNormalized('pine_sapling_small', 4.8);
-  if (sideTree) {
-    const sideSpruceX = 6.8, sideSpruceZ = 8.2;
-    sideTree.position.set(sideSpruceX, getGroundHeight(sideSpruceX, sideSpruceZ) - 0.05, sideSpruceZ);
-    sideTree.rotation.y = 1.2;
-    group.add(sideTree);
-    const sideShadow = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.2), contactShadowMat);
-    sideShadow.rotation.x = -Math.PI / 2;
-    sideShadow.position.set(sideSpruceX, getGroundHeight(sideSpruceX, sideSpruceZ) + 0.015, sideSpruceZ);
-    group.add(sideShadow);
-    colliders.push({ minX: 6.3, maxX: 7.3, minZ: 7.7, maxZ: 8.7, tag: 'side-tree' });
-  }
-
-  // Back-left accent evergreen — Real CC0 GLB
-  const backSpruce = assets?.cloneNormalized('pine_sapling_small', 4.5) ?? assets?.cloneNormalized('fir_sapling', 4.5);
-  if (backSpruce) {
-    backSpruce.position.set(-11.0, getGroundHeight(-11.0, 1.5) - 0.05, 1.5);
-    backSpruce.rotation.y = 2.8;
-    group.add(backSpruce);
-  }
-
-  // 7. Near/Midground Real CC0 Alpine Pine GLBs (background forest is rendered in 2.5D parallax layers)
+  // 7. Near/Midground Real CC0 Alpine Pine GLBs (background mountain slope behind chalet)
   buildNearPineGltfs(group, isMobile, assets);
 
   const setHighDetail = (_high: boolean) => {
@@ -488,105 +453,7 @@ function buildShorelinePebbles(parent: THREE.Group, mat: THREE.Material): void {
   parent.add(pebbles);
 }
 
-function createCurvedTrunkGeo(botR: number, topR: number, height: number, bendX: number): THREE.BufferGeometry {
-  const geo = new THREE.CylinderGeometry(topR, botR, height, 10, 6);
-  geo.translate(0, height * 0.5, 0);
-  const p = geo.attributes.position;
-  for (let i = 0; i < p.count; i++) {
-    const y = p.getY(i);
-    const t = y / height;
-    // Gentle organic S-bend + root flare at bottom
-    p.setX(i, p.getX(i) + Math.sin(t * Math.PI * 0.85) * bendX);
-    if (t < 0.14) {
-      const flare = 1.0 + (0.14 - t) * 2.2;
-      p.setX(i, p.getX(i) * flare);
-      p.setZ(i, p.getZ(i) * flare);
-    }
-  }
-  geo.computeVertexNormals();
-  return geo;
-}
 
-function buildHeroDeciduousTree(): THREE.Group {
-  const tree = new THREE.Group();
-  const barkTex = createBarkTexture();
-  const barkMat = new THREE.MeshStandardMaterial({
-    map: barkTex,
-    color: '#8a705b',
-    roughness: 0.94,
-  });
-  const leafTex = createLeafClusterTexture();
-  const leafMat = new THREE.MeshStandardMaterial({
-    map: leafTex,
-    alphaTest: 0.4,
-    roughness: 0.68,
-    side: THREE.DoubleSide,
-  });
-
-  const trunk = new THREE.Mesh(createCurvedTrunkGeo(0.46, 0.26, 4.6, 0.28), barkMat);
-  trunk.castShadow = true;
-  trunk.receiveShadow = true;
-  tree.add(trunk);
-
-  const boughs: Array<{ pos: [number, number, number]; rot: [number, number, number]; len: number; r: number }> = [
-    { pos: [1.35, 4.5, 0.15], rot: [0.1, 0.1, -0.82], len: 3.9, r: 0.15 },
-    { pos: [3.2, 5.5, -0.5], rot: [-0.2, 0.2, -1.08], len: 3.6, r: 0.10 },
-    { pos: [-0.6, 4.7, -0.8], rot: [-0.35, 0, 0.52], len: 2.8, r: 0.14 },
-    { pos: [0.75, 5.1, 1.1], rot: [0.48, 0, -0.45], len: 2.7, r: 0.12 },
-  ];
-  for (const b of boughs) {
-    const branch = new THREE.Mesh(new THREE.CylinderGeometry(b.r * 0.52, b.r, b.len, 8), barkMat);
-    branch.position.set(...b.pos);
-    branch.rotation.set(...b.rot);
-    branch.castShadow = true;
-    tree.add(branch);
-  }
-
-  const cardGeo = new THREE.PlaneGeometry(1.85, 1.85);
-  const clusterCenters: Array<[number, number, number, number]> = [
-    [0.25, 5.5, 0.1, 1.32],
-    [1.85, 5.7, -0.2, 1.24],
-    [3.35, 5.9, -0.6, 1.18],
-    [4.65, 6.0, -0.9, 1.05],
-    [5.85, 6.1, -1.1, 0.94],
-    [-1.15, 5.3, -0.8, 1.18],
-    [0.95, 5.5, 1.4, 1.15],
-    [2.55, 5.4, 0.9, 1.1],
-    [1.25, 6.4, -0.3, 1.15],
-    [3.15, 6.5, -0.5, 1.05],
-  ];
-
-  clusterCenters.forEach(([lx, ly, lz, sc], idx) => {
-    for (let k = 0; k < 3; k++) {
-      const card = new THREE.Mesh(cardGeo, leafMat);
-      card.position.set(lx + (k - 1) * 0.22, ly + (k === 1 ? 0.18 : -0.1), lz + (k - 1) * 0.15);
-      card.rotation.set(0.35 * (k - 1), idx * 0.8 + k * 1.05, 0.25 * (k - 1));
-      card.scale.setScalar(sc);
-      card.castShadow = true;
-      card.receiveShadow = true;
-      tree.add(card);
-    }
-  });
-
-  // Creamy-white spring Alpine blossoms clustered among the arching boughs
-  const blossomMat = new THREE.MeshStandardMaterial({ color: '#faf6eb', roughness: 0.65 });
-  const blossomGeo = new THREE.IcosahedronGeometry(0.09, 0);
-  const blossomCount = 54;
-  const blossoms = new THREE.InstancedMesh(blossomGeo, blossomMat, blossomCount);
-  const bDummy = new THREE.Object3D();
-  for (let i = 0; i < blossomCount; i++) {
-    const [cx, cy, cz, sc] = clusterCenters[i % clusterCenters.length];
-    const ang = i * 2.39996;
-    const r = (0.2 + (i % 5) * 0.16) * sc;
-    bDummy.position.set(cx + Math.cos(ang) * r, cy + Math.sin(i * 1.7) * 0.35, cz + Math.sin(ang) * r);
-    bDummy.scale.setScalar(0.85 + (i % 3) * 0.25);
-    bDummy.updateMatrix();
-    blossoms.setMatrixAt(i, bDummy.matrix);
-  }
-  tree.add(blossoms);
-
-  return tree;
-}
 
 function buildInstancedGltfBotanicals(
   parent: THREE.Group,
@@ -820,6 +687,67 @@ function buildInstancedGltfBotanicals(
   );
 }
 
+function buildSmallDeciduousTrees(
+  parent: THREE.Group,
+  isMobile: boolean,
+  assets?: HybridAssetLoader,
+  colliders?: Array<{ minX: number; maxX: number; minZ: number; maxZ: number; tag?: string }>
+): void {
+  if (!assets) return;
+
+  // Real CC0 Deciduous Trees (Tree Small 02 from 3DSky / Poly Haven) replicated across entire yard & garden
+  const sites = [
+    { x: -12.4, z: 12.1, h: 5.6, ry: 0.65 },  // Front-left garden path hero tree (replacing ugly truncated tree)
+    { x: -8.8,  z: 13.8, h: 4.8, ry: 1.85 },  // Stepping stone entry left
+    { x: -5.2,  z: 16.5, h: 4.2, ry: 2.40 },  // Lakeside path left
+    { x: 2.8,   z: 17.2, h: 4.5, ry: 0.95 },  // Lakeside path right
+    { x: 7.8,   z: 15.2, h: 4.8, ry: 3.10 },  // Front driveway / lakeside corner
+    { x: 9.2,   z: 11.5, h: 5.2, ry: 1.45 },  // Right garden lawn
+    { x: 7.2,   z: 7.8,  h: 4.9, ry: 2.20 },  // Right lawn by fireplace terrace
+    { x: -10.8, z: 2.5,  h: 5.0, ry: 1.30 },  // Left terrace garden flank
+    { x: -13.6, z: 6.2,  h: 4.6, ry: 2.80 },  // West garden boundary
+    { x: -14.2, z: 10.0, h: 4.3, ry: 0.40 },  // Front entrance walkway approach
+    { x: 6.5,   z: 4.2,  h: 4.7, ry: 1.70 },  // Near side-deck transition
+  ];
+
+  for (const s of sites) {
+    const tree = assets.cloneNormalized('tree_small_02', s.h);
+    if (tree) {
+      const gy = getGroundHeight(s.x, s.z);
+      tree.position.set(s.x, gy - 0.04, s.z);
+      tree.rotation.y = s.ry;
+      tree.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.castShadow = !isMobile;
+          child.receiveShadow = true;
+          if (child.material) {
+            const mats = Array.isArray(child.material) ? child.material : [child.material];
+            for (const m of mats) {
+              if (m.name && m.name.toLowerCase().includes('leaves')) {
+                m.transparent = false;
+                m.alphaTest = 0.45;
+                m.depthWrite = true;
+                m.side = THREE.DoubleSide;
+              }
+            }
+          }
+        }
+      });
+      parent.add(tree);
+
+      if (colliders) {
+        colliders.push({
+          minX: s.x - 0.45,
+          maxX: s.x + 0.45,
+          minZ: s.z - 0.45,
+          maxZ: s.z + 0.45,
+          tag: 'tree-small-02',
+        });
+      }
+    }
+  }
+}
+
 function buildNearPineGltfs(
   parent: THREE.Group,
   isMobile: boolean,
@@ -827,10 +755,9 @@ function buildNearPineGltfs(
 ): void {
   if (!assets) return;
 
-  // Real CC0 Photorealistic Alpine Pine & Fir Groves
-  // Each grove combines primary + intertwined secondary instances for lush, dense, natural foliage
+  // Real CC0 Photorealistic Alpine Pine & Fir Groves on mountain slopes behind chalet
   const groveCenters: Array<{ x: number; z: number; h: number; id: 'pine_sapling_small' | 'fir_sapling' }> = [
-    // Left forest copse framing the garden
+    // Left forest copse framing the mountain
     { x: -14.2, z: -2.5, h: 5.2, id: 'fir_sapling' },
     { x: -16.5, z: -7.0, h: 5.8, id: 'pine_sapling_small' },
     { x: -13.8, z: -10.5, h: 5.4, id: 'fir_sapling' },
@@ -843,9 +770,6 @@ function buildNearPineGltfs(
     // Deep background forest fringe (far behind, subtle depth)
     { x: -1.2, z: -26.0, h: 6.5, id: 'fir_sapling' },
     { x: 3.5, z: -27.5, h: 6.8, id: 'pine_sapling_small' },
-    // Lakeside & driveway accents
-    { x: 8.6, z: 12.2, h: 3.8, id: 'fir_sapling' },
-    { x: -15.5, z: 5.5, h: 4.6, id: 'pine_sapling_small' },
   ];
 
   const buckets: Record<'pine_sapling_small' | 'fir_sapling', THREE.Matrix4[]> = {
