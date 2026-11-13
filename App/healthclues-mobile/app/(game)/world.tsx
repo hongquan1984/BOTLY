@@ -117,10 +117,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       roleVi: "Điểm Danh & Nhật Ký",
       roleEn: "Check-in & Care Records",
       IconComponent: TentTree,
-      x: 288,
-      y: 423,
-      approachX: 380,
-      approachY: 670,
+      x: 1440,
+      y: 710,
+      approachX: 1330,
+      approachY: 720,
       greetingVi: "Chào mừng bạn đến khu cắm trại! Hãy ghi lại nhịp sống hôm nay để nhận 10 EXP.",
       greetingEn: "Welcome to camp! Log today's care routine to earn 10 EXP.",
       detailsVi: "Ghi nhận 3 thói quen buổi sáng, chất lượng giấc ngủ và bài tập hít thở trước khi ngủ.",
@@ -140,10 +140,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       npcRole: "Chuyên Gia Thảo Mộc Y Khoa",
       npcAvatar: require("../../assets/game/regions/npc-botanist-distinct.webp"),
       IconComponent: Flower2,
-      x: 1088,
-      y: 414,
-      approachX: 1040,
-      approachY: 480,
+      x: 1250,
+      y: 480,
+      approachX: 1180,
+      approachY: 530,
       greetingVi: "Hoa cúc La Mã (Chamomile) và Lạc tiên chứa apigenin tự nhiên giúp thư giãn tinh thần trước khi ngủ.",
       greetingEn: "Chamomile contains apigenin binding GABA receptors for natural calm.",
       detailsVi: "Tài liệu y học: Các hợp chất thảo mộc hỗ trợ cơ chế thư giãn thần kinh tự nhiên mà không gây phụ thuộc.",
@@ -163,10 +163,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       npcRole: "Chuyên Gia Thư Giãn",
       npcAvatar: require("../../assets/game/regions/npc-wellness-guide-distinct.webp"),
       IconComponent: Flower2,
-      x: 1216,
-      y: 648,
-      approachX: 1180,
-      approachY: 650,
+      x: 180,
+      y: 720,
+      approachX: 300,
+      approachY: 730,
       greetingVi: "Hãy thả lỏng vai và hàm. Kỹ thuật thở 4-7-8 kích hoạt hệ thần kinh đối giao cảm giúp nhịp tim chậm lại.",
       greetingEn: "Drop your shoulders and unclench your jaw. 4-7-8 breathing activates parasympathetic tone.",
       detailsVi: "Thực hành: Hít vào 4 giây qua mũi, giữ hơi 7 giây, thở ra 8 giây qua miệng. Lặp lại 4 chu kỳ.",
@@ -186,10 +186,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       npcRole: "Hướng Dẫn Viên Vận Động",
       npcAvatar: require("../../assets/game/regions/npc-trail-explorer-distinct.webp"),
       IconComponent: Footprints,
-      x: 384,
-      y: 648,
-      approachX: 430,
-      approachY: 660,
+      x: 640,
+      y: 740,
+      approachX: 680,
+      approachY: 720,
       greetingVi: "Đi bộ nhẹ 15-20 phút sau bữa tối giúp hạ đường huyết và hỗ trợ tiết melatonin tự nhiên trước giờ ngủ.",
       greetingEn: "A gentle 15-20 min post-dinner walk improves glycemic regulation and natural melatonin.",
       detailsVi: "Khuyến nghị: Không tập luyện cường độ cao trong vòng 2 tiếng trước khi đi ngủ.",
@@ -205,10 +205,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       roleVi: "Kho Tri Thức Giấc Ngủ",
       roleEn: "Sleep Hygiene Library",
       IconComponent: BookOpen,
-      x: 384,
-      y: 256,
-      approachX: 432,
-      approachY: 340,
+      x: 910,
+      y: 380,
+      approachX: 910,
+      approachY: 480,
       greetingVi: "Ánh sáng xanh từ điện thoại ức chế tuyến tùng tiết melatonin. Quy tắc vàng: Tắt màn hình 45p trước khi ngủ.",
       greetingEn: "Blue light suppresses pineal melatonin. Gold standard: Screen-free 45 mins before sleep.",
       detailsVi: "Quy chuẩn vệ sinh giấc ngủ y khoa: Phòng ngủ thoáng mát (18-22°C), tối hoàn toàn và yên tĩnh.",
@@ -224,10 +224,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       roleVi: "Khu Phố & Ngôi Nhà Ấm Áp",
       roleEn: "Neighborhood & Cozy Chalet",
       IconComponent: Home,
-      x: 784,
-      y: 252,
-      approachX: 784,
-      approachY: 414,
+      x: 240,
+      y: 460,
+      approachX: 350,
+      approachY: 560,
       greetingVi: "Cánh cổng đá vòm rợp hoa lá dẫn vào Làng An Cư — nơi tọa lạc ngôi nhà ấm áp của bạn và khu phố những người bạn cùng rèn luyện lối sống khỏe.",
       greetingEn: "The stone ivy archway leading to Home Haven — your cozy chalet and neighborhood of friends.",
       detailsVi: "Bước qua cánh cổng để về ngôi nhà ấm cúng của riêng bạn hoặc khám phá bản đồ khu phố minh họa của các cư dân trong làng.",
@@ -243,10 +243,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       roleVi: "Cột Mốc & Phần Thưởng",
       roleEn: "Milestones & Trophies",
       IconComponent: Trophy,
-      x: 1344,
-      y: 702,
-      approachX: 1260,
-      approachY: 720,
+      x: 1100,
+      y: 780,
+      approachX: 1040,
+      approachY: 740,
       greetingVi: "Khu vực lưu giữ các phần thưởng và cột mốc hành trình sức khỏe của bạn.",
       greetingEn: "Archive of your wellness keepsakes and habit milestones.",
       detailsVi: "Cột mốc: Ngày 7, Ngày 14, Ngày 30. Mỗi cột mốc nhận thưởng cổ vật và danh hiệu vinh danh.",
@@ -264,10 +264,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       roleVi: "Nhật Ký Thể Chất",
       roleEn: "Physical Care Journal",
       IconComponent: TentTree,
-      x: 280,
-      y: 465,
-      approachX: 380,
-      approachY: 670,
+      x: 1440,
+      y: 710,
+      approachX: 1330,
+      approachY: 720,
       greetingVi: "Chào mừng đến Vương Quốc HealthClues! Điểm danh hôm nay để kích hoạt bảo vệ thể chất.",
       greetingEn: "Welcome to HealthClues Realm! Check in today to fortify your vitality.",
       detailsVi: "Theo dõi lượng nước theo nhu cầu cơ thể, mức độ thoải mái khớp và chế độ dinh dưỡng bảo vệ.",
@@ -287,10 +287,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       npcRole: "Dược Tính Tự Nhiên",
       npcAvatar: require("../../assets/game/regions/npc-botanist-distinct.webp"),
       IconComponent: Flower2,
-      x: 1088,
-      y: 414,
-      approachX: 1040,
-      approachY: 480,
+      x: 1250,
+      y: 480,
+      approachX: 1180,
+      approachY: 530,
       greetingVi: "Khu vườn bảo tồn các loại thảo dược tự nhiên. Tìm hiểu các nhóm thực phẩm giàu flavonoid và anthocyanin.",
       greetingEn: "Botanical garden preserving healing flora. Discover polyphenol-rich foods.",
       detailsVi: "Tri thức dinh dưỡng: Quả mọng và cần tây giàu chất chống oxy hóa tự nhiên, hỗ trợ chuyển hóa lành mạnh.",
@@ -310,10 +310,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       npcRole: "Chuyên Gia Phục Hồi Khớp",
       npcAvatar: require("../../assets/game/regions/npc-wellness-guide-distinct.webp"),
       IconComponent: Flower2,
-      x: 1216,
-      y: 648,
-      approachX: 1180,
-      approachY: 650,
+      x: 180,
+      y: 720,
+      approachX: 300,
+      approachY: 730,
       greetingVi: "Nước là dung môi bài tiết tự nhiên tốt nhất. Bài tập thở thư giãn giúp giảm co thắt mạch máu ngoại biên.",
       greetingEn: "Water is nature's best solvent. Relaxed breathing improves peripheral circulation.",
       detailsVi: "Thực hành bài tập thở 4-7-8 giúp xoa dịu thần kinh và tăng lưu thông máu đến khớp bị mỏi.",
@@ -333,10 +333,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       npcRole: "Vận Động Trị Liệu",
       npcAvatar: require("../../assets/game/regions/npc-trail-explorer-distinct.webp"),
       IconComponent: Footprints,
-      x: 384,
-      y: 648,
-      approachX: 430,
-      approachY: 660,
+      x: 640,
+      y: 740,
+      approachX: 680,
+      approachY: 720,
       greetingVi: "Vận động nhẹ 15 phút kích thích tiết dịch khớp mà không gây tổn thương sụn.",
       greetingEn: "Low-impact exercise stimulates synovial fluid without cartilage impact.",
       detailsVi: "Quy tắc an toàn: Dừng lại ngay khi khớp có dấu hiệu sưng đau cấp tính. Không tập nặng.",
@@ -352,10 +352,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       roleVi: "Tri Thức Chuyển Hóa",
       roleEn: "Metabolic Hygiene",
       IconComponent: BookOpen,
-      x: 384,
-      y: 256,
-      approachX: 432,
-      approachY: 340,
+      x: 910,
+      y: 380,
+      approachX: 910,
+      approachY: 480,
       greetingVi: "Purine từ nội tạng động vật và hải sản là nguồn gốc chính tạo ra acid uric trong cơ thể.",
       greetingEn: "Dietary purines from organ meats metabolize into uric acid.",
       detailsVi: "Nguyên tắc chế độ ăn: Ưu tiên đạm từ sữa ít béo, trứng và các loại đậu. Uống nước rải đều trong ngày.",
@@ -371,10 +371,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       roleVi: "Khu Phố & Ngôi Nhà Ấm Áp",
       roleEn: "Neighborhood & Cozy Chalet",
       IconComponent: Home,
-      x: 784,
-      y: 252,
-      approachX: 784,
-      approachY: 414,
+      x: 240,
+      y: 460,
+      approachX: 350,
+      approachY: 560,
       greetingVi: "Cánh cổng đá vòm rợp hoa lá dẫn vào Làng An Cư — nơi tọa lạc ngôi nhà ấm áp của bạn và khu phố những người bạn cùng rèn luyện lối sống khỏe.",
       greetingEn: "The stone ivy archway leading to Home Haven — your cozy chalet and neighborhood of friends.",
       detailsVi: "Bước qua cánh cổng để về ngôi nhà ấm cúng của riêng bạn hoặc khám phá bản đồ khu phố minh họa của các cư dân trong làng.",
@@ -390,10 +390,10 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       roleVi: "Thành Tựu Sức Khỏe",
       roleEn: "Wellness Hall of Fame",
       IconComponent: Trophy,
-      x: 1344,
-      y: 702,
-      approachX: 1260,
-      approachY: 720,
+      x: 1100,
+      y: 780,
+      approachX: 1040,
+      approachY: 740,
       greetingVi: "Nơi tôn vinh những người chơi duy trì lối sống lành mạnh liên tục 14 và 30 ngày.",
       greetingEn: "Honoring players achieving consistent 14 and 30-day care streaks.",
       detailsVi: "Phần thưởng hiện vật và danh hiệu vinh danh độc quyền từ Hội đồng Cố vấn Sức khỏe.",
@@ -802,7 +802,7 @@ export default function WorldScreen() {
   }, [visitedHouses]);
 
   const [mode, setMode] = useState<RegionMode>("exploration");
-  const [activeRegion, setActiveRegion] = useState<ActiveRegion>("healthclues-realm");
+  const [activeRegion, setActiveRegion] = useState<ActiveRegion>("sleep-valley");
   const [zoomMode, setZoomMode] = useState<"close" | "overview">("close");
   const [cameraFollow, setCameraFollow] = useState<boolean>(true);
   const [diorama25D, setDiorama25D] = useState<boolean>(true);
@@ -836,16 +836,16 @@ export default function WorldScreen() {
   }, []);
 
   // Player Real-time Coordinates on 1600x900 map (GPU Animated values drive 60fps movement with zero React re-renders)
-  const [playerPos, setPlayerPos] = useState<{ x: number; y: number }>({ x: 430, y: 660 });
-  const playerPosRef = useRef<{ x: number; y: number }>({ x: 430, y: 660 });
+  const [playerPos, setPlayerPos] = useState<{ x: number; y: number }>({ x: 880, y: 720 });
+  const playerPosRef = useRef<{ x: number; y: number }>({ x: 880, y: 720 });
   const [targetPos, setTargetPos] = useState<{ x: number; y: number } | null>(null);
   const [waypointQueue, setWaypointQueue] = useState<Point[]>([]);
   const activeRouteRef = useRef<Point[]>([]);
   const [isMoving, setIsMoving] = useState<boolean>(false);
 
-  const playerAnimX = useRef(new Animated.Value(430)).current;
-  const playerAnimY = useRef(new Animated.Value(660)).current;
-  const playerScaleAnim = useRef(new Animated.Value(getWorldDepthScale(660, true))).current;
+  const playerAnimX = useRef(new Animated.Value(880)).current;
+  const playerAnimY = useRef(new Animated.Value(720)).current;
+  const playerScaleAnim = useRef(new Animated.Value(getWorldDepthScale(720, true))).current;
   const facingScaleAnim = useRef(new Animated.Value(1)).current;
   const petOffsetXAnim = useRef(new Animated.Value(-24)).current;
   const petShadowOffsetXAnim = useRef(new Animated.Value(-24)).current;
@@ -1536,11 +1536,7 @@ export default function WorldScreen() {
                 }}
               >
                 <ImageBackground
-                  source={
-                    activeRegion === "sleep-valley"
-                      ? require("../../assets/game/regions/sleep-valley-scene-blueprint.webp")
-                      : require("../../assets/game/regions/healthclues-realm-scene-blueprint.webp")
-                  }
+                  source={require("../../assets/game/regions/sleep-valley-square-fg.webp")}
                   style={styles.blueprintCanvas}
                   resizeMode="cover"
                 >
@@ -1616,14 +1612,14 @@ export default function WorldScreen() {
               {diorama25D && (
                 <View style={styles.parallaxBackgroundContainer} pointerEvents="none">
                   <Image
-                    source={require("../../assets/game/regions/world-bg-mountains-lake.webp")}
+                    source={require("../../assets/game/regions/sleep-valley-mountains-bg.webp")}
                     style={[
                       styles.parallaxBackgroundImage,
                       {
                         transform: [
-                          { translateX: -cameraScroll.x * 0.32 },
-                          { translateY: -cameraScroll.y * 0.12 },
-                          { scale: 1.08 },
+                          { translateX: -cameraScroll.x * 0.22 },
+                          { translateY: -cameraScroll.y * 0.08 },
+                          { scale: 1.1 },
                         ],
                       },
                     ]}
@@ -1699,11 +1695,7 @@ export default function WorldScreen() {
                     >
                     <ImageBackground
                       accessibilityLabel="world-blueprint-canvas"
-                      source={
-                        activeRegion === "sleep-valley"
-                          ? require("../../assets/game/regions/sleep-valley-scene-blueprint.webp")
-                          : require("../../assets/game/regions/healthclues-realm-scene-blueprint.webp")
-                      }
+                      source={require("../../assets/game/regions/sleep-valley-square-fg.webp")}
                       style={styles.blueprintCanvas}
                       resizeMode="cover"
                     >

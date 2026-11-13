@@ -1,23 +1,19 @@
-## 2026-11-13 — Cycle 90: HealthClues Mobile — Cổng Làng An Cư (Home Haven Gate), Bản Đồ Khu Phố Cư Dân & Map 2.5D Diorama Tách Lớp Parallax Núi Hồ
+## 2026-11-13 — Cycle 91: HealthClues Mobile — Hai Layer Đồ Họa Độc Lập (Quảng Trường Làng An Cư & Nền Núi Tuyết Alpine), Ghép 2.5D Parallax & Nghiệm Thu AI Vision 2 Vòng
 
-**Status: IMPLEMENTED & VERIFIED (`npx tsc --noEmit` PASS + `npx expo export` PASS + CDP BROWSER VERIFIED + PORT `8081` LIVE).**
+**Status: IMPLEMENTED & VERIFIED ACROSS 2 AUTOMATED ROUNDS (`npx tsc --noEmit` PASS + `npx expo export` PASS + AI VISION PASS + PORT `8081` LIVE).**
 
-- **1. Cổng Làng An Cư (Home Haven Gate) & Bản Đồ Khu Phố Cư Dân ([`world.tsx`](file:///D:/botly/App/healthclues-mobile/app/(game)/world.tsx)):**
-  - Chuyển đổi landmark trung tâm thành **Cổng Làng An Cư (Home Haven Gate)** với biểu tượng `Home` vàng kim (`<Home size={18} color="#fef08a" />`) trên cả 2 vùng Sleep Valley và HealthClues Realm.
-  - Khi tiếp cận cổng, xuất hiện pill hành động nhanh với 2 lựa chọn: `Về Nhà 🏡` (chuyển hướng trực tiếp vào màn hình thiết kế nội thất `/(game)/home`) và `Khu Phố →` (mở Sheet minh họa).
-  - Tích hợp Sheet **Bản Đồ Khu Phố Các Cư Dân (Minh Họa)** gồm:
-    - *Tổ Ấm Của Bạn (Your Cozy Chalet)*: Thẻ nổi bật dẫn vào trang căn nhà.
-    - *Căn hộ của các cư dân láng giềng*: Mai Anh (Streak 14 ngày, Vườn cúc La Mã), Minh Tuấn (Streak 21 ngày, Góc thể thao 10k bước), Biệt Thự Bác Sĩ Hoàng (Cố vấn sức khỏe cộng đồng), Gác Xép Leo & Lucas (Đài thiên văn & thư viện), Bungalow Anna & Lily (Khu thiền định & yoga).
-    - Tương tác thân thiện: *"Ghé Thăm & Gửi Tim ❤️ (+5 EXP)"* kích hoạt rung xúc giác và thông báo thành công.
-- **2. Tách Riêng Background Núi Hồ & Hiệu Ứng 2.5D Diorama Parallax Hoàn Chỉnh ([`world.tsx`](file:///D:/botly/App/healthclues-mobile/app/(game)/world.tsx), [`world-bg-mountains-lake.webp`](file:///D:/botly/App/healthclues-mobile/assets/game/regions/world-bg-mountains-lake.webp)):**
-  - Tách riêng hoàn toàn layer phong cảnh nền núi tuyết & hồ nước Alpine Panorama (`world-bg-mountains-lake.webp`, `2000x520px`) nằm độc lập ở đường chân trời.
-  - Tích hợp hiệu ứng **Parallax Cuộn Đa Tầng Thời Gian Thực**: Khi nhân vật di chuyển và camera cuộn, layer nền trôi êm phía sau theo tỉ lệ phối cảnh sâu (`-cameraScroll.x * 0.22`, `-cameraScroll.y * 0.08`).
-  - **Mặt đất nghiêng 3D Perspective**: Khi bật chế độ `✨ 2.5D`, mặt đất nghiêng phối cảnh 3D (`perspective: 950`, `rotateX: 18deg`, `scale: 1.05`), mở rộng không gian phía chân trời; khi ở chế độ `🗺️ 2D`, mặt đất phẳng trực giao (`rotateX: 0deg`, `scale: 1.0`).
-  - **Billboard Counter-Tilt cho nhân vật**: Nhân vật người chơi `Bạn`, linh thú `Lumi`, các NPC và cư dân được đối trọng góc nghiêng `rotateX: -18deg` giúp đứng thẳng vuông góc trên mặt cỏ cùng bóng đổ tiếp xúc hình oval.
-  - Đầy đủ nút chuyển đổi trạng thái `✨ 2.5D` / `🗺️ 2D` trực quan tại thanh công cụ phía trên.
-- **3. Bằng chứng kiểm thử:**
-  - Báo cáo chi tiết: [`V1_MOBILE_25D_PARALLAX_AND_HOME_GATE_ACCEPTANCE.md`](file:///D:/botly/App/reports/V1_MOBILE_25D_PARALLAX_AND_HOME_GATE_ACCEPTANCE.md).
-  - Ảnh chụp màn hình: `world-25d-parallax-mountain.png`, `world-2d-flat-ground.png`, `world-home-gate-view.png`, `iphone-simulator-25d-horizon.png`.
+- **1. Hai Layer Nghệ Thuật Độc Lập Chuẩn Ghibli/Shinkai ([`sleep-valley-square-fg.webp`](file:///D:/botly/App/healthclues-mobile/assets/game/regions/sleep-valley-square-fg.webp), [`sleep-valley-mountains-bg.webp`](file:///D:/botly/App/healthclues-mobile/assets/game/regions/sleep-valley-mountains-bg.webp)):**
+  - **Layer Tiền Cảnh (Quảng Trường Làng An Cư - `1600x900`):** Phối cảnh 2.5D isometric ~30° nhìn xuống quảng trường trung tâm. Đài phun nước đá hoa văn chạm khắc tinh xảo với nước ngọc lam sủi bọt, các ngôi nhà chalet gỗ Thụy Sĩ ấm áp với giàn hoa ban công, Cổng Làng An Cư (vòm đá phủ dây leo & cầu gỗ dẫn về nhà), đường đá cuội tỏa tròn uốn quanh bồn hoa và ghế nghỉ chân.
+  - **Layer Hậu Cảnh (Dãy Núi Tuyết & Mặt Hồ Alpine - `2200x950`):** Toàn cảnh panorama dãy núi tuyết sắc nét soi bóng xuống mặt hồ nước xanh ngọc phẳng lặng, rừng thông xanh ngút ngàn, bầu trời rọi tia nắng ban mai trong trẻo, hoàn toàn không có chướng ngại vật tiền cảnh.
+  - **Tách Lớp Alpha Gradient Tự Nhiên:** Đỉnh mái chalet và hàng thông ở tiền cảnh được xử lý kênh Alpha chuyển tiếp trong suốt mượt mà, cho phép layer núi tuyết và hồ nước phía sau lộ diện chân thực ở đường chân trời.
+- **2. Tích Hợp Kỹ Thuật 2.5D Diorama Parallax & Billboard Nhân Vật ([`world.tsx`](file:///D:/botly/App/healthclues-mobile/app/(game)/world.tsx)):**
+  - Khi bật `✨ 2.5D`, mặt đất nghiêng 3D perspective (`perspective: 950`, `rotateX: 18deg`, `scale: 1.05`), nhân vật (`Bạn`, linh thú `Luna`, `Anna`, `Leo`, `Ben`, `Lucas`) được đối trọng `rotateX: -18deg` đứng thẳng góc vuông trên mặt đá/cỏ kèm bóng đổ oval tiếp xúc.
+  - Hiệu ứng Parallax cuộn đa tầng: Khi nhân vật di chuyển và camera lia, hậu cảnh núi tuyết & hồ nước di chuyển êm theo tỉ lệ `0.22x` tạo cảm giác núi hồ nằm xa tít tắp.
+  - Chuyển `🗺️ 2D`: Mặt phẳng duỗi thẳng trực giao 100% (`rotateX: 0deg`), toast phản hồi tức thì.
+- **3. Nghiệm Thu Tự Động 2 Vòng & Phân Tích Bằng AI Vision ([`test_2round_vision.mjs`](file:///D:/botly/App/healthclues-mobile/scripts/test_2round_vision.mjs)):**
+  - Chi tiết tại [`reports/V1_MOBILE_25D_PARALLAX_AND_HOME_GATE_ACCEPTANCE.md`](file:///D:/botly/App/reports/V1_MOBILE_25D_PARALLAX_AND_HOME_GATE_ACCEPTANCE.md).
+  - Vòng 1: Kiểm thử cấu trúc khối, di chuyển qua lại giữa các mốc, đổi chế độ 2D/2.5D và hiển thị trên khung iPhone 15 Pro.
+  - Vòng 2: Kiểm thử ghép nối trong suốt chân trời, mở modal Sheet Khu Phố Cư Dân tại Cổng Home, xác nhận bóng đổ nhân vật và độ phân giải hiển thị trên iPhone Simulator.
 
 ---
 

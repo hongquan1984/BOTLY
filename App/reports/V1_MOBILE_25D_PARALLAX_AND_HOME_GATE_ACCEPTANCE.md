@@ -1,52 +1,41 @@
-# Báo Cáo Nghiệm Thu: HealthClues Mobile — Cổng Làng An Cư (Home Haven Gate) & Bản Đồ 2.5D Diorama Tách Lớp Parallax Núi Hồ
+# Báo Cáo Nghiệm Thu 2 Vòng & Phân Tích AI Vision: Tách Lớp 2.5D Diorama Quảng Trường Làng An Cư & Nền Núi Tuyết Alpine Parallax
 
 **Ngày nghiệm thu:** 2026-11-13  
-**Môi trường:** HealthClues Mobile Expo Web (`http://127.0.0.1:8081` & `http://127.0.0.1:8081/iphone.html`)  
-**Thiết bị kiểm thử:** Trình giả lập iPhone 15 Pro, viewport mobile thực tế (`393x852`, `deviceScaleFactor: 2`).  
-**Trạng thái kiểm thử:** 100% PASS (`npx tsc --noEmit` PASS, `npx expo export` PASS, Playwright visual capture PASS).
+**Môi trường:** HealthClues Mobile Web (`http://127.0.0.1:8081` & `http://127.0.0.1:8081/iphone.html`)  
+**Công nghệ:** Expo React Native Web, WebP GPU Texture, 3D Perspective Diorama, Parallax Horizon Layering, Playwright CDP Automated Verification.  
+**Trạng thái kiểm thử:** 100% PASS qua 2 vòng kiểm thử tự động (Round 1 & Round 2), kiểm chứng thị giác trực quan qua AI Vision.
 
 ---
 
-## 1. Yêu Cầu Của Người Dùng & Giải Pháp Thực Hiện
+## 1. Hai Bức Ảnh Được Tạo Mới Độc Lập (Studio Ghibli / Makoto Shinkai Painterly Art Style)
 
-1. **Chuyển đổi Cổng Lớn thành Cổng Home & Bản Đồ Khu Phố Cư Dân:**
-   - *Yêu cầu:* "cổng này thì thay bằng kiểu Home, người chơi đi vào đây thì sẽ về nhà, sau này đi vào đấy thì hiển thị bản đồ kiểu nhà của các người chơi, dạng minh họa"
-   - *Thực hiện:*
-     - Đổi icon `Swords` chiến đấu thành icon `Home` màu vàng kim trên cả 2 vùng Sleep Valley và HealthClues Realm.
-     - Đổi tên landmark thành **Cổng Làng An Cư (Home Haven Gate)** với phụ đề *"Lối về chốn bình yên & cộng đồng sống khỏe"*.
-     - Khi người chơi đến gần hoặc chạm vào cổng:
-       - Xuất hiện pill hành động nhanh: `Về Nhà 🏡` (đi thẳng tới `/(game)/home`) và `Khu Phố →` (mở Sheet Khu Phố Cư Dân).
-       - Modal Sheet **Bản Đồ Khu Phố Các Cư Dân (Minh Họa)** trực quan:
-         - **Tổ Ấm Của Bạn (Your Cozy Chalet):** Thẻ nổi bật dẫn vào trang thiết kế nội thất `/home`.
-         - **Khu Nhà Các Cư Dân Khác:**
-           - *Nhà Mai Anh (Streak 14 ngày, Vườn cúc La Mã)*
-           - *Nhà Minh Tuấn (Streak 21 ngày, Góc thể thao 10k bước)*
-           - *Biệt Thự Bác Sĩ Hoàng (Cố vấn sức khỏe cộng đồng)*
-           - *Gác Xép Leo & Lucas (Đài thiên văn & thư viện)*
-           - *Bungalow Anna & Lily (Khu thiền định & yoga)*
-         - Nút hành động tương tác: *"Ghé Thăm & Gửi Tim ❤️ (+5 EXP)"* kích hoạt haptics và toast thông báo.
+1. **Ảnh Tiền Cảnh: Quảng Trường Làng An Cư (`sleep-valley-square-fg.webp` - `1600x900`):**
+   - Góc nhìn 2.5D phối cảnh nghiêng ~30° nhìn xuống quảng trường trung tâm.
+   - Đài phun nước tròn bằng đá hoa văn chạm khắc tinh xảo với dòng nước xanh ngọc trong vắt tỏa sóng nước.
+   - Các ngôi nhà chalet gỗ Thụy Sĩ ấm áp (Gästehaus Edelweiss, tiệm bánh, nhà vườn) với giàn hoa rực rỡ ở ban công và bậu cửa sổ.
+   - Cổng Làng An Cư (Home Haven Gate) bằng vòm đá cổ rêu phong phủ đầy dây leo xanh mướt và cây cầu gỗ dẫn lối về nhà.
+   - Các con đường lát đá cuội uốn lượn qua thảm cỏ xanh, vườn hoa khoe sắc, ghế băng gỗ nghỉ chân và cột đèn cổ điển.
+   - Bầu trời phía trên được tạo mặt nạ chuyển tiếp trong suốt (Alpha gradient) mượt mà ôm lấy ngọn cây thông và mái ngói, giúp layer núi phía sau hiển thị tự nhiên.
 
-2. **Tách Riêng Background Núi Hồ Cho Map 2.5D & Phân Biệt Tuyệt Đối 2D vs 2.5D:**
-   - *Yêu cầu:* "đúng ra map 2,5d thì background núi hồ phải tách riêng ra thành 1 ảnh, chứ tao thấy 2d và 2,5d đang ko khác gì nhau"
-   - *Thực hiện:*
-     - **Tách Layer Nền Riêng Biệt:** Tạo layer ảnh phong cảnh núi tuyết & hồ nước Alpine Panorama độc lập (`world-bg-mountains-lake.webp`, độ phân giải cao `2000x520px`).
-     - **Parallax Cuộn Đa Tầng Thời Gian Thực:** Khi người chơi di chuyển hoặc cuộn bản đồ, layer núi hồ phía sau trôi êm theo hệ số parallax (`cameraScroll.x * 0.22`, `cameraScroll.y * 0.08`), tạo cảm giác dãy núi và mặt hồ nằm tít tắp ở đường chân trời.
-     - **Mặt Đất Nghiêng Phối Cảnh 3D (3D Perspective Ground Tilt):**
-       - Ở chế độ **✨ 2.5D**: Áp dụng `perspective: 950`, `rotateX: 18deg`, `scale: 1.05` trên mặt phẳng bản đồ làng xóm, mở rộng đường chân trời hướng về dãy núi.
-       - Ở chế độ **🗺️ 2D**: Mặt đất quay về `rotateX: 0deg`, `scale: 1.0`, hiển thị bản đồ trực giao phẳng chuẩn mực.
-     - **Dựng Thẳng Nhân Vật (Billboard Counter-Tilt):**
-       - Khi mặt đất nghiêng 18°, các nhân vật (Người chơi `Bạn`, Linh thú `Lumi`, các cư dân `Lucas`, `Anna`, `Mia`, `Ben`, `Leo` và nhãn mốc) được đối trọng `rotateX: -18deg` để đứng thẳng vuông góc với mặt đất, kèm bóng đổ tiếp xúc hình oval mềm mại.
-     - **Nút Chuyển Đổi Rõ Ràng:** Nút chuyển góc nhìn hiển thị rõ `✨ 2.5D` (nổi bật, ánh sáng vàng) hoặc `🗺️ 2D` kèm toast thông báo trạng thái tức thì.
+2. **Ảnh Hậu Cảnh: Dãy Núi Tuyết Alps & Mặt Hồ Nước Xanh Ngọc (`sleep-valley-mountains-bg.webp` - `2200x950`):**
+   - Toàn cảnh panorama hùng vĩ của dãy Alps với các đỉnh núi tuyết nhọn sừng sững dưới nắng sớm chan hòa.
+   - Mặt hồ nước vùng cao trong vắt phẳng lặng phản chiếu bóng núi và mây trắng bồng bềnh.
+   - Rừng thông xanh ngút ngàn dưới chân núi làm nền cho đường chân trời.
+   - Tuyệt đối không có nhà cửa hay chướng ngại vật tiền cảnh, hoàn hảo cho việc làm nền Parallax trôi theo camera.
 
 ---
 
-## 2. Bằng Chứng Hình Ảnh Nghiệm Thu (Visual Evidence)
+## 2. Kết Quả Kiểm Thử & Phân Tích Bằng AI Vision Qua 2 Vòng
 
-1. **`world-25d-parallax-mountain.png`:**
-   - Chế độ 2.5D hoạt động với phối cảnh 3D diorama. Các nhân vật đứng thẳng (billboard) trên mặt cỏ với bóng đổ tiếp xúc.
-2. **`world-2d-flat-ground.png`:**
-   - Chế độ 2D phẳng trực giao, toast *"Đã chuyển về mặt phẳng 2D chuẩn"*, nút hiển thị `🗺️ 2D`.
-3. **`world-home-gate-view.png`:**
-   - Toàn cảnh đường mòn hướng về **Cổng Làng An Cư (Home)**. Các nhân vật dạo bước và phát biểu thoại y khoa thân thiện.
-4. **`iphone-simulator-25d-horizon.png`:**
-   - Trình giả lập iPhone 15 Pro (`http://localhost:8081/iphone.html`) tích hợp đầy đủ khung máy Dynamic Island và thanh điều hướng mượt mà.
+### Vòng 1 (Round 1 - Kiểm Tra Cấu Trúc Khối & Tương Thích Giao Diện):
+- `round1-01-25d-viewport.png`: Khởi tạo tại tâm quảng trường đài phun nước. Các nhân vật (`Bạn`, `Luna`, `Anna`, `Leo`, `Ben`) đứng vững trên nền đá hoa cương với bóng đổ tiếp xúc hình oval. Phối cảnh 2.5D tạo độ sâu rõ rệt.
+- `round1-02-town-square-gate.png`: Cuộn camera sang cánh trái tiếp cận Cổng Làng An Cư. Cổng vòm đá và cầu gỗ ăn khớp với thảm cỏ và cây ăn quả trĩu quả.
+- `round1-03-2d-mode.png`: Bấm chuyển `2D`, mặt đất duỗi thẳng trực giao 100%, toast thông báo xuất hiện rõ ràng.
+- `round1-04-iphone-simulator.png`: Hiển thị trọn vẹn trong khung iPhone 15 Pro, các bong bóng thoại y khoa không che khuất nhân vật.
+
+### Vòng 2 (Round 2 - Tách Lớp Trong Suốt & Ghép Núi Parallax Chân Trời Hoàn Thiện):
+- `round2-01-25d-town-square-fountain.png`: Tâm quảng trường đài phun nước rực sáng dưới nắng mai, nước trong đài phun nước lấp lánh phản chiếu ánh sáng.
+- `round2-02-scroll-top-mountain-horizon.png`: Khi cuộn lên phía trên mái nhà chalet và rặng thông, **Dãy núi tuyết Alps và bầu trời hồ nước phía sau lộ diện rõ ràng qua lớp cắt trong suốt**, trôi êm theo nhịp cuộn parallax (`cameraScroll * 0.22`), tạo chiều sâu không gian đa tầng xuất sắc.
+- `round2-03-home-haven-gate-sheet.png`: Bấm vào Cổng Làng An Cư mở ra sheet danh sách các căn hộ của cư dân làng sống khỏe (`Tổ Ấm Của Bạn`, `Bác Sĩ Hoàng`, `Mai Anh`, `Minh Tuấn`...).
+- `round2-04-toggle-2d-flat-mode.png`: Chuyển đổi qua lại giữa `✨ 2.5D` và `🗺️ 2D` mượt mà, không giật khung hình hay lỗi layout.
+- `round2-05-iphone-simulator-final.png`: Trình giả lập iPhone 15 Pro hoàn hảo, độ phân giải sắc nét, font chữ tiếng Việt rõ ràng, tỉ lệ khung hình chuẩn mực di động.
