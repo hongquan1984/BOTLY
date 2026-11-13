@@ -513,6 +513,9 @@ const VisitorLayer = React.memo(function VisitorLayer({
                 top: v.y - 44,
                 zIndex,
                 transform: [{ scale }],
+                // @ts-ignore - Smooth GPU compositor interpolation for living village visitors
+                transition: "left 120ms linear, top 120ms linear",
+                willChange: "left, top",
               },
             ]}
             pointerEvents="box-none"
@@ -575,6 +578,9 @@ const RemotePlayersLayer = React.memo(function RemotePlayersLayer({
                 top: peer.y - 44,
                 zIndex,
                 transform: [{ scale }],
+                // @ts-ignore - Smooth GPU compositor interpolation for remote multiplayer peers
+                transition: "left 200ms linear, top 200ms linear",
+                willChange: "left, top",
               },
             ]}
             pointerEvents="box-none"
