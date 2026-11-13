@@ -647,7 +647,10 @@ const WorldLandmarksLayer = React.memo(function WorldLandmarksLayer({
                 left: lm.x - 60,
                 top: lm.y - 32,
                 zIndex: lmZ,
-                transform: [{ scale: lmDepthScale }],
+                transform: [
+                  { scale: lmDepthScale },
+                  ...(diorama25D ? ([{ rotateX: "-18deg" }] as any) : []),
+                ],
               },
             ]}
             accessibilityRole="button"
@@ -889,6 +892,7 @@ export default function WorldScreen() {
   const vScrollRef = useRef<ScrollView>(null);
   const mapSurfaceRef = useRef<View>(null);
   const lastScrollRef = useRef<{ x: number; y: number }>({ x: -999, y: -999 });
+  const [cameraScroll, setCameraScroll] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const currentLandmarks = REGION_LANDMARKS[activeRegion];
   const resolvedAtmosphere = resolveWorldAtmosphere(atmosphereMode);
@@ -934,10 +938,12 @@ export default function WorldScreen() {
       if (Math.abs(scrollX - lastScrollRef.current.x) >= 1) {
         lastScrollRef.current.x = scrollX;
         hScrollRef.current?.scrollTo({ x: scrollX, animated });
+        setCameraScroll((prev) => (prev.x !== scrollX ? { ...prev, x: scrollX } : prev));
       }
       if (Math.abs(scrollY - lastScrollRef.current.y) >= 1) {
         lastScrollRef.current.y = scrollY;
         vScrollRef.current?.scrollTo({ y: scrollY, animated });
+        setCameraScroll((prev) => (prev.y !== scrollY ? { ...prev, y: scrollY } : prev));
       }
     },
     [viewportWidth, viewportHeight, zoomMode, coverScale, activeTalkLandmark]
@@ -1496,7 +1502,7 @@ export default function WorldScreen() {
                   onPress={() => {
                     setDiorama25D((prev) => {
                       const next = !prev;
-                      setActionSuccessMsg(next ? "Đã bật chiều sâu 2.5D Diorama" : "Đã chuyển về mặt phẳng 2D chuẩn");
+                      setActionSuccessMsg(next ? "Đã bật chiều sâu 2.5D Diorama & Parallax Núi Hồ" : "Đã chuyển về mặt phẳng 2D chuẩn");
                       return next;
                     });
                     try {
@@ -1506,7 +1512,7 @@ export default function WorldScreen() {
                 >
                   <Sparkles size={11} color={diorama25D ? "#042f2e" : colors.textSecondary} />
                   <Text style={[styles.dioramaHudText, diorama25D && styles.dioramaHudTextActive]}>
-                    2.5D
+                    {diorama25D ? "✨ 2.5D" : "🗺️ 2D"}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -1605,51 +1611,92 @@ export default function WorldScreen() {
               </View>
             </ScrollView>
           ) : (
-            <ScrollView
-              ref={vScrollRef}
-              style={styles.vScroll}
-              contentContainerStyle={styles.vScrollContent}
-              scrollEnabled={true}
-              bounces={false}
-              overScrollMode="never"
-              decelerationRate="fast"
-              showsVerticalScrollIndicator={false}
-            >
+            <View style={styles.dioramaStageWrapper}>
+              {/* TRUE 2.5D PARALLAX HORIZON LAYER: Separated Alpine Mountains & Lake */}
+              {diorama25D && (
+                <View style={styles.parallaxBackgroundContainer} pointerEvents="none">
+                  <Image
+                    source={require("../../assets/game/regions/world-bg-mountains-lake.webp")}
+                    style={[
+                      styles.parallaxBackgroundImage,
+                      {
+                        transform: [
+                          { translateX: -cameraScroll.x * 0.32 },
+                          { translateY: -cameraScroll.y * 0.12 },
+                          { scale: 1.08 },
+                        ],
+                      },
+                    ]}
+                    contentFit="cover"
+                  />
+                  <View style={styles.horizonMistOverlay} />
+                </View>
+              )}
+
               <ScrollView
-                ref={hScrollRef}
-                horizontal
-                style={styles.hScroll}
-                contentContainerStyle={styles.hScrollContent}
+                ref={vScrollRef}
+                style={styles.vScroll}
+                contentContainerStyle={styles.vScrollContent}
                 scrollEnabled={true}
                 bounces={false}
                 overScrollMode="never"
                 decelerationRate="fast"
-                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                scrollEventThrottle={16}
+                onScroll={(e) => {
+                  const y = Math.round(e.nativeEvent.contentOffset.y);
+                  if (Math.abs(y - lastScrollRef.current.y) >= 2) {
+                    setCameraScroll((prev) => ({ ...prev, y }));
+                  }
+                }}
               >
-                <View
-                  style={{
-                    width: 1600 * coverScale,
-                    height: 900 * coverScale,
-                    overflow: "hidden",
+                <ScrollView
+                  ref={hScrollRef}
+                  horizontal
+                  style={styles.hScroll}
+                  contentContainerStyle={styles.hScrollContent}
+                  scrollEnabled={true}
+                  bounces={false}
+                  overScrollMode="never"
+                  decelerationRate="fast"
+                  showsHorizontalScrollIndicator={false}
+                  scrollEventThrottle={16}
+                  onScroll={(e) => {
+                    const x = Math.round(e.nativeEvent.contentOffset.x);
+                    if (Math.abs(x - lastScrollRef.current.x) >= 2) {
+                      setCameraScroll((prev) => ({ ...prev, x }));
+                    }
                   }}
                 >
-                  <TouchableOpacity
-                    ref={mapSurfaceRef as any}
-                    activeOpacity={1}
-                    onPress={handleMapPress}
-                    style={[
-                      styles.mapTouchSurface,
-                      coverScale !== 1
-                        ? {
-                            transform: [
-                              { translateX: (1600 * (coverScale - 1)) / 2 },
-                              { translateY: (900 * (coverScale - 1)) / 2 },
-                              { scale: coverScale },
-                            ],
-                          }
-                        : null,
-                    ]}
+                  <View
+                    style={{
+                      width: 1600 * coverScale,
+                      height: 900 * coverScale,
+                      overflow: "hidden",
+                    }}
                   >
+                    <TouchableOpacity
+                      ref={mapSurfaceRef as any}
+                      activeOpacity={1}
+                      onPress={handleMapPress}
+                      style={[
+                        styles.mapTouchSurface,
+                        coverScale !== 1
+                          ? {
+                              transform: [
+                                { translateX: (1600 * (coverScale - 1)) / 2 },
+                                { translateY: (900 * (coverScale - 1)) / 2 },
+                                { scale: coverScale },
+                                ...(diorama25D
+                                  ? ([{ perspective: 1200 }, { rotateX: "13deg" }] as any)
+                                  : ([{ perspective: 1200 }, { rotateX: "0deg" }] as any)),
+                              ],
+                            }
+                          : diorama25D
+                          ? (styles.dioramaGroundTilt as any)
+                          : (styles.flatGround2D as any),
+                      ]}
+                    >
                     <ImageBackground
                       accessibilityLabel="world-blueprint-canvas"
                       source={
@@ -1789,6 +1836,7 @@ export default function WorldScreen() {
                             { translateY: playerAnimY },
                             { scale: playerScaleAnim },
                             { translateY: walkBobAnim },
+                            ...(diorama25D ? ([{ rotateX: "-18deg" }] as any) : []),
                           ],
                         },
                       ]}
@@ -1825,6 +1873,7 @@ export default function WorldScreen() {
                             { translateY: playerAnimY },
                             { scale: Animated.multiply(playerScaleAnim, 0.96) },
                             { translateY: petFloatAnim },
+                            ...(diorama25D ? ([{ rotateX: "-18deg" }] as any) : []),
                           ],
                         },
                       ]}
@@ -1867,7 +1916,8 @@ export default function WorldScreen() {
                 </View>
               </ScrollView>
             </ScrollView>
-          )}
+          </View>
+        )}
 
           {/* ACTIVE TALK HUD (SLIM SINGLE-ROW PROMPT NEVER OBSCURING AVATAR) */}
           {activeTalkLandmark && (
@@ -2655,18 +2705,64 @@ const styles = StyleSheet.create({
   vScrollContent: {
     flexGrow: 1,
     ...(Platform.OS === "web" ? { width: "100%" as any } : {}),
-    backgroundColor: "#05110e",
+    backgroundColor: "transparent",
   },
   hScroll: {
     flex: 1,
+    backgroundColor: "transparent",
   },
   hScrollContent: {
     flexGrow: 1,
+    backgroundColor: "transparent",
   },
   mapTouchSurface: {
     width: 1600,
     height: 900,
     position: "relative",
+  },
+  dioramaStageWrapper: {
+    flex: 1,
+    position: "relative",
+    overflow: "hidden",
+    backgroundColor: "#030a07",
+  },
+  parallaxBackgroundContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 380,
+    overflow: "hidden",
+    zIndex: 0,
+  },
+  parallaxBackgroundImage: {
+    width: 2200,
+    height: 480,
+    position: "absolute",
+    top: -20,
+    left: -150,
+  },
+  horizonMistOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 100,
+    backgroundColor: "rgba(3, 10, 7, 0.45)",
+  },
+  dioramaGroundTilt: {
+    transform: [
+      { perspective: 950 as any },
+      { rotateX: "18deg" },
+      { scale: 1.05 },
+    ],
+  },
+  flatGround2D: {
+    transform: [
+      { perspective: 950 as any },
+      { rotateX: "0deg" },
+      { scale: 1.0 },
+    ],
   },
   blueprintCanvas: {
     width: "100%",

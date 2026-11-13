@@ -1,3 +1,26 @@
+## 2026-11-13 — Cycle 90: HealthClues Mobile — Cổng Làng An Cư (Home Haven Gate), Bản Đồ Khu Phố Cư Dân & Map 2.5D Diorama Tách Lớp Parallax Núi Hồ
+
+**Status: IMPLEMENTED & VERIFIED (`npx tsc --noEmit` PASS + `npx expo export` PASS + CDP BROWSER VERIFIED + PORT `8081` LIVE).**
+
+- **1. Cổng Làng An Cư (Home Haven Gate) & Bản Đồ Khu Phố Cư Dân ([`world.tsx`](file:///D:/botly/App/healthclues-mobile/app/(game)/world.tsx)):**
+  - Chuyển đổi landmark trung tâm thành **Cổng Làng An Cư (Home Haven Gate)** với biểu tượng `Home` vàng kim (`<Home size={18} color="#fef08a" />`) trên cả 2 vùng Sleep Valley và HealthClues Realm.
+  - Khi tiếp cận cổng, xuất hiện pill hành động nhanh với 2 lựa chọn: `Về Nhà 🏡` (chuyển hướng trực tiếp vào màn hình thiết kế nội thất `/(game)/home`) và `Khu Phố →` (mở Sheet minh họa).
+  - Tích hợp Sheet **Bản Đồ Khu Phố Các Cư Dân (Minh Họa)** gồm:
+    - *Tổ Ấm Của Bạn (Your Cozy Chalet)*: Thẻ nổi bật dẫn vào trang căn nhà.
+    - *Căn hộ của các cư dân láng giềng*: Mai Anh (Streak 14 ngày, Vườn cúc La Mã), Minh Tuấn (Streak 21 ngày, Góc thể thao 10k bước), Biệt Thự Bác Sĩ Hoàng (Cố vấn sức khỏe cộng đồng), Gác Xép Leo & Lucas (Đài thiên văn & thư viện), Bungalow Anna & Lily (Khu thiền định & yoga).
+    - Tương tác thân thiện: *"Ghé Thăm & Gửi Tim ❤️ (+5 EXP)"* kích hoạt rung xúc giác và thông báo thành công.
+- **2. Tách Riêng Background Núi Hồ & Hiệu Ứng 2.5D Diorama Parallax Hoàn Chỉnh ([`world.tsx`](file:///D:/botly/App/healthclues-mobile/app/(game)/world.tsx), [`world-bg-mountains-lake.webp`](file:///D:/botly/App/healthclues-mobile/assets/game/regions/world-bg-mountains-lake.webp)):**
+  - Tách riêng hoàn toàn layer phong cảnh nền núi tuyết & hồ nước Alpine Panorama (`world-bg-mountains-lake.webp`, `2000x520px`) nằm độc lập ở đường chân trời.
+  - Tích hợp hiệu ứng **Parallax Cuộn Đa Tầng Thời Gian Thực**: Khi nhân vật di chuyển và camera cuộn, layer nền trôi êm phía sau theo tỉ lệ phối cảnh sâu (`-cameraScroll.x * 0.22`, `-cameraScroll.y * 0.08`).
+  - **Mặt đất nghiêng 3D Perspective**: Khi bật chế độ `✨ 2.5D`, mặt đất nghiêng phối cảnh 3D (`perspective: 950`, `rotateX: 18deg`, `scale: 1.05`), mở rộng không gian phía chân trời; khi ở chế độ `🗺️ 2D`, mặt đất phẳng trực giao (`rotateX: 0deg`, `scale: 1.0`).
+  - **Billboard Counter-Tilt cho nhân vật**: Nhân vật người chơi `Bạn`, linh thú `Lumi`, các NPC và cư dân được đối trọng góc nghiêng `rotateX: -18deg` giúp đứng thẳng vuông góc trên mặt cỏ cùng bóng đổ tiếp xúc hình oval.
+  - Đầy đủ nút chuyển đổi trạng thái `✨ 2.5D` / `🗺️ 2D` trực quan tại thanh công cụ phía trên.
+- **3. Bằng chứng kiểm thử:**
+  - Báo cáo chi tiết: [`V1_MOBILE_25D_PARALLAX_AND_HOME_GATE_ACCEPTANCE.md`](file:///D:/botly/App/reports/V1_MOBILE_25D_PARALLAX_AND_HOME_GATE_ACCEPTANCE.md).
+  - Ảnh chụp màn hình: `world-25d-parallax-mountain.png`, `world-2d-flat-ground.png`, `world-home-gate-view.png`, `iphone-simulator-25d-horizon.png`.
+
+---
+
 ## 2026-11-12 — Cycle 89: Mystery Detective — 3-Round Mobile Landscape (`844x390` & `667x375`) Ergonomic Overhaul (Layout, Controls, Aspect Scaling & Zero-Scroll Fit)
 
 **Status: IMPLEMENTED & VERIFIED ACROSS 3 AUDIT/FIX ROUNDS (`test-landscape-audit.mjs ENFORCE_LANDSCAPE=1 PASS` + `run-all-tests.mjs 7/7 PASS` ON PORT `3329`).**
