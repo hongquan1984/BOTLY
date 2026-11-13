@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthClues RPG — Trình Giả Lập iPhone 15 Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #15221e 0%, #080f0c 60%, #040806 100%);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #e2e8f0;
+      overflow-x: hidden;
+      padding: 14px 16px 36px;
+    }
+
+    /* Top Control Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      max-width: 1160px;
+      margin-bottom: 16px;
+      padding: 10px 18px;
+      background: rgba(18, 36, 29, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 999px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    }
+
+    .brand-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .controls-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.06);
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #f8fafc;
+      border-color: rgba(52, 211, 153, 0.4);
+    }
+
+    .btn.active {
+      background: #10b981;
+      color: #041f14;
+      border-color: #34d399;
+      font-weight: 700;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-route {
+      background: rgba(52, 211, 153, 0.12);
+      color: #6ee7b7;
+      border-color: rgba(52, 211, 153, 0.35);
+    }
+
+    .btn-route.active {
+      background: #10b981;
+      color: #022c22;
+      border-color: #6ee7b7;
+      font-weight: 700;
+    }
+
+    .btn-highlight {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.25));
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+
+    .btn-highlight:hover {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.35));
+      color: #fef3c7;
+    }
+
+    .separator {
+      width: 1px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      margin: 0 3px;
+    }
+
+    /* Stage */
+    .simulator-stage {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0 20px;
+      width: 100%;
+    }
+
+    .scale-wrapper {
+      transform-origin: top center;
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* iPhone 15 Pro Titanium Chassis */
+    .iphone-chassis {
+      position: relative;
+      width: 393px;
+      height: 852px;
+      background: #1c1c1e;
+      border-radius: 54px;
+      padding: 12px;
+      box-shadow:
+        0 0 0 1px #424245,
+        0 0 0 4px #2c2c2e,
+        0 0 0 5px #151516,
+        0 25px 60px -15px rgba(0, 0, 0, 0.8),
+        0 50px 100px -20px rgba(0, 0, 0, 0.7);
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .iphone-screen {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      border-radius: 44px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 11px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 124px;
+      height: 35px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      box-shadow: 0 0 2px rgba(255, 255, 255, 0.2);
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .island-camera {
+      width: 11px;
+      height: 11px;
+      background: radial-gradient(circle at 35% 35%, #1e293b 0%, #030712 70%);
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .island-sensor {
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, #0f172a 0%, #020617 80%);
+      border-radius: 50%;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      padding: 12px 28px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      z-index: 99998;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .status-time {
+      letter-spacing: -0.2px;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .status-battery {
+      width: 22px;
+      height: 11px;
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      border-radius: 3.5px;
+      padding: 1px;
+      position: relative;
+    }
+
+    .status-battery::after {
+      content: '';
+      position: absolute;
+      right: -3.5px;
+      top: 2.5px;
+      width: 2px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 0 1px 1px 0;
+    }
+
+    .battery-fill {
+      width: 85%;
+      height: 100%;
+      background: #10b981;
+      border-radius: 1.5px;
+    }
+
+    /* The actual Game iFrame */
+    .game-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #020b08;
+    }
+
+    /* Home Bar Indicator */
+    .home-indicator {
+      position: absolute;
+      bottom: 7px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 136px;
+      height: 4.5px;
+      background: rgba(255, 255, 255, 0.65);
+      border-radius: 3px;
+      z-index: 99999;
+      pointer-events: none;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Landscape Mode */
+    .iphone-chassis.landscape {
+      border-radius: 54px;
+    }
+
+    .iphone-chassis.landscape .dynamic-island {
+      top: 50%;
+      left: 14px;
+      transform: translateY(-50%) rotate(90deg);
+    }
+
+    .iphone-chassis.landscape .status-bar {
+      display: none;
+    }
+
+    .iphone-chassis.landscape .home-indicator {
+      bottom: 6px;
+      width: 180px;
+    }
+
+    /* Hidden Overlay Mode */
+    .hide-overlay .status-bar,
+    .hide-overlay .dynamic-island,
+    .hide-overlay .home-indicator {
+      display: none !important;
+    }
+
+    /* Tips / Footnote */
+    .footnote {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+    }
+
+    .footnote strong {
+      color: #34d399;
+    }
+
+    .direct-link {
+      color: #6ee7b7;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Controller Bar -->
+  <header class="top-bar">
+    <div class="brand-group">
+      <div class="brand-badge">IPHONE SIMULATOR</div>
+      <div class="brand-title">HealthClues RPG <span>✨</span></div>
+    </div>
+
+    <!-- Quick Route Navigation -->
+    <div class="controls-group">
+      <button class="btn btn-route active" id="route-world" onclick="enterWorldDirectly()">🏰 Bản Đồ RPG</button>
+      <button class="btn btn-route" id="route-home" onclick="navigateGame('/')">🏡 Trang Chào</button>
+      <button class="btn btn-route" id="route-quiz" onclick="navigateGame('/(onboarding)/quiz')">📝 Khảo Sát</button>
+      <button class="btn btn-route" id="route-journey" onclick="navigateGame('/(game)/journey')">🧭 Hành Trình</button>
+      <button class="btn btn-route" id="route-inventory" onclick="navigateGame('/(game)/inventory')">🎒 Túi Đồ</button>
+      <button class="btn btn-route" id="route-profile" onclick="navigateGame('/(game)/profile')">⚙️ Cài Đặt</button>
+    </div>
+
+    <!-- Device & Display Controls -->
+    <div class="controls-group">
+      <button class="btn active" id="btn-15pro" onclick="setDevice('15pro')">iPhone 15 Pro</button>
+      <button class="btn" id="btn-15promax" onclick="setDevice('15promax')">15 Pro Max</button>
+      <button class="btn" id="btn-mini" onclick="setDevice('mini')">Mini</button>
+      <button class="btn" id="orient-btn" onclick="toggleOrientation()">🔄 Xoay</button>
+      <span class="separator"></span>
+      <button class="btn" id="zoom-btn" onclick="cycleZoom()">🔍 88%</button>
+      <button class="btn" id="notch-btn" onclick="toggleNotch()">📱 Ẩn Notch</button>
+      <button class="btn btn-highlight" onclick="resetToWelcome()">⟳ Làm mới</button>
+    </div>
+  </header>
+
+  <!-- iPhone Mockup Stage -->
+  <main class="simulator-stage">
+    <div class="scale-wrapper" id="scaleWrapper" style="transform: scale(0.88);">
+      <div class="iphone-chassis" id="chassis">
+        <div class="iphone-screen">
+          <!-- Status Bar -->
+          <div class="status-bar" id="statusBar">
+            <div class="status-time" id="clock">09:41</div>
+            <div class="status-icons">
+              <span>5G</span>
+              <span>📶</span>
+              <div class="status-battery">
+                <div class="battery-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Island -->
+          <div class="dynamic-island" id="island">
+            <div class="island-camera"></div>
+            <div class="island-sensor"></div>
+          </div>
+
+          <!-- Game Frame -->
+          <iframe src="/" class="game-iframe" id="gameFrame" allow="geolocation; microphone; camera; midi; vr; accelerometer; gyroscope"></iframe>
+
+          <!-- iOS Home Bar Indicator -->
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footnote">
+    <div>💡 <strong>Mẹo tương tác:</strong> Dùng chuột click trực tiếp vào mặt đất hoặc nhân vật để di chuyển và trò chuyện như trên màn hình cảm ứng iPhone.</div>
+    <div>Hoặc mở trực tiếp toàn màn hình: <a class="direct-link" href="/" target="_blank">http://localhost:8081/</a> | Chế độ F12: bấm <kbd>Ctrl+Shift+M</kbd> trên Chrome/Edge.</div>
+  </footer>
+
+  <script>
+    const chassis = document.getElementById('chassis');
+    const scaleWrapper = document.getElementById('scaleWrapper');
+    const gameFrame = document.getElementById('gameFrame');
+    const clock = document.getElementById('clock');
+    const orientBtn = document.getElementById('orient-btn');
+    const zoomBtn = document.getElementById('zoom-btn');
+    const notchBtn = document.getElementById('notch-btn');
+
+    let currentModel = '15pro';
+    let isLandscape = false;
+    let hideOverlay = false;
+    const zoomLevels = [0.88, 1.0, 0.75];
+    let zoomIdx = 0;
+
+    const SIZES = {
+      '15pro': { w: 393, h: 852, radius: 54 },
+      '15promax': { w: 430, h: 932, radius: 58 },
+      'mini': { w: 375, h: 812, radius: 48 },
+    };
+
+    function updateSize() {
+      const cfg = SIZES[currentModel] || SIZES['15pro'];
+      if (!isLandscape) {
+        chassis.style.width = cfg.w + 'px';
+        chassis.style.height = cfg.h + 'px';
+        chassis.style.borderRadius = cfg.radius + 'px';
+        chassis.classList.remove('landscape');
+        orientBtn.textContent = '🔄 Xoay Ngang';
+      } else {
+        chassis.style.width = cfg.h + 'px';
+        chassis.style.height = cfg.w + 'px';
+        chassis.style.borderRadius = cfg.radius + 'px';
+        chassis.classList.add('landscape');
+        orientBtn.textContent = '🔄 Xoay Dọc';
+      }
+    }
+
+    function setDevice(model) {
+      currentModel = model;
+      ['btn-15pro', 'btn-15promax', 'btn-mini'].forEach(id => {
+        document.getElementById(id).classList.toggle('active', id === 'btn-' + model);
+      });
+      updateSize();
+    }
+
+    function toggleOrientation() {
+      isLandscape = !isLandscape;
+      updateSize();
+    }
+
+    function cycleZoom() {
+      zoomIdx = (zoomIdx + 1) % zoomLevels.length;
+      const z = zoomLevels[zoomIdx];
+      scaleWrapper.style.transform = `scale(${z})`;
+      zoomBtn.textContent = `🔍 ${Math.round(z * 100)}%`;
+    }
+
+    function toggleNotch() {
+      hideOverlay = !hideOverlay;
+      chassis.classList.toggle('hide-overlay', hideOverlay);
+      notchBtn.textContent = hideOverlay ? '📱 Hiện Notch' : '📱 Ẩn Notch';
+    }
+
+    function setActiveRouteBtn(btnId) {
+      document.querySelectorAll('.btn-route').forEach(b => b.classList.remove('active'));
+      const activeEl = document.getElementById(btnId);
+      if (activeEl) activeEl.classList.add('active');
+    }
+
+    function enterWorldDirectly() {
+      setActiveRouteBtn('route-world');
+      try {
+        if (gameFrame.contentWindow) {
+          gameFrame.contentWindow.localStorage.setItem('healthclues-onboarding-completed', 'true');
+        }
+      } catch(e) {}
+      gameFrame.src = '/(game)/world';
+    }
+
+    function navigateGame(route) {
+      if (route.includes('world')) setActiveRouteBtn('route-world');
+      else if (route === '/') setActiveRouteBtn('route-home');
+      else if (route.includes('quiz')) setActiveRouteBtn('route-quiz');
+      else if (route.includes('journey')) setActiveRouteBtn('route-journey');
+      else if (route.includes('inventory')) setActiveRouteBtn('route-inventory');
+      else if (route.includes('profile')) setActiveRouteBtn('route-profile');
+
+      gameFrame.src = route;
+    }
+
+    function resetToWelcome() {
+      setActiveRouteBtn('route-home');
+      gameFrame.src = '/?reload=' + Date.now();
+    }
+
+    // Auto set onboarding done if direct world is preferred
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        localStorage.setItem('healthclues-onboarding-completed', 'true');
+      } catch(e) {}
+    });
+
+    // Dynamic Live Clock
+    function updateClock() {
+      const d = new Date();
+      const h = String(d.getHours()).padStart(2, '0');
+      const m = String(d.getMinutes()).padStart(2, '0');
+      clock.textContent = `${h}:${m}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
