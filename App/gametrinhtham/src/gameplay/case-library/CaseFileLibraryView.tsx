@@ -364,6 +364,14 @@ export function CaseFileLibraryView({
                       {caseData.subtitle}
                     </p>
                   )}
+                  {caseData.victimOrPatient?.initialQuote && (
+                    <p
+                      data-testid={`case-quote-${caseData.id}`}
+                      className="text-[10.5px] italic text-[#664b2d] bg-[#f8f1de] border border-[#e5d4b5] px-2 py-1 rounded-md line-clamp-2"
+                    >
+                      💬 “{caseData.victimOrPatient.initialQuote}”
+                    </p>
+                  )}
                   <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-[#594128]">
                     <span className="bg-white/60 border border-[#cfb991] px-2 py-0.5 rounded-md">
                       {caseData.victimOrPatient.avatar || "👤"} {caseData.victimOrPatient.name}

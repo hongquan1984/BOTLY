@@ -64,7 +64,9 @@ export function getWorldDepthScale(y: number, enabled = true): number {
   if (!enabled) return 1;
   const clamped = Math.max(180, Math.min(860, y));
   const t = (clamped - 180) / (860 - 180); // 0 (far) -> 1 (near)
-  return Number((0.76 + t * 0.38).toFixed(3));
+  // Balanced isometric perspective: subtle depth scaling (0.92x to 1.08x) so NPCs and villagers
+  // remain consistent and proportionate across the village square without looking unnaturally tiny.
+  return Number((0.92 + t * 0.16).toFixed(3));
 }
 
 /**

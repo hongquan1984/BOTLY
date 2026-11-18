@@ -1,3 +1,130 @@
+## Implementation traceability update — 2026-11-17 (Cycle 135: 3 Real Houses Identification & Dynamic Toolkit Library)
+
+- Identified and mapped 3 authentic architectural houses in the 3D Village (`word3d` & `landmarkCatalog.ts`):
+  * **🌿 Nhà Thảo Mộc (Tiên Nữ Flora):** Timber apothecary `bld_potion_shop` (`[-11.56, 1.80, 8.91]`) $\rightarrow$ opens `HerbalGardenModal`.
+  * **🎵 Nhà Âm Thanh (Tiên Nữ Lyra):** Red-roof timber cottage `bld_bookshop` across stone bridge (`[10.78, 1.80, -11.17]`) $\rightarrow$ opens `SoundGardenModal`. Removed interaction from water wheel `bld_watermill` (restored to non-functional scenic river prop).
+  * **🌬️ Thiền Đường - Hơi Thở (Tiên Nữ Aura):** Two-story timber hall `bld_great_hall` (`[-3.31, 1.82, 13.88]`) $\rightarrow$ opens `ZenBreathModal`.
+- Implemented Dynamic Toolkit Library & Pick-to-Bag Architecture:
+  * Entering each house presents a full catalog/library of healing sounds, breathing exercises, and herbs with preview and practice capabilities.
+  * Players click `[ + Lưu Vào Túi Đồ (+10 EXP) ]` / `[ Cất vào Túi ]` to explicitly collect items into their bag (`toolkitStorage.ts`).
+  * Túi Đồ (Inventory) starts clean/empty (`[]`) by default, rendering rich Empty States with CTAs to explore the village.
+  * Collected items in Túi Đồ feature full interactive players/coaches and `[ ✕ Bỏ Khỏi Túi Đồ ]` buttons.
+- Fully verified via automated test `test_verify_3_houses_and_bag_library.mjs` (PASS 100%).
+
+---
+
+## Implementation traceability update — 2026-11-17 (Cycle 131: Healing Toolkit Transformation & Free-Form Habit Input)
+
+- Transformed "Túi Đồ" (Inventory) into a 3-Sanctuary Personal Healing Toolkit (`inventory.tsx`):
+  * **Tab 1: 🌿 Nhà Thảo Mộc (Tiên Nữ Flora):** Botanical tea recipes, temperature/steeping guidelines, PubMed clinical citations, and direct `+ Đưa vào Hành Trình` habit bridge.
+  * **Tab 2: 🎵 Vườn Âm Thanh (Tiên Nữ Lyra):** Multi-Track Web Audio Engine (`soundscapeEngine.ts`) with 6 offline synthesized ambient tracks (Rain, Stream, Forest Birds, Campfire, Delta 432Hz, Hypnosis Ocean Waves). Allows concurrent multi-track playback, individual volume sliders, sleep timer, and floating master bar.
+  * **Tab 3: 🌬️ Thiền Đường - Hơi Thở (Tiên Nữ Aura):** Clinical breathwork & mindfulness catalog (`breathworkData.ts`) with interactive animated breathing circle (Inhale $\rightarrow$ Hold $\rightarrow$ Exhale) and daily habit integration.
+- Integrated the 3 village sanctuaries in `world.tsx`:
+  * Botanical sanctuary opens Herbal Garden Modal.
+  * Sound garden navigates to Toolkit tab Âm Thanh (`inventory?tab=sounds`).
+  * Zen Breath sanctuary navigates to Toolkit tab Hơi Thở (`inventory?tab=breath`).
+- Simplified Habit Creation form in `journey.tsx`:
+  * Removed rigid mechanical constraints ("15 phút định mức", "7 ngày/tuần").
+  * Enabled 1-field free-form text input allowing lifestyle habits like "Không uống rượu bia" and quick 1-tap category selection.
+- Verified 100% PASS via automated Playwright test suite (`test_verify_toolkit_and_houses.mjs` and `test_verify_simplified_habit_and_hud.mjs`).
+
+---
+
+## Implementation traceability update — 2026-11-16 (Cycle 114: World 3D Cinematic Overview, Floating Lumi Mascot Tour & Pulsing Building Beacons)
+
+- Implemented the official 3D village entry sequence:
+  * Camera initializes in high-altitude Overview mode (`overview`), presenting the floating fantasy village in full scenic scope.
+  * The top toolbar (`floatingToolbarOverlay`) is hidden to preserve an uncluttered cinematic presentation.
+- Developed `VillageCinematicTourModal.tsx` in `src/modules/tour`:
+  * Floating Lumi mascot with continuous vertical hover loop (`Animated.loop`, -10px, 1.4s).
+  * 7 sequential narrative stops: Overview $\rightarrow$ Ngôi Nhà Của Bạn $\rightarrow$ Nhà Thảo Mộc $\rightarrow$ Nhà Cơ Thể $\rightarrow$ Văn Phòng Giải Mã $\rightarrow$ Quảng Trường & Giếng Ước $\rightarrow$ Sẵn Sàng Khám Phá.
+  * Bidirectional synchronization with Three.js via `HIGHLIGHT_LANDMARK` postMessage.
+- Upgraded `SmartLandmarkOverlay.tsx` with dynamic glowing beacons (`@keyframes pulseGlowBeacon` and `@keyframes pulseBeaconRing`) that pulse when a building is introduced.
+- Renamed "Phá Án" to **"Giải Mã"** across all user-facing UI, accessibility labels, and dialogues.
+- Added replay button `[ ✨ Tour ]` on the primary toolbar to allow players to re-experience the village overview tour at any time.
+- De-conflicted with legacy spotlight tour via `cinematicTourDone` guard in `(game)\_layout.tsx`.
+- Verified 100% PASS via Playwright automated browser test on port 8081. Evidence: `App/reports/V1_CYCLE_114_CINEMATIC_OVERVIEW_TOUR.md`.
+
+---
+
+## Implementation traceability update — 2026-11-15 (Cycle 111: Master Narrative & 3-Video Cinematic Onboarding V1)
+
+- Integrated the official narrative lore: A normal human accidentally crosses a radiant dimensional portal in the clouds into "Xứ Sở Sức Khỏe" (HealthClues Realm) and meets Lumi, a winged rabbit companion prophesied by The Seer.
+- Built the Three-Video Onboarding Shell (`IntroStoryPlayer.tsx`) triggered immediately after language selection on Welcome:
+  * Video 1: "Cánh Cổng Bí Ẩn" (The Mystery Portal).
+  * Video 2: "Người Bạn Đã Chờ Đợi" (The Awaited Friend - Lumi).
+  * Video 3: "Xứ Sở Sức Khỏe" (The Cloud Floating Village Realm).
+- Implemented a resilient dual-tier engine: plays native/web MP4 video when present and falls back gracefully to custom Ghibli-style high-resolution storyboard art (`story_poster_1_portal.jpg`, `story_poster_2_lumi.jpg`, `story_poster_3_realm.jpg`) with zero blank screens or broken layout bugs.
+- Preserved strict player agency: scenes never auto-advance; player controls playback with "Phát / Dừng", progresses via "Tiếp tục →", or skips via "Bỏ qua câu chuyện".
+- Wove Lumi's narrative framing throughout the Quiz steps (`quest_choice`, `discovery`, `plan`, `mascot_ready`), preserving 100% of underlying schemas, risk factors, AI logic, and Supabase auth.
+- Persisted story state in AsyncStorage (`healthclues_story_state_v1`) to prevent re-forcing on returning users while adding permanent "Xem lại cốt truyện mở đầu" replay options in Profile settings and the Lumi Mascot menu.
+
+## Implementation traceability update — 2026-11-15 (Cycle 106: Cozy Fantasy 3D World Integration & Dual-Mode Presentation)
+
+- Integrated the Three.js Cozy Fantasy Village 3D world from `D:\botly\App\word3d` into HealthClues Mobile (`app/(game)/world.tsx`) via standalone player runtime `PlayerApp.tsx` (`?mode=player`).
+- Maintained a clean presentation layer: zero editor components, zero debug counters, mobile-friendly orbit/pinch touch controls, animated waterfall/watermill, and rigged 3D humanoid character.
+- Created the 5-member fairy NPC family (`Flora`, `Aura`, `Lyra`, `Mira`, `Nova`) and Lumi floating companion with hovering animations and proximity responsiveness.
+- Established a bidirectional postMessage communication bridge to trigger native HealthClues features (Herbal sheet, 4-7-8 Breathing, Body Detective modal, Daily Care check-in, Quests).
+- Preserved pristine 2D Swiss Village baseline with unblurred photographic panorama and human RPG sprites, providing an instant subheader toggle button (`3D Làng Nổi` / `2D Làng Núi`) with zero state loss and zero re-renders.
+
+## Implementation traceability update — 2026-11-14 (Cycle 104: Crisp Swiss Village Texture Synthesis, Zero-Smudge 2.5D Lake/Mountain Diorama & Strict Collision De-confliction)
+
+- Replaced biharmonic inpainting blur with Texture-Preserving Patch Synthesis on `swiss-village-mobile-diorama-v1.png`, eliminating all gray smudge blemishes across cobblestones and chalets (gradient 10.44 - 13.43).
+- Separated pristine alpine turquoise lake and snow-capped mountain vista into `swiss-village-lake-bg.webp` (2200x1050), exposed through an anti-aliased alpha transparency window for 2.5D parallax.
+- De-conflicted all 7 landmark stations and 6 living visitors in `world.tsx` and `useLivingVillageVisitors.ts`, achieving mathematical zero-overlap (closest pair > 75px) and eliminating unwanted station talk popups on initial screen load.
+- Verified via 2-round AI-Vision audit across Mobile Portrait (390x844) and Landscape/Desktop (1024x507 & 1280x800) with 0 page errors and 0.00% black void ratio.
+
+## Implementation traceability update — 2026-11-14 (Cycle 98: Mobile Game FTUE — Full-Screen Dark Scrim Spotlight, Anti-Overlap Layout, Glowing Focus Frames & Mascot Lifecycle)
+
+- Implemented a full-screen dark scrim spotlight system (`darkBackdrop`: `rgba(3, 10, 8, 0.74)` with backdrop blur) replacing cluttered floating cards and preventing overlapping card messes (`InteractiveTourCard.tsx`).
+- Created dynamic glowing focus frames (`#fbbf24`), animated pulse, radar crosshairs, directional pointer arrows (`▲`/`▼`), and contextual labels (`✨ ĐANG FOCUS: NHẬT KÝ 7 NGÀY`, `TỰ LẬP MỤC TIÊU`, `ĐÓNG DẤU NHẬN XU`, `BIỆT THỰ GỖ 3D CHALET`, `PHÁ ÁN KIẾM XU`).
+- Structured a granular interactive sub-step progression through World, Journey (7-day streak & + Thêm Mới), Daily Care (check-in seals), Home (Golden Key & 3D Chalet lore), and World (Phá Án button & doctorless lore).
+- Strictly de-conflicted `PermanentMascotHelper`: unmounted during the active tour (`{!tourStep && <PermanentMascotHelper />}`) and mounted at `bottom: 74, left: 14` only after tour completion or skip.
+- Verified across 12 sequential Playwright AI Vision audit steps with 0 page errors and 100% PASS rate. Evidence: `App/reports/V1_MOBILE_MASCOT_DETECTIVE_HOME3D_ACCEPTANCE.md`.
+
+## Implementation traceability update — 2026-11-14 (Cycle 97: Authentic Sprout Sprites, Glowing Tab Spotlight Tour, Helper Drawer & Full D:\botly\App\gametrinhtham WebView Integration)
+
+- Integrated authentic pre-generated Sprout Rabbit sprites (`healthclues-sprout-rabbit-{idle,talk,sad,wave,laugh,sulk}.png`) from the welcome screen through onboarding and celebration modals with breathing pulse and dolphin audio.
+- Implemented an interactive spotlight walkthrough where each introduced menu tab glows with golden borders, neon effects, and sparkle badges (`_layout.tsx`, `villageTourService.ts`, `InteractiveTourCard.tsx`).
+- Pinned a permanent mascot helper button at bottom-left (`PermanentMascotHelper.tsx`) with a contextual guidance drawer.
+- Embedded the authentic `D:\botly\App\gametrinhtham` detective package via full-screen `DetectiveWebViewModal.tsx` on `http://localhost:3329/detective`, supporting 6 medical cases, SVG scan hotspots, clue notebook, deduction board, and bidirectional coin sync.
+- Replaced all "Thụy Sĩ" / "Alps" naming with "Làng Sống Khỏe (Wellness Village)".
+- Verified across 18 automated Playwright AI Vision audit steps with 0 page errors. Evidence: `App/reports/V1_MOBILE_MASCOT_DETECTIVE_HOME3D_ACCEPTANCE.md`.
+
+## Implementation traceability update — 2026-11-14 (Cycle 95: Mascot Guide, Unified Economy, Body Detective & 3D Chalet Shop)
+
+- Synchronized mascot Mầm Nhỏ with float/breathe micro-animations and Web Audio API dolphin chirps/whistles (`src/modules/audio/dolphinAudio.ts`, `MascotSprout.tsx`).
+- Standardized 5-step Village tutorial modal without robotic "AI" talk, guiding the player through personalized recommendations, Journey, Daily Care, House Gift celebration popup (`HouseGiftCelebration.tsx`), and Body Detective lore.
+- Integrated Body Detective launcher into World HUD with high-contrast glowing pills (`world.tsx`, `DetectiveMobileLauncher.tsx`), scene clues inspection, diagnosis deduction, and 120–150 Xu payout.
+- Embedded Three.js 3D Chalet into Tab Ngôi Nhà with 5-room perspective switcher and an in-game furniture catalog shop using Xu Coins.
+- Integrated 3D humanoid avatar with skeletal walk cycle into 3D Wellness Village (`3DHOME/src/world/PlayerController.ts`, `village.ts`).
+- Verified across 2 full AI Vision audit rounds with 0 page errors and thumb-friendly touch targets (`44x44px`). Evidence: `App/reports/V1_MOBILE_MASCOT_DETECTIVE_HOME3D_ACCEPTANCE.md`.
+
+## Implementation traceability update — 2026-11-14 (Cycle 94: Mobile companion onboarding)
+
+- Selecting the already-playable HealthClues Realm now leads first to a concise Mầm Nhỏ companion welcome, then one explicit focus choice with an optional free-text issue, and a final companion confirmation before entering the existing World.
+- The companion is visual/on-device presentation only: it neither collects additional health data nor modifies canonical discovery IDs, selected goals, onboarding completion, region availability, APIs, authorization, schema or rewards. Lumi remains the in-World companion for HealthClues Realm.
+- The mobile guide offers a decorative float/breathe loop and optional laugh, sad and sulk tap reactions with local CC0 effects; it does not present health advice, diagnosis or treatment. Browser evidence remains local only; physical-device review is still open.
+
+## Implementation traceability update — 2026-11-14 (Cycle 93: Full-screen mobile World and live tactical overview)
+
+- The Mobile World tab preserves its established bottom tab bar. The overview keeps the 1600×900 scene interactive: player marker movement, six visitors and seven named landmarks remain visible and tappable without a scrollable station list.
+- Sleep Valley tap-to-walk is presentation-bounded to the Swiss Village paved plaza and excludes the lake/fountain/building edge. This is a client scene/navigation presentation constraint only; no server progression, schema, reward or authorization behavior changes.
+- Three local Chrome rounds passed at `720×844`, `390×844` and `1280×800`; evidence and known local-only limits are in `App/reports/V1_MOBILE_SWISS_VILLAGE_INTEGRATION_ACCEPTANCE.md`.
+
+## Implementation traceability update — 2026-11-14 (Cycle 102: Photorealistic Alpine Village Square, Separated 2.5D Parallax Horizon, 3D CGI Adventurer Walk Cycle & Harmonious NPC Sizing)
+
+- `App/healthclues-mobile/app/(game)/world.tsx` separates Sleep Valley into 2 distinct layers for true 2.5D diorama parallax: horizon background (`swiss-village-lake-bg.webp`) with mountains and turquoise lake, and foreground diorama (`swiss-village-mobile-diorama-v1.png`) with aged timber chalets, red geranium window boxes, cobblestone dorfplatz plaza, and transparent alpha cutout on the lake/sky window. Zero flags of any country exist in the scene.
+- Integrates mature volumetric 3D CGI adventurer walk cycle (`player-human-idle.png`, `player-human-walk{1,2,3}.png`) with realistic lighting, linen tunic, blue cape, satchel, and boots.
+- Standardizes all NPCs (Anna, Ben, Mia, Nhà Thám Hiểm Trail) to 48x76px (matching the player's 76px height) with ground contact drop shadows and balanced `getWorldDepthScale` perspective scale (0.92x to 1.08x).
+- Verified via Playwright automation captures (`01_world_photorealistic_scene.png` through `06_parallax_panned.png` in `photorealistic_25d_audit/`), TypeScript zero errors, and clean Expo web export.
+
+## Implementation traceability update — 2026-11-13 (Cycle 92: Mobile Swiss Village scene integration)
+
+- `App/healthclues-mobile/app/(game)/world.tsx` now renders a dedicated Swiss Village panorama for Sleep Valley while retaining the current 1600×900 gameplay coordinate system, player/Luna/NPC/landmark layers, HUD, camera and overview. The standalone 3DHOME demo is not part of the mobile runtime.
+- The two product-approved playable destinations remain Sleep Valley/Luna and HealthClues Realm/Lumi. This change is presentation-only: no new World/region schema, API, authorization, progression or reward write path was added.
+- Local evidence is in `App/reports/V1_MOBILE_SWISS_VILLAGE_INTEGRATION_ACCEPTANCE.md`: TypeScript and Expo web export pass; visual review at mobile/desktop and functional browser Round 2 pass. This is not a physical-device or production acceptance.
+
 ## Implementation traceability update — 2026-11-12 (Cycle 87: Condition-Specific Advisor Coverage & RPG Game Audio System)
 
 - Updated `src/app/api/healthclues/wellness-advisor/route.ts` and `App/healthclues-mobile/src/services/onboarding.ts` so Gout (`gút / axit uric cao`), Weight Management, Blood Pressure, Digestion, and Migraine produce condition-tailored habits ordered by selected Step 2 factors instead of falling back to generic digestion/hydration copy.

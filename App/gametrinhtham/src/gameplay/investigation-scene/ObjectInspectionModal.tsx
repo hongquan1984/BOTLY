@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import type { CaseClue, DetailHotspot, SceneHotspot } from "../../types";
 import { detectiveAudio } from "../../audio/detectiveSoundEngine";
 
@@ -20,15 +20,7 @@ export function ObjectInspectionModal({
   onClose,
 }: Props) {
   const detailHotspots = sceneHotspot.detailHotspots || [];
-  const [selectedDetail, setSelectedDetail] = useState<DetailHotspot | null>(() => {
-    const firstUnrecorded = detailHotspots.find((d) => {
-      if (d.associatedClueId && recordedClueIds.includes(d.associatedClueId)) {
-        return false;
-      }
-      return !recordedClueIds.includes(`clue-${d.id}`);
-    });
-    return firstUnrecorded || detailHotspots[0] || null;
-  });
+  const [selectedDetail, setSelectedDetail] = useState<DetailHotspot | null>(null);
   const [justRecordedId, setJustRecordedId] = useState<string | null>(null);
   const [sealFlash, setSealFlash] = useState(false);
 
@@ -95,6 +87,14 @@ export function ObjectInspectionModal({
     return recordedClueIds.includes(`clue-${detail.id}`);
   };
 
+  const activeDetail = useMemo(() => {
+    if (selectedDetail && detailHotspots.some((d) => d.id === selectedDetail.id)) {
+      return selectedDetail;
+    }
+    const firstUnrecorded = detailHotspots.find((d) => !isDetailRecorded(d));
+    return firstUnrecorded || detailHotspots[0] || null;
+  }, [selectedDetail, detailHotspots, recordedClueIds]);
+
   const inspectionType = sceneHotspot.inspectionType || "generic";
   const hasUnrecordedPrimaryClue =
     Boolean(sceneHotspot.clueId) && !recordedClueIds.includes(sceneHotspot.clueId);
@@ -141,11 +141,11 @@ export function ObjectInspectionModal({
         <div className="detective-obj-grid flex-1 grid grid-cols-1 md:grid-cols-12 overflow-y-auto min-h-0">
           {/* Left Column: Visual Object Scaled Cleanly on Mobile so Detail & Action fit viewport */}
           <div className="detective-obj-left md:col-span-7 bg-[#12110f] px-3 py-3 sm:p-5 flex flex-col items-center justify-center relative select-none border-b md:border-b-0 md:border-r border-[#3d362c] overflow-hidden">
-            <div className="detective-obj-scale origin-center scale-[0.72] sm:scale-[0.88] md:scale-100 -my-6 sm:-my-3 md:my-0 flex items-center justify-center">
+            <div className="detective-obj-scale origin-center scale-[0.62] sm:scale-[0.82] md:scale-100 -my-10 sm:-my-4 md:my-0 flex items-center justify-center">
             {(() => {
               const renderPins = (pinTheme: "amber" | "emerald" = "amber") =>
                 detailHotspots.map((d) => {
-                  const isSelected = selectedDetail?.id === d.id;
+                  const isSelected = activeDetail?.id === d.id;
                   const isRecorded = isDetailRecorded(d);
                   return (
                     <button
@@ -479,7 +479,7 @@ export function ObjectInspectionModal({
 
                         <div className="my-auto flex flex-col items-center justify-center text-center gap-2.5 z-10 px-2">
                           <div className={`w-16 h-16 rounded-2xl border ${theme.pillBg} flex items-center justify-center text-4xl shadow-md`}>
-                            {selectedDetail?.discoveredIcon || sceneHotspot.discoveredIcon || "🔍"}
+                            {activeDetail?.discoveredIcon || sceneHotspot.discoveredIcon || "🔍"}
                           </div>
                           <p className={`text-[11px] font-semibold max-w-xs leading-snug ${theme.text}`}>
                             {sceneHotspot.inspectMessage}
@@ -522,7 +522,7 @@ export function ObjectInspectionModal({
               {/* Neutral Detail Selector Tabs */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-[#383127] mb-2.5">
                 {detailHotspots.map((d, idx) => {
-                  const isSelected = selectedDetail?.id === d.id;
+                  const isSelected = activeDetail?.id === d.id;
                   const isRecorded = isDetailRecorded(d);
 
                   return (
@@ -548,47 +548,47 @@ export function ObjectInspectionModal({
               </div>
 
               {/* Active Detail Display */}
-              {selectedDetail ? (
+              {activeDetail ? (
                 <div className="space-y-2.5 animate-in fade-in">
                   <div className="flex items-center gap-2">
                     <span className="text-lg p-1.5 rounded-xl bg-amber-950/80 border border-amber-700/60 shrink-0">
-                      {selectedDetail.discoveredIcon || "🔍"}
+                      {activeDetail.discoveredIcon || "🔍"}
                     </span>
                     <div className="min-w-0">
                       <span className="text-[10px] font-mono uppercase text-amber-400 block">
-                        {selectedDetail.category === "timestamp"
+                        {activeDetail.category === "timestamp"
                           ? "⏱️ DẤU THỜI GIAN"
-                          : selectedDetail.category === "statement"
+                          : activeDetail.category === "statement"
                           ? "💬 LỜI KHAI ĐỐI CHỨNG"
-                          : selectedDetail.category === "medical_record"
+                          : activeDetail.category === "medical_record"
                           ? "🔬 DỮ LIỆU CHỈ SỐ"
                           : "📋 QUAN SÁT THỰC ĐỊA"}
                       </span>
                       <h4 className="text-xs sm:text-sm font-black text-amber-100 leading-tight">
-                        {selectedDetail.title}
+                        {activeDetail.title}
                       </h4>
                     </div>
                   </div>
 
-                  {selectedDetail.evidenceData?.timestamp && (
+                  {activeDetail.evidenceData?.timestamp && (
                     <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded-lg border border-amber-700/60">
                       <span>⏱️</span>
                       <span className="font-mono text-white">
-                        {selectedDetail.evidenceData.timestamp}
+                        {activeDetail.evidenceData.timestamp}
                       </span>
                     </div>
                   )}
 
                   <div className="p-3 rounded-xl bg-[#14120f] border border-[#3b3429] text-xs text-slate-200 leading-relaxed shadow-inner">
-                    <p>{selectedDetail.observation}</p>
+                    <p>{activeDetail.observation}</p>
                   </div>
 
-                  {selectedDetail.evidenceData?.medicalRef && (
+                  {activeDetail.evidenceData?.medicalRef && (
                     <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-700/50 text-[11px] text-emerald-200 leading-relaxed">
                       <span className="font-bold text-emerald-300 block mb-0.5">
                         Cơ sở khoa học liên đới:
                       </span>
-                      <p>{selectedDetail.evidenceData.medicalRef.summary}</p>
+                      <p>{activeDetail.evidenceData.medicalRef.summary}</p>
                     </div>
                   )}
                 </div>
@@ -622,8 +622,8 @@ export function ObjectInspectionModal({
             </p>
           )}
           <div className="flex items-center justify-between gap-2">
-            {selectedDetail ? (
-              isDetailRecorded(selectedDetail) ? (
+            {activeDetail ? (
+              isDetailRecorded(activeDetail) ? (
                 <div
                   data-testid="object-save-action"
                   className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-900/70 border border-emerald-500 text-emerald-200 font-black text-[11px] sm:text-xs flex items-center justify-center gap-1.5 whitespace-nowrap"
@@ -633,7 +633,7 @@ export function ObjectInspectionModal({
               ) : (
                 <button
                   data-testid="object-save-action"
-                  onClick={() => handleRecordDetail(selectedDetail)}
+                  onClick={() => handleRecordDetail(activeDetail)}
                   className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:brightness-110 active:scale-98 text-slate-950 font-black text-xs shadow-lg transition flex items-center justify-center gap-1.5 whitespace-nowrap"
                 >
                   <span>+ GHI NHẬN VÀO SỔ MANH MỐI</span>

@@ -7,7 +7,7 @@ export const AUDIO_STORAGE_KEY = "healthclues-audio-settings";
 export const AUDIO_STATE_EVENT = "healthclues-audio-changed";
 
 export type BgmTrackId = "forest" | "alpine" | "night" | "off";
-export type SfxSoundType = "tap" | "tab" | "seal" | "success" | "locked";
+export type SfxSoundType = "tap" | "tab" | "seal" | "success" | "locked" | "mascotGiggle" | "mascotGrumble";
 
 export interface BgmTrackOption {
   id: BgmTrackId;
@@ -65,6 +65,8 @@ const SFX_ASSETS: Record<SfxSoundType, number> = {
   seal: require("../../assets/audio/sfx-seal.wav"),
   success: require("../../assets/audio/sfx-success.wav"),
   locked: require("../../assets/audio/sfx-locked.wav"),
+  mascotGiggle: require("../../assets/audio/mascot-giggle.mp3"),
+  mascotGrumble: require("../../assets/audio/mascot-grumble.mp3"),
 };
 
 const BGM_ASSETS: Record<Exclude<BgmTrackId, "off">, number> = {
@@ -139,15 +141,17 @@ function playWebFallbackTone(type: SfxSoundType): void {
       seal: 1046,
       success: 880,
       locked: 170,
+      mascotGiggle: 980,
+      mascotGrumble: 210,
     };
-    osc.type = type === "locked" ? "triangle" : "sine";
+    osc.type = type === "locked" || type === "mascotGrumble" ? "triangle" : "sine";
     osc.frequency.setValueAtTime(freqMap[type], now);
     gain.gain.setValueAtTime(0.08 * currentSettings.sfxVolume, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + (type === "success" ? 0.28 : 0.08));
+    gain.gain.exponentialRampToValueAtTime(0.001, now + (type === "success" || type === "mascotGiggle" ? 0.28 : 0.08));
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start(now);
-    osc.stop(now + (type === "success" ? 0.3 : 0.09));
+    osc.stop(now + (type === "success" || type === "mascotGiggle" ? 0.3 : 0.09));
   } catch {}
 }
 

@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
   DeviceEventEmitter,
 } from "react-native";
-import { Sparkles, Key, Gem, Volume2, VolumeX } from "lucide-react-native";
+import { Sparkles, Key, Gem, Volume2, VolumeX, Coins } from "lucide-react-native";
 import { colors, fonts, spacing, radius } from "@/theme";
+import { useEconomy } from "@/modules/economy/useEconomy";
 import {
   AUDIO_STATE_EVENT,
   DEFAULT_AUDIO_SETTINGS,
@@ -38,6 +39,7 @@ export function TopHud({
   const { height } = useWindowDimensions();
   const isShort = height < 520;
   const [audio, setAudio] = useState<GameAudioSettings>(DEFAULT_AUDIO_SETTINGS);
+  const { coins } = useEconomy();
 
   useEffect(() => {
     let active = true;
@@ -85,6 +87,11 @@ export function TopHud({
 
       {/* Currencies, Sound Toggle & Online Status */}
       <View style={styles.rightGroup}>
+        <View style={styles.coinsBadge}>
+          <Coins size={12} color="#fbbf24" />
+          <Text style={styles.coinsText}>{coins}</Text>
+        </View>
+
         {keys > 0 && (
           <View style={styles.currencyBadge}>
             <Key size={13} color={colors.goldLight} />
@@ -193,6 +200,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     color: colors.textPrimary,
+  },
+  coinsBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3.5,
+    backgroundColor: "rgba(245, 158, 11, 0.18)",
+    paddingHorizontal: 7,
+    paddingVertical: 3.5,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: "rgba(245, 158, 11, 0.45)",
+  },
+  coinsText: {
+    fontFamily: fonts.uiSemiBold,
+    fontSize: 11.5,
+    fontWeight: "800",
+    color: "#fbbf24",
   },
   soundBadge: {
     alignItems: "center",

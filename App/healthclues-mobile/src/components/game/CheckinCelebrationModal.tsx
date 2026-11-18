@@ -109,7 +109,7 @@ export function CheckinCelebrationModal({
           {/* Top Mascot Header */}
           <View style={styles.mascotWrapper}>
             <Image
-              source={require("../../../assets/game/ui/lumi_fox_clean.png")}
+              source={require("../../../assets/game/characters/healthclues-sprout-rabbit-laugh.png")}
               style={styles.mascotImage}
               contentFit="contain"
             />

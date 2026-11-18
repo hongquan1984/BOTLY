@@ -36,14 +36,19 @@ const buildEnv = {
 };
 delete buildEnv.HEALTHCLUES_BUILD_DIST_DIR;
 
-console.log("Starting Next.js daemon on port 3329...");
-const server = spawn(process.execPath, [nextBin, "start", buildDir, "--hostname", "127.0.0.1", "--port", "3329"], {
-  cwd: buildDir,
-  env: buildEnv,
-  stdio: "inherit",
-});
+console.log("Starting Next.js daemon on port 3329 (with auto-restart)...");
 
-server.on("exit", (code) => {
-  console.log("Next.js server exited with code", code);
-  process.exit(code || 0);
-});
+function runServer() {
+  const server = spawn(process.execPath, [nextBin, "start", buildDir, "--hostname", "127.0.0.1", "--port", "3329"], {
+    cwd: buildDir,
+    env: buildEnv,
+    stdio: ["ignore", "inherit", "inherit"],
+  });
+
+  server.on("exit", (code) => {
+    console.log(`[Next.js 3329] exited with code ${code}, reviving in 1000ms...`);
+    setTimeout(runServer, 1000);
+  });
+}
+
+runServer();

@@ -22,46 +22,101 @@ export interface MobileWellnessGoal {
   expValue?: number;
   description?: string;
   evidence?: string;
+  titleEn?: string;
+  categoryEn?: string;
+  targetEn?: string;
+  unitEn?: string;
+  descriptionEn?: string;
+  evidenceEn?: string;
 }
 
 export const CANONICAL_STARTER_HABITS: MobileWellnessGoal[] = [
   {
     id: "habit-water-hydration",
     title: "Duy Trì Uống Đủ Nước Hàng Ngày",
+    titleEn: "Maintain Daily Hydration",
     category: "Dinh Dưỡng",
+    categoryEn: "Nutrition",
     status: "active",
     target: "Từng ngụm nhỏ",
+    targetEn: "Small sips",
     unit: "đều đặn",
+    unitEn: "regularly",
     daysPerWeek: 7,
     expValue: 10,
     description: "Bổ sung nước đều đặn theo nhu cầu cơ thể, hỗ trợ thận bài tiết tự nhiên.",
+    descriptionEn: "Drink water steadily according to your body's needs, supporting natural kidney excretion.",
     evidence: "Khuyến cáo Dinh dưỡng Lối sống Y học",
+    evidenceEn: "Lifestyle Medicine Nutrition Guidelines",
   },
   {
     id: "habit-antioxidant-nutrition",
     title: "Tăng Cường Rau Quả Chống Oxy Hóa",
+    titleEn: "Boost Antioxidant-Rich Greens & Fruits",
     category: "Dinh Dưỡng",
+    categoryEn: "Nutrition",
     status: "active",
     target: "1 - 2",
+    targetEn: "1 - 2",
     unit: "khẩu phần",
+    unitEn: "servings",
     daysPerWeek: 7,
     expValue: 15,
     description: "Bổ sung thực phẩm giàu chất chống oxy hóa tự nhiên giúp hỗ trợ cân bằng chuyển hóa.",
+    descriptionEn: "Add natural antioxidant-rich produce to support metabolic balance.",
     evidence: "Dinh dưỡng Dự phòng Y khoa",
+    evidenceEn: "Preventive Nutrition Evidence",
   },
   {
     id: "habit-walk-15min",
     title: "Đi Bộ Nhẹ Nhàng 15 Phút Khởi Động Khớp",
+    titleEn: "Gentle 15-Minute Joint Mobility Walk",
     category: "Vận Động",
+    categoryEn: "Activity",
     status: "active",
     target: "15",
+    targetEn: "15",
     unit: "phút",
+    unitEn: "mins",
     daysPerWeek: 7,
     expValue: 10,
     description: "Kích thích bài tiết hoạt dịch bôi trơn sụn khớp và duy trì biên độ vận động linh hoạt.",
+    descriptionEn: "Stimulates synovial fluid secretion to lubricate cartilage and preserve joint mobility.",
     evidence: "Khuyến nghị Vận động BMJ Clin Evid",
+    evidenceEn: "BMJ Clinical Evidence Guidelines",
   },
 ];
+
+export function getLocalizedGoal(goal: MobileWellnessGoal, locale: string = "vi"): MobileWellnessGoal {
+  if (locale !== "en") return goal;
+  return {
+    ...goal,
+    title: goal.titleEn || goal.title,
+    category:
+      goal.categoryEn ||
+      (goal.category === "Dinh Dưỡng"
+        ? "Nutrition"
+        : goal.category === "Vận Động"
+          ? "Activity"
+          : goal.category === "Giấc Ngủ"
+            ? "Sleep"
+            : goal.category === "Tâm Lý"
+              ? "Mindfulness"
+              : goal.category),
+    target: goal.targetEn || goal.target,
+    unit:
+      goal.unitEn ||
+      (goal.unit === "khẩu phần"
+        ? "servings"
+        : goal.unit === "phút"
+          ? "mins"
+          : goal.unit === "đều đặn"
+            ? "regularly"
+            : goal.unit),
+    description: goal.descriptionEn || goal.description,
+    evidence: goal.evidenceEn || goal.evidence,
+  };
+}
 
 export function calculateStars(done: number, total: number): number {
   if (total <= 0) return 0;

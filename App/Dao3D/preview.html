@@ -1,0 +1,3002 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HealthClues — My Island 3D (2.5D Parallax & Full Word3D Catalog)</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/node_modules/three/build/three.module.js",
+      "three/examples/jsm/": "/node_modules/three/examples/jsm/",
+      "three/addons/": "/node_modules/three/examples/jsm/"
+    }
+  }
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #93c5fd;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+
+    /* TOP MODE SWITCHER BAR */
+    .mode-switcher-bar {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      z-index: 50;
+      background: rgba(3, 21, 16, 0.94);
+      backdrop-filter: blur(14px);
+      border: 1.5px solid #059669;
+      border-radius: 18px;
+      padding: 8px 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .mode-tabs {
+      display: flex;
+      gap: 6px;
+    }
+    .mode-tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(6, 44, 34, 0.85);
+      border: 1.5px solid #047857;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .mode-tab-btn:hover {
+      color: #f1f5f9;
+      border-color: #10b981;
+    }
+    .mode-tab-btn.active {
+      background: linear-gradient(135deg, #059669, #047857);
+      border-color: #34d399;
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+    }
+    .mode-tab-btn.admin-tab.active {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      border-color: #fbbf24;
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+    }
+    .player-controls-strip, .admin-controls-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .player-label {
+      color: #a7f3d0;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .player-select {
+      background: #062e24;
+      border: 1.5px solid #10b981;
+      color: #ecfdf5;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      outline: none;
+    }
+    .mode-action-btn {
+      background: #0f766e;
+      border: 1px solid #2dd4bf;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .mode-action-btn:hover {
+      background: #14b8a6;
+      transform: translateY(-1px);
+    }
+    .mode-action-btn.reset {
+      background: #334155;
+      border-color: #64748b;
+      color: #cbd5e1;
+    }
+    .mode-action-btn.reset:hover {
+      background: #475569;
+    }
+    .admin-quick-add-btn {
+      background: #0284c7;
+      border: 1px solid #38bdf8;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .admin-quick-add-btn:hover {
+      background: #0369a1;
+      transform: translateY(-1px);
+    }
+    .player-status-tag {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .admin-banner-text {
+      color: #fde68a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .admin-save-btn {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border: 1.5px solid #fef08a;
+      color: #451a03;
+      font-size: 12px;
+      font-weight: 900;
+      padding: 7px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+      transition: all 0.2s ease;
+    }
+    .admin-save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(245, 158, 11, 0.6);
+    }
+    .admin-quick-add-btn.clear-all-btn {
+      background: #dc2626;
+      border-color: #f87171;
+    }
+    .admin-quick-add-btn.clear-all-btn:hover {
+      background: #b91c1c;
+    }
+    .placed-items-inline-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 6px;
+      padding-left: 10px;
+      border-left: 1.5px solid rgba(255,255,255,0.18);
+      flex-wrap: wrap;
+    }
+    .placed-items-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .placed-items-chips {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .placed-item-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid #334155;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #e2e8f0;
+      transition: all 0.15s ease;
+    }
+    .placed-item-chip:hover {
+      border-color: #38bdf8;
+      background: rgba(30, 41, 59, 0.98);
+    }
+    .placed-item-chip.active {
+      border-color: #34d399;
+      background: rgba(6, 78, 59, 0.85);
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.45);
+      color: #a7f3d0;
+    }
+    .placed-item-chip .chip-label {
+      cursor: pointer;
+    }
+    .placed-item-chip .chip-delete-btn {
+      background: transparent;
+      border: none;
+      color: #f87171;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 1px 4px;
+      border-radius: 4px;
+      line-height: 1;
+      transition: all 0.15s;
+    }
+    .placed-item-chip .chip-delete-btn:hover {
+      background: #dc2626;
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+
+    /* TOP HUD */
+    .top-hud {
+      position: absolute;
+      top: 68px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+      pointer-events: none;
+    }
+    .hud-btn {
+      pointer-events: auto;
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      background: rgba(6, 28, 22, 0.9);
+      border: 1.5px solid #059669;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: transform 0.15s ease;
+    }
+    .hud-btn:active {
+      transform: scale(0.92);
+    }
+    .island-badge {
+      background: rgba(6, 28, 22, 0.9);
+      border: 1.5px solid #059669;
+      border-radius: 20px;
+      padding: 6px 16px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .island-title {
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .island-sub {
+      color: #34d399;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .hud-right {
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .coin-badge {
+      background: rgba(6, 28, 22, 0.9);
+      border: 1.5px solid #fbbf24;
+      border-radius: 20px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #fbbf24;
+      font-weight: 800;
+      font-size: 13px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    /* BOTTOM DOCK */
+    .bottom-dock {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(6, 28, 22, 0.95);
+      border: 1.5px solid #059669;
+      border-radius: 28px;
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 20;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .dock-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: none;
+      border: none;
+      color: #e2e8f0;
+      cursor: pointer;
+      gap: 4px;
+    }
+    .dock-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 22px;
+      background: rgba(16, 185, 129, 0.15);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      transition: all 0.2s ease;
+    }
+    .dock-btn.active .dock-icon {
+      background: #34d399;
+      color: #042f2e;
+    }
+    .dock-label {
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 30;
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-sheet {
+      width: 100%;
+      max-width: 520px;
+      max-height: 82%;
+      background: #06201a;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      border: 1.5px solid #059669;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #0f3d32;
+    }
+    .modal-title {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .category-filter {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 8px 0;
+      border-bottom: 1px solid #0f3d32;
+    }
+    .filter-chip {
+      background: rgba(15, 61, 50, 0.7);
+      border: 1px solid #059669;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 14px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .filter-chip.active {
+      background: #10b981;
+      color: #042f2e;
+      border-color: #34d399;
+    }
+    .item-list {
+      overflow-y: auto;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 14px;
+    }
+    .item-card {
+      display: flex;
+      align-items: center;
+      background: rgba(15, 61, 50, 0.5);
+      border: 1px solid #0f3d32;
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .item-thumb-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 50% 35%, #0d4a3e 0%, #03211c 100%);
+      border: 1.5px solid #059669;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 12px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+    }
+    .item-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      opacity: 0;
+      z-index: 2;
+    }
+    .item-thumb-img.loaded {
+      opacity: 1;
+    }
+    .item-thumb-fallback {
+      position: absolute;
+      font-size: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.2s ease;
+      z-index: 1;
+    }
+    .item-thumb-fallback.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .item-name {
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-desc {
+      color: #94a3b8;
+      font-size: 11px;
+      margin-top: 2px;
+      line-height: 14px;
+    }
+    .item-stats {
+      color: #38bdf8;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .action-btn {
+      background: #10b981;
+      border: none;
+      color: #042f2e;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .action-btn.disabled {
+      background: #334155;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+
+    /* PLACEMENT BAR */
+    .placement-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 20px;
+      right: 20px;
+      background: rgba(6, 28, 22, 0.95);
+      border: 1.5px solid #10b981;
+      border-radius: 20px;
+      padding: 12px 16px;
+      z-index: 25;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .placement-bar.open {
+      display: flex;
+    }
+    .placement-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .placement-name {
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .placement-status {
+      font-size: 12px;
+      font-weight: 700;
+      color: #34d399;
+    }
+    .placement-status.invalid {
+      color: #f87171;
+    }
+    .placement-controls {
+      display: flex;
+      gap: 8px;
+    }
+    .ctrl-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 12px;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+    .rotate-btn {
+      background: #047857;
+      color: #fff;
+    }
+    .elevate-btn {
+      background: #0284c7;
+      color: #fff;
+    }
+    .elevate-btn:hover {
+      background: #0369a1;
+    }
+    .delete-btn {
+      background: #dc2626;
+      color: #fff;
+      font-weight: 700;
+    }
+    .delete-btn:hover {
+      background: #b91c1c;
+    }
+    .cancel-btn {
+      background: #475569;
+      color: #fff;
+    }
+    .confirm-btn {
+      background: #34d399;
+      color: #042f2e;
+      font-weight: 800;
+    }
+    .elevation-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+      background: rgba(14, 165, 233, 0.18);
+      border: 1px solid rgba(14, 165, 233, 0.4);
+      padding: 2px 8px;
+      border-radius: 8px;
+      letter-spacing: 0.3px;
+    }
+    .toast-container {
+      position: absolute;
+      top: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+    .toast-msg {
+      background: rgba(6, 32, 26, 0.95);
+      border: 1.5px solid #10b981;
+      color: #ecfdf5;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+      animation: fadeInOut 2.8s ease forwards;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(-8px); }
+      12% { opacity: 1; transform: translateY(0); }
+      82% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-8px); }
+    }
+
+    /* FLOATING QUICK TOOLS (RIGHT SCREEN EDGE - ALWAYS VISIBLE) */
+    .floating-quick-tools {
+      position: absolute;
+      top: 130px;
+      right: 18px;
+      background: rgba(6, 28, 22, 0.94);
+      backdrop-filter: blur(14px);
+      border: 1.5px solid #10b981;
+      border-radius: 18px;
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 35;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      min-width: 140px;
+    }
+    .quick-tool-header {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+      padding-bottom: 6px;
+      text-align: center;
+    }
+    .quick-tool-title {
+      font-size: 10px;
+      font-weight: 800;
+      color: #34d399;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .quick-tool-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid #38bdf8;
+      border-radius: 6px;
+      padding: 2px 6px;
+    }
+    .quick-tool-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 9px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .quick-tool-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    }
+    .quick-tool-btn:active {
+      transform: scale(0.96);
+    }
+    .quick-tool-btn.elevate-up {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border-color: #38bdf8;
+    }
+    .quick-tool-btn.elevate-down {
+      background: linear-gradient(135deg, #0f766e, #115e59);
+      border-color: #2dd4bf;
+    }
+    .quick-tool-btn.rotate {
+      background: linear-gradient(135deg, #059669, #047857);
+      border-color: #34d399;
+    }
+    .quick-tool-btn.delete {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      border-color: #f87171;
+    }
+
+    /* HORIZONTAL DECORATION TRAY (QUICK SELECTOR) */
+    .decor-tray {
+      position: absolute;
+      bottom: 84px;
+      left: 16px;
+      right: 16px;
+      background: rgba(6, 28, 22, 0.96);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid #10b981;
+      border-radius: 20px;
+      padding: 10px 14px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 28;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      transition: all 0.25s ease;
+    }
+    .decor-tray.open {
+      display: flex;
+    }
+    .decor-tray-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+      padding-bottom: 6px;
+    }
+    .decor-tray-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #34d399;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .decor-count {
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .decor-tray-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    .decor-filter-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .decor-filter-btn.active {
+      background: #059669;
+      color: #fff;
+      border-color: #34d399;
+    }
+    .decor-close-btn {
+      background: #334155;
+      border: none;
+      color: #f1f5f9;
+      font-size: 12px;
+      font-weight: 700;
+      width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 6px;
+    }
+    .decor-scroll-container {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 4px 2px;
+      scroll-behavior: smooth;
+    }
+    .decor-scroll-container::-webkit-scrollbar {
+      height: 6px;
+    }
+    .decor-scroll-container::-webkit-scrollbar-thumb {
+      background: #10b981;
+      border-radius: 3px;
+    }
+    .decor-item-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 76px;
+      max-width: 82px;
+      background: #0f231e;
+      border: 1.5px solid #1e3a32;
+      border-radius: 14px;
+      padding: 6px 4px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+      position: relative;
+    }
+    .decor-item-chip:hover {
+      transform: translateY(-3px);
+      border-color: #34d399;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+    .decor-item-chip.selected {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: #38bdf8;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+    }
+    .decor-item-chip.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      background: #38bdf8;
+      color: #042f2e;
+      font-size: 11px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .decor-chip-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: #0b1915;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    .decor-chip-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .decor-chip-thumb img.loaded {
+      display: block;
+    }
+    .decor-chip-name {
+      font-size: 10px;
+      font-weight: 700;
+      color: #e2e8f0;
+      text-align: center;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      width: 100%;
+    }
+    .decor-chip-badge {
+      font-size: 9px;
+      font-weight: 700;
+      color: #34d399;
+      margin-top: 2px;
+    }
+
+    /* LUMI MODAL */
+    .lumi-modal {
+      width: 90%;
+      max-width: 400px;
+      background: #06201a;
+      border: 1.5px solid #fbbf24;
+      border-radius: 24px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .lumi-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
+      background: rgba(251, 191, 36, 0.15);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+    .lumi-title {
+      color: #fbbf24;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+    .lumi-sub {
+      color: #34d399;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .lumi-lore {
+      background: rgba(4, 47, 46, 0.6);
+      border: 1px solid #0f3d32;
+      border-radius: 14px;
+      padding: 14px;
+      margin: 14px 0;
+      color: #e2e8f0;
+      font-size: 12px;
+      line-height: 18px;
+      font-style: italic;
+      text-align: left;
+    }
+    .lumi-accept-btn {
+      width: 100%;
+      background: #10b981;
+      border: none;
+      color: #042f2e;
+      font-weight: 900;
+      font-size: 13px;
+      padding: 12px;
+      border-radius: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <!-- TOP MODE SWITCHER (ADMIN MASTER TEMPLATE BUILDER vs PLAYER VIEW) -->
+  <div class="mode-switcher-bar">
+    <div class="mode-tabs">
+      <button class="mode-tab-btn admin-tab active" id="btn-mode-admin" onclick="window.switchMode('admin')">
+        <span>🛠️</span>
+        <span>Chế Độ Admin (Thiết Kế Đảo Mẫu)</span>
+      </button>
+      <button class="mode-tab-btn" id="btn-mode-player" onclick="window.switchMode('player')">
+        <span>👤</span>
+        <span>Góc Nhìn Người Chơi (Player App)</span>
+      </button>
+    </div>
+
+    <!-- ADMIN CONTROLS STRIP (SHOWN IN ADMIN MODE) -->
+    <div class="admin-controls-strip" id="admin-controls-strip">
+      <span class="admin-banner-text">🛠️ Địa thế:</span>
+      <button class="admin-quick-add-btn" onclick="window.quickAddTerrain('ter_snowy_mountain')">🏔️ Thêm Núi</button>
+      <button class="admin-quick-add-btn" onclick="window.quickAddTerrain('ter_mossy_pond')">🌊 Thêm Hồ Nước</button>
+      <button class="admin-quick-add-btn" onclick="window.quickAddTerrain('ter_stream_meander_s')">〰️ Thêm Suối</button>
+      <button class="admin-quick-add-btn" onclick="window.quickAddTerrain('bld_starter_cottage')">🏠 Thêm Nhà Gỗ</button>
+      <button class="admin-quick-add-btn clear-all-btn" onclick="window.clearEntireIslandAndNotify()" title="Xóa toàn bộ đối tượng để làm lại từ đầu">🧹 Xóa Hết Đảo</button>
+      <button class="admin-save-btn" id="btn-save-admin-template" onclick="window.saveAdminDefaultTemplate()">
+        💾 LƯU THÀNH ĐẢO MẪU CHO TẤT CẢ NGƯỜI CHƠI
+      </button>
+      <div class="placed-items-inline-wrap" id="placed-items-inline-wrap">
+        <span class="placed-items-title">Đang có trên đảo:</span>
+        <div class="placed-items-chips" id="placed-items-chips"></div>
+      </div>
+    </div>
+
+    <!-- PLAYER CONTROLS STRIP (SHOWN IN PLAYER MODE) -->
+    <div class="player-controls-strip" id="player-controls-strip" style="display: none;">
+      <span class="player-label">👤 Đảo khởi đầu nhận từ Admin:</span>
+      <button class="mode-action-btn reset" id="btn-reset-player" onclick="window.resetCurrentPlayerIsland()" title="Khôi phục lại đúng địa thế ban đầu do Admin tạo">
+        🔄 Khôi Phục Về Đảo Mẫu Của Admin
+      </button>
+      <span class="player-status-tag">🏝️ Đảo Mẫu Chuẩn Cho Tân Thủ</span>
+    </div>
+  </div>
+
+  <!-- TOP HUD -->
+  <div class="top-hud">
+    <button class="hud-btn" id="btn-back" title="Quay lại">←</button>
+    <div class="island-badge">
+      <div class="island-title">My Island — Hòn Đảo Của Tôi</div>
+      <div class="island-sub">2.5D Parallax World · Toàn Bộ Mô Hình Word3D</div>
+    </div>
+    <div class="hud-right">
+      <div class="coin-badge">
+        <span>🪙</span>
+        <span id="txt-coins">500</span>
+      </div>
+      <button class="hud-btn" id="btn-reset-cam" title="Reset Camera">🧭</button>
+    </div>
+  </div>
+
+  <!-- DECOR SELECTION TRAY (POPS UP WHEN PRESSING TRANG TRÍ) -->
+  <div class="decor-tray" id="decor-tray">
+    <div class="decor-tray-header">
+      <div class="decor-tray-title">
+        <span>🛠️ CHỌN VẬT PHẨM TRANG TRÍ</span>
+        <span class="decor-count" id="decor-tray-count">(58 Món)</span>
+      </div>
+      <div class="decor-tray-actions">
+        <button class="decor-filter-btn active" data-cat="all">Tất Cả</button>
+        <button class="decor-filter-btn" data-cat="landscape">Tiện Ích</button>
+        <button class="decor-filter-btn" data-cat="nature">Cây Cối</button>
+        <button class="decor-filter-btn" data-cat="building">Kiến Trúc</button>
+        <button class="decor-filter-btn" data-cat="companion">Bạn ĐH</button>
+        <button class="decor-close-btn" id="btn-close-decor-tray" title="Đóng thanh trang trí">✕</button>
+      </div>
+    </div>
+    <div class="decor-scroll-container" id="decor-scroll-container">
+      <!-- Dynamic item chips -->
+    </div>
+  </div>
+
+  <!-- BOTTOM DOCK -->
+  <div class="bottom-dock" id="bottom-dock">
+    <button class="dock-btn" id="btn-open-shop">
+      <div class="dock-icon">🛍️</div>
+      <span class="dock-label">Cửa Hàng</span>
+    </button>
+    <button class="dock-btn" id="btn-open-inv">
+      <div class="dock-icon">🎒</div>
+      <span class="dock-label" id="lbl-inv">Kho Đồ (58)</span>
+    </button>
+    <button class="dock-btn" id="btn-toggle-decor">
+      <div class="dock-icon">🛠️</div>
+      <span class="dock-label" id="lbl-decor">Trang Trí</span>
+    </button>
+  </div>
+
+  <!-- TOAST FEEDBACK NOTIFICATIONS -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- FLOATING QUICK TOOLS (RIGHT SCREEN EDGE - ALWAYS VISIBLE) -->
+  <div class="floating-quick-tools" id="floating-quick-tools">
+    <div class="quick-tool-header">
+      <div class="quick-tool-title">ĐIỀU KHIỂN ĐỒ</div>
+      <div class="quick-tool-badge" id="side-elevation-badge">Cao: +0.25m</div>
+    </div>
+    <button class="quick-tool-btn elevate-up" id="side-btn-up" title="Nâng cao mô hình để không bị lún vào lớp cỏ">
+      <span>⬆️</span>
+      <span>Lên (+0.15)</span>
+    </button>
+    <button class="quick-tool-btn elevate-down" id="side-btn-down" title="Hạ thấp mô hình">
+      <span>⬇️</span>
+      <span>Xuống (-0.15)</span>
+    </button>
+    <button class="quick-tool-btn rotate" id="side-btn-rot" title="Xoay mô hình 45 độ">
+      <span>🔄</span>
+      <span>Xoay 45°</span>
+    </button>
+    <button class="quick-tool-btn delete" id="side-btn-del" title="Xóa vật phẩm khỏi đảo và cất lại vào kho đồ">
+      <span>🗑️</span>
+      <span>Xóa Khỏi Đảo</span>
+    </button>
+  </div>
+
+  <!-- PLACEMENT & EDITING CONTROLS BAR -->
+  <div class="placement-bar" id="placement-bar">
+    <div class="placement-header">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="placement-name" id="txt-placement-name">Vật Phẩm</span>
+        <span class="elevation-badge" id="txt-elevation-badge">Cao: +0.00m</span>
+      </div>
+      <span class="placement-status" id="txt-placement-status">✓ Vị trí hợp lệ</span>
+    </div>
+    <div class="placement-controls">
+      <button class="ctrl-btn elevate-btn" id="btn-elevate-up" title="Nâng cao mô hình để không bị lún vào lớp cỏ/đất">⬆️ Lên (+)</button>
+      <button class="ctrl-btn elevate-btn" id="btn-elevate-down" title="Hạ thấp mô hình">⬇️ Xuống (-)</button>
+      <button class="ctrl-btn rotate-btn" id="btn-rotate" title="Xoay mô hình 45 độ">🔄 Xoay</button>
+      <button class="ctrl-btn delete-btn" id="btn-delete" title="Xóa vật phẩm khỏi đảo và cất lại vào kho đồ">🗑️ Xóa</button>
+      <button class="ctrl-btn cancel-btn" id="btn-cancel" title="Hủy bỏ / Đóng bảng chỉnh">✕ Đóng</button>
+      <button class="ctrl-btn confirm-btn" id="btn-confirm" title="Xác nhận đặt hoặc lưu vị trí">✅ Lưu</button>
+    </div>
+  </div>
+
+  <!-- SHOP MODAL -->
+  <div class="modal-overlay" id="modal-shop">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">🛍️ Cửa Hàng Vật Phẩm Đảo (Toàn Bộ Mô Hình Word3D)</div>
+        <button class="close-btn" id="btn-close-shop">✕</button>
+      </div>
+      <div class="category-filter" id="shop-category-filter">
+        <button class="filter-chip active" data-cat="all">Tất Cả (58)</button>
+        <button class="filter-chip" data-cat="building">Kiến Trúc (17)</button>
+        <button class="filter-chip" data-cat="landscape">Cầu & Tiện Ích (11)</button>
+        <button class="filter-chip" data-cat="nature">Thiên Nhiên (15)</button>
+        <button class="filter-chip" data-cat="terrain">Suối & Địa Hình (10)</button>
+        <button class="filter-chip" data-cat="companion">Đồng Hành (5)</button>
+      </div>
+      <div class="item-list" id="shop-item-list"></div>
+    </div>
+  </div>
+
+  <!-- INVENTORY MODAL -->
+  <div class="modal-overlay" id="modal-inv">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">🎒 Kho Đồ Trang Trí (Toàn Bộ 58 Mô Hình Từ Word3D)</div>
+        <button class="close-btn" id="btn-close-inv">✕</button>
+      </div>
+      <div class="category-filter" id="inv-category-filter">
+        <button class="filter-chip active" data-cat="all">Tất Cả (58)</button>
+        <button class="filter-chip" data-cat="building">Kiến Trúc (17)</button>
+        <button class="filter-chip" data-cat="landscape">Cầu & Tiện Ích (11)</button>
+        <button class="filter-chip" data-cat="nature">Thiên Nhiên (15)</button>
+        <button class="filter-chip" data-cat="terrain">Suối & Địa Hình (10)</button>
+        <button class="filter-chip" data-cat="companion">Đồng Hành (5)</button>
+      </div>
+      <div class="item-list" id="inv-item-list"></div>
+    </div>
+  </div>
+
+  <!-- LUMI WELCOME MODAL -->
+  <div class="modal-overlay" id="modal-lumi" style="align-items: center;">
+    <div class="lumi-modal">
+      <div class="lumi-icon">✨</div>
+      <div class="lumi-title">QUÀ TẶNG TỪ LUMI</div>
+      <div class="lumi-sub">Mảnh Đất & Căn Nhà Khởi Đầu Trên Đảo Nổi 2.5D</div>
+      <div class="lumi-lore">
+        "Chào mừng bạn đến với Hòn Đảo 3D cá nhân!<br><br>
+        Mình đã chuẩn bị sẵn hiệu ứng nền 2.5D Parallax cùng toàn bộ kho mô hình làng mây Cozy Fantasy từ Word3D.<br><br>
+        Hãy thoải mái chọn, đặt, xoay và sáng tạo không gian riêng của bạn nhé!"
+      </div>
+      <button class="lumi-accept-btn" id="btn-accept-lumi">Bắt Đầu Khám Phá Hòn Đảo</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from "/node_modules/three/build/three.module.js";
+    import { GLTFLoader } from "/node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+
+    // -------------------------------------------------------------
+    // TOÀN BỘ HỆ THỐNG MÔ HÌNH TỪ WORD3D (58 VẬT PHẨM ĐÃ ĐỒNG BỘ TỈ LỆ CHUẨN)
+    // -------------------------------------------------------------
+    const FULL_CATALOG = [
+      // 1. KIẾN TRÚC & CÔNG TRÌNH (BUILDINGS - 17)
+      { id: 'bld_starter_cottage', nameVi: 'Căn Nhà Gỗ Khởi Đầu', cat: 'building', price: 0, icon: '🏠', glb: 'fantasy_house_1.glb', scale: 1.5, desc: 'Ngôi nhà gỗ ấm cúng Lumi trao tặng làm chốn an cư khởi đầu.' },
+      { id: 'bld_great_hall', nameVi: 'Nhà Đại Sảnh Sinh Hoạt Chung', cat: 'building', price: 220, icon: '🏰', glb: 'house_great_hall.glb', scale: 0.63, desc: 'Không gian sinh hoạt cộng đồng, hội tụ các bậc hiền triết y khoa.' },
+      { id: 'bld_general_store', nameVi: 'Cửa Hàng Tạp Hóa Làng Mây', cat: 'building', price: 180, icon: '🏪', glb: 'house_general_store.glb', scale: 0.65, desc: 'Nơi trao đổi các dược thảo quý và vật phẩm sinh hoạt vùng cao.' },
+      { id: 'bld_library_cottage', nameVi: 'Thư Viện Thảo Mộc Cổ Điển', cat: 'building', price: 170, icon: '📚', glb: 'house_library_cottage.glb', scale: 0.95, desc: 'Lưu trữ cổ thư y học, các công trình nghiên cứu về thảo dược.' },
+      { id: 'bld_stone_house', nameVi: 'Biệt Thự Đá Cổ Phong', cat: 'building', price: 190, icon: '🏛️', glb: 'model_stone_house_7483.glb', scale: 3.8, desc: 'Kiến trúc đá nguyên khối vững chãi trước gió sương vùng tuyết sơn.' },
+      { id: 'bld_fantasy_rest', nameVi: 'Nhà Gỗ Nghỉ Chân Mây', cat: 'building', price: 160, icon: '🛖', glb: 'model_fantasy_house_9348.glb', scale: 3.5, desc: 'Căn nhà nhỏ ấm áp với lò sưởi củi thông cho giấc ngủ sâu.' },
+      { id: 'bld_mill', nameVi: 'Cối Xay Gió Nông Trại', cat: 'building', price: 150, icon: '🌬️', glb: 'mill.glb', scale: 0.94, desc: 'Cối xay bột ngũ cốc nguyên cám giàu chất xơ hỗ trợ tiêu hóa.' },
+      { id: 'bld_bell_tower', nameVi: 'Tháp Chuông Hòa Bình', cat: 'building', price: 160, icon: '🔔', glb: 'bell_tower.glb', scale: 1.09, desc: 'Tiếng chuông ngân sớm mai đánh thức nhịp sinh học tự nhiên.' },
+      { id: 'bld_greenhouse', nameVi: 'Nhà Kính Dược Liệu Cổ Sinh', cat: 'building', price: 140, icon: '🏡', glb: 'greenhouse.glb', scale: 4.55, desc: 'Vườn ươm dây thìa canh và quế ceylon với nhiệt ẩm tối ưu.' },
+      { id: 'bld_blacksmith', nameVi: 'Xưởng Rèn Ngũ Kim Alpine', cat: 'building', price: 140, icon: '⚒️', glb: 'blacksmith.glb', scale: 0.87, desc: 'Rèn giũa công cụ leo núi và dụng cụ thể thao rèn luyện sức bền.' },
+      { id: 'bld_fantasy_inn', nameVi: 'Nhà Trọ Cozy Fantasy', cat: 'building', price: 180, icon: '🏨', glb: 'fantasy_inn.glb', scale: 1.03, desc: 'Chốn dừng chân ấm cúng thưởng thức trà thảo mộc bên lò sưởi.' },
+      { id: 'bld_fantasy_barracks', nameVi: 'Khu Rèn Luyện Thể Lực', cat: 'building', price: 150, icon: '🏰', glb: 'fantasy_barracks.glb', scale: 1.68, desc: 'Khu vận động kích hoạt kênh GLUT4 tiêu thụ đường huyết hiệu quả.' },
+      { id: 'bld_two_story_house', nameVi: 'Biệt Thự Gỗ 2 Tầng', cat: 'building', price: 150, icon: '🏠', glb: 'two_story_house.glb', scale: 2.77, desc: 'Ngôi nhà gỗ thông hai tầng thoáng mát ngắm toàn cảnh biển mây.' },
+      { id: 'bld_fantasy_house_2', nameVi: 'Nhà Gỗ Ban Công Hoa', cat: 'building', price: 130, icon: '🏡', glb: 'fantasy_house_2.glb', scale: 0.89, desc: 'Căn nhà gỗ ấm áp với ban công ngắm bình minh trên đỉnh núi.' },
+      { id: 'bld_fantasy_house_3', nameVi: 'Nhà Gỗ Thảo Dược Rừng Sâu', cat: 'building', price: 135, icon: '🛖', glb: 'fantasy_house_3.glb', scale: 0.92, desc: 'Căn nhà của thầy thuốc bản địa lưu trữ thảo dược quý.' },
+      { id: 'bld_gazebo', nameVi: 'Chòi Vọng Cảnh Hoa Trắng', cat: 'building', price: 120, icon: '🏛️', glb: 'gazebo.glb', scale: 1.86, desc: 'Kiến trúc gỗ mở ngắm bình minh trên mây, thiền định và trà đạo.' },
+      { id: 'bld_market_stand', nameVi: 'Quầy Nông Sản Hữu Cơ', cat: 'building', price: 85, icon: '🧺', glb: 'market_stand.glb', scale: 1.91, desc: 'Trưng bày rau quả tươi sạch giàu polyphenol chống oxy hóa.' },
+
+      // 2. CẢNH QUAN, CẦU & TIỆN ÍCH NGOẠI CẢNH (LANDSCAPE & PROPS - 11)
+      { id: 'prop_japanese_garden', nameVi: 'Cầu Gỗ & Vườn Thiền Nhật Bản', cat: 'landscape', price: 180, icon: '⛩️', glb: 'model_bridge_and_japanese_garden_2650.glb', scale: 0.23, desc: 'Vườn thiền đá cuội và cầu gỗ thư thái cân bằng tâm trí.' },
+      { id: 'prop_plaza_well', nameVi: 'Giếng Nước Cổ Dưỡng Sinh', cat: 'landscape', price: 60, icon: '🚰', glb: 'well.glb', scale: 1.44, desc: 'Mạch nước nguồn từ lòng núi tuyết, khởi tạo thói quen uống nước ấm.' },
+      { id: 'prop_park_bench', nameVi: 'Ghế Băng Công Viên Gỗ', cat: 'landscape', price: 35, icon: '🪑', glb: 'prop_park_bench.glb', scale: 0.64, desc: 'Băng ghế gỗ mộc hướng ra biển mây, nơi thư giãn cột sống.' },
+      { id: 'prop_oak_bench', nameVi: 'Ghế Gỗ Sồi Nghỉ Ngơi', cat: 'landscape', price: 35, icon: '🪑', glb: 'bench.glb', scale: 2.26, desc: 'Băng ghế gỗ sồi sưởi nắng sớm mai hỗ trợ tổng hợp vitamin D.' },
+      { id: 'prop_bonfire', nameVi: 'Đống Lửa Trại Ấm Áp', cat: 'landscape', price: 50, icon: '🔥', glb: 'bonfire.glb', scale: 2.95, desc: 'Ngọn lửa củi thông reo tí tách, xua tan giá lạnh màn đêm.' },
+      { id: 'prop_hand_cart', nameVi: 'Xe Kéo Tay Thu Hoạch', cat: 'landscape', price: 45, icon: '🛒', glb: 'cart.glb', scale: 1.26, desc: 'Xe gỗ chở đầy hoa quả tươi thu hái từ các triền đồi trong lành.' },
+      { id: 'prop_oak_barrel', nameVi: 'Thùng Gỗ Trữ Dược Liệu', cat: 'landscape', price: 25, icon: '🪵', glb: 'barrel.glb', scale: 4.89, desc: 'Thùng gỗ sồi ướp hương quế và hoa hồi, giữ ấm không gian sống.' },
+      { id: 'prop_supply_crate', nameVi: 'Hòm Gỗ Thu Hái Thảo Mộc', cat: 'landscape', price: 20, icon: '📦', glb: 'crate.glb', scale: 4.99, desc: 'Chứa những búp trà thảo mộc tươi hái trên sườn núi HealthClues.' },
+      { id: 'prop_pine_fence', nameVi: 'Hàng Rào Gỗ Thông', cat: 'landscape', price: 15, icon: '🪵', glb: 'fence.glb', scale: 2.78, desc: 'Phân định khu vườn thảo mộc và bảo vệ lối đi phong cách diorama.' },
+      { id: 'prop_picket_fence', nameVi: 'Hàng Rào Cọc Gỗ Vườn', cat: 'landscape', price: 15, icon: '🪵', glb: 'prop_picket_fence.glb', scale: 0.77, desc: 'Hàng rào cọc nhọn xinh xắn bao quanh vườn rau quả sạch.' },
+      { id: 'prop_lantern_post', nameVi: 'Đèn Lồng Đêm Ấm Cúng', cat: 'landscape', price: 40, icon: '🏮', glb: 'Lantern_01.glb', scale: 5.74, desc: 'Ánh sáng vàng dịu dàng bước sóng thấp, giữ nhịp sinh học melatonin.' },
+
+      // 3. THIÊN NHIÊN, HOA CỎ & CÂY XANH (NATURE & FLORA - 15)
+      { id: 'nat_momiji_maple', nameVi: 'Cây Phong Đỏ Momiji', cat: 'nature', price: 80, icon: '🍁', glb: 'tree_momiji_maple.glb', scale: 1.11, desc: 'Sắc lá đỏ thắm rực rỡ mang nguồn năng lượng tươi mới mỗi ngày.' },
+      { id: 'nat_lineside_oak', nameVi: 'Cây Sồi Ven Đường Làng Mây', cat: 'nature', price: 75, icon: '🌳', glb: 'tree_lineside_oak.glb', scale: 0.99, desc: 'Cổ thụ sồi tỏa bóng mát tạo ion âm trong lành sảng khoái.' },
+      { id: 'nat_shade_park_tree', nameVi: 'Cây Bóng Mát Công Viên', cat: 'nature', price: 70, icon: '🌳', glb: 'tree_shade_park.glb', scale: 0.77, desc: 'Tán lá tròn xòe rộng điều hòa vi khí hậu hòn đảo.' },
+      { id: 'nat_pine_sapling', nameVi: 'Cây Thông Non Thanh Lọc', cat: 'nature', price: 30, icon: '🌲', glb: 'pine_sapling_small.glb', scale: 0.53, desc: 'Tỏa hương phytoncide tự nhiên giúp thông thoáng đường thở.' },
+      { id: 'nat_alpine_pine', nameVi: 'Cây Thông Núi Tuyết Alpine', cat: 'nature', price: 35, icon: '🌲', glb: 'tree_small_02.glb', scale: 0.37, desc: 'Giống thông tuyết sinh trưởng kiên cường ở độ cao trên 2000m.' },
+      { id: 'nat_mums_pot', nameVi: 'Chậu Hoa Cúc Quảng Trường', cat: 'nature', price: 30, icon: '🌼', glb: 'plant_mums_flowerpot.glb', scale: 1.11, desc: 'Những bông cúc vàng rực rỡ thanh nhiệt giải độc và sáng mắt.' },
+      { id: 'nat_library_pot', nameVi: 'Chậu Cây Cảnh Thư Viện', cat: 'nature', price: 28, icon: '🪴', glb: 'plant_library_flowerpot.glb', scale: 1.02, desc: 'Cây kiểng thanh lọc formaldehyde và tạo cảm hứng học tập.' },
+      { id: 'nat_plaza_planter', nameVi: 'Bồn Hoa Quảng Trường Trung Tâm', cat: 'nature', price: 45, icon: '💐', glb: 'prop_plaza_planter.glb', scale: 1.02, desc: 'Bồn hoa đá mộc tràn ngập sắc màu sinh khí của Làng Mây.' },
+      { id: 'nat_mulch_bed', nameVi: 'Luống Đất Trồng Dược Liệu', cat: 'nature', price: 25, icon: '🌱', glb: 'bed_mulch_tile.glb', scale: 0.45, desc: 'Đất mùn hữu cơ giàu vi sinh dưỡng rễ cây sâm và ngải thảo.' },
+      { id: 'nat_flower_gazania', nameVi: 'Khóm Hoa Thảo Mộc Rực Rỡ', cat: 'nature', price: 25, icon: '🌼', glb: 'flower_gazania.glb', scale: 0.68, desc: 'Những cánh hoa vàng cam tràn ngập sinh khí, xua tan căng thẳng.' },
+      { id: 'nat_moss_patch', nameVi: 'Thảm Rêu Phủ Nền Tự Nhiên', cat: 'nature', price: 20, icon: '🟢', glb: 'moss_patch.glb', scale: 1.05, desc: 'Thảm rêu nhung xanh mướt giữ ẩm và làm dịu không gian mát mẻ.' },
+      { id: 'nat_fern', nameVi: 'Bụi Dương Xỉ Rừng Sâu', cat: 'nature', price: 20, icon: '🌿', glb: 'fern_02.glb', scale: 0.61, desc: 'Cây ưa ẩm mang không khí trong lành của rừng rậm cổ sinh.' },
+      { id: 'nat_acanthus_scatter', nameVi: 'Bụi Cây Thấp Acanthus', cat: 'nature', price: 18, icon: '🌿', glb: 'grass_acanthus_scatter.glb', scale: 0.45, desc: 'Thảo mộc viền đá tự nhiên giúp điều hòa nhịp thở thư giãn.' },
+      { id: 'nat_lawn_tuft', nameVi: 'Khóm Cỏ Xanh Đồng Cỏ', cat: 'nature', price: 15, icon: '🌱', glb: 'grass_lawn_tuft.glb', scale: 0.61, desc: 'Những khóm cỏ xanh mát bước chân đi bộ sau bữa ăn.' },
+      { id: 'nat_grass_medium', nameVi: 'Thảm Cỏ Đồng Nội Xanh Mướt', cat: 'nature', price: 15, icon: '🌱', glb: 'grass_medium_01.glb', scale: 0.2, desc: 'Thảm cỏ dịu mát bước chân đi bộ thư giãn sau bữa ăn.' },
+
+      // 4. ĐỊA HÌNH, SUỐI & ĐÁ TẢNG (TERRAIN & WATER - 10)
+      { id: 'ter_snowy_mountain', nameVi: 'Dãy Núi Tuyết Alpine Vista', cat: 'terrain', price: 250, icon: '🏔️', glb: 'model_snowy_mountain_-_terrain_1678.glb', scale: 7.5, desc: 'Rặng núi tuyết hùng vĩ che chắn gió rét phương bắc cho hòn đảo.' },
+      { id: 'ter_mossy_pond', nameVi: 'Hồ Nước Đá Rêu Mossy Pond', cat: 'terrain', price: 130, icon: '🌊', glb: 'stream_pond_01.glb', scale: 0.49, desc: 'Hồ nước trong veo soi bóng trời mây và nuôi dưỡng tôm cá.' },
+      { id: 'ter_cascade_step', nameVi: 'Bậc Thác Nước Đá Đổ Cascade', cat: 'terrain', price: 110, icon: '⛲', glb: 'stream_waterfall_step_01.glb', scale: 0.57, desc: 'Thác đá bậc thang với tiếng nước reo róc rách thanh lọc tâm trí.' },
+      { id: 'ter_stream_meander_s', nameVi: 'Suối Uốn Lượn Chữ S', cat: 'terrain', price: 90, icon: '〰️', glb: 'stream_meandering_s_01.glb', scale: 0.21, desc: 'Dòng suối uốn khúc tạo phong thủy luân chuyển sinh khí trên đảo.' },
+      { id: 'ter_stream_winding', nameVi: 'Suối Lượn Sóng Đôi Winding', cat: 'terrain', price: 90, icon: '〰️', glb: 'stream_winding_river_01.glb', scale: 0.19, desc: 'Mạch suối đôi dẫn nước mát từ thác về tưới mát vườn thảo mộc.' },
+      { id: 'ter_stream_bend_90', nameVi: 'Khúc Cua Suối 90°', cat: 'terrain', price: 75, icon: '↪️', glb: 'stream_bend_90_01.glb', scale: 0.3, desc: 'Khúc quanh suối tự nhiên ôm trọn lấy các công trình đảo nổi.' },
+      { id: 'ter_stream_fork', nameVi: 'Ngã Ba Suối Chữ Y', cat: 'terrain', price: 85, icon: '🔱', glb: 'stream_fork_junction_01.glb', scale: 0.23, desc: 'Phân nhánh dòng nước ngọc bích tỏa đi khắp các triền hoa.' },
+      { id: 'ter_stream_straight', nameVi: 'Đoạn Suối Thẳng Viền Sỏi', cat: 'terrain', price: 65, icon: '➖', glb: 'stream_straight_01.glb', scale: 0.19, desc: 'Đoạn suối thẳng với bờ sỏi trắng lấp lánh dưới ánh nắng mai.' },
+      { id: 'ter_moss_boulder', nameVi: 'Tảng Đá Rêu Phong Cổ Sinh', cat: 'terrain', price: 30, icon: '🪨', glb: 'rock_moss_boulder.glb', scale: 0.79, desc: 'Tảng đá sa thạch phủ rêu xanh chứng tích thời gian của Làng Mây.' },
+      { id: 'ter_boulder_weathered', nameVi: 'Đá Tảng Phong Sương', cat: 'terrain', price: 25, icon: '🪨', glb: 'boulder_01.glb', scale: 0.77, desc: 'Đá cuội núi lửa định vị bờ suối và giữ bờ đất vững chắc.' },
+
+      // 5. BẠN ĐỒNG HÀNH & NHÂN VẬT RPG (COMPANIONS & CHARACTERS - 5)
+      { id: 'char_fox', nameVi: 'Cáo Lửa Đồng Hành Tuyết Sơn', cat: 'companion', price: 90, icon: '🦊', glb: 'Fox.glb', scale: 0.0071, desc: 'Chú cáo thông minh luôn chạy nhảy bên dòng suối và sưởi ấm bên đống lửa.' },
+      { id: 'char_robot', nameVi: 'Người Máy Trợ Lý Nghiên Cứu', cat: 'companion', price: 95, icon: '🤖', glb: 'RobotExpressive.glb', scale: 0.31, desc: 'Trợ lý AI cơ khí phân tích chỉ số vận động và năng lượng calo.' },
+      { id: 'char_knight', nameVi: 'Hiệp Sĩ Hoàng Gia Làng Mây', cat: 'companion', price: 150, icon: '🛡️', glb: 'Knight.glb', scale: 0.72, desc: 'Chiến binh quả cảm bảo vệ sự bình yên và động viên người chơi rèn luyện.' },
+      { id: 'char_mage', nameVi: 'Pháp Sư Tinh Anh Rừng Tuyết', cat: 'companion', price: 150, icon: '🧙‍♂️', glb: 'Mage.glb', scale: 0.65, desc: 'Bậc thầy thảo dược cổ truyền điều chế các phương thuốc diệu kỳ.' },
+      { id: 'char_rogue', nameVi: 'Đạo Tặc Tốc Độ Thảo Nguyên', cat: 'companion', price: 140, icon: '🥷', glb: 'Rogue.glb', scale: 0.75, desc: 'Chuyên gia di chuyển nhanh nhẹn rèn luyện phản xạ và tốc độ bước chân.' }
+    ];
+
+    window.FULL_CATALOG = FULL_CATALOG;
+
+    let playerCoins = 500;
+    // CHO TOÀN BỘ 58 MÔ HÌNH VÀO KHO ĐỒ THEO YÊU CẦU CỦA USER
+    let ownedInventory = FULL_CATALOG.map(c => ({ itemId: c.id, count: 3 }));
+    let placedItems = [];
+    window.placedItems = placedItems;
+
+    // -------------------------------------------------------------
+    // THREE.JS 3D SCENE SETUP
+    // -------------------------------------------------------------
+    const container = document.getElementById('canvas-container');
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#93c5fd');
+    scene.fog = new THREE.FogExp2('#cbe7fc', 0.0032);
+
+    const camera = new THREE.PerspectiveCamera(42, width / height, 0.5, 350);
+    let cameraDistance = 38.0;
+    let cameraPolar = Math.PI / 3.4;
+    let cameraAzimuth = Math.PI / 4.0;
+    scene.add(camera);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setClearColor('#93c5fd', 1.0);
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+
+    const gltfLoader = new GLTFLoader();
+
+    // -------------------------------------------------------------
+    // 2.5D SKY ENVIRONMENT & PARALLAX BACKGROUND PLANE (FROM WORD3D)
+    // -------------------------------------------------------------
+    function createCozyFantasySkyTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 2048;
+      canvas.height = 1152;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // 1. Cozy Fantasy Morning Sky Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+      skyGrad.addColorStop(0.0, '#1e3a8a'); // Deep sapphire zenith
+      skyGrad.addColorStop(0.22, '#2563eb'); // Royal azure
+      skyGrad.addColorStop(0.48, '#60a5fa'); // Clear morning blue
+      skyGrad.addColorStop(0.66, '#93c5fd'); // Soft pale azure
+      skyGrad.addColorStop(0.76, '#fed7aa'); // Warm honey peach sunrise glow
+      skyGrad.addColorStop(0.86, '#fef08a'); // Gentle golden mist
+      skyGrad.addColorStop(1.0, '#e0f2fe'); // Soft cloud sea
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. Warm Sun Flare (Upper-Right)
+      const sunX = w * 0.74;
+      const sunY = h * 0.28;
+      const sunGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, w * 0.45);
+      sunGlow.addColorStop(0.0, 'rgba(255, 255, 252, 0.95)');
+      sunGlow.addColorStop(0.08, 'rgba(254, 240, 138, 0.65)');
+      sunGlow.addColorStop(0.22, 'rgba(253, 230, 138, 0.28)');
+      sunGlow.addColorStop(0.40, 'rgba(254, 215, 170, 0.10)');
+      sunGlow.addColorStop(1.0, 'rgba(254, 215, 170, 0.0)');
+      ctx.fillStyle = sunGlow;
+      ctx.fillRect(0, 0, w, h);
+
+      // 3. Far Alpine Mountain Silhouettes
+      ctx.fillStyle = 'rgba(147, 197, 253, 0.35)';
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.80);
+      const mtnPts = [
+        [0.0, 0.75], [0.12, 0.70], [0.24, 0.74], [0.38, 0.68],
+        [0.50, 0.75], [0.64, 0.67], [0.78, 0.72], [0.88, 0.66], [1.0, 0.73]
+      ];
+      for (let i = 0; i < mtnPts.length - 1; i++) {
+        const p1 = mtnPts[i];
+        const p2 = mtnPts[i + 1];
+        const cpx = ((p1[0] + p2[0]) / 2) * w;
+        const cpy = Math.min(p1[1], p2[1]) * h - 18;
+        ctx.quadraticCurveTo(cpx, cpy, p2[0] * w, p2[1] * h);
+      }
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // 4. Distant Floating Citadel & Archipelagos
+      ctx.fillStyle = 'rgba(125, 170, 235, 0.45)';
+      // Sky Citadel Island Left
+      const drawIsland = (cx, cy, rx, dy) => {
+        ctx.beginPath();
+        ctx.moveTo(cx - rx, cy);
+        ctx.bezierCurveTo(cx - rx * 0.8, cy + dy * 0.6, cx - rx * 0.3, cy + dy * 0.9, cx, cy + dy);
+        ctx.bezierCurveTo(cx + rx * 0.3, cy + dy * 0.9, cx + rx * 0.8, cy + dy * 0.6, cx + rx, cy);
+        ctx.quadraticCurveTo(cx, cy - dy * 0.15, cx - rx, cy);
+        ctx.closePath();
+        ctx.fill();
+        // Castle towers
+        ctx.fillRect(cx - rx * 0.1, cy - dy * 0.8, rx * 0.2, dy * 0.8);
+      };
+      drawIsland(w * 0.22, h * 0.58, 80, 50);
+      drawIsland(w * 0.82, h * 0.52, 95, 60);
+
+      // 5. Billowing Cloud Horizon at Bottom
+      const cloudGrad = ctx.createLinearGradient(0, h * 0.82, 0, h);
+      cloudGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.85)');
+      cloudGrad.addColorStop(1.0, 'rgba(224, 242, 254, 0.95)');
+      ctx.fillStyle = cloudGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.85);
+      for (let x = 0; x <= w; x += 120) {
+        ctx.quadraticCurveTo(x + 60, h * 0.80 - 15 * Math.sin(x), x + 120, h * 0.85);
+      }
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      ctx.fill();
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      return texture;
+    }
+
+    // CREATE FIXED 2.5D BACKGROUND PLANE ATTACHED TO CAMERA
+    const bgDistance = 140;
+    const bgGeo = new THREE.PlaneGeometry(1, 1);
+    const bgMat = new THREE.MeshBasicMaterial({
+      map: createCozyFantasySkyTexture(),
+      depthWrite: false,
+      depthTest: false,
+    });
+    const bgPlane = new THREE.Mesh(bgGeo, bgMat);
+    bgPlane.renderOrder = -1000;
+    bgPlane.position.z = -bgDistance;
+    camera.add(bgPlane);
+
+    // Try loading realistic 2.5D sky texture if present
+    const texLoader = new THREE.TextureLoader();
+    texLoader.load('/textures/sky/fantasy_sky_worlds_25d.jpg', (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      bgMat.map = tex;
+      bgMat.needsUpdate = true;
+    }, undefined, () => {});
+
+    let bgScaleW = 1;
+    let bgScaleH = 1;
+
+    function updateBgFrustumScale(aspect) {
+      const fovRad = (camera.fov * Math.PI) / 180;
+      const frustumH = 2 * bgDistance * Math.tan(fovRad / 2);
+      const frustumW = frustumH * aspect;
+      const imgAspect = 16 / 9;
+
+      let baseW, baseH;
+      if (aspect > imgAspect) {
+        baseW = frustumW;
+        baseH = frustumW / imgAspect;
+      } else {
+        baseH = frustumH;
+        baseW = frustumH * imgAspect;
+      }
+      // Expand by 85% horizontally and 55% vertically so no borders can ever show on any screen or camera angle
+      bgScaleW = baseW * 1.85;
+      bgScaleH = baseH * 1.55;
+      bgPlane.scale.set(bgScaleW, bgScaleH, 1);
+    }
+    updateBgFrustumScale(camera.aspect);
+
+    // 2 NEARBY 3D DEPTH CLOUDS FOR PARALLAX DEPTH (WORD3D STYLE)
+    const depthCloudsGroup = new THREE.Group();
+    const cloudGeo = new THREE.DodecahedronGeometry(2.4, 1);
+    const cloudMat = new THREE.MeshStandardMaterial({
+      color: '#ffffff',
+      roughness: 0.95,
+      transparent: true,
+      opacity: 0.85,
+      flatShading: true,
+    });
+
+    // Cloud 1: Foreground Depth Anchor (Left flank)
+    const cloud1 = new THREE.Mesh(cloudGeo, cloudMat);
+    cloud1.scale.set(1.8, 0.7, 1.4);
+    cloud1.position.set(-14, 0.5, 4);
+    depthCloudsGroup.add(cloud1);
+
+    // Cloud 2: Waterfall Landing Pillow (Right flank)
+    const cloud2 = new THREE.Mesh(cloudGeo, cloudMat);
+    cloud2.scale.set(2.2, 0.8, 1.6);
+    cloud2.position.set(12, -4.5, 6);
+    depthCloudsGroup.add(cloud2);
+    scene.add(depthCloudsGroup);
+
+    // LIGHTING SETUP (MATCHING WORD3D CRISP DAYTIME)
+    const sunLight = new THREE.DirectionalLight('#ffffff', 2.8);
+    sunLight.position.set(22, 34, 18);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.set(1024, 1024);
+    sunLight.shadow.bias = -0.0004;
+    scene.add(sunLight);
+
+    const hemiLight = new THREE.HemisphereLight('#7dd3fc', '#3b4252', 1.2);
+    scene.add(hemiLight);
+
+    const ambientLight = new THREE.AmbientLight('#f0f9ff', 0.55);
+    scene.add(ambientLight);
+
+    // -------------------------------------------------------------
+    // PROCEDURAL FLOATING ISLAND (ORGANIC SCULPTED KEEL & LUSH MEADOW)
+    // -------------------------------------------------------------
+    const islandRadiusX = 16.5;
+    const islandRadiusZ = 16.5;
+
+    // 1. ORGANIC ROCKY KEEL (OPEN-ENDED CYLINDER WITH SQUIRCLE INTERPOLATION)
+    const undersideGeo = new THREE.CylinderGeometry(
+      islandRadiusX,
+      0.6,
+      16.0,
+      72,
+      28,
+      true // open-ended: no ugly single-vertex radial top fan!
+    );
+    const uPos = undersideGeo.attributes.position;
+    const uColors = [];
+    const uV = new THREE.Vector3();
+
+    const colSoilRim = new THREE.Color('#453123');   // Top dark soil rim
+    const colGranite = new THREE.Color('#5a4e44');   // Mid rocky cliff
+    const colBasalt = new THREE.Color('#2e2722');    // Deep keel rock
+
+    for (let i = 0; i < uPos.count; i++) {
+      uV.fromBufferAttribute(uPos, i);
+      const angle = Math.atan2(uV.z, uV.x);
+      const normY = (uV.y + 8.0) / 16.0; // 0 at bottom, 1 at top
+
+      const cosA = Math.cos(angle);
+      const sinA = Math.sin(angle);
+
+      // Squircle interpolation (rounded organic rectangle matching cozy diorama)
+      const p = 1.0 - 0.28 * normY;
+      const sqX = Math.sign(cosA) * Math.pow(Math.abs(cosA), p);
+      const sqZ = Math.sign(sinA) * Math.pow(Math.abs(sinA), p);
+
+      const wobble = 1.0 + 0.05 * Math.sin(angle * 4 + 1.2) + 0.03 * Math.cos(angle * 7 - 0.5);
+      const strataLedge = 1.0 + Math.sin(normY * Math.PI * 12) * 0.035;
+      const taper = Math.pow(normY, 0.46);
+      const rockNoise = 1.0 + (1.0 - normY) * 0.08 * Math.sin(uV.y * 2.4 + angle * 5);
+
+      uV.x = sqX * islandRadiusX * wobble * strataLedge * taper * rockNoise;
+      uV.z = sqZ * islandRadiusZ * wobble * strataLedge * taper * rockNoise;
+
+      if (normY < 0.25) {
+        uV.x += (0.25 - normY) * 2.8;
+        uV.z -= (0.25 - normY) * 1.6;
+      }
+
+      uPos.setXYZ(i, uV.x, uV.y, uV.z);
+
+      const c = new THREE.Color();
+      if (normY > 0.75) {
+        c.copy(colSoilRim).lerp(colGranite, (1.0 - normY) * 4.0);
+      } else if (normY > 0.25) {
+        c.copy(colGranite).lerp(colBasalt, (0.75 - normY) * 2.0);
+      } else {
+        c.copy(colBasalt);
+      }
+      uColors.push(c.r, c.g, c.b);
+    }
+    undersideGeo.setAttribute('color', new THREE.Float32BufferAttribute(uColors, 3));
+    undersideGeo.computeVertexNormals();
+
+    const undersideMesh = new THREE.Mesh(
+      undersideGeo,
+      new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.92, metalness: 0.04, flatShading: true })
+    );
+    undersideMesh.position.y = -8.0 + 1.8;
+    undersideMesh.receiveShadow = true;
+    undersideMesh.castShadow = true;
+    scene.add(undersideMesh);
+
+    // 2. TOP MEADOW SURFACE (UNIFORM LUSH GREEN, SILKY SMOOTH, NO SPOTS OR BLEMISHES)
+    const meadowRings = 36;
+    const meadowSegments = 72;
+    const mPositions = [];
+    const mColors = [];
+    const mIndices = [];
+
+    const colGrass = new THREE.Color('#58a649');      // Uniform lush highland pasture green
+
+    // DEFINE UNIFIED RIVER CURVE
+    const riverCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-9.5, 1.80, -7.5),
+      new THREE.Vector3(-5.5, 1.80, -5.2),
+      new THREE.Vector3(-0.8, 1.80, -3.2),
+      new THREE.Vector3(4.5, 1.80, -1.0),
+      new THREE.Vector3(9.2, 1.80, 1.2)
+    ]);
+    const riverCurvePts = riverCurve.getPoints(48);
+
+    for (let r = 0; r <= meadowRings; r++) {
+      const rf = r / meadowRings;
+      for (let s = 0; s < meadowSegments; s++) {
+        const a = (s / meadowSegments) * Math.PI * 2;
+        const cosA = Math.cos(a);
+        const sinA = Math.sin(a);
+        const p = 0.72; // squircle power matching keel top
+        const sqX = Math.sign(cosA) * Math.pow(Math.abs(cosA), p);
+        const sqZ = Math.sign(sinA) * Math.pow(Math.abs(sinA), p);
+        const wobble = 1.0 + 0.05 * Math.sin(a * 4 + 1.2) + 0.03 * Math.cos(a * 7 - 0.5);
+
+        const x = sqX * islandRadiusX * wobble * rf;
+        const z = sqZ * islandRadiusZ * wobble * rf;
+        let y = 1.8;
+
+        // Smooth outer bevel curving down to meet rock cliff
+        if (rf > 0.92) {
+          y -= (rf - 0.92) * 4.2;
+        }
+
+        mPositions.push(x, y, z);
+
+        // Uniform, pristine, even green color across entire meadow surface
+        const c = new THREE.Color();
+        if (rf > 0.96) {
+          c.copy(colGrass).lerp(colSoilRim, (rf - 0.96) / 0.04);
+        } else {
+          c.copy(colGrass);
+        }
+        mColors.push(c.r, c.g, c.b);
+      }
+    }
+
+    for (let r = 0; r < meadowRings; r++) {
+      for (let s = 0; s < meadowSegments; s++) {
+        const nextS = (s + 1) % meadowSegments;
+        const i0 = r * meadowSegments + s;
+        const i1 = r * meadowSegments + nextS;
+        const i2 = (r + 1) * meadowSegments + s;
+        const i3 = (r + 1) * meadowSegments + nextS;
+        mIndices.push(i0, i1, i2);
+        mIndices.push(i1, i3, i2);
+      }
+    }
+
+    const meadowGeo = new THREE.BufferGeometry();
+    meadowGeo.setAttribute('position', new THREE.Float32BufferAttribute(mPositions, 3));
+    meadowGeo.setAttribute('color', new THREE.Float32BufferAttribute(mColors, 3));
+    meadowGeo.setIndex(mIndices);
+    meadowGeo.computeVertexNormals();
+
+    const meadowMesh = new THREE.Mesh(
+      meadowGeo,
+      new THREE.MeshStandardMaterial({
+        vertexColors: true,
+        roughness: 0.82,
+        metalness: 0.02,
+        flatShading: false, // SMOOTH SHADING: SILKY SMOOTH MEADOW, NO TRIANGLE EDGES!
+        side: THREE.DoubleSide,
+      })
+    );
+    meadowMesh.receiveShadow = true;
+    scene.add(meadowMesh);
+
+    // MIST PUFFS SWIRLING AROUND KEEL
+    const mistGeo = new THREE.DodecahedronGeometry(1.5, 1);
+    const mistMat = new THREE.MeshStandardMaterial({ color: '#fff', roughness: 0.95, transparent: true, opacity: 0.72, flatShading: true });
+    for (let m = 0; m < 9; m++) {
+      const puff = new THREE.Mesh(mistGeo, mistMat);
+      const mAngle = (m / 9) * Math.PI * 2;
+      const mRad = 10.5 + (m % 3) * 2.2;
+      puff.scale.set(1.5 + (m % 2) * 0.5, 0.7, 1.3 + (m % 3) * 0.4);
+      puff.position.set(Math.cos(mAngle) * mRad, -9.0 + (m % 3) * 1.2, Math.sin(mAngle) * mRad);
+      scene.add(puff);
+    }
+
+    // PLACED OBJECTS GROUP (INTERACTIVE, SELECTABLE & DELETABLE)
+    const placedObjectsGroup = new THREE.Group();
+    scene.add(placedObjectsGroup);
+
+    // 3. FACTORY BUILDERS FOR DYNAMIC ISLAND OBJECTS
+    let waterfall = null;
+
+    function buildMountain(instId) {
+      const mountainGroup = new THREE.Group();
+      mountainGroup.userData = { instanceId: instId, itemId: 'ter_snowy_mountain' };
+
+      const mainPeakGeo = new THREE.ConeGeometry(3.8, 5.8, 14, 8, false);
+      const mPos = mainPeakGeo.attributes.position;
+      const mColorsPeak = [];
+      const mV = new THREE.Vector3();
+      const colMoss = new THREE.Color('#384b39');
+      const colGraniteMtn = new THREE.Color('#4c4139');
+      const colSnow = new THREE.Color('#f0f9ff');
+
+      for (let i = 0; i < mPos.count; i++) {
+        mV.fromBufferAttribute(mPos, i);
+        const normY = (mV.y + 2.9) / 5.8;
+        const angle = Math.atan2(mV.z, mV.x);
+        const crag = 1.0 + 0.16 * Math.sin(angle * 5 + normY * 4) + 0.06 * Math.cos(angle * 7);
+        mV.x *= crag;
+        mV.z *= crag;
+        mPos.setXYZ(i, mV.x, mV.y, mV.z);
+
+        const c = new THREE.Color();
+        if (normY > 0.68) {
+          c.copy(colGraniteMtn).lerp(colSnow, (normY - 0.68) / 0.32);
+        } else if (normY < 0.25) {
+          c.copy(colMoss).lerp(colGraniteMtn, normY / 0.25);
+        } else {
+          c.copy(colGraniteMtn);
+        }
+        mColorsPeak.push(c.r, c.g, c.b);
+      }
+      mainPeakGeo.setAttribute('color', new THREE.Float32BufferAttribute(mColorsPeak, 3));
+      mainPeakGeo.computeVertexNormals();
+
+      const mainPeak = new THREE.Mesh(
+        mainPeakGeo,
+        new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, flatShading: true })
+      );
+      mainPeak.position.y = 2.9 - 0.2;
+      mainPeak.castShadow = true;
+      mainPeak.receiveShadow = true;
+      mainPeak.userData = { instanceId: instId, itemId: 'ter_snowy_mountain' };
+      mountainGroup.add(mainPeak);
+
+      // Flanking crag (West shoulder)
+      const westCragGeo = new THREE.ConeGeometry(2.6, 4.0, 10, 6, false);
+      const wcPos = westCragGeo.attributes.position;
+      const wcColors = [];
+      for (let i = 0; i < wcPos.count; i++) {
+        mV.fromBufferAttribute(wcPos, i);
+        const normY = (mV.y + 2.0) / 4.0;
+        const angle = Math.atan2(mV.z, mV.x);
+        mV.x *= (1.0 + 0.14 * Math.sin(angle * 4));
+        mV.z *= (1.0 + 0.14 * Math.cos(angle * 4));
+        wcPos.setXYZ(i, mV.x, mV.y, mV.z);
+
+        const c = new THREE.Color();
+        if (normY > 0.75) c.copy(colGraniteMtn).lerp(colSnow, (normY - 0.75) / 0.25);
+        else if (normY < 0.3) c.copy(colMoss).lerp(colGraniteMtn, normY / 0.3);
+        else c.copy(colGraniteMtn);
+        wcColors.push(c.r, c.g, c.b);
+      }
+      westCragGeo.setAttribute('color', new THREE.Float32BufferAttribute(wcColors, 3));
+      westCragGeo.computeVertexNormals();
+
+      const westCrag = new THREE.Mesh(
+        westCragGeo,
+        new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, flatShading: true })
+      );
+      westCrag.position.set(-2.2, 2.0 - 0.3, 1.0);
+      westCrag.castShadow = true;
+      westCrag.receiveShadow = true;
+      westCrag.userData = { instanceId: instId, itemId: 'ter_snowy_mountain' };
+      mountainGroup.add(westCrag);
+
+      // Evergreen pine trees clustered at the mountain foothills
+      const pineGeo = new THREE.ConeGeometry(0.85, 2.8, 7);
+      const pineMat = new THREE.MeshStandardMaterial({ color: '#1b4332', roughness: 0.85, flatShading: true });
+      const trunkGeo = new THREE.CylinderGeometry(0.15, 0.20, 0.7, 6);
+      const trunkMat = new THREE.MeshStandardMaterial({ color: '#4a3728', roughness: 0.9 });
+
+      [
+        { x: 2.0, z: 1.6, s: 1.0 },
+        { x: 3.0, z: 0.4, s: 0.8 },
+        { x: -0.5, z: 2.6, s: 1.15 },
+        { x: -2.8, z: 2.4, s: 0.9 }
+      ].forEach(p => {
+        const tree = new THREE.Group();
+        tree.userData = { instanceId: instId, itemId: 'ter_snowy_mountain' };
+        const tr = new THREE.Mesh(trunkGeo, trunkMat);
+        tr.position.y = 0.35;
+        tr.userData = { instanceId: instId, itemId: 'ter_snowy_mountain' };
+        tree.add(tr);
+        const fol = new THREE.Mesh(pineGeo, pineMat);
+        fol.position.y = 1.75;
+        fol.castShadow = true;
+        fol.userData = { instanceId: instId, itemId: 'ter_snowy_mountain' };
+        tree.add(fol);
+        tree.position.set(p.x, 0, p.z);
+        tree.scale.setScalar(p.s);
+        mountainGroup.add(tree);
+      });
+
+      return mountainGroup;
+    }
+
+    function buildStream(instId) {
+      const streamGroup = new THREE.Group();
+      streamGroup.userData = { instanceId: instId, itemId: 'ter_stream_meander_s' };
+
+      const streamWidth = 1.45;
+      const streamPositions = [];
+      const streamUvs = [];
+      for (let i = 0; i < riverCurvePts.length; i++) {
+        const p = riverCurvePts[i];
+        let tangent;
+        if (i < riverCurvePts.length - 1) {
+          tangent = new THREE.Vector3().subVectors(riverCurvePts[i + 1], p).normalize();
+        } else {
+          tangent = new THREE.Vector3().subVectors(p, riverCurvePts[i - 1]).normalize();
+        }
+        const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+        const left = p.clone().addScaledVector(normal, -streamWidth / 2);
+        const right = p.clone().addScaledVector(normal, streamWidth / 2);
+        // Position stream ribbon exactly 2cm above the meadow surface (y = 0.02 relative to group at y = 1.8)
+        streamPositions.push(left.x, 0.02, left.z);
+        streamPositions.push(right.x, 0.02, right.z);
+        streamUvs.push(0, i / riverCurvePts.length);
+        streamUvs.push(1, i / riverCurvePts.length);
+      }
+      const streamIndices = [];
+      for (let i = 0; i < riverCurvePts.length - 1; i++) {
+        const i0 = i * 2, i1 = i * 2 + 1, i2 = (i + 1) * 2, i3 = (i + 1) * 2 + 1;
+        streamIndices.push(i0, i1, i2);
+        streamIndices.push(i1, i3, i2);
+      }
+      const streamGeo = new THREE.BufferGeometry();
+      streamGeo.setAttribute('position', new THREE.Float32BufferAttribute(streamPositions, 3));
+      streamGeo.setAttribute('uv', new THREE.Float32BufferAttribute(streamUvs, 2));
+      streamGeo.setIndex(streamIndices);
+      streamGeo.computeVertexNormals();
+
+      const streamMat = new THREE.MeshStandardMaterial({
+        color: '#38bdf8',
+        roughness: 0.08,
+        metalness: 0.45,
+        transparent: true,
+        opacity: 0.88,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      });
+      const stream = new THREE.Mesh(streamGeo, streamMat);
+      stream.receiveShadow = true;
+      stream.userData = { instanceId: instId, itemId: 'ter_stream_meander_s' };
+      streamGroup.add(stream);
+
+      // Generous invisible click collider tube along the stream path for effortless raycasting & selection
+      const colliderGeo = new THREE.TubeGeometry(
+        new THREE.CatmullRomCurve3(riverCurvePts.map(pt => new THREE.Vector3(pt.x, 0.2, pt.z))),
+        36,
+        1.5, // 1.5m wide clickable cylinder tube
+        8,
+        false
+      );
+      const colliderMat = new THREE.MeshBasicMaterial({ visible: false, wireframe: false });
+      const colliderMesh = new THREE.Mesh(colliderGeo, colliderMat);
+      colliderMesh.userData = { instanceId: instId, itemId: 'ter_stream_meander_s' };
+      streamGroup.add(colliderMesh);
+
+      // Waterfall plunging into horizon clouds
+      const wfGeo = new THREE.PlaneGeometry(2.0, 15.0, 8, 28);
+      wfGeo.rotateY(0.45);
+      const wfMat = new THREE.MeshStandardMaterial({
+        color: '#bae6fd',
+        roughness: 0.12,
+        metalness: 0.35,
+        transparent: true,
+        opacity: 0.85,
+        side: THREE.DoubleSide,
+      });
+      waterfall = new THREE.Mesh(wfGeo, wfMat);
+      waterfall.position.set(9.2, -7.5, 1.2);
+      waterfall.userData = { instanceId: instId, itemId: 'ter_stream_meander_s' };
+      streamGroup.add(waterfall);
+
+      return streamGroup;
+    }
+
+    function buildCottage(instId) {
+      const cottageGroup = new THREE.Group();
+      cottageGroup.scale.set(1.4, 1.4, 1.4);
+      cottageGroup.userData = { instanceId: instId, itemId: 'bld_starter_cottage' };
+
+      // Procedural fallback while GLB loads
+      const fallbackCottage = new THREE.Group();
+      fallbackCottage.userData = { instanceId: instId, itemId: 'bld_starter_cottage' };
+      const stoneBase = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.6, 3.2), new THREE.MeshStandardMaterial({ color: '#57534e', roughness: 0.9 }));
+      stoneBase.position.y = 0.3;
+      stoneBase.userData = { instanceId: instId, itemId: 'bld_starter_cottage' };
+      fallbackCottage.add(stoneBase);
+      const woodWalls = new THREE.Mesh(new THREE.BoxGeometry(3.3, 2.2, 2.9), new THREE.MeshStandardMaterial({ color: '#854d0e', roughness: 0.75 }));
+      woodWalls.position.y = 1.7;
+      woodWalls.userData = { instanceId: instId, itemId: 'bld_starter_cottage' };
+      fallbackCottage.add(woodWalls);
+      const roofGeo = new THREE.ConeGeometry(2.8, 1.8, 4);
+      roofGeo.rotateY(Math.PI / 4);
+      const roof = new THREE.Mesh(roofGeo, new THREE.MeshStandardMaterial({ color: '#991b1b', roughness: 0.65 }));
+      roof.position.y = 3.6;
+      roof.scale.set(1.15, 1.0, 1.05);
+      roof.userData = { instanceId: instId, itemId: 'bld_starter_cottage' };
+      fallbackCottage.add(roof);
+
+      const lantern = new THREE.PointLight('#fef08a', 1.5, 8.0);
+      lantern.position.set(1.8, 1.8, 1.0);
+      fallbackCottage.add(lantern);
+
+      cottageGroup.add(fallbackCottage);
+
+      gltfLoader.load('/assets/models/fantasy_house_1.glb', (gltf) => {
+        cottageGroup.remove(fallbackCottage);
+        const model = gltf.scene;
+        model.traverse(c => {
+          if (c.isMesh) {
+            c.castShadow = true;
+            c.receiveShadow = true;
+            c.userData = { instanceId: instId, itemId: 'bld_starter_cottage' };
+          }
+        });
+        model.userData = { instanceId: instId, itemId: 'bld_starter_cottage' };
+        cottageGroup.add(model);
+      }, undefined, () => {});
+
+      return cottageGroup;
+    }
+
+    function buildPond(instId) {
+      const pondGroup = new THREE.Group();
+      pondGroup.userData = { instanceId: instId, itemId: 'ter_mossy_pond' };
+
+      // Water surface (oval/circle) positioned 2cm above meadow
+      const waterGeo = new THREE.CircleGeometry(2.8, 32).rotateX(-Math.PI / 2);
+      const waterMat = new THREE.MeshStandardMaterial({
+        color: '#0284c7',
+        roughness: 0.08,
+        metalness: 0.45,
+        transparent: true,
+        opacity: 0.88,
+      });
+      const water = new THREE.Mesh(waterGeo, waterMat);
+      water.position.y = 0.02;
+      water.userData = { instanceId: instId, itemId: 'ter_mossy_pond' };
+      pondGroup.add(water);
+
+      // Stone rim surrounding the pond
+      const stoneMat = new THREE.MeshStandardMaterial({ color: '#57534e', roughness: 0.9, flatShading: true });
+      for (let i = 0; i < 14; i++) {
+        const angle = (i / 14) * Math.PI * 2;
+        const rx = 2.8 + Math.sin(i * 3) * 0.2;
+        const rz = 2.8 + Math.cos(i * 2) * 0.2;
+        const stoneGeo = new THREE.DodecahedronGeometry(0.45 + (i % 3) * 0.12, 1);
+        const stone = new THREE.Mesh(stoneGeo, stoneMat);
+        stone.position.set(Math.cos(angle) * rx, 0.05, Math.sin(angle) * rz);
+        stone.scale.set(1.2, 0.6, 1.0);
+        stone.castShadow = true;
+        stone.receiveShadow = true;
+        stone.userData = { instanceId: instId, itemId: 'ter_mossy_pond' };
+        pondGroup.add(stone);
+      }
+
+      // Lilypad decorations
+      const padGeo = new THREE.CircleGeometry(0.35, 12).rotateX(-Math.PI / 2);
+      const padMat = new THREE.MeshStandardMaterial({ color: '#15803d', roughness: 0.8 });
+      [
+        { x: 0.8, z: 0.6, r: 0.4 },
+        { x: -0.9, z: -0.5, r: 0.3 },
+        { x: 0.4, z: -1.0, r: 0.35 }
+      ].forEach(p => {
+        const pad = new THREE.Mesh(padGeo, padMat);
+        pad.position.set(p.x, 0.025, p.z);
+        pad.scale.setScalar(p.r / 0.35);
+        pad.userData = { instanceId: instId, itemId: 'ter_mossy_pond' };
+        pondGroup.add(pad);
+      });
+
+      // Generous invisible click collider cylinder for instant raycast selection
+      const pondCollider = new THREE.Mesh(
+        new THREE.CylinderGeometry(3.2, 3.2, 0.8, 16),
+        new THREE.MeshBasicMaterial({ visible: false })
+      );
+      pondCollider.position.y = 0.4;
+      pondCollider.userData = { instanceId: instId, itemId: 'ter_mossy_pond' };
+      pondGroup.add(pondCollider);
+
+      return pondGroup;
+    }
+
+    function buildGenericCatalogItem(itemId, instId) {
+      const def = FULL_CATALOG.find(c => c.id === itemId);
+      const group = new THREE.Group();
+      group.userData = { instanceId: instId, itemId };
+
+      const placeholder = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.9, 0.9, 1.2, 16),
+        new THREE.MeshStandardMaterial({ color: '#10b981', roughness: 0.7 })
+      );
+      placeholder.position.y = 0.6;
+      placeholder.castShadow = true;
+      placeholder.userData = { instanceId: instId, itemId };
+      group.add(placeholder);
+
+      if (def && def.glb) {
+        gltfLoader.load(`/assets/models/${def.glb}`, (gltf) => {
+          group.remove(placeholder);
+          const m = gltf.scene;
+          const s = def.scale || 1.0;
+          m.scale.set(s, s, s);
+          m.traverse(c => {
+            if (c.isMesh) {
+              c.castShadow = true;
+              c.receiveShadow = true;
+              c.userData = { instanceId: instId, itemId };
+            }
+          });
+          m.userData = { instanceId: instId, itemId };
+          group.add(m);
+        }, undefined, () => {});
+      }
+      return group;
+    }
+
+    function spawnPlacedItem(itemRecord) {
+      const { instanceId, itemId, position, rotationY = 0, elevation = 0 } = itemRecord;
+      let group;
+      if (itemId === 'ter_snowy_mountain') {
+        group = buildMountain(instanceId);
+      } else if (itemId === 'bld_starter_cottage') {
+        group = buildCottage(instanceId);
+      } else if (itemId === 'ter_stream_meander_s') {
+        group = buildStream(instanceId);
+      } else if (itemId === 'ter_mossy_pond') {
+        group = buildPond(instanceId);
+      } else {
+        group = buildGenericCatalogItem(itemId, instanceId);
+      }
+
+      const y = (position && position.y !== undefined) ? position.y : (1.8 + elevation);
+      const x = (position && position.x !== undefined) ? position.x : 0;
+      const z = (position && position.z !== undefined) ? position.z : 0;
+
+      group.position.set(x, y, z);
+      group.rotation.y = rotationY;
+      placedObjectsGroup.add(group);
+
+      const placedRecord = {
+        instanceId,
+        itemId,
+        position: { x, y, z },
+        rotationY,
+        elevation,
+        group
+      };
+      placedItems.push(placedRecord);
+      return placedRecord;
+    }
+
+    function clearEntireIsland() {
+      if (selectedInstanceId) {
+        selectedInstanceId = null;
+        cursor.visible = false;
+      }
+      while (placedObjectsGroup.children.length > 0) {
+        placedObjectsGroup.remove(placedObjectsGroup.children[0]);
+      }
+      placedItems = [];
+      window.placedItems = placedItems;
+      if (typeof renderDecorTray === 'function') renderDecorTray();
+      if (typeof updatePlacedChips === 'function') updatePlacedChips();
+    }
+
+    function loadIslandLayout(itemsList) {
+      clearEntireIsland();
+      if (Array.isArray(itemsList)) {
+        itemsList.forEach(it => spawnPlacedItem(it));
+      }
+      if (typeof updatePlacedChips === 'function') updatePlacedChips();
+      if (placedItems.length > 0) {
+        setTimeout(() => {
+          selectPlacedItem(placedItems[0].instanceId);
+          const tray = document.getElementById('decor-tray');
+          if (tray) {
+            tray.classList.add('open');
+            renderDecorTray();
+          }
+        }, 200);
+      }
+    }
+
+    window.spawnPlacedItem = spawnPlacedItem;
+    window.clearEntireIsland = clearEntireIsland;
+    window.loadIslandLayout = loadIslandLayout;
+
+    function updatePlacedChips() {
+      const container = document.getElementById('placed-items-chips');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!placedItems || placedItems.length === 0) {
+        container.innerHTML = '<span style="color:#94a3b8;font-size:11px;font-style:italic;">(Chưa có vật phẩm nào — Hãy chọn Thêm Núi, Hồ, Suối...)</span>';
+        return;
+      }
+      placedItems.forEach((item) => {
+        const def = FULL_CATALOG.find(c => c.id === item.itemId);
+        const name = def ? def.nameVi : item.itemId;
+        const icon = def ? def.icon : '📦';
+        const isSel = selectedInstanceId === item.instanceId;
+        const chip = document.createElement('div');
+        chip.className = 'placed-item-chip' + (isSel ? ' active' : '');
+        chip.innerHTML = `
+          <span class="chip-label" title="Nhấp để định vị & chọn trên 3D">${icon} ${name}</span>
+          <button class="chip-delete-btn" title="Xóa ngay vật phẩm này khỏi đảo">✕</button>
+        `;
+        chip.querySelector('.chip-label').onclick = (e) => {
+          e.stopPropagation();
+          selectPlacedItem(item.instanceId);
+          updatePlacedChips();
+        };
+        chip.querySelector('.chip-delete-btn').onclick = (e) => {
+          e.stopPropagation();
+          deleteSpecificItem(item.instanceId);
+        };
+        container.appendChild(chip);
+      });
+    }
+    window.updatePlacedChips = updatePlacedChips;
+
+    function deleteSpecificItem(instId) {
+      const idx = placedItems.findIndex(p => p.instanceId === instId);
+      if (idx === -1) return;
+      const item = placedItems[idx];
+      const def = FULL_CATALOG.find(c => c.id === item.itemId);
+      if (item.group) {
+        placedObjectsGroup.remove(item.group);
+      }
+      placedItems.splice(idx, 1);
+      if (selectedInstanceId === instId) {
+        selectedInstanceId = null;
+        cursor.visible = false;
+        placementBar.classList.remove('open');
+      }
+      updatePlacedChips();
+      renderDecorTray();
+      showToast(`Đã xóa & dọn dẹp "${def ? def.nameVi : 'Vật phẩm'}" khỏi đảo!`);
+    }
+    window.deleteSpecificItem = deleteSpecificItem;
+
+    function clearEntireIslandAndNotify() {
+      clearEntireIsland();
+      updatePlacedChips();
+      showToast('🧹 Đã xóa sạch toàn bộ hòn đảo để thiết kế lại từ đầu!');
+    }
+    window.clearEntireIslandAndNotify = clearEntireIslandAndNotify;
+
+    function quickAddTerrain(itemId) {
+      const def = FULL_CATALOG.find(c => c.id === itemId);
+      const instId = 'inst_terrain_' + Date.now().toString().slice(-4);
+
+      let pos = { x: 0, y: 1.8, z: 0 };
+      if (itemId === 'ter_snowy_mountain') {
+        pos = { x: -8.5, y: 1.8, z: -8.0 };
+      } else if (itemId === 'ter_mossy_pond') {
+        pos = { x: 5.5, y: 1.8, z: -3.5 };
+      } else if (itemId === 'ter_stream_meander_s') {
+        pos = { x: 0, y: 1.8, z: 0 };
+      } else if (itemId === 'bld_starter_cottage') {
+        pos = { x: -2.5, y: 1.8, z: 2.2 };
+      }
+
+      const count = placedItems.filter(p => p.itemId === itemId).length;
+      if (count > 0) {
+        pos.x += (count % 2 === 1 ? 2.5 : -2.5);
+        pos.z += (count * 1.8);
+      }
+
+      spawnPlacedItem({
+        instanceId: instId,
+        itemId,
+        position: pos,
+        rotationY: 0,
+        elevation: 0
+      });
+      selectPlacedItem(instId);
+      updatePlacedChips();
+      renderDecorTray();
+      showToast(`Đã thêm địa thế "${def ? def.nameVi : itemId}" vào đảo mẫu!`);
+    }
+    window.quickAddTerrain = quickAddTerrain;
+
+    // RAYCAST & PLACEMENT SYSTEM
+    const rayPlane = new THREE.Mesh(
+      new THREE.CircleGeometry(14.5, 32).rotateX(-Math.PI / 2),
+      new THREE.MeshBasicMaterial({ visible: false })
+    );
+    rayPlane.position.y = 1.8;
+    scene.add(rayPlane);
+
+    const cursor = new THREE.Mesh(
+      new THREE.RingGeometry(0.7, 0.85, 32).rotateX(-Math.PI / 2),
+      new THREE.MeshBasicMaterial({ color: '#10b981', side: THREE.DoubleSide, transparent: true, opacity: 0.9 })
+    );
+    cursor.position.y = 1.85;
+    cursor.visible = false;
+    scene.add(cursor);
+
+    const ghostGroup = new THREE.Group();
+    scene.add(ghostGroup);
+
+    // -------------------------------------------------------------
+    // CAMERA UPDATE & 2.5D BOUNDED PARALLAX (EXACT WORD3D SYSTEM)
+    // -------------------------------------------------------------
+    function updateCamera() {
+      camera.position.x = cameraDistance * Math.sin(cameraPolar) * Math.sin(cameraAzimuth);
+      camera.position.y = 1.8 + cameraDistance * Math.cos(cameraPolar);
+      camera.position.z = cameraDistance * Math.sin(cameraPolar) * Math.cos(cameraAzimuth);
+      camera.lookAt(0, 1.8, 0);
+
+      // 2.5D BOUNDED PARALLAX SHIFT:
+      // When the camera orbits around the island, calculate azimuth (theta) & elevation (phi).
+      // The background plane smoothly glides counter to rotation, strictly bounded so edges are never revealed!
+      const theta = cameraAzimuth;
+      const phi = cameraPolar;
+
+      const fovRad = (camera.fov * Math.PI) / 180;
+      const frustumH = 2 * bgDistance * Math.tan(fovRad / 2);
+      const frustumW = frustumH * camera.aspect;
+      const maxSlideX = Math.max(0, (bgScaleW - frustumW) * 0.46);
+      const maxSlideY = Math.max(0, (bgScaleH - frustumH) * 0.44);
+
+      const targetParallaxX = -Math.sin(theta) * (maxSlideX * 0.85);
+      const targetParallaxY = (phi - 0.70) * (maxSlideY * 0.65);
+
+      bgPlane.position.set(targetParallaxX, targetParallaxY, -bgDistance);
+
+      // Nearby 3D depth clouds parallax shift
+      depthCloudsGroup.position.x = -Math.sin(theta) * 2.5;
+      depthCloudsGroup.position.z = -Math.cos(theta) * 1.5;
+    }
+    updateCamera();
+
+    // -------------------------------------------------------------
+    // TOUCH & INTERACTION HANDLERS
+    // -------------------------------------------------------------
+    let isInteracting = false;
+    let lastX = 0, lastY = 0;
+    let downX = 0, downY = 0;
+    let isDecorationMode = false;
+    let activePreviewItemId = null;
+    let selectedInstanceId = null;
+    let previewElevation = 0.0;
+    let previewPos = { x: 0, z: 0 };
+    let previewRotY = 0;
+    let isPlacementValid = true;
+
+    function validatePlacement(x, z, r = 1.0) {
+      if (Math.hypot(x, z) + r > 13.5) return false;
+      if (Math.hypot(x - (-2.5), z - 2.2) < 3.2 + r) return false; // starter house
+      if (Math.hypot(x - (-10.0), z - (-8.0)) < 5.8 + r) return false; // alpine mountain
+      if (distToRiver(x, z) < 1.4 + r) return false; // crystal riverbed
+      return true;
+    }
+
+    container.addEventListener('pointerdown', (e) => {
+      isInteracting = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      downX = e.clientX;
+      downY = e.clientY;
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!isInteracting) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+
+      if (isDecorationMode && activePreviewItemId) {
+        const raycaster = new THREE.Raycaster();
+        const normX = (e.clientX / window.innerWidth) * 2 - 1;
+        const normY = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(new THREE.Vector2(normX, normY), camera);
+        const hits = raycaster.intersectObject(rayPlane);
+        if (hits.length > 0) {
+          const pt = hits[0].point;
+          previewPos.x = Math.round(pt.x * 2) / 2;
+          previewPos.z = Math.round(pt.z * 2) / 2;
+
+          isPlacementValid = validatePlacement(previewPos.x, previewPos.z);
+          cursor.position.set(previewPos.x, 1.85, previewPos.z);
+          ghostGroup.position.set(previewPos.x, 1.8 + previewElevation, previewPos.z);
+          cursor.material.color.set(isPlacementValid ? '#10b981' : '#ef4444');
+
+          const statusEl = document.getElementById('txt-placement-status');
+          statusEl.textContent = isPlacementValid ? '✓ Vị trí hợp lệ' : '✗ Vị trí không hợp lệ';
+          statusEl.className = 'placement-status ' + (isPlacementValid ? '' : 'invalid');
+        }
+      } else {
+        cameraAzimuth -= dx * 0.005;
+        cameraPolar = Math.max(Math.PI / 8.0, Math.min(Math.PI / 2.3, cameraPolar - dy * 0.005));
+        updateCamera();
+      }
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      isInteracting = false;
+      const moved = Math.hypot(e.clientX - downX, e.clientY - downY);
+      if (moved < 14) {
+        // Tap to select ANY object on the island
+        const raycaster = new THREE.Raycaster();
+        const normX = (e.clientX / window.innerWidth) * 2 - 1;
+        const normY = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(new THREE.Vector2(normX, normY), camera);
+
+        const hits = raycaster.intersectObjects(placedObjectsGroup.children, true);
+        if (hits.length > 0) {
+          let root = hits[0].object;
+          let targetInstanceId = root.userData?.instanceId;
+          while (root.parent && root.parent !== placedObjectsGroup) {
+            root = root.parent;
+            if (!targetInstanceId && root.userData?.instanceId) {
+              targetInstanceId = root.userData.instanceId;
+            }
+          }
+          if (targetInstanceId) {
+            selectPlacedItem(targetInstanceId);
+          }
+        }
+      }
+    });
+
+    window.addEventListener('wheel', (e) => {
+      cameraDistance = Math.max(18.0, Math.min(55.0, cameraDistance * (e.deltaY > 0 ? 1.05 : 0.95)));
+      updateCamera();
+    });
+
+    document.getElementById('btn-reset-cam').onclick = () => {
+      cameraDistance = 38.0;
+      cameraPolar = Math.PI / 3.4;
+      cameraAzimuth = Math.PI / 4.0;
+      updateCamera();
+    };
+
+    // -------------------------------------------------------------
+    // MODAL & INVENTORY CONTROLS
+    // -------------------------------------------------------------
+    document.getElementById('btn-accept-lumi').onclick = () => {
+      document.getElementById('modal-lumi').classList.remove('open');
+      if (placedItems.length > 0) {
+        selectPlacedItem(placedItems[0].instanceId);
+      }
+    };
+
+    const modalShop = document.getElementById('modal-shop');
+    const modalInv = document.getElementById('modal-inv');
+    const placementBar = document.getElementById('placement-bar');
+
+    let shopFilter = 'all';
+    let invFilter = 'all';
+
+    document.getElementById('btn-open-shop').onclick = () => {
+      renderShopList();
+      modalShop.classList.add('open');
+    };
+    document.getElementById('btn-close-shop').onclick = () => modalShop.classList.remove('open');
+
+    document.getElementById('btn-open-inv').onclick = () => {
+      renderInvList();
+      modalInv.classList.add('open');
+    };
+    document.getElementById('btn-close-inv').onclick = () => modalInv.classList.remove('open');
+
+    // Filter chip listeners
+    document.querySelectorAll('#shop-category-filter .filter-chip').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#shop-category-filter .filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        shopFilter = btn.dataset.cat;
+        renderShopList();
+      };
+    });
+
+    document.querySelectorAll('#inv-category-filter .filter-chip').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#inv-category-filter .filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        invFilter = btn.dataset.cat;
+        renderInvList();
+      };
+    });
+
+    // -------------------------------------------------------------
+    // REAL 3D MODEL THUMBNAIL RENDERER
+    // -------------------------------------------------------------
+    const thumbnailCache = new Map();
+    const thumbCanvas = document.createElement('canvas');
+    thumbCanvas.width = 128;
+    thumbCanvas.height = 128;
+    const thumbRenderer = new THREE.WebGLRenderer({
+      canvas: thumbCanvas,
+      antialias: true,
+      alpha: true,
+      preserveDrawingBuffer: true,
+    });
+    thumbRenderer.setSize(128, 128);
+    thumbRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+    thumbRenderer.toneMappingExposure = 1.35;
+
+    const thumbScene = new THREE.Scene();
+    const thumbCamera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+
+    const thumbHemi = new THREE.HemisphereLight(0xffffff, 0x475569, 1.35);
+    thumbScene.add(thumbHemi);
+
+    const thumbSun = new THREE.DirectionalLight(0xfffbeb, 2.0);
+    thumbSun.position.set(5, 8, 5);
+    thumbScene.add(thumbSun);
+
+    const thumbRim = new THREE.DirectionalLight(0x93c5fd, 0.9);
+    thumbRim.position.set(-5, 4, -4);
+    thumbScene.add(thumbRim);
+
+    function requestThumbnail(item, imgElement, fallbackElement) {
+      if (!item || !item.glb) return;
+      if (thumbnailCache.has(item.id)) {
+        if (imgElement) {
+          imgElement.src = thumbnailCache.get(item.id);
+          imgElement.classList.add('loaded');
+        }
+        if (fallbackElement) fallbackElement.classList.add('hidden');
+        return;
+      }
+
+      gltfLoader.load('/assets/models/' + item.glb, (gltf) => {
+        const model = gltf.scene.clone();
+        model.traverse(c => {
+          if (c.isMesh) { c.castShadow = false; c.receiveShadow = false; }
+        });
+
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
+
+        model.position.sub(center);
+        thumbScene.add(model);
+
+        const dist = maxDim * 1.55;
+        thumbCamera.position.set(dist * 0.9, dist * 0.72, dist * 0.9);
+        thumbCamera.lookAt(0, 0, 0);
+
+        thumbRenderer.render(thumbScene, thumbCamera);
+        const dataUrl = thumbCanvas.toDataURL('image/webp', 0.88);
+
+        thumbnailCache.set(item.id, dataUrl);
+        thumbScene.remove(model);
+
+        if (imgElement && imgElement.isConnected) {
+          imgElement.src = dataUrl;
+          imgElement.classList.add('loaded');
+        }
+        if (fallbackElement && fallbackElement.isConnected) {
+          fallbackElement.classList.add('hidden');
+        }
+      }, undefined, () => {});
+    }
+
+    function renderShopList() {
+      const list = document.getElementById('shop-item-list');
+      list.innerHTML = '';
+      const filtered = FULL_CATALOG.filter(c => shopFilter === 'all' || c.cat === shopFilter);
+
+      filtered.forEach(item => {
+        const canAfford = playerCoins >= item.price;
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.style.cursor = 'pointer';
+        card.title = avail > 0 ? 'Nhấp để đặt vật phẩm này lên đảo' : 'Đã đặt hết';
+        card.onclick = (e) => {
+          if (avail > 0) {
+            startPlacement(item.id);
+          } else {
+            showToast('Vật phẩm này đã được đặt hết lên đảo!');
+          }
+        };
+        card.innerHTML = `
+          <div class="item-thumb-box">
+            <div class="item-thumb-fallback" id="shop-fallback-${item.id}">${item.icon}</div>
+            <img class="item-thumb-img" id="shop-thumb-${item.id}" alt="${item.nameVi}" />
+          </div>
+          <div class="item-info">
+            <div class="item-name">${item.nameVi}</div>
+            <div class="item-desc">${item.desc}</div>
+            <div class="item-price">🪙 ${item.price} Xu</div>
+          </div>
+          <button class="action-btn ${canAfford ? '' : 'disabled'}" ${canAfford ? '' : 'disabled'}>${canAfford ? 'Mua' : 'Thiếu Xu'}</button>
+        `;
+        card.querySelector('button').onclick = () => {
+          if (playerCoins >= item.price) {
+            playerCoins -= item.price;
+            document.getElementById('txt-coins').textContent = playerCoins;
+            const existing = ownedInventory.find(i => i.itemId === item.id);
+            if (existing) existing.count++;
+            else ownedInventory.push({ itemId: item.id, count: 1 });
+            document.getElementById('lbl-inv').textContent = `Kho Đồ (${ownedInventory.reduce((a, b) => a + b.count, 0)})`;
+            renderShopList();
+          }
+        };
+        list.appendChild(card);
+        requestThumbnail(
+          item,
+          card.querySelector(`#shop-thumb-${item.id}`),
+          card.querySelector(`#shop-fallback-${item.id}`)
+        );
+      });
+    }
+
+    function renderInvList() {
+      const list = document.getElementById('inv-item-list');
+      list.innerHTML = '';
+      const filtered = ownedInventory.filter(inv => {
+        const item = FULL_CATALOG.find(c => c.id === inv.itemId);
+        return item && (invFilter === 'all' || item.cat === invFilter);
+      });
+
+      filtered.forEach(inv => {
+        const item = FULL_CATALOG.find(c => c.id === inv.itemId);
+        if (!item) return;
+        const placedCount = placedItems.filter(p => p.itemId === inv.itemId).length;
+        const avail = inv.count - placedCount;
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.style.cursor = 'pointer';
+        card.title = avail > 0 ? 'Nhấp để đặt vật phẩm này lên đảo' : 'Đã đặt hết';
+        card.onclick = (e) => {
+          if (avail > 0) {
+            startPlacement(item.id);
+          } else {
+            showToast('Vật phẩm này đã được đặt hết lên đảo!');
+          }
+        };
+        card.innerHTML = `
+          <div class="item-thumb-box">
+            <div class="item-thumb-fallback" id="inv-fallback-${item.id}">${item.icon}</div>
+            <img class="item-thumb-img" id="inv-thumb-${item.id}" alt="${item.nameVi}" />
+          </div>
+          <div class="item-info">
+            <div class="item-name">${item.nameVi}</div>
+            <div class="item-desc">${item.desc}</div>
+            <div class="item-stats">Sở hữu: ${inv.count} | Đã đặt: ${placedCount} | Còn: ${avail}</div>
+          </div>
+          <button class="action-btn ${avail > 0 ? '' : 'disabled'}" ${avail > 0 ? '' : 'disabled'}>${avail > 0 ? 'Đặt Đảo' : 'Đã Hết'}</button>
+        `;
+        card.querySelector('button').onclick = () => {
+          if (avail > 0) {
+            startPlacement(item.id);
+          }
+        };
+        list.appendChild(card);
+        requestThumbnail(
+          item,
+          card.querySelector(`#inv-thumb-${item.id}`),
+          card.querySelector(`#inv-fallback-${item.id}`)
+        );
+      });
+    }
+
+    function startPlacement(itemId) {
+      modalInv.classList.remove('open');
+      modalShop.classList.remove('open');
+      isDecorationMode = true;
+      activePreviewItemId = itemId;
+      const def = FULL_CATALOG.find(c => c.id === itemId);
+      document.getElementById('txt-placement-name').textContent = def.nameVi;
+      placementBar.classList.add('open');
+      cursor.visible = true;
+
+      // Create ghost
+      ghostGroup.clear();
+      const ghostMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.9, 0.9, 1.2, 16),
+        new THREE.MeshStandardMaterial({ color: '#6ee7b7', transparent: true, opacity: 0.65 })
+      );
+      ghostMesh.position.y = 0.6;
+      ghostGroup.add(ghostMesh);
+
+      // Try loading real model for ghost
+      if (def && def.glb) {
+        gltfLoader.load(`/assets/models/${def.glb}`, (gltf) => {
+          ghostGroup.remove(ghostMesh);
+          const m = gltf.scene;
+          const s = def.scale || 1.0;
+          m.scale.set(s, s, s);
+          ghostGroup.add(m);
+        }, undefined, () => {});
+      }
+
+      previewPos = { x: 2.0, z: 2.0 };
+      cursor.position.set(2.0, 1.85, 2.0);
+      ghostGroup.position.set(2.0, 1.8 + previewElevation, 2.0);
+    }
+
+    function updateElevationDisplay() {
+      const sign = previewElevation >= 0 ? '+' : '';
+      const text = `Cao: ${sign}${previewElevation.toFixed(2)}m`;
+      const elBadge = document.getElementById('txt-elevation-badge');
+      if (elBadge) elBadge.textContent = text;
+      const elSide = document.getElementById('side-elevation-badge');
+      if (elSide) elSide.textContent = text;
+    }
+
+    function showToast(msg) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const el = document.createElement('div');
+      el.className = 'toast-msg';
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 2800);
+    }
+
+    let decorFilter = 'all';
+    function renderDecorTray() {
+      const container = document.getElementById('decor-scroll-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const filtered = FULL_CATALOG.filter(c => decorFilter === 'all' || c.cat === decorFilter);
+      const countEl = document.getElementById('decor-tray-count');
+      if (countEl) countEl.textContent = `(${filtered.length} Món)`;
+
+      let currentActiveId = null;
+      if (selectedInstanceId) {
+        const item = placedItems.find(p => p.instanceId === selectedInstanceId);
+        if (item) currentActiveId = item.itemId;
+      } else if (activePreviewItemId) {
+        currentActiveId = activePreviewItemId;
+      }
+
+      filtered.forEach(item => {
+        const isSelected = item.id === currentActiveId;
+        const placedCount = placedItems.filter(p => p.itemId === item.id).length;
+        const chip = document.createElement('div');
+        chip.className = `decor-item-chip ${isSelected ? 'selected' : ''}`;
+        chip.id = `decor-chip-${item.id}`;
+        chip.title = `${item.nameVi} (Đã đặt: ${placedCount})`;
+        chip.innerHTML = `
+          <div class="decor-chip-thumb">
+            <span id="tray-fallback-${item.id}">${item.icon}</span>
+            <img id="tray-thumb-${item.id}" alt="${item.nameVi}" />
+          </div>
+          <div class="decor-chip-name">${item.nameVi}</div>
+          <div class="decor-chip-badge">${placedCount > 0 ? `Đã đặt: ${placedCount}` : 'Sẵn sàng'}</div>
+        `;
+        chip.onclick = (e) => {
+          e.stopPropagation();
+          selectItemFromTray(item.id);
+        };
+        container.appendChild(chip);
+
+        requestThumbnail(
+          item,
+          chip.querySelector(`#tray-thumb-${item.id}`),
+          chip.querySelector(`#tray-fallback-${item.id}`)
+        );
+      });
+    }
+
+    function selectItemFromTray(itemId) {
+      const def = FULL_CATALOG.find(c => c.id === itemId);
+      if (!def) return;
+
+      const existing = placedItems.find(p => p.itemId === itemId);
+      if (existing) {
+        selectPlacedItem(existing.instanceId);
+      } else {
+        startPlacement(itemId);
+      }
+      renderDecorTray();
+      showToast(`Đã chọn: "${def.nameVi}"! Dùng ⬆️ ⬇️ để nâng hạ, 🗑️ để xóa`);
+    }
+    window.selectItemFromTray = selectItemFromTray;
+
+    function selectPlacedItem(instanceId) {
+      const item = placedItems.find(p => p.instanceId === instanceId);
+      if (!item) return;
+      selectedInstanceId = instanceId;
+      activePreviewItemId = null;
+      ghostGroup.clear();
+
+      const def = FULL_CATALOG.find(c => c.id === item.itemId);
+      previewElevation = (item.group.position.y - 1.8) || 0;
+      updateElevationDisplay();
+
+      cursor.position.set(item.group.position.x, 1.85, item.group.position.z);
+      if (item.itemId === 'ter_snowy_mountain') {
+        cursor.scale.set(4.5, 4.5, 4.5);
+      } else if (item.itemId === 'ter_stream_meander_s') {
+        cursor.scale.set(3.2, 3.2, 3.2);
+      } else if (item.itemId === 'bld_starter_cottage' || (def && def.cat === 'building')) {
+        cursor.scale.set(2.4, 2.4, 2.4);
+      } else {
+        cursor.scale.set(1.0, 1.0, 1.0);
+      }
+      cursor.material.color.set('#38bdf8');
+      cursor.visible = true;
+
+      document.getElementById('txt-placement-name').textContent = `Đang chọn: ${def ? def.nameVi : 'Vật phẩm'}`;
+      document.getElementById('txt-placement-status').textContent = '✓ Đang chỉnh sửa';
+      document.getElementById('txt-placement-status').className = 'placement-status';
+      document.getElementById('btn-confirm').textContent = '✅ Xong';
+      document.getElementById('btn-delete').textContent = '🗑️ Xóa Khỏi Đảo';
+      placementBar.classList.add('open');
+      renderDecorTray();
+      showToast(`Đã chọn "${def ? def.nameVi : 'Vật phẩm'}" — dùng ⬆️ ⬇️ để nâng/hạ độ cao, 🗑️ để xóa`);
+    }
+    window.selectPlacedItem = selectPlacedItem;
+    window.startPlacement = startPlacement;
+    window.placedItems = placedItems;
+
+    function handleElevateUp() {
+      if (!selectedInstanceId && !activePreviewItemId && placedItems.length > 0) {
+        selectPlacedItem(placedItems[0].instanceId);
+      }
+      previewElevation = Math.min(3.5, Math.round((previewElevation + 0.15) * 100) / 100);
+      updateElevationDisplay();
+      if (activePreviewItemId) {
+        ghostGroup.position.y = 1.8 + previewElevation;
+      } else if (selectedInstanceId) {
+        const item = placedItems.find(p => p.instanceId === selectedInstanceId);
+        if (item && item.group) {
+          item.group.position.y = 1.8 + previewElevation;
+          item.position.y = 1.8 + previewElevation;
+          item.elevation = previewElevation;
+        }
+      }
+      showToast(`Đã nâng độ cao: ${previewElevation >= 0 ? '+' : ''}${previewElevation.toFixed(2)}m (tránh bị lún cỏ)`);
+    }
+
+    function handleElevateDown() {
+      if (!selectedInstanceId && !activePreviewItemId && placedItems.length > 0) {
+        selectPlacedItem(placedItems[0].instanceId);
+      }
+      previewElevation = Math.max(-0.6, Math.round((previewElevation - 0.15) * 100) / 100);
+      updateElevationDisplay();
+      if (activePreviewItemId) {
+        ghostGroup.position.y = 1.8 + previewElevation;
+      } else if (selectedInstanceId) {
+        const item = placedItems.find(p => p.instanceId === selectedInstanceId);
+        if (item && item.group) {
+          item.group.position.y = 1.8 + previewElevation;
+          item.position.y = 1.8 + previewElevation;
+          item.elevation = previewElevation;
+        }
+      }
+      showToast(`Đã hạ độ cao: ${previewElevation >= 0 ? '+' : ''}${previewElevation.toFixed(2)}m`);
+    }
+
+    function handleRotate() {
+      if (!selectedInstanceId && !activePreviewItemId && placedItems.length > 0) {
+        selectPlacedItem(placedItems[0].instanceId);
+      }
+      if (activePreviewItemId) {
+        previewRotY += Math.PI / 4;
+        ghostGroup.rotation.y = previewRotY;
+      } else if (selectedInstanceId) {
+        const item = placedItems.find(p => p.instanceId === selectedInstanceId);
+        if (item && item.group) {
+          item.group.rotation.y += Math.PI / 4;
+          item.rotationY = item.group.rotation.y;
+        }
+      }
+      showToast('Đã xoay mô hình 45°');
+    }
+
+    function handleDelete() {
+      if (!selectedInstanceId && !activePreviewItemId && placedItems.length > 0) {
+        selectPlacedItem(placedItems[0].instanceId);
+      }
+      if (selectedInstanceId) {
+        const itemIdx = placedItems.findIndex(p => p.instanceId === selectedInstanceId);
+        if (itemIdx !== -1) {
+          const item = placedItems[itemIdx];
+          const def = FULL_CATALOG.find(c => c.id === item.itemId);
+          if (item.group) {
+            placedObjectsGroup.remove(item.group);
+          }
+          placedItems.splice(itemIdx, 1);
+          const invItem = ownedInventory.find(i => i.itemId === item.itemId);
+          if (invItem) {
+            invItem.count += 1;
+          } else {
+            ownedInventory.push({ itemId: item.itemId, count: 1 });
+          }
+          renderInvList();
+          showToast(`Đã xóa & thu hồi "${def ? def.nameVi : 'Vật phẩm'}" về Kho Đồ!`);
+        }
+        selectedInstanceId = null;
+        cursor.visible = false;
+        placementBar.classList.remove('open');
+      } else if (activePreviewItemId) {
+        placementBar.classList.remove('open');
+        cursor.visible = false;
+        ghostGroup.clear();
+        activePreviewItemId = null;
+        showToast('Đã hủy đặt vật phẩm');
+      } else {
+        showToast('Chưa có vật phẩm nào được chọn để xóa!');
+      }
+    }
+
+    // Attach to Bottom Placement Bar
+    document.getElementById('btn-elevate-up').onclick = handleElevateUp;
+    document.getElementById('btn-elevate-down').onclick = handleElevateDown;
+    document.getElementById('btn-rotate').onclick = handleRotate;
+    document.getElementById('btn-delete').onclick = handleDelete;
+
+    // Attach to Floating Side Quick Tools
+    document.getElementById('side-btn-up').onclick = handleElevateUp;
+    document.getElementById('side-btn-down').onclick = handleElevateDown;
+    document.getElementById('side-btn-rot').onclick = handleRotate;
+    document.getElementById('side-btn-del').onclick = handleDelete;
+
+    // Attach to Dock Decor Button
+    document.getElementById('btn-toggle-decor').onclick = () => {
+      isDecorationMode = true;
+      const tray = document.getElementById('decor-tray');
+      if (tray) {
+        tray.classList.toggle('open');
+        if (tray.classList.contains('open')) {
+          renderDecorTray();
+          showToast('🛠️ Đang mở Thanh Chọn Đồ — Nhấp vào món bất kỳ để chọn!');
+        } else {
+          showToast('Đã thu gọn thanh chọn đồ');
+        }
+      }
+    };
+
+    document.querySelectorAll('.decor-filter-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.decor-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        decorFilter = btn.dataset.cat;
+        renderDecorTray();
+      };
+    });
+
+    const btnCloseTray = document.getElementById('btn-close-decor-tray');
+    if (btnCloseTray) {
+      btnCloseTray.onclick = (e) => {
+        e.stopPropagation();
+        document.getElementById('decor-tray').classList.remove('open');
+      };
+    }
+
+    document.getElementById('btn-cancel').onclick = () => {
+      placementBar.classList.remove('open');
+      cursor.visible = false;
+      ghostGroup.clear();
+      activePreviewItemId = null;
+      selectedInstanceId = null;
+    };
+
+    document.getElementById('btn-confirm').onclick = () => {
+      if (selectedInstanceId) {
+        // Confirm editing of existing placed item
+        const item = placedItems.find(p => p.instanceId === selectedInstanceId);
+        const def = item ? FULL_CATALOG.find(c => c.id === item.itemId) : null;
+        selectedInstanceId = null;
+        cursor.visible = false;
+        placementBar.classList.remove('open');
+        showToast(`Đã lưu vị trí "${def ? def.nameVi : 'Vật phẩm'}"!`);
+        return;
+      }
+
+      if (!isPlacementValid || !activePreviewItemId) return;
+      const def = FULL_CATALOG.find(c => c.id === activePreviewItemId);
+
+      const instId = 'inst_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      spawnPlacedItem({
+        instanceId: instId,
+        itemId: activePreviewItemId,
+        position: { x: previewPos.x, y: 1.8 + previewElevation, z: previewPos.z },
+        rotationY: previewRotY,
+        elevation: previewElevation
+      });
+
+      // Deduct 1 from inventory if in player mode
+      const invItem = ownedInventory.find(i => i.itemId === activePreviewItemId);
+      if (invItem && invItem.count > 0) {
+        invItem.count -= 1;
+      }
+
+      placementBar.classList.remove('open');
+      cursor.visible = false;
+      ghostGroup.clear();
+      activePreviewItemId = null;
+      renderInvList();
+      renderDecorTray();
+      showToast(`Đã đặt "${def ? def.nameVi : 'Vật phẩm'}" lên đảo thành công!`);
+    };
+
+    // -----------------------------------------------------------------
+    // ADMIN MASTER TEMPLATE & PLAYER REAL EXPERIENCE SYSTEM
+    // -----------------------------------------------------------------
+    let currentMode = 'admin'; // defaults to admin designer
+    window.currentMode = currentMode;
+
+    async function switchMode(mode) {
+      const prevMode = currentMode;
+      currentMode = mode;
+      window.currentMode = mode;
+      const btnAdmin = document.getElementById('btn-mode-admin');
+      const btnPlayer = document.getElementById('btn-mode-player');
+      const adminStrip = document.getElementById('admin-controls-strip');
+      const playerStrip = document.getElementById('player-controls-strip');
+      const badgeTitle = document.querySelector('.island-title');
+      const badgeSub = document.querySelector('.island-sub');
+
+      if (mode === 'admin') {
+        if (btnPlayer) btnPlayer.classList.remove('active');
+        if (btnAdmin) btnAdmin.classList.add('active');
+        if (playerStrip) playerStrip.style.display = 'none';
+        if (adminStrip) adminStrip.style.display = 'flex';
+        if (badgeTitle) badgeTitle.textContent = '🛠️ Admin Mode — Thiết Kế Đảo Mẫu & Địa Thế';
+        if (badgeSub) badgeSub.textContent = 'Sắp đặt núi, hồ, suối... Bấm "Lưu Thành Đảo Mẫu" để áp dụng cho mọi người chơi';
+
+        // Load Master Template from Server with timestamp cache-buster
+        try {
+          const res = await fetch('/api/template/default?t=' + Date.now());
+          if (res.ok) {
+            const data = await res.json();
+            loadIslandLayout(data.placedItems || []);
+            updatePlacedChips();
+            showToast('🛠️ Đang ở Chế Độ Admin: Hãy tự do tạo địa thế (núi, hồ, suối...) cho đảo mẫu!');
+            return;
+          }
+        } catch (e) {
+          console.warn('API error:', e);
+        }
+      } else {
+        if (btnAdmin) btnAdmin.classList.remove('active');
+        if (btnPlayer) btnPlayer.classList.add('active');
+        if (adminStrip) adminStrip.style.display = 'none';
+        if (playerStrip) playerStrip.style.display = 'flex';
+        if (badgeTitle) badgeTitle.textContent = '👤 Góc Nhìn Người Chơi — Nhận Địa Thế Từ Admin';
+        if (badgeSub) badgeSub.textContent = 'Mặc định nhận hòn đảo có địa thế (núi, hồ, suối...) do Admin thiết lập';
+
+        // When switching from Admin to Player, auto-save the current Admin layout first to guarantee 100% live synchronization!
+        if (prevMode === 'admin' && placedItems.length > 0) {
+          await saveAdminDefaultTemplate(true);
+        }
+
+        // Load the Master Template that Admin created!
+        try {
+          const res = await fetch('/api/template/default?t=' + Date.now());
+          if (res.ok) {
+            const data = await res.json();
+            loadIslandLayout(data.placedItems || []);
+            updatePlacedChips();
+            showToast('👤 Đang ở Góc Nhìn Người Chơi: Đảo hiển thị đúng 100% địa thế Admin vừa tạo!');
+            return;
+          }
+        } catch (e) {
+          console.warn('Load player error:', e);
+        }
+      }
+    }
+    window.switchMode = switchMode;
+
+    async function saveAdminDefaultTemplate(silent = false) {
+      const payload = {
+        templateVersion: '2.4.0',
+        updatedBy: 'Admin (World Builder)',
+        placedItems: placedItems.map(p => ({
+          instanceId: p.instanceId,
+          itemId: p.itemId,
+          position: p.position,
+          rotationY: p.rotationY,
+          elevation: p.elevation
+        }))
+      };
+      try {
+        const res = await fetch('/api/template/default', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          updatePlacedChips();
+          if (!silent) {
+            showToast(`🎉 ĐÃ LƯU ĐẢO MẪU! Mọi người chơi khi vào game sẽ mặc định nhận đúng địa thế này (${payload.placedItems.length} đối tượng)!`);
+          }
+        }
+      } catch (e) {
+        if (!silent) {
+          showToast(`❌ Lỗi lưu template: ${e.message}`);
+        }
+      }
+    }
+    window.saveAdminDefaultTemplate = saveAdminDefaultTemplate;
+
+    async function resetCurrentPlayerIsland() {
+      try {
+        const res = await fetch('/api/template/default?t=' + Date.now());
+        if (res.ok) {
+          const data = await res.json();
+          loadIslandLayout(data.placedItems || []);
+          showToast('🔄 Đã khôi phục hoàn toàn về địa thế gốc của Admin!');
+        }
+      } catch (e) {
+        showToast('❌ Lỗi đặt lại đảo!');
+      }
+    }
+    window.resetCurrentPlayerIsland = resetCurrentPlayerIsland;
+
+    async function initIslandSystem() {
+      const params = new URLSearchParams(window.location.search);
+      const reqMode = params.get('mode') || 'admin';
+      await switchMode(reqMode);
+    }
+    initIslandSystem();
+
+    // RENDER LOOP
+    function animate(time) {
+      requestAnimationFrame(animate);
+      if (waterfall && waterfall.parent) {
+        waterfall.position.y = 1.62 - 7.5 + Math.sin(time * 0.003) * 0.05;
+      }
+      // Gentle depth clouds drift
+      if (cloud1) cloud1.position.y = 0.5 + Math.sin(time * 0.001) * 0.15;
+      if (cloud2) cloud2.position.y = -4.5 + Math.cos(time * 0.0012) * 0.2;
+
+      renderer.render(scene, camera);
+    }
+    animate(0);
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      updateBgFrustumScale(camera.aspect);
+      updateCamera();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

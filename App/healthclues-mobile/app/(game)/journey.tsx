@@ -10,6 +10,7 @@ import {
   Modal,
   TextInput,
   useWindowDimensions,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
@@ -30,11 +31,12 @@ import {
   PenLine,
 } from "lucide-react-native";
 import { colors, fonts, spacing, radius } from "@/theme";
+import { t, useLocale } from "@/localization";
 import { TopHud } from "@/components/common/TopHud";
 import { HabitIconBox } from "@/components/game/HabitIconBox";
 import { ExpGain } from "@/components/game/ExpGain";
 import { useAuth } from "@/hooks/useAuth";
-import { useWorld } from "@/hooks/useWorld";
+import { useWorld, getLocalizedGoal } from "@/hooks/useWorld";
 import {
   AiSuggestedGoal,
   buildDiscoveryProfile,
@@ -95,6 +97,14 @@ const QUICK_HABIT_PRESETS = [
   },
 ];
 
+const QUICK_HABIT_PRESETS_EN = [
+  { title: "Drink warm water after waking", category: "Nutrition" },
+  { title: "Practice 4-7-8 breathing before bed", category: "Relaxation" },
+  { title: "Take a gentle 20-minute walk after dinner", category: "Movement" },
+  { title: "Turn off screens 30 minutes before bed", category: "Sleep" },
+  { title: "Add more leafy greens to each meal", category: "Nutrition" },
+] as const;
+
 const TRAIL_WAVE_OFFSETS = [5, -5, 4, -4, 3, -5, 0];
 
 function buildSmoothTrailPath(pts: { x: number; y: number }[]): string {
@@ -113,6 +123,7 @@ function buildSmoothTrailPath(pts: { x: number; y: number }[]): string {
  * Wellness Journey RPG Adventure Scroll: Lumi signboard, 7-day rune trail, guild charters & saved drawer.
  */
 export default function JourneyScreen() {
+  const { locale, strings } = useLocale();
   const { height: screenHeight } = useWindowDimensions();
   const isCompactViewport = screenHeight < 480;
   const { isAuthenticated } = useAuth();
@@ -131,10 +142,7 @@ export default function JourneyScreen() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newCategory, setNewCategory] = useState("Vận Động");
-  const [newTarget, setNewTarget] = useState("15");
-  const [newUnit, setNewUnit] = useState("phút");
-  const [newDays, setNewDays] = useState(7);
+  const [newCategory, setNewCategory] = useState(locale === "en" ? "Nutrition" : "Dinh Dưỡng");
   const [adding, setAdding] = useState(false);
   const [habitFormError, setHabitFormError] = useState<string | null>(null);
   const [habitToast, setHabitToast] = useState<string | null>(null);
@@ -156,12 +164,14 @@ export default function JourneyScreen() {
     const offset = i - 6;
     const d = new Date();
     d.setDate(d.getDate() + offset);
-    const dayLabels = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+    const dayLabelsVi = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+    const dayLabelsEn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const dayLabels = locale === "en" ? dayLabelsEn : dayLabelsVi;
     const isToday = offset === 0;
     const completed = isToday ? !!todayCheckin?.submitted : offset >= -2;
     return {
       key: `day-${offset}`,
-      label: isToday ? "Hôm nay" : dayLabels[d.getDay()],
+      label: isToday ? (locale === "en" ? "Today" : "Hôm nay") : dayLabels[d.getDay()],
       dayNum: d.getDate(),
       isToday,
       completed,
@@ -182,23 +192,25 @@ export default function JourneyScreen() {
 
   const triggerHaptic = () => {
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      if (Platform.OS !== "web") {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch?.(() => {});
+      }
     } catch {}
   };
 
   const triggerSuccessHaptic = () => {
     try {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      if (Platform.OS !== "web") {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch?.(() => {});
+      }
     } catch {}
   };
 
-  const handlePickPreset = (preset: (typeof QUICK_HABIT_PRESETS)[0]) => {
+  const handlePickPreset = (preset: (typeof QUICK_HABIT_PRESETS)[0], index: number) => {
     triggerHaptic();
-    setNewTitle(preset.title);
-    setNewCategory(preset.category);
-    setNewTarget(preset.target);
-    setNewUnit(preset.unit);
-    setNewDays(preset.daysPerWeek);
+    const displayPreset = locale === "en" ? QUICK_HABIT_PRESETS_EN[index] : preset;
+    setNewTitle(displayPreset.title);
+    setNewCategory(displayPreset.category);
     setHabitFormError(null);
   };
 
@@ -219,10 +231,10 @@ export default function JourneyScreen() {
             concernNote: "",
             selectedFactors: [],
             factorNote: "",
-            locale: "vi",
+            locale,
           });
       setAiSuggestFocus(profile.adaptiveDiscovery.concernDetail || profile.adaptiveDiscovery.focusLabel);
-      const res = await requestWellnessAdvisor(profile, requestQuestId, "vi");
+      const res = await requestWellnessAdvisor(profile, requestQuestId, locale);
       setAiPresets(res.goals);
     } finally {
       setAiSuggestLoading(false);
@@ -231,26 +243,23 @@ export default function JourneyScreen() {
 
   const handlePickAiPreset = (goal: AiSuggestedGoal) => {
     triggerHaptic();
-    setNewTitle(goal.title.vi);
+    setNewTitle(locale === "en" ? goal.title.en : goal.title.vi);
     const catLower = (goal.category || "").toLowerCase();
     setNewCategory(
       /sleep|ngủ/.test(catLower)
-        ? "Giấc Ngủ"
+        ? locale === "en" ? "Sleep" : "Giấc Ngủ"
         : /move|walk|vận động/.test(catLower)
-          ? "Vận Động"
+          ? locale === "en" ? "Movement" : "Vận Động"
           : /relax|breath|thư giãn/.test(catLower)
-            ? "Thư Giãn"
-            : "Dinh Dưỡng"
+            ? locale === "en" ? "Lifestyle" : "Lối Sống"
+            : locale === "en" ? "Nutrition" : "Dinh Dưỡng"
     );
-    setNewTarget(goal.optionA.title.vi);
-    setNewUnit("lần/ngày");
-    setNewDays(7);
     setHabitFormError(null);
   };
 
   const handleSaveHabit = async () => {
     if (!newTitle.trim()) {
-      setHabitFormError("Vui lòng nhập tên thói quen sống khỏe hoặc chọn gợi ý nhanh phía trên.");
+      setHabitFormError("Vui lòng nhập tên thói quen sống khỏe của bạn.");
       return;
     }
     setHabitFormError(null);
@@ -261,11 +270,11 @@ export default function JourneyScreen() {
       await addHabit({
         title: newTitle.trim(),
         category: newCategory,
-        target: newTarget.trim() || "1",
-        unit: newUnit.trim() || "lần",
-        daysPerWeek: newDays,
+        target: "Hằng ngày",
+        unit: "mục tiêu",
+        daysPerWeek: 7,
         expValue: 15,
-        description: "Thói quen sống khỏe cá nhân hóa cùng Bé Cáo Lumi.",
+        description: `Thói quen "${newTitle.trim()}" rèn luyện đều đặn hằng ngày.`,
         evidence: "Người dùng tự thiết lập",
       });
 
@@ -326,10 +335,12 @@ export default function JourneyScreen() {
 
             <View style={styles.signboardTextCol}>
               <Text style={[styles.signboardTitle, isCompactViewport && { fontSize: 15 }]}>
-                Hành Trình Sống Khỏe
+                {locale === "en" ? "Wellness Journey" : "Hành Trình Sống Khỏe"}
               </Text>
               <Text style={styles.signboardQuote} numberOfLines={2}>
-                "Từng bước nhỏ vững vàng mỗi ngày cùng Lumi ~"
+                {locale === "en"
+                  ? "\"Small, steady daily steps with Lumi ~\""
+                  : "\"Từng bước nhỏ vững vàng mỗi ngày cùng Lumi ~\""}
               </Text>
             </View>
           </View>
@@ -344,7 +355,7 @@ export default function JourneyScreen() {
           {/* 7-Day Winding Rune Trail Card */}
           <View style={styles.trailCard}>
             <View style={styles.trailTitleTag}>
-              <Text style={styles.trailTitleTagText}>Nhật Ký 7 Ngày</Text>
+              <Text style={styles.trailTitleTagText}>{locale === "en" ? "7-Day Journal" : "Nhật Ký 7 Ngày"}</Text>
             </View>
 
             <View style={styles.trailPathContainer}>
@@ -419,13 +430,15 @@ export default function JourneyScreen() {
               {/* Active Goals Section Header */}
               <View style={styles.sectionHeaderRow}>
                 <View style={styles.sectionTitleGroup}>
-                  <Text style={styles.sectionTitle}>Đang Theo Dõi ({activeGoals.length})</Text>
+                  <Text style={styles.sectionTitle}>
+                    {locale === "en" ? `Active Habits (${activeGoals.length})` : `Đang Theo Dõi (${activeGoals.length})`}
+                  </Text>
                 </View>
 
                 <TouchableOpacity
                   style={styles.addPlaqueBtn}
                   accessibilityRole="button"
-                  accessibilityLabel="Thêm mới"
+                  accessibilityLabel={locale === "en" ? "Add new habit" : "Thêm mới"}
                   activeOpacity={0.82}
                   onPress={() => {
                     triggerHaptic();
@@ -433,7 +446,7 @@ export default function JourneyScreen() {
                   }}
                 >
                   <Plus size={13} color="#fef08a" />
-                  <Text style={styles.addPlaqueBtnText}>Thêm Mới</Text>
+                  <Text style={styles.addPlaqueBtnText}>{locale === "en" ? "Add Habit" : "Thêm Mới"}</Text>
                 </TouchableOpacity>
               </View>
 
@@ -441,12 +454,15 @@ export default function JourneyScreen() {
               {activeGoals.length === 0 ? (
                 <View style={styles.emptyCard}>
                   <Text style={styles.emptyText}>
-                    Chưa có mục tiêu nào đang theo dõi. Bấm "Thêm Mới" hoặc kích hoạt bên dưới!
+                    {locale === "en"
+                      ? "No habits currently tracked. Tap '+ Add Habit' or explore presets below!"
+                      : "Chưa có mục tiêu nào đang theo dõi. Bấm \"Thêm Mới\" hoặc kích hoạt bên dưới!"}
                   </Text>
                 </View>
               ) : (
                 <View style={styles.chartersList}>
-                  {activeGoals.map((goal, index) => {
+                  {activeGoals.map((rawGoal, index) => {
+                    const goal = getLocalizedGoal(rawGoal, locale);
                     const isLoreOpen = !!expandedLore[goal.id];
                     return (
                       <View key={goal.id || index} style={styles.charterCard}>
@@ -467,7 +483,7 @@ export default function JourneyScreen() {
                               {goal.title}
                             </Text>
                             <Text style={styles.charterSub} numberOfLines={2}>
-                              {goal.daysPerWeek || 7} ngày/tuần · {goal.target || "Đều đặn"} {goal.unit || ""}
+                              {goal.daysPerWeek || 7} {locale === "en" ? "days/wk" : "ngày/tuần"} · {goal.target || (locale === "en" ? "Daily" : "Đều đặn")} {goal.unit || ""}
                             </Text>
                           </View>
 
@@ -498,7 +514,7 @@ export default function JourneyScreen() {
                                 toggleGoalStatus(goal.id, "saved_for_later");
                               }}
                             >
-                              <Text style={styles.archivePlaqueText}>Lưu sau</Text>
+                              <Text style={styles.archivePlaqueText}>{locale === "en" ? "Save" : "Lưu sau"}</Text>
                             </TouchableOpacity>
                           </View>
                         </View>
@@ -534,7 +550,7 @@ export default function JourneyScreen() {
                   <View style={styles.savedHeaderLeft}>
                     <Scroll size={14} color="#d4a84f" />
                     <Text style={styles.savedDrawerTitle}>
-                      Đã Lưu Xem Sau ({savedGoals.length})
+                      {locale === "en" ? `Saved for Later (${savedGoals.length})` : `Đã Lưu Xem Sau (${savedGoals.length})`}
                     </Text>
                   </View>
                   {isSavedDrawerOpen ? (
@@ -548,33 +564,40 @@ export default function JourneyScreen() {
                   <View style={styles.savedDrawerBody}>
                     {savedGoals.length === 0 ? (
                       <Text style={styles.savedEmptyHint}>
-                        Các thói quen tạm hoãn sẽ nằm gọn tại ngăn này để kích hoạt lại bất cứ lúc nào.
+                        {locale === "en"
+                          ? "Deferred habits will be kept neatly here to reactivate whenever you're ready."
+                          : "Các thói quen tạm hoãn sẽ nằm gọn tại ngăn này để kích hoạt lại bất cứ lúc nào."}
                       </Text>
                     ) : (
-                      savedGoals.map((goal, index) => (
-                        <View key={goal.id || index} style={styles.savedGoalRow}>
-                          <HabitIconBox category={goal.category} title={goal.title} size={32} />
-                          <View style={styles.savedGoalMeta}>
-                            <Text style={styles.savedGoalTitle} numberOfLines={1}>
-                              {goal.title}
-                            </Text>
-                            <Text style={styles.savedGoalSub}>
-                              {goal.category} · +{goal.expValue || 10} EXP
-                            </Text>
+                      savedGoals.map((rawGoal, index) => {
+                        const goal = getLocalizedGoal(rawGoal, locale);
+                        return (
+                          <View key={goal.id || index} style={styles.savedGoalRow}>
+                            <HabitIconBox category={goal.category} title={goal.title} size={32} />
+                            <View style={styles.savedGoalMeta}>
+                              <Text style={styles.savedGoalTitle} numberOfLines={1}>
+                                {goal.title}
+                              </Text>
+                              <Text style={styles.savedGoalSub}>
+                                {goal.category} · +{goal.expValue || 10} EXP
+                              </Text>
+                            </View>
+                            <TouchableOpacity
+                              style={styles.activateGoalBtn}
+                              accessibilityRole="button"
+                              accessibilityLabel={`Kích hoạt ${goal.title}`}
+                              onPress={() => {
+                                triggerSuccessHaptic();
+                                toggleGoalStatus(goal.id, "active");
+                              }}
+                            >
+                              <Text style={styles.activateGoalBtnText}>
+                                {locale === "en" ? "Activate" : "Kích hoạt"}
+                              </Text>
+                            </TouchableOpacity>
                           </View>
-                          <TouchableOpacity
-                            style={styles.activateGoalBtn}
-                            accessibilityRole="button"
-                            accessibilityLabel={`Kích hoạt ${goal.title}`}
-                            onPress={() => {
-                              triggerSuccessHaptic();
-                              toggleGoalStatus(goal.id, "active");
-                            }}
-                          >
-                            <Text style={styles.activateGoalBtnText}>Kích hoạt</Text>
-                          </TouchableOpacity>
-                        </View>
-                      ))
+                        );
+                      })
                     )}
                   </View>
                 )}
@@ -584,7 +607,9 @@ export default function JourneyScreen() {
               <View style={styles.disclaimerFootnote}>
                 <AlertCircle size={12} color="#64748b" />
                 <Text style={styles.disclaimerFootnoteText}>
-                  Khuyến cáo: Các mục tiêu mang tính định hướng lối sống dựa trên khuyến cáo ACR & BMJ, không thay thế tư vấn bác sĩ.
+                  {locale === "en"
+                    ? "Disclaimer: Lifestyle wellness guidance based on ACR & BMJ recommendations; does not substitute clinical physician advice."
+                    : "Khuyến cáo: Các mục tiêu mang tính định hướng lối sống dựa trên khuyến cáo ACR & BMJ, không thay thế tư vấn bác sĩ."}
                 </Text>
               </View>
             </>
@@ -609,8 +634,8 @@ export default function JourneyScreen() {
                   contentFit="contain"
                 />
                 <View>
-                  <Text style={styles.modalTitle}>Thêm Thói Quen Mới</Text>
-                  <Text style={styles.modalSub}>Cùng Lumi thiết lập mục tiêu khỏe mạnh</Text>
+                  <Text style={styles.modalTitle}>{locale === "en" ? "Add New Habit" : "Thêm Thói Quen Mới"}</Text>
+                  <Text style={styles.modalSub}>{locale === "en" ? "Set a healthy goal with Lumi" : "Cùng Lumi thiết lập mục tiêu khỏe mạnh"}</Text>
                 </View>
               </View>
               <TouchableOpacity
@@ -632,7 +657,9 @@ export default function JourneyScreen() {
               >
                 <Sparkles size={15} color="#fef08a" />
                 <Text style={styles.aiSuggestTriggerText}>
-                  {aiSuggestLoading ? "Đang tải gợi ý AI..." : "Lấy gợi ý AI theo vấn đề của bạn"}
+                  {aiSuggestLoading
+                    ? locale === "en" ? "Loading AI suggestions..." : "Đang tải gợi ý AI..."
+                    : locale === "en" ? "Get AI suggestions for your focus" : "Lấy gợi ý AI theo vấn đề của bạn"}
                 </Text>
               </TouchableOpacity>
 
@@ -641,7 +668,7 @@ export default function JourneyScreen() {
                   <View style={styles.fieldHeadingRow}>
                     <Sparkles size={13} color="#fef08a" />
                     <Text style={styles.fieldSectionHeading}>
-                      GỢI Ý AI CHO "{aiSuggestFocus || "HỒ SƠ CỦA BẠN"}":
+                      {locale === "en" ? `AI SUGGESTIONS FOR "${aiSuggestFocus || "YOUR PROFILE"}":` : `GỢI Ý AI CHO "${aiSuggestFocus || "HỒ SƠ CỦA BẠN"}":`}
                     </Text>
                   </View>
                   <View style={styles.presetsContainer}>
@@ -654,12 +681,12 @@ export default function JourneyScreen() {
                       >
                         <View style={styles.presetPillRow}>
                           <Text style={styles.presetTitleText} numberOfLines={1}>
-                            {goal.title.vi}
+                            {locale === "en" ? goal.title.en : goal.title.vi}
                           </Text>
                           <Text style={styles.presetExpText}>+15 EXP</Text>
                         </View>
                         <Text style={styles.presetCategoryText} numberOfLines={2}>
-                          {goal.relevanceReason.vi}
+                          {locale === "en" ? goal.relevanceReason.en : goal.relevanceReason.vi}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -669,7 +696,7 @@ export default function JourneyScreen() {
 
               <View style={styles.fieldHeadingRow}>
                 <Lightbulb size={13} color="#fef08a" />
-                <Text style={styles.fieldSectionHeading}>GỢI Ý NHANH TỪ BÉ CÁO LUMI:</Text>
+                <Text style={styles.fieldSectionHeading}>{locale === "en" ? "QUICK SUGGESTIONS FROM LUMI:" : "GỢI Ý NHANH TỪ BÉ CÁO LUMI:"}</Text>
               </View>
               <View style={styles.presetsContainer}>
                 {QUICK_HABIT_PRESETS.map((preset, idx) => (
@@ -677,16 +704,16 @@ export default function JourneyScreen() {
                     key={idx}
                     style={styles.presetPill}
                     activeOpacity={0.7}
-                    onPress={() => handlePickPreset(preset)}
+                    onPress={() => handlePickPreset(preset, idx)}
                   >
                     <View style={styles.presetPillRow}>
                       <Text style={styles.presetTitleText} numberOfLines={1}>
-                        {preset.title}
+                        {locale === "en" ? QUICK_HABIT_PRESETS_EN[idx].title : preset.title}
                       </Text>
                       <Text style={styles.presetExpText}>+{preset.expValue} EXP</Text>
                     </View>
                     <Text style={styles.presetCategoryText}>
-                      {preset.category} • {preset.target} {preset.unit}
+                      {locale === "en" ? QUICK_HABIT_PRESETS_EN[idx].category : preset.category} • {preset.target} {preset.unit}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -695,22 +722,26 @@ export default function JourneyScreen() {
               <View style={[styles.fieldHeadingRow, { marginTop: spacing.md }]}>
                 <PenLine size={13} color="#fef08a" />
                 <Text style={styles.fieldSectionHeading}>
-                  TỰ ĐẶT MỤC TIÊU CỦA BẠN:
+                  {locale === "en" ? "WRITE YOUR OWN HABIT:" : "TỰ GÕ THÓI QUEN CỦA BẠN:"}
                 </Text>
               </View>
 
-              <Text style={styles.inputLabel}>Tên thói quen sống khỏe *</Text>
+              <Text style={styles.inputLabel}>{locale === "en" ? "Enter the habit you want to practice *" : "Nhập thói quen bạn muốn rèn luyện *"}</Text>
               <TextInput
-                style={styles.textInput}
-                placeholder="Ví dụ: Tập giãn cơ bắp chân 10 phút"
-                placeholderTextColor="rgba(255,255,255,0.4)"
+                style={[styles.textInput, { minHeight: 46, fontSize: 14 }]}
+                placeholder={locale === "en" ? "e.g. No alcohol, Drink 2L water, Walk 15 min..." : "Ví dụ: Không uống rượu bia, Uống 2L nước, Đi bộ 15p..."}
+                placeholderTextColor="rgba(255,255,255,0.45)"
                 value={newTitle}
                 onChangeText={setNewTitle}
+                returnKeyType="done"
               />
 
-              <Text style={styles.inputLabel}>Danh mục rèn luyện</Text>
+              <Text style={styles.inputLabel}>{locale === "en" ? "Habit category" : "Nhóm thói quen"}</Text>
               <View style={styles.pillSelectorRow}>
-                {["Vận Động", "Dinh Dưỡng", "Giấc Ngủ", "Thư Giãn"].map((cat) => (
+                {(locale === "en"
+                  ? ["Nutrition", "Movement", "Sleep", "Lifestyle"]
+                  : ["Dinh Dưỡng", "Vận Động", "Giấc Ngủ", "Lối Sống"]
+                ).map((cat) => (
                   <TouchableOpacity
                     key={cat}
                     style={[
@@ -734,55 +765,6 @@ export default function JourneyScreen() {
                 ))}
               </View>
 
-              <Text style={styles.inputLabel}>Tần suất thực hiện</Text>
-              <View style={styles.pillSelectorRow}>
-                {[7, 5, 3].map((d) => (
-                  <TouchableOpacity
-                    key={d}
-                    style={[
-                      styles.choicePill,
-                      newDays === d && styles.choicePillActive,
-                    ]}
-                    onPress={() => {
-                      triggerHaptic();
-                      setNewDays(d);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.choicePillText,
-                        newDays === d && styles.choicePillTextActive,
-                      ]}
-                    >
-                      {d} ngày/tuần
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              <View style={styles.targetRow}>
-                <View style={{ flex: 1, marginRight: 8 }}>
-                  <Text style={styles.inputLabel}>Định mức mỗi lần</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="15"
-                    placeholderTextColor="rgba(255,255,255,0.4)"
-                    value={newTarget}
-                    onChangeText={setNewTarget}
-                  />
-                </View>
-                <View style={{ flex: 1, marginLeft: 8 }}>
-                  <Text style={styles.inputLabel}>Đơn vị</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="phút / ml / cốc"
-                    placeholderTextColor="rgba(255,255,255,0.4)"
-                    value={newUnit}
-                    onChangeText={setNewUnit}
-                  />
-                </View>
-              </View>
-
               {habitFormError && (
                 <Text style={styles.habitErrorText}>{habitFormError}</Text>
               )}
@@ -790,6 +772,8 @@ export default function JourneyScreen() {
               <TouchableOpacity
                 style={styles.submitModalBtn}
                 activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel="save-custom-habit-btn"
                 onPress={handleSaveHabit}
                 disabled={adding}
               >

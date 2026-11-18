@@ -1,0 +1,96 @@
+import { chromium } from "file:///d:/botly/App/word3d/node_modules/playwright-core/index.mjs";
+
+async function main() {
+  const browser = await chromium.launch({
+    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    headless: true,
+    args: ["--no-sandbox", "--disable-web-security"],
+  });
+  const page = await browser.newPage();
+  await page.setViewportSize({ width: 800, height: 600 });
+  
+  const html = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <style>body { margin: 0; background: #2b3a4a; overflow: hidden; }</style>
+  </head>
+  <body>
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, 800 / 600, 0.1, 100);
+      camera.position.set(0, 1.2, 3.2);
+      
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(800, 600);
+      renderer.setClearColor(0x2b3a4a);
+      document.body.appendChild(renderer.domElement);
+      
+      const ambLight = new THREE.AmbientLight(0xffffff, 1.6);
+      scene.add(ambLight);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1.8);
+      dirLight.position.set(5, 10, 7);
+      scene.add(dirLight);
+      
+      const loader = new THREE.GLTFLoader();
+      
+      // Left: Unarmed Idle
+      loader.load('http://localhost:5174/assets/characters/Rogue.glb', (gltf) => {
+        const m = gltf.scene;
+        m.traverse((node) => {
+          if (node.name.includes('Knife') || node.name.includes('Crossbow') || node.name.includes('Throwable')) {
+            node.visible = false;
+          }
+        });
+        m.position.set(-0.6, 0, 0);
+        m.scale.set(0.9, 0.9, 0.9);
+        scene.add(m);
+        
+        const mixer = new THREE.AnimationMixer(m);
+        const clip = THREE.AnimationClip.findByName(gltf.animations, 'Idle');
+        if (clip) mixer.clipAction(clip).play();
+        window.mixer1 = mixer;
+      });
+      
+      // Right: Walking_A
+      loader.load('http://localhost:5174/assets/characters/Rogue.glb', (gltf) => {
+        const m = gltf.scene;
+        m.traverse((node) => {
+          if (node.name.includes('Knife') || node.name.includes('Crossbow') || node.name.includes('Throwable')) {
+            node.visible = false;
+          }
+        });
+        m.position.set(0.6, 0, 0);
+        m.scale.set(0.9, 0.9, 0.9);
+        scene.add(m);
+        
+        const mixer = new THREE.AnimationMixer(m);
+        const clip = THREE.AnimationClip.findByName(gltf.animations, 'Walking_A');
+        if (clip) mixer.clipAction(clip).play();
+        window.mixer2 = mixer;
+      });
+      
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const delta = clock.getDelta();
+        if (window.mixer1) window.mixer1.update(delta);
+        if (window.mixer2) window.mixer2.update(delta);
+        renderer.render(scene, camera);
+      }
+      animate();
+    </script>
+  </body>
+  </html>
+  `;
+  
+  await page.setContent(html);
+  await new Promise(r => setTimeout(r, 3500));
+  await page.screenshot({ path: 'C:/Users/Admin/.gemini/antigravity/brain/657e9da8-7551-4202-bc28-ecfcfda170bb/test_rogue_unarmed.png' });
+  console.log('Saved test_rogue_unarmed.png');
+  await browser.close();
+}
+
+main();

@@ -1,0 +1,22 @@
+{
+  "userId": "player_02",
+  "playerName": "Phương Linh (Luna 02)",
+  "islandTitle": "Thiền Viện Trúc Lâm Phương Linh",
+  "updatedAt": "2026-11-18T01:30:00.000Z",
+  "placedItems": [
+    {
+      "instanceId": "inst_cottage_luna",
+      "itemId": "bld_starter_cottage",
+      "position": { "x": -6.0, "y": 1.8, "z": 4.0 },
+      "rotationY": -0.4,
+      "elevation": 0
+    },
+    {
+      "instanceId": "inst_stream_luna",
+      "itemId": "ter_stream_meander_s",
+      "position": { "x": 0, "y": 1.815, "z": 0 },
+      "rotationY": 0,
+      "elevation": 0
+    }
+  ]
+}

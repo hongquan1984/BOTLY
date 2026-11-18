@@ -1,3 +1,60 @@
+## UC-HC-CYCLE135 — 3 Ngôi Nhà Thực Trong Làng 3D & Thư Viện Kiến Thức — Lưu Vào Túi Đồ Động — 2026-11-17
+
+Actor: Người chơi khám phá Làng 3D và quản lý Balo Trị Liệu.
+Trigger: Người chơi nhấn/tiếp cận 1 trong 3 ngôi nhà thực trong Làng 3D (`bld_potion_shop`, `bld_bookshop`, `bld_great_hall`) hoặc truy cập tab Túi Đồ (`inventory.tsx`).
+Main flow:
+1. Người chơi di chuyển trong Làng 3D. Guồng nước `bld_watermill` là cảnh quan ven suối và không nhận lệnh mở popup.
+2. Người chơi tiếp cận Nhà Thảo Mộc (`bld_potion_shop`), Nhà Âm Thanh (`bld_bookshop`), hoặc Thiền Đường - Hơi Thở (`bld_great_hall`).
+3. Popup thư viện chuyên biệt mở ra, hiển thị nhân vật Tiên Nữ đại diện (Flora, Lyra, Aura) cùng giới thiệu và thư viện hoàn chỉnh các bài tập/âm thanh/dược liệu.
+4. Người chơi có thể nghe thử, tập thử, và nhấn `[ + Lưu Vào Túi Đồ (+10 EXP) ]`. Nút chuyển sang `[ Đã Có Trong Túi Đồ ✓ ]`, điểm EXP cộng +10 và dữ liệu được lưu vào storage.
+5. Người chơi mở tab Túi Đồ:
+   - Túi đồ ban đầu hoàn toàn trống với Empty State tinh tế hướng dẫn quay lại Làng 3D.
+   - Khi đã có vật phẩm cất vào túi, các tab hiển thị đúng các vật phẩm đã lưu.
+   - Người chơi có thể điều khiển trực tiếp (Mixer âm thanh đa kênh, vòng tròn thở, công thức hãm trà) hoặc nhấn `[ ✕ Bỏ Khỏi Túi Đồ ]` để bỏ ra khỏi balo.
+
+---
+
+## UC-HC-CYCLE113 — Video Onboarding Responsive Zero-Overlap Layout & HealthClues-Only Flow — 2026-11-15
+
+Actor: First-time or returning mobile player entering HealthClues.
+Trigger: Player taps `Bắt Đầu Hành Trình` on the Welcome screen.
+Main flow:
+1. Video 1 plays immediately upon tapping the button.
+2. In portrait orientation, the player views the widescreen 16:9 video at the top of the screen with zero cropping, while the dialogue text is presented in a separate scrollable container below the video with zero overlap.
+3. In landscape orientation, the video scales to fill the screen with a compact bottom overlay card.
+4. Player advances through the 3 scenes (Portal, Lumi, Floating Village) and transitions directly to HealthClues Discovery.
+5. Player experiences the streamlined 2-step onboarding trail (`1. Khám phá` → `2. Kế hoạch`) without any Sleep Valley prompt, building their personalized wellness plan with Lumi.
+6. Player enters the 3D Floating Village World, finding a clean diorama view with active region set to HealthClues Realm and top toolbar cleaned of outdated region buttons.
+
+---
+
+## UC-HC-CYCLE111 — Master Narrative Opening & 3-Video Onboarding — 2026-11-15
+
+Actor: First-time or returning mobile player entering HealthClues.
+Trigger: Player opens HealthClues Mobile and starts from the Welcome screen.
+Main flow:
+1. Player selects language (VI / EN) and taps `Bắt Đầu Hành Trình`.
+2. First-time player experiences the 3-Scene Cinematic Story (`IntroStoryPlayer`):
+   - Scene 1: Discovers the radiant portal in the clouds and steps through.
+   - Scene 2: Meets companion Lumi, who introduces The Seer's prophecy.
+   - Scene 3: Views the floating village and learns the mission of body exploration and health decoding.
+3. Player reads dialogue, taps `Tiếp tục →` at their own pace, or taps `Bỏ qua câu chuyện` if desired.
+4. Player advances through the narrative-framed Discovery Quiz with Lumi, receives tailored health habits, and enters World 3D.
+5. Replay: Player can re-watch the 3 scenes at any time from Profile Settings or the Lumi Mascot Action Drawer without resetting account data.
+
+---
+
+## UC-HC-CYCLE94 — Mầm Nhỏ visual companion onboarding — 2026-11-14
+
+Actor: First-time mobile player selecting the playable HealthClues Realm.
+Trigger: Player chooses `Vương Quốc HealthClues` and continues from the existing realm selection.
+Main flow:
+1. Mầm Nhỏ welcomes the player before a one-screen focus quiz. The optional mascot tap briefly plays laugh, sad or sulk feedback and friendly non-clinical copy, then returns to talk without changing any profile or plan value.
+2. The compact horizontal guide remains above the four focus choices and optional note; all controls fit the reference phone viewport without scrolling. Mầm Nhỏ waves on a final explicit confirmation screen.
+3. Player taps `Vào Vùng đất HealthClues`; the unchanged `completeMobileOnboarding` path persists explicitly selected data and opens the existing World with Lumi as its in-world companion.
+
+---
+
 ## UC-HC-CYCLE87 — Condition-Matched Gout Recommendations & RPG Game Audio Customization — 2026-11-12
 
 Actor: Player selecting Gout (or other health concerns) during Onboarding and customizing RPG audio.

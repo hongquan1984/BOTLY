@@ -1,3 +1,219 @@
+## 2026-11-17 — Cycle 135: 3 Ngôi Nhà Thực Trong Làng 3D & Luồng Thu Thập Thư Viện Vào Túi Đồ
+
+1. **Khám Phá 3 Ngôi Nhà Thực Thụ Trong Làng 3D (`world.tsx` & `word3d`):**
+   - Người chơi di chuyển trong Làng 3D, tiếp cận hoặc chạm vào 3 ngôi nhà kiến trúc:
+     * Chạm Nhà Thảo Mộc (`bld_potion_shop`): Mở popup `HerbalGardenModal` với Tiên Nữ Flora.
+     * Chạm Nhà Âm Thanh (`bld_bookshop` - Ngôi nhà ngói đỏ qua cầu đá): Mở popup `SoundGardenModal` với Tiên Nữ Lyra. *Guồng nước `bld_watermill` không còn tương tác.*
+     * Chạm Thiền Đường - Hơi Thở (`bld_great_hall`): Mở popup `ZenBreathModal` với Tiên Nữ Aura.
+2. **Luồng Thu Thập Từ Thư Viện Vào Túi Đồ:**
+   - Trong mỗi ngôi nhà, người chơi xem trọn vẹn danh mục (12 bài âm thanh, 4 bài tập thở y khoa, danh sách dược thảo).
+   - Người chơi có thể nghe thử âm thanh hoặc tập thử nhịp thở ngay tại chỗ.
+   - Bấm nút `[ + Lưu Vào Túi Đồ (+10 EXP) ]` (hoặc `[ Cất vào Túi ]` đối với thảo mộc) $\rightarrow$ Cộng +10 EXP, hiện toast thông báo, nút đổi thành `[ Đã Có Trong Túi Đồ ✓ ]`.
+   - Lưu trữ tức thì vào persistent storage (`toolkitStorage.ts`) và phát sự kiện `HEALTHCLUES_TOOLKIT_CHANGED`.
+3. **Luồng Trải Nghiệm Túi Đồ Động (`inventory.tsx`):**
+   - Khởi đầu với túi đồ hoàn toàn trống, xuất hiện Empty State trực quan hướng dẫn người chơi quay lại Làng 3D khám phá.
+   - Khi đã có vật phẩm thu thập, các tab Thảo Mộc, Âm Thanh, Hơi Thở chỉ hiển thị chính xác các mục đã lưu.
+   - Người chơi có thể kích hoạt phát nhạc Mixer đa kênh, tập thở theo vòng tròn chuyển động, hoặc nhấn `[ ✕ Bỏ Khỏi Túi Đồ ]` để loại bỏ khỏi balo.
+
+---
+
+## 2026-11-16 — Cycle 115: Personalized Herbal Garden & Body Science Library Interaction Flows
+
+1. **Personalized Herbal Garden Flow (`world.tsx`, `HerbalGardenModal.tsx`):**
+   - Player taps `bld_potion_shop` (Nhà Thảo Mộc) in the 3D village or walks near it in 2D mode.
+   - `HerbalGardenModal` loads `healthclues-starter-profile` and displays a personalized banner citing the player's 2-week goal from the onboarding quiz.
+   - Recommends tailored herbs:
+     * Sleep: Cúc La Mã (German Chamomile) & Lạc Tiên Tây (Passionflower) targeting GABA-A receptors.
+     * Weight / Gout / Uric Acid: Tía Tô (Perilla) & Bụp Giấm (Hibiscus) targeting Xanthine Oxidase inhibition and urinary uric acid excretion.
+   - Tapping "Pha tách trà này" completes the Daily Tea Brewing Ritual, awarding +15 EXP with sound/toast feedback and setting a daily cooldown.
+   - Expanding an herb reveals bioactive compounds, biological mechanisms, PubMed citations with external links, tea preparation guide, and safety contraindications.
+
+2. **Dedicated Body Science Library Flow (`world.tsx`, `BodyScienceLibraryModal.tsx`):**
+   - Player taps `bld_bookshop` (Nhà Cơ Thể).
+   - `BodyScienceLibraryModal` presents deep cellular physiology chapters tailored to the player's concern (Adenosine sleep pressure, Circadian Melatonin cycle, Glymphatic cleansing, HPA axis Cortisol, or Insulin curves).
+   - Player participates in the Daily Biology Clue Quiz: answering correctly awards +20 EXP and unlocks a biological clue saved to the backpack/dossier.
+   - Direct CTA "Đến Văn Phòng Giải Mã Dùng Manh Mối Này Ngay" navigates into the Detective Game to solve medical casefiles.
+
+3. **Building Action Disentanglement Flow:**
+   - `bld_potion_shop` $\rightarrow$ Herbal Garden.
+   - `bld_bookshop` $\rightarrow$ Body Science Library.
+   - `bld_watermill` $\rightarrow$ Detective Office minigame.
+   - `bld_great_hall` $\rightarrow$ 3D Chalet Home.
+   - `bld_plaza_well` $\rightarrow$ Daily check-in / well wish.
+
+---
+
+## 2026-11-16 — Cycle 114: World 3D Cinematic Overview, Floating Lumi Mascot Tour & Pulsing Building Beacons
+
+1. **Cinematic Village Overview Entry Flow (`world.tsx`, `VillageCinematicTourModal.tsx`):**
+   - When entering World 3D for the first time or replaying via the `[ ✨ Tour ]` button, the camera starts in high-altitude **Overview (Toàn Cảnh)** mode.
+   - The top toolbar is completely hidden, presenting an unobstructed cinematic view of the floating fantasy village, waterfall, and procedural sky.
+   - The floating mascot Lumi hovers over the bottom glass card with smooth vertical oscillation (`Animated.loop`).
+2. **Pulsing Highlight Tour Flow (`SmartLandmarkOverlay.tsx`, `World3DView.tsx`, `PlayerApp.tsx`):**
+   - Player taps "Tiếp tục →" to step through the 7 narrative stops:
+     * *Stop 0 (Overview):* Welcome to HealthClues Realm.
+     * *Stop 1 (Ngôi Nhà Của Bạn):* `bld_great_hall` pulses with radiant emerald-gold halo.
+     * *Stop 2 (Nhà Thảo Mộc):* `bld_potion_shop` pulses with radiant halo.
+     * *Stop 3 (Nhà Cơ Thể):* `bld_bookshop` pulses with radiant halo.
+     * *Stop 4 (Văn Phòng Giải Mã):* `bld_watermill` pulses with radiant halo.
+     * *Stop 5 (Quảng Trường & Giếng Ước):* `bld_plaza_well` pulses with radiant halo.
+     * *Stop 6 (Sẵn Sàng Khám Phá):* Final call to action with "Bắt đầu khám phá ✨".
+3. **Smooth Close-up Transition & HUD Unveiling Flow:**
+   - Tapping "Bắt đầu khám phá" smoothly transitions the camera to **Cận Cảnh (`close`)** behind the adventurer character.
+   - The top toolbar cleanly unhides with `[ 3D Làng Nổi ]`, `[ Toàn Cảnh ]`, `[ 🔍 Giải Mã ]`, `[ 8 Vùng ]`, and `[ ✨ Tour ]`.
+   - Tapping `[ 🔍 Giải Mã ]` opens the Detective modal for solving health investigation dossiers.
+
+---
+
+## 2026-11-15 — Cycle 113: Video Onboarding Responsive Layout (No Text Overlap) & Default HealthClues Realm
+
+1. **Immediate Video Entry & Responsive Non-Overlapping Layout (`IntroStoryPlayer.tsx`, `quiz.tsx`):**
+   - Tapping "Bắt Đầu Hành Trình" on the Welcome screen immediately launches Video 1 with zero lag.
+   - **Portrait Orientation (Mobile Phone):** The video container is fixed to screen width (`width: 100%`) with standard 16:9 widescreen aspect ratio (`aspectRatio: 16 / 9`, ~217px height on 390px width). The dialogue and text card is positioned in a separate vertical flex block (`flex: 1`) directly beneath the video with zero overlap/overlay on top of the video. Contains an internal ScrollView to prevent dialogue truncation on any screen size.
+   - **Landscape / Desktop Orientation:** The video expands to full-screen cinematic view, with the dialogue card gracefully positioned as a compact frosted-glass overlay at the bottom center.
+   - Ergnomics: Play/Pause, Mute/Unmute (`[ 🔊 ]` / `[ 🔇 ]`), and "Bỏ qua câu chuyện" pills remain accessible in the top header.
+2. **HealthClues-Only Direct Flow (Sleep Valley Removed):**
+   - Completing or skipping the 3 videos transitions directly into HealthClues Discovery. The intermediate `quest_choice` step is bypassed.
+   - Onboarding Step Trail displays exactly 2 steps: `1. Khám phá` → `2. Kế hoạch`.
+   - In World (`world.tsx`), the active region defaults to `"healthclues-realm"`. The top toolbar `[ 🌙 Thung Lũng ]` toggle button is removed. Duplicate bottom dock buttons in `word3d` are removed, leaving a clean, unobstructed 3D floating island diorama.
+
+## 2026-11-15 — Cycle 111: Master Narrative Onboarding & 3-Video Cinematic Opening Flow
+
+1. **Language Selection & Cinematic Opening Flow (`quiz.tsx`, `IntroStoryPlayer.tsx`):**
+   - Player opens HealthClues Mobile and selects language on the Welcome Screen (VI / EN).
+   - Tapping "Bắt Đầu Hành Trình" initiates the 3-Scene Cinematic Story (`IntroStoryPlayer`):
+     * *Scene 1 (Cánh Cổng Bí Ẩn):* Player discovers the glowing mysterious portal in the clouds and steps through.
+     * *Scene 2 (Người Bạn Đã Chờ Đợi):* Player meets Lumi, the winged rabbit companion prophesied by The Seer.
+     * *Scene 3 (Xứ Sở Sức Khỏe):* Panoramic introduction to the floating village, its functional houses, and the player's core health mission.
+   - Dual-tier rendering: Plays video if MP4 file is available; automatically and cleanly falls back to custom high-resolution Ghibli-style story poster art without stalling or displaying broken assets.
+   - Player control: Each scene requires explicit tap on "Tiếp tục →" to advance; scene never auto-advances. Player can tap "Phát / Dừng" or "Bỏ qua câu chuyện".
+2. **Narrative-Driven Quiz & Discovery Flow:**
+   - Completing or skipping the story smoothly brings the player to Quest Choice with The Seer's guidance.
+   - Lumi guides the player through habit discovery questions with warm, empathetic dialogue.
+   - Finale screen presents Lumi's welcome to the HealthClues Realm with a call to action button: "Bước Vào Xứ Sở Sức Khỏe".
+3. **Story Persistence & Replay Flow (`storyState.ts`, `profile.tsx`, `PermanentMascotHelper.tsx`):**
+   - Story progress is saved in AsyncStorage (`healthclues_story_state_v1`). Returning users do not re-experience the intro.
+   - Players can re-watch the 3-scene story at any time from Profile Settings or the Lumi Mascot Helper action sheet.
+
+## 2026-11-15 — Cycle 106: Cozy Fantasy 3D World Exploration & Seamless Dual-Mode Toggle Flow
+
+1. **Cozy Fantasy 3D World Interaction Flow (`world.tsx`, `World3DView.tsx`):**
+   - Player opens the World tab and experiences the 3D floating village with procedural sky, rotating watermill, and flowing waterfall.
+   - Player can orbit and pinch-zoom the camera or tap anywhere on the floating island to navigate their 3D character.
+   - Proximity or tap on fairy NPCs (Flora, Aura, Lyra, Mira, Nova) triggers the postMessage bridge, opening corresponding native HealthClues features (Herbal sheet, Breathing, Body Detective, Daily Care, Quests).
+2. **Dual-Mode 3D/2D Instant Toggle Flow:**
+   - Tap `3D Làng Nổi` on the subheader to switch to the restored, crystal-clear 2D Swiss Village view (`2D Làng Núi`).
+   - The 2D view immediately centers on the player in the central plaza (`800, 700`) with semi-realistic human RPG character sprites, zero blur, and complete landscape/lake vista.
+   - Tap `2D Làng Núi` to switch back to the 3D floating village with zero reload or state loss.
+
+## 2026-11-14 — Cycle 104: Crisp Swiss Village Texture Synthesis, Zero-Smudge 2.5D Lake/Mountain Diorama & Strict Collision De-confliction
+
+1. **Clean Cobblestone Dorfplatz & 2.5D Mountain Horizon Parallax Flow (`world.tsx`):**
+   - Player navigates across razor-sharp cobblestones reconstructed via Texture-Preserving Patch Synthesis (zero inpainting blur smudges).
+   - Moving or tilting dynamically reveals the distant turquoise lake and snow-capped peaks through the alpha cutout opening behind the chalets and church.
+2. **De-conflicted Landmark & Visitor Interaction Flow (`world.tsx`, `useLivingVillageVisitors.ts`):**
+   - Landmark pins (`Thư Viện Ánh Trăng`, `Nhà Thực Vật Học`, `Cổng Làng An Cư`, `Trại Thám Hiểm`, `Đài Thiên Văn Giấc Mơ`, `Nhà Thám Hiểm Trail`) occupy dedicated elevated station anchors.
+   - Visitors (`Anna`, `Leo`, `Mia`, `Ben`, `Lily`, `Lucas`) patrol wide dedicated lanes with > 75px clearance from any station or peer.
+   - Screen loads cleanly with zero auto-popped interaction banners, preserving immersive open view.
+
+## 2026-11-14 — Cycle 102: Photorealistic Alpine Village Square, Separated 2.5D Parallax Horizon, 3D CGI Adventurer Walk Cycle & Harmonious NPC Sizing
+
+1. **Photorealistic Alpine Village & 2.5D Parallax Exploration Flow (`world.tsx`):**
+   - Player enters the realistic Alpine Village square with aged timber chalets, flowering balconies, stone fountain, and cobblestone dorfplatz.
+   - Zero national flags or heraldic emblems exist anywhere in the environment.
+   - When tapping to move across the plaza or panning the camera, the background alpine mountains and turquoise lake glide at differential parallax speed (`translateX: -cameraScroll.x * 0.22`, `translateY: -cameraScroll.y * 0.08`) behind the transparent diorama opening.
+2. **Volumetric 3D Adventurer Walk Cycle Flow:**
+   - Walking triggers a 4-frame animated walk cycle with realistic hand/leg swings, billowing blue cape, and solid ground footfalls on the cobblestones.
+   - Direction flips cleanly (`facingScaleAnim`) when navigating left or right.
+3. **Harmonious NPC Proportions & Grounding:**
+   - All village NPCs (Anna, Ben, Mia, Nhà Thám Hiểm Trail) stand with 100% height parity (76px) alongside the player, supported by realistic ground contact drop shadows.
+
+## 2026-11-14 — Cycle 98: Mobile Game FTUE — Full-Screen Dark Scrim Spotlight, Anti-Overlap Granular Sub-Steps & Mascot Tour Lifecycle
+
+1. **Full-Screen Dark Scrim Spotlight & Dimmed Backdrop Flow (`villageTourService.ts`, `InteractiveTourCard.tsx`):**
+   - Eliminates UI clutter and overlapping cards by introducing a professional game spotlight scrim (`darkBackdrop`: `rgba(3, 10, 8, 0.74)`).
+   - Only the active interactive element is highlighted with glowing amber borders (`#fbbf24`), animated radar crosshairs, and dynamic badges (`✨ ĐANG FOCUS: NHẬT KÝ 7 NGÀY`, `TỰ LẬP MỤC TIÊU`, `ĐÓNG DẤU NHẬN XU`, `BIỆT THỰ GỖ 3D CHALET`, `PHÁ ÁN KIẾM XU`).
+   - Directional bouncing arrows (`▲` or `▼`) point directly to the spotlighted targets.
+   - Non-overlapping compact dialogue balloons keep the habits, buttons, and content completely visible and unobstructed.
+   - A top-right `Bỏ qua ✕` button is accessible at every step for seamless 1-tap exit.
+2. **Granular Interactive Sub-Step Progression:**
+   - *Step 1 (World):* Dimmed village, Tab `Hành Trình` spotlighted + `▼`. Mầm Nhỏ provides personalized non-AI guidance based on user concern.
+   - *Step 2A (Journey):* Dimmed background, `Nhật Ký 7 Ngày` spotlighted + `▲`. Explains 7-day streak tracking, rune stones, EXP & Coins.
+   - *Step 2B (Journey):* Dimmed background, `+ Thêm Mới` button spotlighted + `TỰ LẬP MỤC TIÊU`. Habit list is completely uncovered and legible.
+   - *Step 2C (Journey):* Tab `Nhiệm Vụ` at bottom bar spotlighted + `▼`.
+   - *Step 3A (Daily Care):* Dimmed background, 1-tap seal check-in spotlighted + `ĐÓNG DẤU NHẬN XU`.
+   - *Step 3B (Daily Care):* Tab `Ngôi Nhà` spotlighted + `▼`.
+   - *Step 4A (Home):* Golden Key celebration modal unlocks 3D Chalet + 50 initial Coins.
+   - *Step 4B (Home):* Dimmed background, 3D Chalet stage spotlighted + `BIỆT THỰ GỖ 3D CHALET`. Mầm Nhỏ explains empty chalet needs furnishings from daily quests and detective cases.
+   - *Step 4C (World):* Floating `Phá Án` button spotlighted + `PHÁ ÁN KIẾM XU`. Introduces lore of doctorless village and medical mysteries.
+   - *Step 5 (Detective):* Opens full-screen `gametrinhtham` WebView modal. Tapping `← Về Làng` completes the tour and awards +50 Xu.
+3. **Permanent Mascot Lifecycle & Drawer Flow (`PermanentMascotHelper.tsx`):**
+   - `PermanentMascotHelper` is strictly unmounted during active tour steps (`{!tourStep && <PermanentMascotHelper />}`), preventing any overlap.
+   - Upon tour completion or skip, the mascot button mounts at `bottom: 74, left: 14` with gentle breathing pulse.
+   - Tapping it opens the Mầm Nhỏ Đồng Hành Drawer with personal health focus, screen-specific guidance, quick links, and a restart tour button.
+
+## 2026-11-14 — Cycle 97: Authentic Sprout Mascot, Glowing Tab Spotlight Tour, Permanent Mascot Helper & gametrinhtham WebView Flow
+
+1. **Authentic Sprout Rabbit Mascot & Dolphin Audio Flow (`MascotSprout.tsx`, `quiz.tsx`):**
+   - Player meets the authentic Sprout Rabbit mascot (`healthclues-sprout-rabbit-laugh.png`) immediately on the welcome screen.
+   - The mascot pulses with breathing scale (`0.975 - 1.045`) and float animations. Tapping triggers Web Audio API dolphin chirps and giggles with cheerful sprite changes (`talk`, `laugh`, `wave`).
+2. **Interactive Spotlight Tour Flow (`villageTourService.ts`, `InteractiveTourCard.tsx`, `_layout.tsx`):**
+   - Upon entering the village, each introduced feature's menu or button dynamically glows with a radiant gold border, neon shadow, and sparkle badge.
+   - *Step 1 (World):* Mầm Nhỏ delivers personalized health suggestions based on user input without "AI" phrasing (*"Mình đã nhận được thông tin..."*). Tab `Hành Trình` glows.
+   - *Step 2 (Journey):* Player taps glowing `Hành Trình` -> Mầm Nhỏ card explains habit tracking, streak milestones, and custom habit creation via ➕. Tab `Nhiệm Vụ` glows.
+   - *Step 3 (Daily Care):* Player taps glowing `Nhiệm Vụ` -> Mầm Nhỏ card explains 1-tap seal check-in for daily EXP and Xu coins. Tab `Ngôi Nhà` glows.
+   - *Step 4 (Home 3D):* Player taps glowing `Ngôi Nhà` -> Golden Key celebration modal unlocks the 3D Chalet! Mầm Nhỏ explains the empty chalet needs furnishings from daily quests, and introduces village lore: no doctors in village, mysterious ailments, villagers pay Xu for medical detectives. Floating `Phá Án` button glows.
+   - *Step 5 (Detective):* Player taps glowing `Phá Án` -> Opens the full-screen `DetectiveWebViewModal`. Awards +50 Xu completion bonus and concludes the tour.
+3. **Permanent Bottom-Left Mascot Helper Drawer Flow (`PermanentMascotHelper.tsx`):**
+   - After the tour, a permanent mascot icon remains pinned at `bottom: 74, left: 14` with a breathing pulse and "Mầm Nhỏ 🌱" label.
+   - Tapping it opens a bottom-sheet helper drawer offering screen-specific guidance, health tips, 3D house advice, detective shortcuts, and tour replay.
+4. **Full `D:\botly\App\gametrinhtham` WebView Integration Flow (`DetectiveWebViewModal.tsx`):**
+   - Renders `http://localhost:3329/detective` in a full-screen modal with top HUD: `← Về Làng`, case title, and live `🪙 Xu` balance.
+   - Bidirectional wallet sync communicates coin balances between the detective engine and the mobile app via `window.postMessage`.
+   - Players examine 2D SVG crime scenes, inspect objects, take clue notes, bust contradictions, connect deductions, and collect Xu rewards.
+
+## 2026-11-14 — Cycle 95: Mascot Guide, 5-Step Village Onboarding, Body Detective & 3D Chalet Shop Flows
+
+1. **Mầm Nhỏ Synchronized Companion & Dolphin Sound (`MascotSprout.tsx`, `quiz.tsx`):** A new mobile player meets Mầm Nhỏ at welcome with breathing/pulsing animation (`scale 0.975 - 1.045`). Tapping Mầm Nhỏ triggers authentic dolphin chirps/whistles via Web Audio API with cheerful mood reaction.
+2. **Village Entry & 5-Step Tutorial (`VillageTutorialModal.tsx`, `HouseGiftCelebration.tsx`):**
+   - Step 1: Delivers personalized health suggestions based on user input without robotic "AI" phrasing (*"Mình đã nhận được thông tin về vấn đề bạn đang quan tâm..."*).
+   - Step 2: Explains Journey tracking and habit creation via ➕ button.
+   - Step 3: Explains Daily Care 1-tap seal check-in for EXP and Xu (Coins 🪙).
+   - Step 4: Triggers House Gift celebration popup with Golden Key aura; explains that the 3D Chalet is magnificent but empty, requiring quests/cases to furnish warmly.
+   - Step 5: Explains village lore (no doctor in village, villagers pay Xu for solving mysterious symptoms).
+3. **Body Detective Mobile Action Flow (`DetectiveMobileLauncher.tsx`, `world.tsx`):**
+   - Player taps high-contrast glowing `Phá Án` (🔍) button from the World HUD.
+   - Selects a case (e.g. *Vụ 1: Bí Ẩn Đêm Không Ngủ*), examines 3 scene clues, selects diagnosis deduction, and submits conclusion.
+   - Successful deduction awards 120–150 Xu and 40 EXP with dolphin celebration audio; player exits immediately via `[NHẬN XU & ĐÓNG VĂN PHÒNG]` or switches cases.
+4. **Tab Ngôi Nhà 3D Chalet & Furniture Shop Flow (`home.tsx`, `Home3DStage.tsx`, `HomeFurnitureShopModal.tsx`):**
+   - Player opens Tab Ngôi Nhà, viewing the Three.js 3D Chalet stage with room selector pills (Phòng Khách, Bếp Ăn, Phòng Ngủ, Spa & Tắm, Góc 3/4).
+   - Taps `Sắm Đồ ({coins} 🪙)` to open the Alpine furniture shop with standard 44px close button.
+   - Spends Xu to purchase Alpine oak coffee table (50 Xu), stone fireplace (80 Xu), or piano (120 Xu) with instant feedback and wallet sync.
+5. **Wellness Village 3D Walking Flow (`PlayerController.ts`, `village.html`):**
+   - Player navigates Làng Sống Khỏe 3D using real humanoid avatar with animated skeletal walking leg cycles (`Walk`) and idle breathing (`Idle`).
+
+## 2026-11-14 — Cycle 94: Mầm Nhỏ companion onboarding flow
+
+1. A new mobile player starts onboarding and selects the already-playable HealthClues Realm.
+2. Mầm Nhỏ welcomes the player before a one-screen focus quiz. Tapping the guide is optional and causes laugh, sad or sulk feedback with friendly, non-clinical copy; it does not alter or save data.
+3. The player selects one focus, may add an optional specific issue, and reaches the completion screen without scrolling at the reference `390×844` viewport.
+4. Mầm Nhỏ waves, then the explicit `Vào Vùng đất HealthClues` action invokes the existing completion/persistence flow and opens the existing World where Lumi remains the companion.
+
+## 2026-11-14 — Cycle 93: Full-screen World overview and safe free movement
+
+1. In `/(game)/world`, the player keeps the established bottom tab bar. The map remains the primary surface; only the active region, `Toàn Cảnh`/`Cận Cảnh`, and `8 Vùng` controls remain visible over the map.
+2. Selecting `Toàn Cảnh` keeps the player in the same interactive region. The player sees the complete village, six other visitors and a fixed named legend for every landmark; no long station list or vertical drag is needed.
+3. Tapping the overview or a legend entry starts movement while overview stays open. In Sleep Valley, taps on lake, fountain or building-edge scenery resolve to open cobblestone ground rather than moving the player onto an object.
+
+## 2026-11-13 — Cycle 92: Mobile Swiss Village World flow
+
+1. A player who has completed onboarding opens `/(game)/world` and may choose either approved playable region: Sleep Valley with Luna or HealthClues Realm with Lumi. The six other Overworld IDs remain visible but unavailable.
+2. Choosing Sleep Valley opens the Swiss Village panorama inside the native Expo World scene. The player, Luna, visitors, NPCs, landmarks, camera, overview and HUD stay interactive layers; no external/Three.js page is opened.
+3. The player may open the eight-region map, return to Sleep Valley, switch close/overview, toggle 2D/2.5D and select a visible landmark. Selecting Moonlight Library routes the player to its approach and then exposes the existing Talk HUD.
+4. Landmark labels only appear when the complete marker is in the camera frame, so no partially cropped label is presented at a screen edge. Web preview treats haptic feedback as optional/no-op.
+
+This supersedes the old mobile-only “Sleep Valley temporary lock” snapshot in Cycle 64; it does not change the underlying Journey, authorization, rewards, or persistence flows.
+
 ## 2026-11-12 — Cycle 87: Gout-Matched Discovery Suggestions & RPG Game Audio Flows
 
 1. **Condition-Specific Recommendations (`wellness-advisor/route.ts` -> `onboarding.ts`):** Selecting `Gút / axit uric cao` and dietary/lifestyle factors (e.g., `Tôi thường ăn thịt đỏ hoặc nội tạng`) surfaces purine-reduction, sweet-drink/alcohol water swaps, vitamin-C greens, and low-impact joint mobility suggestions tailored to those factors.

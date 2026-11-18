@@ -29,10 +29,10 @@ const buildEnv = {
 delete buildEnv.HEALTHCLUES_BUILD_DIST_DIR;
 
 console.log("Serving Next.js on port 3329 from", buildDir);
-const server = spawn(process.execPath, [nextBin, "start", buildDir, "--port", "3329"], {
+const server = spawn(process.execPath, [nextBin, "start", buildDir, "--hostname", "0.0.0.0", "--port", "3329"], {
   cwd: buildDir,
   env: buildEnv,
-  stdio: "inherit",
+  stdio: ["ignore", "inherit", "inherit"],
 });
 
 server.on("exit", (code) => {

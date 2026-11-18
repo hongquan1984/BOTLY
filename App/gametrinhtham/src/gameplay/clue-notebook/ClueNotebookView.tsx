@@ -62,7 +62,7 @@ export function ClueNotebookView({
     const isTwinPageVisible =
       typeof window !== "undefined" &&
       window.matchMedia(
-        "(min-width: 1024px), ((orientation: landscape) and (max-height: 520px) and (min-width: 600px))"
+        "(min-width: 1024px), ((orientation: landscape) and (max-height: 640px) and (min-width: 540px))"
       ).matches;
 
     if (!isTwinPageVisible) {
@@ -151,7 +151,7 @@ export function ClueNotebookView({
         {/* Ornate RPG Gold-Bordered Dialogue Box */}
         <div className="space-y-2">
           {activeHandbook ? (
-            <div className="detective-luna-medical-card p-3 rounded-xl bg-[#f9f3e3] border-2 border-[#b58b47] shadow-md space-y-2">
+            <div className="detective-luna-medical-card p-3 rounded-xl bg-[#f9f3e3] border-2 border-[#b58b47] shadow-md space-y-2 overflow-y-auto max-h-56">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[11px] sm:text-xs font-black text-[#4a2b0d]">
                   🦊 TRỢ LÝ Y KHOA LUNA — {activeHandbook.topicTitle}
@@ -218,7 +218,7 @@ export function ClueNotebookView({
         ) : (
           <div className="detective-notebook-grid grid grid-cols-1 lg:grid-cols-12 gap-2.5 lg:gap-0 relative z-10">
             {/* LEFT JOURNAL PAGE: Cream Vintage Ruled Paper + Polaroid Evidence Grid */}
-            <div className="detective-notebook-left lg:col-span-6 rounded-xl lg:rounded-r-none bg-[#f5ecd7] border border-[#cdb88f] p-3 sm:p-4 text-[#2d1d0f] flex flex-col justify-between gap-2.5 shadow-inner">
+            <div className="detective-notebook-left lg:col-span-6 rounded-xl lg:rounded-r-none bg-[#f5ecd7] border border-[#cdb88f] p-3 sm:p-4 text-[#2d1d0f] flex flex-col justify-between gap-2.5 shadow-inner overflow-y-auto max-h-[calc(100dvh-54px)]">
               <div>
                 {/* Compact Journal Page Title */}
                 <div className="flex items-center justify-between gap-2 pb-2 border-b border-[#d6c299]">
@@ -342,7 +342,7 @@ export function ClueNotebookView({
             {/* RIGHT JOURNAL PAGE (Desktop): Pale Sage Parchment + Luna Fox Doctor Dialogue */}
             <aside
               aria-label="Trợ lý Y Khoa Luna"
-              className="detective-notebook-right hidden lg:flex lg:col-span-6 rounded-r-xl bg-[#dbe7df] border border-[#9cb6a4] p-4 flex-col justify-between relative shadow-inner"
+              className="detective-notebook-right hidden lg:flex lg:col-span-6 rounded-r-xl bg-[#dbe7df] border border-[#9cb6a4] p-4 flex-col justify-between relative shadow-inner overflow-y-auto max-h-[calc(100dvh-54px)]"
             >
               {renderRightLunaPage()}
 

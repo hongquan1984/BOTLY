@@ -1,0 +1,52 @@
+{
+  "userId": "current_player",
+  "playerName": "Người Chơi",
+  "islandTitle": "Hòn Đảo Dưỡng Sinh",
+  "placedItems": [
+    {
+      "instanceId": "inst_master_mtn",
+      "itemId": "ter_snowy_mountain",
+      "position": {
+        "x": -8.5,
+        "y": 1.8,
+        "z": -8
+      },
+      "rotationY": 0,
+      "elevation": 0
+    },
+    {
+      "instanceId": "inst_master_pond",
+      "itemId": "ter_mossy_pond",
+      "position": {
+        "x": 5.5,
+        "y": 1.8,
+        "z": -3.5
+      },
+      "rotationY": 0,
+      "elevation": 0
+    },
+    {
+      "instanceId": "inst_master_cottage",
+      "itemId": "bld_starter_cottage",
+      "position": {
+        "x": -2.5,
+        "y": 1.8,
+        "z": 2.2
+      },
+      "rotationY": 0.25,
+      "elevation": 0
+    },
+    {
+      "instanceId": "inst_master_well",
+      "itemId": "prop_plaza_well",
+      "position": {
+        "x": 2.4,
+        "y": 2.05,
+        "z": 2.2
+      },
+      "rotationY": 0.2,
+      "elevation": 0.25
+    }
+  ],
+  "updatedAt": "2026-11-18T07:34:00.233Z"
+}

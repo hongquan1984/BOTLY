@@ -11,7 +11,10 @@ import {
   useWindowDimensions,
   GestureResponderEvent,
   LayoutChangeEvent,
+  DeviceEventEmitter,
 } from "react-native";
+import { HouseGiftCelebration } from "@/modules/mascot/HouseGiftCelebration";
+import { getCurrentTourStep, setTourStep, TOUR_CHANGE_EVENT } from "@/modules/tour/villageTourService";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
@@ -36,6 +39,7 @@ import {
   LayoutGrid,
 } from "lucide-react-native";
 import { colors, fonts, spacing, radius } from "@/theme";
+import { t, useLocale } from "@/localization";
 import { TopHud } from "@/components/common/TopHud";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorld } from "@/hooks/useWorld";
@@ -51,8 +55,25 @@ import {
   getCompanionDepthScale,
 } from "@/hooks/useWellnessHome";
 import { useMobileHomeParallax } from "@/hooks/useMobileHomeParallax";
+import { Home3DStage } from "@/modules/home3d/Home3DStage";
 
 type DockTab = "claimed" | "all" | "chibi";
+
+function safeHapticsImpact(style = Haptics.ImpactFeedbackStyle.Light) {
+  if (Platform.OS !== "web") {
+    try {
+      void Haptics.impactAsync(style);
+    } catch {}
+  }
+}
+
+function safeHapticsNotification(type = Haptics.NotificationFeedbackType.Success) {
+  if (Platform.OS !== "web") {
+    try {
+      void Haptics.notificationAsync(type);
+    } catch {}
+  }
+}
 
 function getItemCenterPct(item: WellnessHomeItem): number {
   const minX = Math.min(item.corners.tl[0], item.corners.bl[0]);
@@ -61,6 +82,7 @@ function getItemCenterPct(item: WellnessHomeItem): number {
 }
 
 export default function HomeScreen() {
+  const { locale, strings } = useLocale();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const { isAuthenticated } = useAuth();
   const { xpTotal, currencies } = useWorld(isAuthenticated);
@@ -89,6 +111,7 @@ export default function HomeScreen() {
     height: Math.max(480, screenHeight - 110),
   });
   const [overviewMode, setOverviewMode] = useState(false);
+  const [is3DMode, setIs3DMode] = useState(true);
 
   const handleViewportLayout = useCallback((e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
@@ -133,6 +156,21 @@ export default function HomeScreen() {
   const [isWalking, setIsWalking] = useState(false);
   const [isWaving, setIsWaving] = useState(false);
   const [facingLeft, setFacingLeft] = useState(true);
+
+  // House Gift Celebration popup for step 4 of village tour
+  const [showHouseGiftTour, setShowHouseGiftTour] = useState(false);
+  useEffect(() => {
+    const cur = getCurrentTourStep();
+    if (cur === "home" || cur === "home_gift") {
+      setShowHouseGiftTour(true);
+    }
+    const tourSub = DeviceEventEmitter.addListener(TOUR_CHANGE_EVENT, (step) => {
+      if (step === "home" || step === "home_gift") {
+        setShowHouseGiftTour(true);
+      }
+    });
+    return () => tourSub.remove();
+  }, []);
   const [speechBubble, setSpeechBubble] = useState<string | null>(null);
 
   const depthScale = getCompanionDepthScale(companionPos.y, homeState.activeRoom);
@@ -221,11 +259,11 @@ export default function HomeScreen() {
     }, duration);
   }, []);
 
-  // Automatically open Starter Welcome Gift when home has not claimed Day 1 Sofa
+  // Automatically open Starter Welcome Gift when home has not claimed Day 1 Sofa (only when tour is NOT active)
   useEffect(() => {
-    if (!loading && !homeState.hasClaimedWelcome) {
+    if (!loading && !homeState.hasClaimedWelcome && !getCurrentTourStep()) {
       setWelcomeModalOpen(true);
-    } else if (!loading && homeState.hasClaimedWelcome) {
+    } else {
       setWelcomeModalOpen(false);
     }
   }, [loading, homeState.hasClaimedWelcome]);
@@ -343,18 +381,14 @@ export default function HomeScreen() {
     setTargetPos(first);
     setWalkQueue(rest);
     setIsWalking(true);
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {}
+    safeHapticsImpact();
   };
 
   const handleCompanionPress = () => {
     setIsWalking(false);
     setIsWaving(true);
     showSpeech(currentCompanion.quotes.greeting, 4800);
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {}
+    safeHapticsImpact();
     setTimeout(() => setIsWaving(false), 2600);
   };
 
@@ -366,9 +400,7 @@ export default function HomeScreen() {
       showSpeech(cfg.quotes.greeting, 4800);
       triggerToast(`Đã chọn bạn đồng hành ${cfg.name} (${cfg.tag})`);
     }
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {}
+    safeHapticsImpact();
     setTimeout(() => setIsWaving(false), 2600);
   };
 
@@ -379,23 +411,19 @@ export default function HomeScreen() {
     setDockTab("claimed");
     setTimeout(() => scrollToPct(51, true), 90);
     triggerToast("Tân gia thành công! Bộ Sofa đã được bày trí trong Phòng Khách.");
-    try {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch {}
+    safeHapticsNotification(Haptics.NotificationFeedbackType.Success);
   };
 
   const handleOpenRewardModal = () => {
     const choices = getDailyRewardChoices();
     if (choices.length === 0) {
-      triggerToast("Bạn đã sưu tập đủ 10/10 món nội thất Thụy Sĩ!");
+      triggerToast("Bạn đã sưu tập đủ 10/10 món nội thất Làng Sống Khỏe!");
       return;
     }
     setRewardChoices(choices);
     setSelectedReward(choices[0]);
     setDailyRewardModalOpen(true);
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {}
+    safeHapticsImpact();
   };
 
   const handleConfirmDailyReward = async () => {
@@ -406,9 +434,7 @@ export default function HomeScreen() {
     setDockTab("claimed");
     setTimeout(() => scrollToPct(getItemCenterPct(selectedReward), true), 110);
     triggerToast(`Đã nhận ${selectedReward.name_vi}! Đặt trong ${selectedReward.tag_vi}.`);
-    try {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch {}
+    safeHapticsNotification(Haptics.NotificationFeedbackType.Success);
   };
 
   const handleConfirmReset = async () => {
@@ -473,12 +499,18 @@ export default function HomeScreen() {
       {/* ===================================================================== */}
       {/* FULL-SCREEN CHALET VIEWPORT (Fills 100% height & width above tab bar)  */}
       {/* ===================================================================== */}
-      <View
-        ref={viewportRef}
-        style={styles.stageViewport}
-        onLayout={handleViewportLayout}
-        accessibilityLabel="wellness-home-viewport"
-      >
+      {is3DMode ? (
+        <Home3DStage
+          onToggleClassic25D={() => setIs3DMode(false)}
+          isClassic25D={false}
+        />
+      ) : (
+        <View
+          ref={viewportRef}
+          style={styles.stageViewport}
+          onLayout={handleViewportLayout}
+          accessibilityLabel="wellness-home-viewport"
+        >
         {/* Pannable Full-Screen 16:9 Stage Layer */}
         <View
           style={[
@@ -803,7 +835,7 @@ export default function HomeScreen() {
                       ]}
                       numberOfLines={1}
                     >
-                      Phòng Khách
+                      {locale === "en" ? "Living Room" : "Phòng Khách"}
                     </Text>
                   </TouchableOpacity>
 
@@ -827,7 +859,19 @@ export default function HomeScreen() {
                       ]}
                       numberOfLines={1}
                     >
-                      Phòng Ngủ
+                      {locale === "en" ? "Bedroom" : "Phòng Ngủ"}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.roomSegBtn, { backgroundColor: "rgba(245, 158, 11, 0.22)" }]}
+                    accessibilityRole="button"
+                    accessibilityLabel="switch-to-3d-home"
+                    onPress={() => setIs3DMode(true)}
+                  >
+                    <Maximize2 size={12} color="#fbbf24" />
+                    <Text style={[styles.roomSegText, { color: "#fbbf24", fontWeight: "900" }]} numberOfLines={1}>
+                      3D Chalet
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -877,7 +921,7 @@ export default function HomeScreen() {
                       dockTab === "claimed" && !dockCollapsed && styles.dockModeChipTextActive,
                     ]}
                   >
-                    Đã nhận ({unlockedCount})
+                    {locale === "en" ? `Claimed (${unlockedCount})` : `Đã nhận (${unlockedCount})`}
                   </Text>
                 </TouchableOpacity>
 
@@ -904,7 +948,7 @@ export default function HomeScreen() {
                       dockTab === "all" && !dockCollapsed && styles.dockModeChipTextActive,
                     ]}
                   >
-                    Kho ({catalog.length})
+                    {locale === "en" ? `Catalog (${catalog.length})` : `Kho (${catalog.length})`}
                   </Text>
                 </TouchableOpacity>
 
@@ -1090,6 +1134,18 @@ export default function HomeScreen() {
           </View>
         </View>
       </View>
+      )}
+
+      {/* ===================================================================== */}
+      {/* MODAL 0: HOUSE GIFT CELEBRATION (TOUR STEP 4)                         */}
+      {/* ===================================================================== */}
+      <HouseGiftCelebration
+        visible={showHouseGiftTour}
+        onClose={() => {
+          setShowHouseGiftTour(false);
+          setTourStep("home_chalet_lore");
+        }}
+      />
 
       {/* ===================================================================== */}
       {/* MODAL 1: WELCOME GIFT (DAY 1 LUXURY SOFA)                             */}
@@ -1109,12 +1165,18 @@ export default function HomeScreen() {
             >
               <View style={styles.modalBadgePill}>
                 <Gift size={12} color={colors.goldLight} />
-                <Text style={styles.modalBadgeText}>Quà Tân Gia Ngày Đầu Tiên</Text>
+                <Text style={styles.modalBadgeText}>
+                  {locale === "en" ? "First Day Housewarming Gift" : "Quà Tân Gia Ngày Đầu Tiên"}
+                </Text>
               </View>
 
-              <Text style={styles.modalTitle}>Chào Mừng Đến Căn Nhà Dãy Alps</Text>
+              <Text style={styles.modalTitle}>
+                {locale === "en" ? "Welcome to Wellness Village Chalet" : "Chào Mừng Đến Biệt Thự Làng Sống Khỏe"}
+              </Text>
               <Text style={styles.modalDesc}>
-                Ngôi nhà gỗ thông Thụy Sĩ nhìn ra dãy núi tuyết đang chờ bạn trang hoàng. Mở ngay món quà đầu tiên để đặt vào Phòng Khách!
+                {locale === "en"
+                  ? "Your cozy wooden chalet in the Wellness Village is waiting to be decorated. Open your first gift to place in the Living Room!"
+                  : "Ngôi nhà gỗ ấm cúng tại Làng Sống Khỏe đang chờ bạn trang hoàng. Mở ngay món quà đầu tiên để đặt vào Phòng Khách!"}
               </Text>
 
               <View style={styles.welcomeItemPreview}>
@@ -1123,9 +1185,13 @@ export default function HomeScreen() {
                   style={styles.welcomeItemImg}
                   contentFit="contain"
                 />
-                <Text style={styles.welcomeItemTitle}>Bộ Sofa Thụy Sĩ Sang Trọng</Text>
+                <Text style={styles.welcomeItemTitle}>
+                  {locale === "en" ? "Cozy Alpine Lounge Sofa" : "Bộ Sofa Nghỉ Dưỡng Ấm Cúng"}
+                </Text>
                 <Text style={styles.welcomeItemSub}>
-                  Sofa êm ái đặt tại trung tâm Phòng Khách ngắm cảnh tuyết trắng.
+                  {locale === "en"
+                    ? "Plush sofa placed at the center of the Living Room to enjoy the snowy alpine view."
+                    : "Sofa êm ái đặt tại trung tâm Phòng Khách ngắm cảnh tuyết trắng."}
                 </Text>
               </View>
 
@@ -1138,7 +1204,9 @@ export default function HomeScreen() {
                 activeOpacity={0.85}
               >
                 <Sparkles size={16} color="#061814" />
-                <Text style={styles.primaryModalBtnText}>Mở Hộp Quà Tân Gia</Text>
+                <Text style={styles.primaryModalBtnText}>
+                  {locale === "en" ? "Open Housewarming Gift" : "Mở Hộp Quà Tân Gia"}
+                </Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
@@ -1343,6 +1411,7 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
+    overflow: "hidden",
   },
   stageViewport: {
     flex: 1,

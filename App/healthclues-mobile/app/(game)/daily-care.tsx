@@ -23,18 +23,20 @@ import {
   CheckCircle2,
 } from "lucide-react-native";
 import { colors, fonts, spacing, radius } from "@/theme";
+import { t, useLocale } from "@/localization";
 import { TopHud } from "@/components/common/TopHud";
 import { HabitIconBox } from "@/components/game/HabitIconBox";
 import { CheckinCelebrationModal } from "@/components/game/CheckinCelebrationModal";
 import { ExpGain } from "@/components/game/ExpGain";
 import { useAuth } from "@/hooks/useAuth";
-import { useWorld } from "@/hooks/useWorld";
+import { useWorld, getLocalizedGoal } from "@/hooks/useWorld";
 import { playSfx } from "@/services/gameAudio";
 
 /**
  * Daily Care RPG Quest Board: 1-tap rune Check Seal per mission + bottom hero confirmation CTA.
  */
 export default function DailyCareScreen() {
+  const { locale, strings } = useLocale();
   const { height: screenHeight } = useWindowDimensions();
   const isCompactViewport = screenHeight < 480;
   const { isAuthenticated } = useAuth();
@@ -196,13 +198,15 @@ export default function DailyCareScreen() {
 
             <View style={[styles.headerStatsCol, isCompactViewport && { gap: 4 }]}>
               <Text style={[styles.boardTitle, isCompactViewport && { fontSize: 15 }]}>
-                Bảng Nhiệm Vụ Hôm Nay
+                {locale === "en" ? "Today's Quest Board" : "Bảng Nhiệm Vụ Hôm Nay"}
               </Text>
 
               <View style={styles.headerBadgesRow}>
                 <View style={styles.streakPill}>
                   <Flame size={12} color="#fb923c" />
-                  <Text style={styles.streakPillText}>Chuỗi 3 Ngày</Text>
+                  <Text style={styles.streakPillText}>
+                    {locale === "en" ? "3-Day Streak" : "Chuỗi 3 Ngày"}
+                  </Text>
                 </View>
 
                 <View style={styles.progressSummaryPill}>
@@ -229,12 +233,15 @@ export default function DailyCareScreen() {
           ) : activeGoals.length === 0 ? (
             <View style={styles.emptyCard}>
               <Text style={styles.emptyText}>
-                Chưa có nhiệm vụ nào được kích hoạt. Hãy mở tab Hành Trình để kích hoạt thói quen!
+                {locale === "en"
+                  ? "No quests currently active. Open the Journey tab to activate habits!"
+                  : "Chưa có nhiệm vụ nào được kích hoạt. Hãy mở tab Hành Trình để kích hoạt thói quen!"}
               </Text>
             </View>
           ) : (
             <View style={styles.questList}>
-              {activeGoals.map((goal) => {
+              {activeGoals.map((rawGoal) => {
+                const goal = getLocalizedGoal(rawGoal, locale);
                 const isDone = statuses[goal.id] === "done";
                 const isExpanded = !!expandedDetails[goal.id];
 
@@ -265,7 +272,7 @@ export default function DailyCareScreen() {
                           <View style={styles.questMetaTop}>
                             <View style={styles.catChip}>
                               <Text style={styles.catChipText}>
-                                {(goal.category || "SỐNG KHỎE").toUpperCase()}
+                                {(goal.category || (locale === "en" ? "WELLNESS" : "SỐNG KHỎE")).toUpperCase()}
                               </Text>
                             </View>
                             <View style={styles.expChip}>
@@ -297,7 +304,7 @@ export default function DailyCareScreen() {
                           </Text>
 
                           <Text style={styles.questTargetText} numberOfLines={1}>
-                            {goal.target || "Đều đặn"} {goal.unit || ""}
+                            {goal.target || (locale === "en" ? "Daily" : "Đều đặn")} {goal.unit || ""}
                           </Text>
                         </TouchableOpacity>
                       </View>
@@ -347,12 +354,16 @@ export default function DailyCareScreen() {
                       <View style={styles.expandedDrawer}>
                         <Text style={styles.expandedDesc}>
                           {goal.description ||
-                            "Thói quen lối sống chuẩn mực giúp cơ thể điều hòa chuyển hóa tự nhiên."}
+                            (locale === "en"
+                              ? "Standard lifestyle habit helping your body naturally regulate metabolism."
+                              : "Thói quen lối sống chuẩn mực giúp cơ thể điều hòa chuyển hóa tự nhiên.")}
                         </Text>
                         {goal.evidence && (
                           <View style={styles.evidenceTag}>
                             <BookOpen size={11} color={colors.emeraldLight} />
-                            <Text style={styles.evidenceText}>Tài liệu: {goal.evidence}</Text>
+                            <Text style={styles.evidenceText}>
+                              {locale === "en" ? "Evidence:" : "Tài liệu:"} {goal.evidence}
+                            </Text>
                           </View>
                         )}
                       </View>
@@ -392,8 +403,8 @@ export default function DailyCareScreen() {
                     )}
                     <Text style={styles.heroConfirmBtnText}>
                       {todayCheckin?.submitted
-                        ? "CẬP NHẬT XÁC NHẬN HÔM NAY"
-                        : `XÁC NHẬN HOÀN THÀNH (+${earnedDailyExp} EXP)`}
+                        ? (locale === "en" ? "UPDATE TODAY'S CHECK-IN" : "CẬP NHẬT XÁC NHẬN HÔM NAY")
+                        : (locale === "en" ? `CONFIRM COMPLETED (+${earnedDailyExp} EXP)` : `XÁC NHẬN HOÀN THÀNH (+${earnedDailyExp} EXP)`)}
                     </Text>
                   </>
                 )}

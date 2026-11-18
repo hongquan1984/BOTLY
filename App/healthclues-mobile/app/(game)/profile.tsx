@@ -27,7 +27,7 @@ import {
   Moon,
 } from "lucide-react-native";
 import { colors, fonts, typography, spacing, radius } from "@/theme";
-import { t, getLocale, setLocale, Locale } from "@/localization";
+import { t, getLocale, setLocale, useLocale, Locale } from "@/localization";
 import { TopHud } from "@/components/common/TopHud";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorld } from "@/hooks/useWorld";
@@ -51,6 +51,7 @@ import {
   unlockAndStartBgm,
   updateAudioSettings,
 } from "@/services/gameAudio";
+import { IntroStoryPlayer } from "@/modules/story/IntroStoryPlayer";
 
 const TIME_PRESETS = ["07:30", "12:30", "20:30", "21:30"] as const;
 const FREQUENCY_OPTIONS: { key: ReminderFrequency; label: string }[] = [
@@ -61,7 +62,7 @@ const FREQUENCY_OPTIONS: { key: ReminderFrequency; label: string }[] = [
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const strings = t();
+  const { locale, strings } = useLocale();
   const { user, logout } = useAuth();
   const { world, xpTotal, currencies } = useWorld(true);
   const [currentLang, setCurrentLang] = useState<Locale>(getLocale());
@@ -78,6 +79,7 @@ export default function ProfileScreen() {
 
   const [audioSettings, setAudioSettings] = useState<GameAudioSettings>(DEFAULT_AUDIO_SETTINGS);
   const [audioModalOpen, setAudioModalOpen] = useState(false);
+  const [showStoryModal, setShowStoryModal] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -231,13 +233,15 @@ export default function ProfileScreen() {
           />
           <View style={styles.profileInfo}>
             <Text style={styles.nickname}>
-              {user?.email?.split("@")[0] || "Nhà Thám Hiểm"}
+              {user?.email?.split("@")[0] || (locale === "en" ? "Adventurer" : "Nhà Thám Hiểm")}
             </Text>
-            <Text style={styles.emailText}>{user?.email || "Chưa có email"}</Text>
+            <Text style={styles.emailText}>{user?.email || (locale === "en" ? "No email linked" : "Chưa có email")}</Text>
             <View style={styles.levelPill}>
               <Sparkles size={12} color={colors.gold} />
               <Text style={styles.levelPillText}>
-                Cấp {Math.max(1, Math.floor(xpTotal / 100) + 1)} · {xpTotal} EXP
+                {locale === "en"
+                  ? `Level ${Math.max(1, Math.floor(xpTotal / 100) + 1)} · ${xpTotal} EXP`
+                  : `Cấp ${Math.max(1, Math.floor(xpTotal / 100) + 1)} · ${xpTotal} EXP`}
               </Text>
             </View>
           </View>
@@ -245,7 +249,9 @@ export default function ProfileScreen() {
 
         {/* Settings Group */}
         <View style={styles.settingsGroup}>
-          <Text style={styles.groupTitle}>Cài Đặt Hệ Thống</Text>
+          <Text style={styles.groupTitle}>
+            {locale === "en" ? "System Settings" : "Cài Đặt Hệ Thống"}
+          </Text>
 
           {/* Language Switcher */}
           <View style={styles.settingItem}>
@@ -300,6 +306,25 @@ export default function ProfileScreen() {
             </Text>
           </View>
 
+          {/* Replay Master Story Onboarding */}
+          <TouchableOpacity
+            style={styles.settingItem}
+            accessibilityRole="button"
+            accessibilityLabel="replay-story-row"
+            onPress={() => setShowStoryModal(true)}
+            activeOpacity={0.75}
+          >
+            <View style={styles.settingLeft}>
+              <Sparkles size={18} color="#34d399" />
+              <Text style={styles.settingLabel}>
+                {strings.profile.replayStory || (locale === "en" ? "Replay opening story" : "Xem lại cốt truyện mở đầu")}
+              </Text>
+            </View>
+            <Text style={{ fontSize: 12, color: colors.emeraldLight, fontWeight: "700" }}>
+              {locale === "en" ? "3 Scenes →" : "3 Cảnh →"}
+            </Text>
+          </TouchableOpacity>
+
           {/* Daily Habit Reminders */}
           <TouchableOpacity
             style={styles.settingItem}
@@ -314,17 +339,19 @@ export default function ProfileScreen() {
                 color={reminderPref.enabled ? colors.emeraldLight : colors.textSecondary}
               />
               <View style={{ flex: 1 }}>
-                <Text style={styles.settingLabel}>Nhắc nhở hằng ngày</Text>
+                <Text style={styles.settingLabel}>
+                  {locale === "en" ? "Daily Reminders" : "Nhắc nhở hằng ngày"}
+                </Text>
                 <Text style={styles.settingHint}>
                   {reminderPref.enabled
                     ? `${
                         reminderPref.frequency === "daily"
-                          ? "Mỗi ngày"
+                          ? (locale === "en" ? "Daily" : "Mỗi ngày")
                           : reminderPref.frequency === "weekdays"
-                            ? "Thứ 2 – Thứ 6"
-                            : "Mỗi tuần (Thứ 2)"
+                            ? (locale === "en" ? "Mon – Fri" : "Thứ 2 – Thứ 6")
+                            : (locale === "en" ? "Weekly (Monday)" : "Mỗi tuần (Thứ 2)")
                       }`
-                    : "Chưa bật · Chạm để cài đặt"}
+                    : (locale === "en" ? "Disabled · Tap to set up" : "Chưa bật · Chạm để cài đặt")}
                 </Text>
               </View>
             </View>
@@ -340,7 +367,9 @@ export default function ProfileScreen() {
                   reminderPref.enabled && styles.reminderBadgeTextActive,
                 ]}
               >
-                {reminderPref.enabled ? `Bật · ${reminderPref.localSendTime}` : "Tắt"}
+                {reminderPref.enabled
+                  ? `${locale === "en" ? "On" : "Bật"} · ${reminderPref.localSendTime}`
+                  : (locale === "en" ? "Off" : "Tắt")}
               </Text>
             </View>
           </TouchableOpacity>
@@ -359,11 +388,25 @@ export default function ProfileScreen() {
                 color={!audioSettings.muted ? colors.goldLight : colors.textSecondary}
               />
               <View style={{ flex: 1 }}>
-                <Text style={styles.settingLabel}>Âm thanh & Nhạc nền game</Text>
+                <Text style={styles.settingLabel}>
+                  {locale === "en" ? "Game Audio & BGM" : "Âm thanh & Nhạc nền game"}
+                </Text>
                 <Text style={styles.settingHint}>
                   {audioSettings.muted
-                    ? "Đang tắt tiếng · Chạm để chọn nhạc"
-                    : `${BGM_TRACK_OPTIONS.find((t) => t.id === audioSettings.bgmTrack)?.label || "Rừng Ngọc Lục Bảo"} · Nút bấm: ${audioSettings.sfxEnabled ? "Bật" : "Tắt"}`}
+                    ? (locale === "en" ? "Muted · Tap to choose music" : "Đang tắt tiếng · Chạm để chọn nhạc")
+                    : (() => {
+                        const trk = BGM_TRACK_OPTIONS.find((t) => t.id === audioSettings.bgmTrack);
+                        const trkLabel = locale === "en"
+                          ? (trk?.id === "forest"
+                              ? "Emerald Forest"
+                              : trk?.id === "alpine"
+                                ? "Alpine Chalet"
+                                : trk?.id === "night"
+                                  ? "Starlight Serenade"
+                                  : "Muted")
+                          : (trk?.label || "Rừng Ngọc Lục Bảo");
+                        return `${trkLabel} · SFX: ${audioSettings.sfxEnabled ? (locale === "en" ? "On" : "Bật") : (locale === "en" ? "Off" : "Tắt")}`;
+                      })()}
                 </Text>
               </View>
             </View>
@@ -379,7 +422,7 @@ export default function ProfileScreen() {
                   !audioSettings.muted && styles.reminderBadgeTextActive,
                 ]}
               >
-                {audioSettings.muted ? "Tắt" : "Bật"}
+                {audioSettings.muted ? (locale === "en" ? "Off" : "Tắt") : (locale === "en" ? "On" : "Bật")}
               </Text>
             </View>
           </TouchableOpacity>
@@ -387,7 +430,9 @@ export default function ProfileScreen() {
 
         {/* Account Actions */}
         <View style={styles.settingsGroup}>
-          <Text style={styles.groupTitle}>Tài Khoản</Text>
+          <Text style={styles.groupTitle}>
+            {locale === "en" ? "Account" : "Tài Khoản"}
+          </Text>
 
           {/* Logout Button */}
           <TouchableOpacity
@@ -413,8 +458,9 @@ export default function ProfileScreen() {
         <View style={styles.legalNotice}>
           <ShieldAlert size={14} color={colors.textMuted} />
           <Text style={styles.legalText}>
-            HealthClues là ứng dụng hỗ trợ lối sống lành mạnh, không đưa ra chẩn
-            đoán y khoa. Mọi tiến trình được bảo vệ an toàn và riêng tư.
+            {locale === "en"
+              ? "HealthClues supports a healthy lifestyle and does not provide medical diagnoses. All progress is securely protected."
+              : "HealthClues là ứng dụng hỗ trợ lối sống lành mạnh, không đưa ra chẩn đoán y khoa. Mọi tiến trình được bảo vệ an toàn và riêng tư."}
           </Text>
         </View>
 
@@ -435,12 +481,12 @@ export default function ProfileScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard} accessibilityLabel="profile-confirm-modal">
             <Text style={styles.modalTitle}>
-              {confirmModal === "delete" ? strings.auth.deleteAccount : "Đăng xuất tài khoản"}
+              {confirmModal === "delete" ? strings.auth.deleteAccount : (locale === "en" ? "Sign Out" : "Đăng xuất tài khoản")}
             </Text>
             <Text style={styles.modalDesc}>
               {confirmModal === "delete"
                 ? strings.auth.deleteAccountConfirm
-                : "Bạn có chắc chắn muốn đăng xuất khỏi phiên hiện tại?"}
+                : (locale === "en" ? "Are you sure you want to sign out of the current session?" : "Bạn có chắc chắn muốn đăng xuất khỏi phiên hiện tại?")}
             </Text>
             <TouchableOpacity
               style={[styles.modalConfirmBtn, confirmModal === "delete" && { backgroundColor: colors.rose }]}
@@ -483,10 +529,14 @@ export default function ProfileScreen() {
             >
               <View style={styles.reminderHeaderRow}>
                 <Bell size={20} color={colors.gold} />
-                <Text style={styles.modalTitle}>Cài Đặt Nhắc Nhở</Text>
+                <Text style={styles.modalTitle}>
+                  {locale === "en" ? "Reminder Settings" : "Cài Đặt Nhắc Nhở"}
+                </Text>
               </View>
               <Text style={styles.modalDesc}>
-                Lumi chỉ nhắc nhẹ giờ điểm danh lối sống, hoàn toàn không thay thế tư vấn y khoa.
+                {locale === "en"
+                  ? "Lumi gently reminds you of your daily wellness check-in, never replacing medical advice."
+                  : "Lumi chỉ nhắc nhẹ giờ điểm danh lối sống, hoàn toàn không thay thế tư vấn y khoa."}
               </Text>
 
               {/* Opt-in Toggle */}
@@ -502,10 +552,14 @@ export default function ProfileScreen() {
               >
                 <View style={{ flex: 1 }}>
                   <Text style={styles.reminderToggleTitle}>
-                    {draftEnabled ? "Đang bật nhắc nhở" : "Đang tắt nhắc nhở"}
+                    {draftEnabled
+                      ? (locale === "en" ? "Reminders Enabled" : "Đang bật nhắc nhở")
+                      : (locale === "en" ? "Reminders Disabled" : "Đang tắt nhắc nhở")}
                   </Text>
                   <Text style={styles.reminderToggleSub}>
-                    Chạm để {draftEnabled ? "tạm tắt" : "bật nhắc nhở mỗi ngày"}
+                    {locale === "en"
+                      ? (draftEnabled ? "Tap to pause" : "Tap to turn on daily reminders")
+                      : `Chạm để ${draftEnabled ? "tạm tắt" : "bật nhắc nhở mỗi ngày"}`}
                   </Text>
                 </View>
                 <View
@@ -520,7 +574,7 @@ export default function ProfileScreen() {
                       draftEnabled && styles.reminderSwitchTextActive,
                     ]}
                   >
-                    {draftEnabled ? "BẬT" : "TẮT"}
+                    {draftEnabled ? (locale === "en" ? "ON" : "BẬT") : (locale === "en" ? "OFF" : "TẮT")}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -529,13 +583,17 @@ export default function ProfileScreen() {
               {draftEnabled && (
                 <View style={styles.consentBanner}>
                   <Text style={styles.consentBannerText}>
-                    Xác nhận đồng ý nhận thông báo nhắc thói quen lối sống (có thể tắt bất cứ lúc nào).
+                    {locale === "en"
+                      ? "Confirm consent to receive lifestyle habit reminders (can be disabled anytime)."
+                      : "Xác nhận đồng ý nhận thông báo nhắc thói quen lối sống (có thể tắt bất cứ lúc nào)."}
                   </Text>
                 </View>
               )}
 
               {/* Time selector */}
-              <Text style={styles.reminderSectionLabel}>Khung Giờ Nhắc Nhở</Text>
+              <Text style={styles.reminderSectionLabel}>
+                {locale === "en" ? "Reminder Time" : "Khung Giờ Nhắc Nhở"}
+              </Text>
               <View style={styles.chipRow}>
                 {TIME_PRESETS.map((preset) => {
                   const active = draftTime === preset;
@@ -588,9 +646,15 @@ export default function ProfileScreen() {
               </View>
 
               {/* Frequency selector */}
-              <Text style={styles.reminderSectionLabel}>Tần Suất</Text>
+              <Text style={styles.reminderSectionLabel}>
+                {locale === "en" ? "Frequency" : "Tần Suất"}
+              </Text>
               <View style={styles.chipRow}>
-                {FREQUENCY_OPTIONS.map((opt) => {
+                {[
+                  { key: "daily" as ReminderFrequency, label: locale === "en" ? "Daily" : "Hằng ngày" },
+                  { key: "weekdays" as ReminderFrequency, label: locale === "en" ? "Mon – Fri" : "Thứ 2–6" },
+                  { key: "weekly" as ReminderFrequency, label: locale === "en" ? "Weekly" : "Hằng tuần" },
+                ].map((opt) => {
                   const active = draftFreq === opt.key;
                   return (
                     <TouchableOpacity
@@ -622,7 +686,9 @@ export default function ProfileScreen() {
                 activeOpacity={0.8}
               >
                 <Bell size={15} color={colors.gold} />
-                <Text style={styles.testReminderBtnText}>Gửi thông báo thử</Text>
+                <Text style={styles.testReminderBtnText}>
+                  {locale === "en" ? "Send Test Reminder" : "Gửi thông báo thử"}
+                </Text>
               </TouchableOpacity>
 
               {reminderPreviewFeedback && (
@@ -644,7 +710,9 @@ export default function ProfileScreen() {
                 onPress={handleSaveReminder}
               >
                 <Text style={styles.modalConfirmBtnText}>
-                  {reminderSaving ? "Đang lưu..." : "Lưu Lịch Nhắc Nhở"}
+                  {reminderSaving
+                    ? (locale === "en" ? "Saving..." : "Đang lưu...")
+                    : (locale === "en" ? "Save Reminder Settings" : "Lưu Lịch Nhắc Nhở")}
                 </Text>
               </TouchableOpacity>
 
@@ -654,7 +722,9 @@ export default function ProfileScreen() {
                 accessibilityLabel="close-reminder-modal-btn"
                 onPress={() => setReminderModalOpen(false)}
               >
-                <Text style={styles.modalCancelBtnText}>Đóng</Text>
+                <Text style={styles.modalCancelBtnText}>
+                  {locale === "en" ? "Close" : "Đóng"}
+                </Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
@@ -680,10 +750,14 @@ export default function ProfileScreen() {
             >
               <View style={styles.reminderHeaderRow}>
                 <Volume2 size={20} color={colors.gold} />
-                <Text style={styles.modalTitle}>Âm Thanh & Nhạc Nền RPG</Text>
+                <Text style={styles.modalTitle}>
+                  {locale === "en" ? "Game Audio & Music" : "Âm Thanh & Nhạc Nền RPG"}
+                </Text>
               </View>
               <Text style={styles.modalDesc}>
-                Tùy chỉnh nhạc nền thư giãn và hiệu ứng âm thanh cho từng thao tác chạm nút trong game.
+                {locale === "en"
+                  ? "Customize relaxing background music and button tap sound effects."
+                  : "Tùy chỉnh nhạc nền thư giãn và hiệu ứng âm thanh cho từng thao tác chạm nút trong game."}
               </Text>
 
               <TouchableOpacity
@@ -697,9 +771,15 @@ export default function ProfileScreen() {
                 activeOpacity={0.8}
               >
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.reminderToggleTitle}>Hiệu ứng nút bấm & Nhiệm vụ (SFX)</Text>
+                  <Text style={styles.reminderToggleTitle}>
+                    {locale === "en"
+                      ? "Button Taps & Quests (SFX)"
+                      : "Hiệu ứng nút bấm & Nhiệm vụ (SFX)"}
+                  </Text>
                   <Text style={styles.reminderToggleSub}>
-                    Phát tiếng lách tách mộc & chuông nhận EXP
+                    {locale === "en"
+                      ? "Play crisp wooden taps & reward chime sounds"
+                      : "Phát tiếng lách tách mộc & chuông nhận EXP"}
                   </Text>
                 </View>
                 <View
@@ -714,16 +794,41 @@ export default function ProfileScreen() {
                       audioSettings.sfxEnabled && !audioSettings.muted && styles.reminderSwitchTextActive,
                     ]}
                   >
-                    {audioSettings.sfxEnabled && !audioSettings.muted ? "BẬT" : "TẮT"}
+                    {audioSettings.sfxEnabled && !audioSettings.muted
+                      ? (locale === "en" ? "ON" : "BẬT")
+                      : (locale === "en" ? "OFF" : "TẮT")}
                   </Text>
                 </View>
               </TouchableOpacity>
 
-              <Text style={styles.reminderSectionLabel}>Chọn Nhạc Nền Không Gian</Text>
+              <Text style={styles.reminderSectionLabel}>
+                {locale === "en" ? "Select Ambient Music" : "Chọn Nhạc Nền Không Gian"}
+              </Text>
               {BGM_TRACK_OPTIONS.map((track) => {
                 const selected = !audioSettings.muted
                   ? audioSettings.bgmTrack === track.id
                   : track.id === "off";
+                const trackLabel =
+                  locale === "en"
+                    ? (track.id === "forest"
+                        ? "Emerald Forest"
+                        : track.id === "alpine"
+                          ? "Alpine Chalet"
+                          : track.id === "night"
+                            ? "Starlight Serenade"
+                            : "Mute Music")
+                    : track.label;
+                const trackDesc =
+                  locale === "en"
+                    ? (track.id === "forest"
+                        ? "Gentle acoustic guitar and morning wind chimes"
+                        : track.id === "alpine"
+                          ? "Warm fireplace crackles and cozy wooden tones"
+                          : track.id === "night"
+                            ? "Deep restful piano chords for evening unwind"
+                            : "Silence all background melodies")
+                    : track.desc;
+
                 return (
                   <TouchableOpacity
                     key={track.id}
@@ -751,9 +856,9 @@ export default function ProfileScreen() {
                           selected && { color: colors.emeraldLight },
                         ]}
                       >
-                        {track.label}
+                        {trackLabel}
                       </Text>
-                      <Text style={styles.audioTrackDesc}>{track.desc}</Text>
+                      <Text style={styles.audioTrackDesc}>{trackDesc}</Text>
                     </View>
                     <View
                       style={[
@@ -767,7 +872,9 @@ export default function ProfileScreen() {
                           selected && styles.reminderSwitchTextActive,
                         ]}
                       >
-                        {selected ? "ĐANG CHỌN" : "CHỌN"}
+                        {selected
+                          ? (locale === "en" ? "ACTIVE" : "ĐANG CHỌN")
+                          : (locale === "en" ? "CHOOSE" : "CHỌN")}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -782,7 +889,9 @@ export default function ProfileScreen() {
                 activeOpacity={0.8}
               >
                 <Volume2 size={15} color={colors.gold} />
-                <Text style={styles.testReminderBtnText}>Nghe thử hiệu ứng nút & EXP</Text>
+                <Text style={styles.testReminderBtnText}>
+                  {locale === "en" ? "Preview button & EXP SFX" : "Nghe thử hiệu ứng nút & EXP"}
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -796,6 +905,20 @@ export default function ProfileScreen() {
             </ScrollView>
           </View>
         </View>
+      </Modal>
+
+      {/* Master Opening Story Replay Modal */}
+      <Modal
+        visible={showStoryModal}
+        animationType="fade"
+        transparent={false}
+        onRequestClose={() => setShowStoryModal(false)}
+      >
+        <IntroStoryPlayer
+          locale={currentLang}
+          onFinish={() => setShowStoryModal(false)}
+          onSkip={() => setShowStoryModal(false)}
+        />
       </Modal>
     </SafeAreaView>
   );

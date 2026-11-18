@@ -1,9 +1,77 @@
+## 2026-11-17 — Cycle 135: 3 Ngôi Nhà Thực Trong Làng 3D & Quy Tắc Lưu Trữ Túi Đồ Động (Pick-to-Bag Rules)
+
+- **Quy Tắc Định Danh Ngôi Nhà Kiến Trúc Chức Năng (`cozyVillageLayoutLoader.ts`, `landmarkCatalog.ts`):**
+  - Chỉ các công trình kiến trúc nhà ở thực thụ mới được gán làm Landmark chức năng sức khỏe.
+  - Tuyệt đối không gán chức năng thư viện/sức khỏe vào đạo cụ cảnh quan (guồng nước `bld_watermill`, giếng nước, đài phun, cây cối).
+  - 3 ngôi nhà chính thức:
+    * `bld_potion_shop` $\rightarrow$ Nhà Thảo Mộc (Flora).
+    * `bld_bookshop` $\rightarrow$ Nhà Âm Thanh (Lyra).
+    * `bld_great_hall` $\rightarrow$ Thiền Đường - Hơi Thở (Aura).
+- **Quy Tắc Lưu Trữ Túi Đồ Động (Aligned with HC-BR44 & HC-BR59):**
+  - Túi Đồ của người chơi mới mặc định hoàn toàn trống (`[]`). Không tự động nhét sẵn toàn bộ danh mục vào túi.
+  - Thư viện trong nhà là nơi tham khảo toàn diện; vật phẩm chỉ được thêm vào Túi Đồ khi người chơi nhấn chủ động nút `[ + Lưu Vào Túi Đồ ]` hoặc `[ Cất vào Túi ]`.
+  - Mỗi lần lưu vật phẩm mới vào túi thưởng cố định +10 EXP (thưởng khám phá học tập một lần theo HC-BR52).
+  - Túi Đồ hỗ trợ người chơi loại bỏ vật phẩm đã lưu bằng nút `[ ✕ Bỏ Khỏi Túi Đồ ]`, cập nhật tức thì trạng thái giao diện và bộ nhớ lưu trữ.
+
+---
+
+## 2026-11-16 — Cycle 114: World 3D Cinematic Overview, Floating Lumi Mascot Tour & Pulsing Building Beacons Rules
+
+- **Cinematic Overview Tour Rule (`VillageCinematicTourModal.tsx`, `world.tsx`):**
+  - First-time entry into the 3D World must display the 7-step village tour in Overview camera mode (`overview`), introducing the functional houses before revealing full gameplay HUD.
+  - The top toolbar (`floatingToolbarOverlay`) must remain hidden until the tour is completed or explicitly skipped, ensuring the 3D village scene remains completely unobstructed.
+  - When the tour completes or is skipped, the camera must smoothly transition to close view (`close`) behind the player character, and the top toolbar must unveil with `[ 3D Làng Nổi ]`, `[ Toàn Cảnh ]`, `[ 🔍 Giải Mã ]`, `[ 8 Vùng ]`, and `[ ✨ Tour ]`.
+- **Dynamic Pulsing Landmark Beacon Rule (`SmartLandmarkOverlay.tsx`, `cozyVillageLayoutLoader.ts`):**
+  - Highlighting a landmark during tour steps triggers both high-distance badge name visibility and continuous CSS pulsing beacon animations (`pulseGlowBeacon` and `pulseBeaconRing`).
+  - Active highlights must safely de-assert (`null`) when the tour ends or skips.
+- **Narrative Terminology & Button Naming Rule:**
+  - The former "Phá Án" action is officially renamed to **"Giải Mã"** across all user-facing UI and accessibility labels (`"Văn phòng giải mã hồ sơ bí ẩn"`).
+  - Detective case solving is strictly framed as educating and investigating lifestyle clues from the human world to help people regain health balance.
+- **Non-Blocking Spotlight Tour Sequencing Rule (`(game)\_layout.tsx`):**
+  - The legacy interactive spotlight tour (`InteractiveTourCard`) must never overlay simultaneously while the cinematic village tour is active (`cinematicTourDone === true` constraint).
+
+---
+
+## 2026-11-15 — Cycle 113: Video Onboarding Responsive Layout & HealthClues-Only Default Rules
+
+- **Zero-Overlap Vertical Flex Rule for Story Intro (`IntroStoryPlayer.tsx`):**
+  - In portrait mode, the video player and narrative dialogue card must inhabit distinct vertical layout flex containers. The dialogue card must NEVER float over or obscure the video area.
+  - Video dimensions must adhere strictly to `width: "100%"` and `aspectRatio: 16 / 9`, preventing vertical squishing or letterboxing artifacts while allowing fluid height scaling across different screen sizes.
+  - In landscape/desktop mode, the video expands to full-screen cinematic proportions, and the dialogue card transitions to an anchored bottom overlay with frosted-glass background.
+- **Default HealthClues Realm Invariant (`quiz.tsx`, `world.tsx`):**
+  - All new player onboarding flows default directly to the canonical HealthClues Realm. Sleep Valley (`sleep-valley`) is removed from new onboarding flow; players are not prompted with a region choice step during onboarding.
+  - The Onboarding Step Trail is strictly 2 steps: `1. Khám phá` → `2. Kế hoạch`.
+  - In the World view, the active region defaults to `"healthclues-realm"` and the `[ 🌙 Thung Lũng ]` region toggle button is removed from the primary toolbar.
+
+---
+
+## 2026-11-15 — Cycle 111: Master Narrative & 3-Video Onboarding Business Rules
+
+- **Strict Player-Driven Progression Invariant (`IntroStoryPlayer.tsx`):**
+  - The 3-scene narrative intro NEVER auto-advances. The player must explicitly tap "Tiếp tục →" to proceed to the next scene.
+  - Video and dialogue must remain strictly separated: The visual viewport handles video playback / poster art, while the bottom narrative card handles dialogue display and character attribution.
+- **Dual-Tier Asset Fallback Invariant:**
+  - If MP4 video files (`assets/videos/story_intro_*.mp4`) are missing, loading, or fail to play, the player automatically falls back to static high-resolution Ghibli-style story poster art. Under no circumstance should a blank screen, missing texture icon, or broken video placeholder be displayed to the user.
+- **Story State Persistence & Skip Behavior (`storyState.ts`):**
+  - Completing Scene 3 or tapping "Bỏ qua câu chuyện" writes `hasSeenIntro: true` to AsyncStorage (`healthclues_story_state_v1`). Returning users or players resuming sessions bypass the story intro automatically.
+  - Replaying the story from Profile or the Mascot action sheet does NOT reset player progress, level, goals, or inventory.
+- **Questionnaire & Auth Integrity Preservation:**
+  - Narrative framing by Lumi across `quiz.tsx` (`quest_choice`, `discovery`, `plan`, `mascot_ready`) must not alter question schemas, option IDs, risk factor matching, AI advisor payloads, Supabase authentication, or local plan storage.
+
+---
+
 ## 2026-11-12 — Cycle 87: Condition Routing Parity & Audio Persistence Contract
 
 - **Deterministic & Offline Concern Matching (`wellness-advisor/route.ts`, `onboarding.ts`):** `getDeterministicWellnessGoals` and `buildLocalPersonalizedGoals` match `gout`, `weight`, `glucose`, `blood-pressure`, `digestion`, `migraine`, `stress`, and `sleep` signals from both `topic` and `adaptiveDiscovery` fields (`focusId`, `focusLabel`, `concernDetail`, and factor answers) and prioritize relevant goals when specific risk factors (`a-red-meat`, `a-seafood`, `a-alcohol`, `a-sweet-drinks`, `a-activity`) are selected.
 - **Audio Preference Sync (`src/services/gameAudio.ts`):** Audio preferences (`bgmTrack`, `sfxEnabled`, `muted`) persist under `healthclues-audio-settings` and synchronize across `TopHud`, Onboarding Welcome, and `profile.tsx` via `AUDIO_STATE_EVENT`.
 
 ---
+
+## 2026-11-14 — Cycle 94: Mobile companion onboarding presentation rule
+
+- Mầm Nhỏ is a presentation-only guide for the mobile HealthClues Realm onboarding sequence. Its optional tap reaction must not create, change, infer, persist, transmit or disclose a health answer, Plan item, profile field, progression, region selection, reward, account state or consent.
+- The new presentation preserves the approved mobile contract: one explicit selected focus and an optional typed issue after region selection, explicit confirmation, and the existing `completeMobileOnboarding` persistence boundary. It does not replace Lumi as the HealthClues Realm in-World companion.
+- Native haptic feedback is optional. Web preview haptics must safely no-op; an unavailable browser haptics API must never block onboarding or raise an unhandled runtime error.
 
 ## 2026-11-12 — Cycle 86: Mobile Onboarding Request Contract, Advisor Fallback & Local Plan Precedence
 

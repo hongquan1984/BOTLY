@@ -101,9 +101,10 @@ export const TOTAL_EXP_KEY = "healthclues-total-exp";
  * Matches Web HealthCluesGoalFirstDiscovery concerns 1:1.
  */
 export const HEALTH_CONCERNS: ConcernOption[] = [
+  { id: "sleep", en: "Sleep & insomnia", vi: "Mất ngủ & Khó ngủ", group: "sleep" },
   { id: "gout", en: "Gout / high uric acid", vi: "Gút / axit uric cao", group: "health" },
   { id: "weight", en: "Weight management", vi: "Giảm cân / quản lý cân nặng", group: "health" },
-  { id: "glucose", en: "Blood glucose", vi: "Đường huyết", group: "health" },
+  { id: "glucose", en: "Blood glucose / diabetes", vi: "Đường huyết / Tiểu đường", group: "health" },
   { id: "blood-pressure", en: "Blood pressure", vi: "Huyết áp", group: "health" },
   { id: "migraine", en: "Headache / migraine", vi: "Đau đầu / migraine", group: "health" },
   { id: "digestion", en: "Digestion", vi: "Tiêu hóa", group: "health" },
@@ -518,7 +519,96 @@ export function buildLocalPersonalizedGoals(profile: MobileHealthProfile): AiSug
     ];
   }
 
-  if (/đường huyết|tiểu đường|glucose|cân nặng|weight|béo|thừa cân/.test(combined)) {
+  if (/tiểu đường|đái tháo đường|đường huyết|glucose|glycemic|hạ đường|tiểu đuờng/.test(combined)) {
+    return [
+      {
+        goalId: "local-diabetes-water",
+        category: "hydration",
+        iconKey: "water",
+        title: {
+          en: "Drink 2L Warm Water Throughout the Day",
+          vi: "Uống 2L nước ấm rải rác trong ngày",
+        },
+        relevanceReason: {
+          en: `Customized for "${focusLabel}": steady warm water supports kidney filtration to naturally excrete excess circulating glucose and prevent blood hyperosmolality.`,
+          vi: `Thiết kế riêng cho "${focusLabel}": uống nước lọc ấm đều đặn hỗ trợ thận lọc và đào thải lượng glucose dư thừa qua nước tiểu một cách tự nhiên, giảm độ cô đặc của máu.`,
+        },
+        optionA: {
+          title: { en: "1 glass on waking & before meals", vi: "1 cốc ấm sau ngủ dậy & trước bữa ăn" },
+          action: { en: "Drink 1 glass of warm water after waking and 15 mins before each meal", vi: "Uống 1 cốc nước ấm ngay sau khi thức dậy và 15 phút trước mỗi bữa ăn chính" },
+        },
+        optionB: {
+          title: { en: "6-8 warm water checkpoints (2L)", vi: "Chia đều 6-8 cốc nước ấm (2L/ngày)" },
+          action: { en: "Spread 6-8 glasses of warm water across morning, noon, afternoon and early evening", vi: "Uống đều 6-8 cốc nước ấm rải rác vào sáng, giữa buổi, trưa, xế chiều và đầu tối" },
+        },
+      },
+      {
+        goalId: "local-diabetes-sugar",
+        category: "nutrition",
+        iconKey: "nutrition",
+        title: {
+          en: "Cut Added Sugars, Soda & Sweets",
+          vi: "Cắt giảm đường đơn, nước ngọt có ga & bánh kẹo",
+        },
+        relevanceReason: {
+          en: "Simple sugars absorb rapidly, triggering sharp post-meal glycemic spikes that overburden pancreatic beta cells.",
+          vi: "Đường tinh luyện hấp thu cực nhanh vào máu gây tăng vọt đường huyết sau ăn (spike) và làm quá tải tế bào beta tuyến tụy.",
+        },
+        optionA: {
+          title: { en: "Zero soft drinks or sweet teas", vi: "Không nước ngọt có ga & trà sữa" },
+          action: { en: "Avoid soda, bubble tea, and added sugar in coffee/tea today", vi: "Cắt hoàn toàn nước ngọt có ga, trà sữa và không thêm đường vào cà phê/trà" },
+        },
+        optionB: {
+          title: { en: "Swap sweets for raw nuts/low-GI fruits", vi: "Thay đồ ngọt bằng hạt & quả ít ngọt" },
+          action: { en: "Replace sweet snacks with raw walnuts, almonds, or low-sugar guava", vi: "Thay đồ ăn vặt ngọt bằng các loại hạt nguyên vị (hạnh nhân, óc chó) hoặc quả ít ngọt (ổi, thanh long ruột trắng)" },
+        },
+      },
+      {
+        goalId: "local-diabetes-plate-rule",
+        category: "nutrition",
+        iconKey: "nutrition",
+        title: {
+          en: "Plate Rule: Eat Greens First, Reduce Fast Carbs",
+          vi: "Quy tắc đĩa ăn: Ăn rau xanh trước, giảm tinh bột nhanh",
+        },
+        relevanceReason: {
+          en: "Soluble dietary fiber coats the intestinal lining, significantly slowing glucose absorption; reducing white rice lowers glycemic load.",
+          vi: "Chất xơ hòa tan từ rau xanh tạo lớp màng làm chậm quá trình phân giải carbohydrate; giảm 1/3 cơm trắng giúp làm phẳng đỉnh đường huyết.",
+        },
+        optionA: {
+          title: { en: "Eat greens 5-10m before rice", vi: "Ăn rau xanh trước cơm 5-10 phút" },
+          action: { en: "Eat boiled greens or soup 5-10 mins before eating starches and main protein", vi: "Ăn hết phần rau luộc hoặc canh rau trước khi ăn cơm và thức ăn chính 5-10 phút" },
+        },
+        optionB: {
+          title: { en: "Trim 1/3 white rice & add greens", vi: "Giảm 1/3 cơm trắng, tăng rau & ngũ cốc" },
+          action: { en: "Cut white rice portion by 1/3 at lunch and dinner, swapping in brown rice or greens", vi: "Giảm 1/3 lượng cơm trắng mỗi bữa, ưu tiên thay thế bằng gạo lứt, yến mạch hoặc rau củ" },
+        },
+      },
+      {
+        goalId: "local-diabetes-walk",
+        category: "movement",
+        iconKey: "movement",
+        title: {
+          en: "Post-Meal 15-20 Min Light Walk",
+          vi: "Đi bộ nhẹ nhàng 15-20 phút sau bữa ăn chính",
+        },
+        relevanceReason: {
+          en: "Light post-meal muscle contraction activates non-insulin-dependent GLUT4 translocation, drawing glucose out of circulation.",
+          vi: "Vận động cơ bắp nhẹ sau bữa ăn kích hoạt kênh GLUT4 vận chuyển glucose trực tiếp vào tế bào mà không phụ thuộc quá nhiều vào insulin.",
+        },
+        optionA: {
+          title: { en: "15 mins stroll after lunch", vi: "Đi bộ nhẹ 15 phút sau bữa trưa" },
+          action: { en: "Stroll calmly for 15 mins after lunch without lying down immediately", vi: "Đi bộ thư giãn hoặc đứng đi lại nhẹ nhàng 15 phút sau bữa trưa (không nằm ngay)" },
+        },
+        optionB: {
+          title: { en: "15-20 mins walk after 2 meals", vi: "Đi bộ 15-20 phút sau 2 bữa chính" },
+          action: { en: "Walk comfortably for 15-20 mins after both lunch and dinner", vi: "Tản bộ nhẹ nhàng 15-20 phút sau cả bữa trưa và tối để cơ thể tiêu hao bớt năng lượng dư" },
+        },
+      },
+    ];
+  }
+
+  if (/cân nặng|weight|béo|thừa cân/.test(combined)) {
     return [
       {
         goalId: "local-metabolic-walk",

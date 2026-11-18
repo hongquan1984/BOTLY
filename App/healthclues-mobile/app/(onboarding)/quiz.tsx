@@ -14,7 +14,15 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
-import * as Haptics from "expo-haptics";
+import * as ExpoHaptics from "expo-haptics";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 import {
   Sparkles,
   ArrowRight,
@@ -56,18 +64,29 @@ import {
   getFactorsForConcerns,
   requestWellnessAdvisor,
 } from "@/services/onboarding";
+import { playDolphinChirp, playDolphinGiggle } from "@/modules/audio/dolphinAudio";
+import { MascotSprout } from "@/modules/mascot/MascotSprout";
+import { IntroStoryPlayer } from "@/modules/story/IntroStoryPlayer";
+import { getStoryState } from "@/modules/story/storyState";
+import { t, setLocale as setGlobalLocale } from "@/localization";
+
+// expo-haptics intentionally has no web implementation; keep interaction feedback native-only
+// without producing browser runtime errors during the web/mobile preview.
+const Haptics =
+  Platform.OS === "web"
+    ? { ...ExpoHaptics, impactAsync: async () => undefined, notificationAsync: async () => undefined }
+    : ExpoHaptics;
 
 function OnboardingStepTrail({
   activeStep,
   locale,
 }: {
-  activeStep: 1 | 2 | 3;
+  activeStep: 1 | 2;
   locale: "vi" | "en";
 }) {
   const steps = [
-    { num: 1, label: locale === "vi" ? "1. Vùng" : "1. Realm" },
-    { num: 2, label: locale === "vi" ? "2. Khám phá" : "2. Discover" },
-    { num: 3, label: locale === "vi" ? "3. Kế hoạch" : "3. Plan" },
+    { num: 1, label: locale === "vi" ? "1. Khám phá" : "1. Discover" },
+    { num: 2, label: locale === "vi" ? "2. Kế hoạch" : "2. Plan" },
   ] as const;
 
   return (
@@ -104,7 +123,103 @@ function OnboardingStepTrail({
   );
 }
 
-type QuizStep = "welcome" | "quest_choice" | "discovery" | "plan";
+type QuizStep = "welcome" | "story_intro" | "quest_choice" | "mascot_welcome" | "discovery" | "plan" | "mascot_ready";
+type MascotMood = "idle" | "talk" | "sad" | "wave" | "laugh" | "sulk";
+
+const MASCOT_SPRITES = {
+  idle: require("../../assets/game/characters/healthclues-sprout-rabbit-idle.png"),
+  talk: require("../../assets/game/characters/healthclues-sprout-rabbit-talk.png"),
+  sad: require("../../assets/game/characters/healthclues-sprout-rabbit-sad.png"),
+  wave: require("../../assets/game/characters/healthclues-sprout-rabbit-wave.png"),
+  laugh: require("../../assets/game/characters/healthclues-sprout-rabbit-laugh.png"),
+  sulk: require("../../assets/game/characters/healthclues-sprout-rabbit-sulk.png"),
+} as const;
+
+const QUICK_DISCOVERY_CHOICES = [
+  { id: "glucose", labelVi: "Đường huyết / Tiểu đường", labelEn: "Blood Sugar / Diabetes", icon: "🩺" },
+  { id: "sleep", labelVi: "Mất ngủ & Khó ngủ", labelEn: "Sleep & Insomnia", icon: "☾" },
+  { id: "weight", labelVi: "Giảm cân & Vóc dáng", labelEn: "Weight & Body Shape", icon: "⚖" },
+  { id: "gout", labelVi: "Gút / Axit Uric", labelEn: "Gout / Uric Acid", icon: "✦" },
+  { id: "stress", labelVi: "Căng thẳng & Stress", labelEn: "Stress & Mental Wellbeing", icon: "♡" },
+  { id: "general", labelVi: "Sức khỏe tổng thể", labelEn: "Holistic Wellness", icon: "🌿" },
+] as const;
+
+function HealthCluesMascot({
+  mood,
+  onPress,
+  accessibilityLabel,
+  compact = false,
+}: {
+  mood: MascotMood;
+  onPress?: () => void;
+  accessibilityLabel: string;
+  compact?: boolean;
+}) {
+  const floatY = useSharedValue(0);
+  const tapScale = useSharedValue(0);
+  const breatheScale = useSharedValue(0);
+  const tilt = useSharedValue(0);
+
+  useEffect(() => {
+    floatY.value = withRepeat(
+      withSequence(
+        withTiming(-7, { duration: 1300, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 1300, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      true
+    );
+  }, [floatY]);
+
+  useEffect(() => {
+    breatheScale.value = withRepeat(
+      withSequence(withTiming(0.035, { duration: 950, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 950, easing: Easing.inOut(Easing.ease) })),
+      -1,
+      true
+    );
+  }, [breatheScale]);
+
+  useEffect(() => {
+    tilt.value = withTiming(mood === "sad" ? -2 : mood === "sulk" ? -4 : mood === "laugh" ? 3 : mood === "wave" ? 1.4 : 0, {
+      duration: 220,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [mood, tilt]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: floatY.value },
+      { scale: 1 + tapScale.value + breatheScale.value },
+      { rotate: `${tilt.value}deg` },
+      { perspective: 700 },
+      { rotateY: `${tilt.value * 2.4}deg` },
+    ],
+  }));
+
+  const handlePress = () => {
+    tapScale.value = withSequence(
+      withTiming(0.055, { duration: 85 }),
+      withTiming(-0.025, { duration: 110 }),
+      withTiming(0, { duration: 180 })
+    );
+    onPress?.();
+  };
+
+  return (
+    <TouchableOpacity
+      activeOpacity={onPress ? 0.94 : 1}
+      onPress={onPress ? handlePress : undefined}
+      disabled={!onPress}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={accessibilityLabel}
+      style={[styles.mascotTouchTarget, compact && styles.mascotTouchTargetCompact]}
+    >
+      <Animated.View style={[styles.mascotMotionWrap, compact && styles.mascotMotionWrapCompact, animatedStyle]}>
+        <Image source={MASCOT_SPRITES[mood]} style={styles.mascotSprite} contentFit="contain" />
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
 
 export default function OnboardingQuizScreen() {
   const router = useRouter();
@@ -112,6 +227,10 @@ export default function OnboardingQuizScreen() {
   const [selectedQuest, setSelectedQuest] = useState<string>("healthclues-realm");
   const [locale, setLocale] = useState<"vi" | "en">("vi");
   const [lockNotice, setLockNotice] = useState<string | null>(null);
+  const [mascotMood, setMascotMood] = useState<MascotMood>("talk");
+  const [mascotHint, setMascotHint] = useState<string | null>(null);
+  const mascotResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mascotTapCount = useRef(0);
 
   // Two-step Adaptive Health Discovery (1:1 parity with Web HealthCluesGoalFirstDiscovery)
   const [discoveryScreen, setDiscoveryScreen] = useState<1 | 2>(1);
@@ -161,6 +280,10 @@ export default function OnboardingQuizScreen() {
     };
   }, []);
 
+  useEffect(() => () => {
+    if (mascotResetTimer.current) clearTimeout(mascotResetTimer.current);
+  }, []);
+
   const handleToggleWelcomeAudio = async () => {
     const nextMuted = !audioSettings.muted;
     const updated = await updateAudioSettings({ muted: nextMuted });
@@ -185,6 +308,32 @@ export default function OnboardingQuizScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {}
     void playSfx("seal");
+  };
+
+  const handleMascotTap = () => {
+    triggerHaptic();
+    if (mascotResetTimer.current) clearTimeout(mascotResetTimer.current);
+    mascotTapCount.current += 1;
+    const isSulking = mascotTapCount.current % 3 === 0;
+    const isLaughing = mascotTapCount.current % 3 === 1;
+    setMascotMood(isSulking ? "sulk" : isLaughing ? "laugh" : "sad");
+    if (isLaughing) {
+      playDolphinGiggle(0.38);
+    } else {
+      playDolphinChirp(0.35);
+    }
+    void playSfx(isSulking ? "mascotGrumble" : isLaughing ? "mascotGiggle" : "locked");
+    setMascotHint(
+      isSulking
+        ? locale === "vi" ? "Hừm! Chạm nữa là mình hờn đó nha…" : "Hmph! One more tap and I might sulk…"
+        : isLaughing
+          ? locale === "vi" ? "Hí hí! Cù quá, nhưng mình thích được chào đón!" : "Hee hee! That tickles, but I love the hello!"
+          : locale === "vi" ? "Ơ… đừng trêu mình lâu nhé. Mình sẵn sàng đồng hành cùng bạn rồi!" : "Oh… don't tease me for too long. I'm ready to join you!"
+    );
+    mascotResetTimer.current = setTimeout(() => {
+      setMascotMood("talk");
+      setMascotHint(null);
+    }, 1100);
   };
 
   const toggleConcern = (id: string) => {
@@ -238,8 +387,18 @@ export default function OnboardingQuizScreen() {
       return;
     }
     triggerSuccessHaptic();
-    setDiscoveryScreen(2);
-    setTimeout(() => discoveryScrollRef.current?.scrollTo({ y: 0, animated: false }), 40);
+    const { profile } = buildDiscoveryProfile({
+      selectedConcerns,
+      primaryConcernId: primaryConcernId || selectedConcerns[0] || "general",
+      concernNote,
+      selectedFactors: [],
+      factorNote: "",
+      locale,
+    });
+    setBuiltProfile(profile);
+    setProviderStatus("LOCAL_FALLBACK");
+    setMascotMood("wave");
+    setStep("mascot_ready");
   };
 
   const applySuggestedGoalsToPlan = (
@@ -441,10 +600,10 @@ export default function OnboardingQuizScreen() {
 
           <ScrollView contentContainerStyle={styles.welcomeCenterContent} showsVerticalScrollIndicator={false}>
             <View style={styles.welcomeChibiWrapper}>
-              <Image
-                source={require("../../assets/game/characters/chibi-anna.png")}
-                style={styles.welcomeChibiImg}
-                contentFit="contain"
+              <HealthCluesMascot
+                mood={mascotMood}
+                onPress={handleMascotTap}
+                accessibilityLabel="Linh vật Mầm Nhỏ chào đón"
               />
               <View style={styles.welcomeFireflyGlow} />
             </View>
@@ -462,8 +621,8 @@ export default function OnboardingQuizScreen() {
             </Text>
             <Text style={styles.heroDescParagraph}>
               {locale === "vi"
-                ? "Chọn hoặc nhập vấn đề bạn quan tâm để AI gợi ý lộ trình thói quen cá nhân hóa cho riêng bạn."
-                : "Share what matters to your wellbeing so Lumi & AI can craft practical daily habits."}
+                ? "Chọn hoặc nhập vấn đề bạn quan tâm để nhận lộ trình thói quen cá nhân hóa cho riêng bạn."
+                : "Share what matters to your wellbeing to receive practical daily habits."}
             </Text>
 
             <View style={styles.languagePillContainer}>
@@ -471,14 +630,20 @@ export default function OnboardingQuizScreen() {
               <View style={styles.langButtonsRow}>
                 <TouchableOpacity
                   style={[styles.langBtn, locale === "en" && styles.langBtnActive]}
-                  onPress={() => setLocale("en")}
+                  onPress={() => {
+                    setLocale("en");
+                    setGlobalLocale("en");
+                  }}
                   accessibilityRole="button"
                 >
                   <Text style={[styles.langBtnText, locale === "en" && styles.langBtnTextActive]}>English</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.langBtn, locale === "vi" && styles.langBtnActive]}
-                  onPress={() => setLocale("vi")}
+                  onPress={() => {
+                    setLocale("vi");
+                    setGlobalLocale("vi");
+                  }}
                   accessibilityRole="button"
                 >
                   <Text style={[styles.langBtnText, locale === "vi" && styles.langBtnTextActive]}>Tiếng Việt</Text>
@@ -491,9 +656,10 @@ export default function OnboardingQuizScreen() {
               accessibilityRole="button"
               accessibilityLabel="welcome-start-btn"
               activeOpacity={0.85}
-              onPress={() => {
+              onPress={async () => {
                 triggerSuccessHaptic();
-                setStep("quest_choice");
+                setSelectedQuest("healthclues-realm");
+                setStep("story_intro");
               }}
             >
               <Text style={styles.startJourneyCtaText}>
@@ -530,6 +696,29 @@ export default function OnboardingQuizScreen() {
       )}
 
       {/* ============================================================== */}
+      {/* MASTER NARRATIVE INTRO: 3-VIDEO STORYBOARD (PORTAL, LUMI, REALM)*/}
+      {/* ============================================================== */}
+      {step === "story_intro" && (
+        <IntroStoryPlayer
+          locale={locale}
+          onFinish={() => {
+            triggerSuccessHaptic();
+            setSelectedQuest("healthclues-realm");
+            setDiscoveryScreen(1);
+            setMascotMood("talk");
+            setStep("discovery");
+          }}
+          onSkip={() => {
+            triggerSuccessHaptic();
+            setSelectedQuest("healthclues-realm");
+            setDiscoveryScreen(1);
+            setMascotMood("talk");
+            setStep("discovery");
+          }}
+        />
+      )}
+
+      {/* ============================================================== */}
       {/* STEP 2: QUEST SELECTION (PARCHMENT RPG REPLICA)                 */}
       {/* ============================================================== */}
       {step === "quest_choice" && (
@@ -543,16 +732,16 @@ export default function OnboardingQuizScreen() {
               contentFit="contain"
             />
             <View style={styles.chapterInfo}>
-              <Text style={styles.chapterKicker}>CHƯƠNG HIỆN TẠI</Text>
-              <Text style={styles.chapterTitle}>Chọn hành trình khởi đầu của bạn</Text>
+              <Text style={styles.chapterKicker}>{t().quizNarrative.questChoiceKicker}</Text>
+              <Text style={styles.chapterTitle}>{t().quizNarrative.questChoiceTitle}</Text>
             </View>
           </View>
 
           <View style={styles.parchmentCard}>
-            <Text style={styles.parchmentKicker}>CHỌN NƠI BẮT ĐẦU</Text>
-            <Text style={styles.parchmentTitle}>Vương Quốc Khám Phá</Text>
+            <Text style={styles.parchmentKicker}>{t().quizNarrative.questChoiceKicker}</Text>
+            <Text style={styles.parchmentTitle}>{t().quizNarrative.questChoiceTitle}</Text>
             <Text style={styles.parchmentDesc}>
-              Bạn chọn hoặc nhập vấn đề sức khỏe ngay sau đây để Lumi & AI gợi ý thói quen cá nhân hóa.
+              {t().quizNarrative.questChoicePrompt}
             </Text>
 
             {lockNotice && (
@@ -586,21 +775,23 @@ export default function OnboardingQuizScreen() {
                     <View style={styles.questBadgeRow}>
                       <View style={styles.questBadgeActive}>
                         <Sparkles size={10} color="#042f2e" />
-                        <Text style={styles.questBadgeActiveText}>ĐANG MỞ (PLAYABLE)</Text>
+                        <Text style={styles.questBadgeActiveText}>{locale === "vi" ? "ĐANG MỞ (CHƠI ĐƯỢC)" : "OPEN (PLAYABLE)"}</Text>
                       </View>
                     </View>
                     <View style={styles.questHeroInfo}>
-                      <Text style={styles.questNameMain}>Vương Quốc HealthClues</Text>
+                      <Text style={styles.questNameMain}>{locale === "vi" ? "Vương Quốc HealthClues" : "HealthClues Realm"}</Text>
                       <View style={styles.companionTag}>
                         <Image
                           source={require("../../assets/game/ui/lumi_fox_clean.png")}
                           style={styles.companionMiniIcon}
                           contentFit="contain"
                         />
-                        <Text style={styles.companionTagName}>Đồng hành cùng Bé Cáo Lumi</Text>
+                        <Text style={styles.companionTagName}>{locale === "vi" ? "Đồng hành cùng Bé Cáo Lumi" : "Travel with Lumi the Fox"}</Text>
                       </View>
                       <Text style={styles.questSummaryText}>
-                        Tùy biến theo mọi mối quan tâm (Gút, cân nặng, đường huyết, căng thẳng, giấc ngủ hoặc tự nhập vấn đề riêng).
+                        {locale === "vi"
+                          ? "Tùy biến theo mọi mối quan tâm (Gút, cân nặng, đường huyết, căng thẳng, giấc ngủ hoặc tự nhập vấn đề riêng)."
+                          : "Personalized for your focus, from gout and weight to blood sugar, stress, sleep, or a concern of your own."}
                       </Text>
                     </View>
                   </View>
@@ -628,14 +819,16 @@ export default function OnboardingQuizScreen() {
                     <View style={styles.questBadgeRow}>
                       <View style={styles.questBadgeLocked}>
                         <Lock size={11} color="#fcd34d" />
-                        <Text style={styles.questBadgeLockedText}>TẠM KHÓA (SẮP MỞ)</Text>
+                        <Text style={styles.questBadgeLockedText}>{locale === "vi" ? "TẠM KHÓA (SẮP MỞ)" : "LOCKED (COMING SOON)"}</Text>
                       </View>
                     </View>
                     <View style={styles.questHeroInfo}>
-                      <Text style={[styles.questNameMain, { color: "rgba(255,255,255,0.7)" }]}>Thung Lũng Giấc Ngủ</Text>
-                      <Text style={styles.companionLocked}>Linh vật đồng hành: Bé Cú Luna</Text>
+                      <Text style={[styles.questNameMain, { color: "rgba(255,255,255,0.7)" }]}>{locale === "vi" ? "Thung Lũng Giấc Ngủ" : "Sleep Valley"}</Text>
+                      <Text style={styles.companionLocked}>{locale === "vi" ? "Linh vật đồng hành: Bé Cú Luna" : "Companion: Luna the Owl"}</Text>
                       <Text style={styles.questSummaryTextLocked}>
-                        Đang bảo trì & nâng cấp không gian giấc ngủ sâu. Vùng đất sẽ mở lại ở bản tiếp theo.
+                        {locale === "vi"
+                          ? "Đang bảo trì & nâng cấp không gian giấc ngủ sâu. Vùng đất sẽ mở lại ở bản tiếp theo."
+                          : "This deep-sleep realm is being upgraded and will return in a future release."}
                       </Text>
                     </View>
                   </View>
@@ -651,10 +844,12 @@ export default function OnboardingQuizScreen() {
               onPress={() => {
                 triggerSuccessHaptic();
                 setDiscoveryScreen(1);
-                setStep("discovery");
+                setMascotMood("talk");
+                setMascotHint(null);
+                setStep("mascot_welcome");
               }}
             >
-              <Text style={styles.parchmentContinueText}>Tiếp Tục Khám Phá Vấn Đề</Text>
+              <Text style={styles.parchmentContinueText}>{locale === "vi" ? "Tiếp Tục Khám Phá Vấn Đề" : "Continue Exploring"}</Text>
               <ArrowRight size={18} color="#042f2e" />
             </TouchableOpacity>
           </View>
@@ -662,60 +857,133 @@ export default function OnboardingQuizScreen() {
       )}
 
       {/* ============================================================== */}
-      {/* STEP 3: TWO-SCREEN GOAL-FIRST DISCOVERY (WEB PARITY)            */}
+      {/* HEALTHCLUES COMPANION WELCOME (AFTER REALM SELECTION)          */}
+      {/* ============================================================== */}
+      {step === "mascot_welcome" && (
+        <ImageBackground
+          source={require("../../assets/game/regions/healthclues-world-overworld.webp")}
+          style={styles.mascotOnboardingBackground}
+          resizeMode="cover"
+        >
+          <View style={styles.mascotOnboardingVignette} />
+          <ScrollView contentContainerStyle={styles.mascotOnboardingContent} showsVerticalScrollIndicator={false}>
+            <View style={styles.mascotProgressPill} accessibilityLabel="mascot-onboarding-introduction">
+              <Sparkles size={13} color="#fef08a" />
+              <Text style={styles.mascotProgressText}>{locale === "vi" ? "ĐỒNG HÀNH CÙNG BẠN" : "YOUR COMPANION"}</Text>
+            </View>
+
+            <MascotSprout
+              mood={mascotMood}
+              onPress={handleMascotTap}
+              size={110}
+              bubbleText={locale === "vi" ? "Chạm vào Lumi nhé!" : "Tap Lumi!"}
+              accessibilityLabel="Chạm linh vật Lumi"
+            />
+
+            <View style={styles.mascotDialogueCard}>
+              <Text style={styles.mascotDialogueName}>Lumi</Text>
+              <Text style={styles.mascotDialogueTitle}>
+                {locale === "vi"
+                  ? "Chào mừng bạn đến với Xứ Sở Sức Khỏe!"
+                  : "Welcome to HealthClues Realm!"}
+              </Text>
+              <Text style={styles.mascotDialogueBody}>
+                {t().quizNarrative.discoveryPrompt}
+              </Text>
+            </View>
+
+            <Text style={styles.mascotTapCaption}>{locale === "vi" ? "Chạm vào Mầm Nhỏ để xem phản ứng của bạn ấy" : "Tap Lumi to see a reaction"}</Text>
+            {mascotHint && <Text style={styles.mascotHintText}>{mascotHint}</Text>}
+
+            <TouchableOpacity
+              style={styles.mascotPrimaryCta}
+              accessibilityRole="button"
+              accessibilityLabel="mascot-welcome-continue-btn"
+              activeOpacity={0.86}
+              onPress={() => {
+                triggerSuccessHaptic();
+                setMascotMood("talk");
+                setStep("discovery");
+              }}
+            >
+              <Text style={styles.mascotPrimaryCtaText}>{locale === "vi" ? "Mình sẵn sàng rồi" : "I’m ready"}</Text>
+              <ArrowRight size={19} color="#052e2b" />
+            </TouchableOpacity>
+          </ScrollView>
+        </ImageBackground>
+      )}
+
+      {/* ============================================================== */}
+      {/* STEP 3: ONE-SCREEN FOCUS DISCOVERY                              */}
       {/* ============================================================== */}
       {step === "discovery" && (
-        <View style={styles.stepViewportContainer}>
+        <View style={[styles.stepViewportContainer, { backgroundColor: "#f5efe0" }]}>
           <View style={styles.stepTrailFixedWrap}>
-            <OnboardingStepTrail activeStep={2} locale={locale} />
+            <OnboardingStepTrail activeStep={1} locale={locale} />
           </View>
           <ScrollView
             ref={discoveryScrollRef}
-            style={styles.innerScroll}
+            style={[styles.innerScroll, { backgroundColor: "#f5efe0" }]}
             contentContainerStyle={styles.innerScrollContentWithSticky}
             keyboardShouldPersistTaps="handled"
           >
             <View style={styles.parchmentCard}>
+              <View style={styles.discoveryMascotRow}>
+                <MascotSprout
+                  mood={mascotMood === "idle" || mascotMood === "wave" ? "talk" : mascotMood}
+                  onPress={handleMascotTap}
+                  size={118}
+                  showBubbleHint={false}
+                  accessibilityLabel="Chạm linh vật trong phần khám phá"
+                />
+                <View style={styles.discoveryMascotSpeech}>
+                  <Text style={styles.discoveryMascotName}>🌱 Lumi ({locale === "vi" ? "Bạn Đồng Hành" : "Companion"})</Text>
+                  <Text style={styles.discoveryMascotCopy}>
+                    {mascotHint ||
+                      (selectedConcerns.length > 0
+                        ? t().quizNarrative.discoveryFollowUp
+                        : t().quizNarrative.discoveryPrompt)}
+                  </Text>
+                </View>
+              </View>
               <View style={styles.discoveryTopRow}>
                 <View style={styles.parchmentKickerRow}>
                   <Compass size={12} color="#047857" />
-                  <Text style={styles.parchmentKicker}>KHÁM PHÁ SỨC KHỎE</Text>
+                  <Text style={styles.parchmentKicker}>{t().quizNarrative.discoveryKicker}</Text>
                 </View>
                 <View style={styles.stepBadgePill}>
-                  <Text style={styles.stepBadgePillText}>BƯỚC {discoveryScreen} / 2</Text>
+                  <Text style={styles.stepBadgePillText}>{locale === "vi" ? "BƯỚC 1 / 1" : "STEP 1 / 1"}</Text>
                 </View>
               </View>
 
               {discoveryScreen === 1 ? (
                 <>
                   <Text style={styles.parchmentTitle}>
-                    {locale === "vi"
-                      ? "Bạn đang quan tâm vấn đề gì về sức khỏe?"
-                      : "What health concerns interest you?"}
-                  </Text>
-                  <Text style={styles.parchmentDesc}>
-                    {locale === "vi"
-                      ? "Chọn một hoặc nhiều vấn đề bên dưới, hoặc chạm \"Vấn đề khác\" để tự mô tả vấn đề của bạn."
-                      : "Choose one or more concerns, or tap Something else to type your own."}
+                    {t().quizNarrative.discoveryPrompt}
                   </Text>
 
                   <View style={styles.concernsGrid}>
-                    {HEALTH_CONCERNS.map((item) => {
+                    {QUICK_DISCOVERY_CHOICES.map((item) => {
                       const active = selectedConcerns.includes(item.id);
                       return (
                         <TouchableOpacity
                           key={item.id}
                           style={[styles.concernChipCard, active && styles.concernChipCardActive]}
                           accessibilityRole="button"
-                          accessibilityLabel={`concern-${item.id}`}
+                          accessibilityLabel={`quick-focus-${item.id}`}
                           activeOpacity={0.8}
-                          onPress={() => toggleConcern(item.id)}
+                          onPress={() => {
+                            triggerHaptic();
+                            setSelectedConcerns([item.id]);
+                            setPrimaryConcernId(item.id);
+                            setDiscoveryError(null);
+                          }}
                         >
                           <View style={[styles.concernCheckSquare, active && styles.concernCheckSquareActive]}>
                             {active && <Check size={12} color="#ffffff" />}
                           </View>
-                          <Text style={[styles.concernLabelText, active && styles.concernLabelTextActive]}>
-                            {locale === "vi" ? item.vi : item.en}
+                            <Text style={[styles.concernLabelText, active && styles.concernLabelTextActive]}>
+                            <Text style={styles.quickChoiceIcon}>{item.icon}</Text> {locale === "vi" ? item.labelVi : item.labelEn}
                           </Text>
                         </TouchableOpacity>
                       );
@@ -749,19 +1017,12 @@ export default function OnboardingQuizScreen() {
                     </View>
                   )}
 
-                  {selectedConcerns.includes("other") && (
-                    <View style={styles.inputFieldBox}>
-                      <Text style={styles.parchmentInputLabel}>
-                        {locale === "vi" ? "Tự mô tả vấn đề sức khỏe của bạn *" : "Briefly describe your concern *"}
-                      </Text>
+                  <View style={styles.inputFieldBox}>
+                      <Text style={styles.parchmentInputLabel}>Vấn đề cụ thể (không bắt buộc)</Text>
                       <TextInput
                         style={styles.parchmentTextInput}
                         accessibilityLabel="onboarding-custom-concern-input"
-                        placeholder={
-                          locale === "vi"
-                            ? "VD: Khó ngủ sâu, hay mỏi vai gáy, muốn giảm cân..."
-                            : "e.g. Trouble sleeping, back stiffness..."
-                        }
+                        placeholder="VD: Tiểu đường, hạ đường huyết, khó ngủ sâu…"
                         placeholderTextColor="#6b8075"
                         maxLength={100}
                         value={concernNote}
@@ -771,7 +1032,6 @@ export default function OnboardingQuizScreen() {
                         }}
                       />
                     </View>
-                  )}
 
                   {discoveryError && (
                     <View style={styles.discoveryErrorBox}>
@@ -837,7 +1097,9 @@ export default function OnboardingQuizScreen() {
                   <View style={styles.safetyParchmentNote}>
                     <ShieldCheck size={15} color="#047857" />
                     <Text style={styles.safetyParchmentText}>
-                      Các lựa chọn là thông tin tự chia sẻ về nếp sinh hoạt, không phải chẩn đoán hay chỉ định điều trị.
+                      {locale === "vi"
+                        ? "Các lựa chọn là thông tin tự chia sẻ về nếp sinh hoạt, không phải chẩn đoán hay chỉ định điều trị."
+                        : "Your choices describe shared lifestyle information; they are not a diagnosis or treatment instruction."}
                     </Text>
                   </View>
                 </>
@@ -852,7 +1114,7 @@ export default function OnboardingQuizScreen() {
                   <>
                     <TouchableOpacity
                       style={styles.parchmentBackBtn}
-                      onPress={() => setStep("quest_choice")}
+                      onPress={() => setStep("mascot_welcome")}
                     >
                       <ArrowLeft size={16} color="#1b4a3e" />
                       <Text style={styles.parchmentBackBtnText}>Quay lại</Text>
@@ -886,7 +1148,7 @@ export default function OnboardingQuizScreen() {
                       accessibilityLabel="discovery-analyze-btn"
                       onPress={handleAnalyzeAndBuildPlan}
                     >
-                      <Text style={styles.parchmentNextBtnText}>AI Phân Tích & Gợi Ý</Text>
+                      <Text style={styles.parchmentNextBtnText}>Phân Tích & Gợi Ý Lộ Trình</Text>
                       <Sparkles size={15} color="#fde047" />
                     </TouchableOpacity>
                   </>
@@ -903,7 +1165,7 @@ export default function OnboardingQuizScreen() {
       {step === "plan" && (
         <View style={styles.stepViewportContainer}>
           <View style={styles.stepTrailFixedWrap}>
-            <OnboardingStepTrail activeStep={3} locale={locale} />
+            <OnboardingStepTrail activeStep={2} locale={locale} />
           </View>
           <ScrollView
             ref={planScrollRef}
@@ -929,23 +1191,23 @@ export default function OnboardingQuizScreen() {
                 )}
                 <Text style={styles.planHeaderTagText} accessibilityLabel="advisor-provider-badge">
                   {advisorLoading
-                    ? "ĐANG PHÂN TÍCH HỒ SƠ..."
+                    ? locale === "vi" ? "ĐANG PHÂN TÍCH HỒ SƠ..." : "ANALYZING YOUR PROFILE..."
                     : providerStatus === "GEMINI_AI"
-                      ? `PHÂN TÍCH AI GEMINI${providerModel ? ` · ${providerModel}` : ""}`
+                      ? `${locale === "vi" ? "PHÂN TÍCH AI GEMINI" : "GEMINI AI ANALYSIS"}${providerModel ? ` · ${providerModel}` : ""}`
                       : providerStatus === "DETERMINISTIC_DEMO"
-                        ? "GỢI Ý TỪ HỒ SƠ KHÁM PHÁ"
-                        : "GỢI Ý CÁ NHÂN HÓA (NGOẠI TUYẾN)"}
+                        ? locale === "vi" ? "GỢI Ý TỪ HỒ SƠ KHÁM PHÁ" : "SUGGESTIONS FROM YOUR DISCOVERY"
+                        : locale === "vi" ? "GỢI Ý CÁ NHÂN HÓA (NGOẠI TUYẾN)" : "PERSONALIZED OFFLINE SUGGESTIONS"}
                 </Text>
               </View>
-              <Text style={styles.planMainTitle}>Kế Hoạch Giải Pháp Dành Cho Bạn</Text>
+              <Text style={styles.planMainTitle}>{locale === "vi" ? "Kế Hoạch Giải Pháp Dành Cho Bạn" : "Your Wellness Plan"}</Text>
               <Text style={styles.planSubtitle}>
-                Dựa trên mối quan tâm <Text style={{ color: "#fde047", fontWeight: "700" }}>{displayFocus}</Text>, hãy chọn mức độ phù hợp hoặc tự thêm thói quen riêng:
+                {locale === "vi" ? "Dựa trên mối quan tâm " : "Based on your focus "}<Text style={{ color: "#fde047", fontWeight: "700" }}>{displayFocus}</Text>{locale === "vi" ? ", hãy chọn mức độ phù hợp hoặc tự thêm thói quen riêng:" : ", choose a level or add your own habit:"}
               </Text>
               {!advisorLoading && (
                 <View style={styles.planReassurePill}>
                   <ShieldCheck size={13} color="#6ee7b7" />
                   <Text style={styles.planReassureText}>
-                    Gợi ý an toàn · Có thể đổi hoặc chỉnh bất cứ lúc nào
+                    {locale === "vi" ? "Gợi ý an toàn · Có thể đổi hoặc chỉnh bất cứ lúc nào" : "Safe suggestions · You can change or edit them anytime"}
                   </Text>
                 </View>
               )}
@@ -954,9 +1216,9 @@ export default function OnboardingQuizScreen() {
             {advisorLoading ? (
               <View style={styles.loadingCard} accessibilityLabel="advisor-loading-card">
                 <ActivityIndicator size="large" color={colors.emeraldLight} />
-                <Text style={styles.loadingCardTitle}>Bé Cáo Lumi & AI đang phân tích câu trả lời của bạn...</Text>
+                <Text style={styles.loadingCardTitle}>{locale === "vi" ? "Bé Cáo Lumi & AI đang phân tích câu trả lời của bạn..." : "Lumi & AI are analyzing your answers..."}</Text>
                 <Text style={styles.loadingCardSub}>
-                  Đang đối chiếu thói quen an toàn & gợi ý 2 cấp độ Khởi Động / Bứt Phá cho vấn đề "{displayFocus}".
+                  {locale === "vi" ? `Đang đối chiếu thói quen an toàn & gợi ý 2 cấp độ Khởi Động / Bứt Phá cho vấn đề "${displayFocus}".` : `Comparing safe habits and two levels of suggestions for "${displayFocus}".`}
                 </Text>
                 {builtProfile && (
                   <TouchableOpacity
@@ -965,7 +1227,7 @@ export default function OnboardingQuizScreen() {
                     accessibilityLabel="plan-quick-fallback-btn"
                     onPress={handleQuickFallbackPlan}
                   >
-                    <Text style={styles.quickFallbackBtnText}>Dùng gợi ý nhanh ngay →</Text>
+                    <Text style={styles.quickFallbackBtnText}>{locale === "vi" ? "Dùng gợi ý nhanh ngay →" : "Use quick suggestions →"}</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -1020,7 +1282,7 @@ export default function OnboardingQuizScreen() {
                           onPress={() => handleChooseOption(goal.goalId, "A")}
                         >
                           <View style={styles.levelHeaderRow}>
-                            <Text style={styles.levelBadgeA}>Khởi Động</Text>
+                            <Text style={styles.levelBadgeA}>{locale === "vi" ? "Khởi Động" : "Starter"}</Text>
                             <Text style={styles.levelTitleText}>
                               {locale === "vi" ? goal.optionA.title.vi : goal.optionA.title.en}
                             </Text>
@@ -1040,7 +1302,7 @@ export default function OnboardingQuizScreen() {
                           onPress={() => handleChooseOption(goal.goalId, "B")}
                         >
                           <View style={styles.levelHeaderRow}>
-                            <Text style={styles.levelBadgeB}>Bứt Phá</Text>
+                            <Text style={styles.levelBadgeB}>{locale === "vi" ? "Bứt Phá" : "Breakthrough"}</Text>
                             <Text style={styles.levelTitleText}>
                               {locale === "vi" ? goal.optionB.title.vi : goal.optionB.title.en}
                             </Text>
@@ -1065,9 +1327,9 @@ export default function OnboardingQuizScreen() {
                           }}
                         >
                           <View style={styles.levelHeaderRow}>
-                            <Text style={styles.levelBadgeCustom}>Tự điều chỉnh</Text>
+                            <Text style={styles.levelBadgeCustom}>{locale === "vi" ? "Tự điều chỉnh" : "Customize"}</Text>
                             <Text style={styles.levelTitleText}>
-                              {customDraft.trim() ? customDraft : "Nhập phiên bản của riêng bạn"}
+                              {customDraft.trim() ? customDraft : (locale === "vi" ? "Nhập phiên bản của riêng bạn" : "Enter your own version")}
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -1223,8 +1485,12 @@ export default function OnboardingQuizScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="onboarding-enter-world-btn"
                   activeOpacity={0.85}
-                  onPress={handleEnterWorld}
-                  disabled={completing}
+                  onPress={() => {
+                    triggerSuccessHaptic();
+                    setMascotMood("wave");
+                    setStep("mascot_ready");
+                  }}
+                  disabled={completing || !builtProfile}
                 >
                   {completing ? (
                     <ActivityIndicator size="small" color="#042f2e" />
@@ -1241,6 +1507,54 @@ export default function OnboardingQuizScreen() {
             </View>
           )}
         </View>
+      )}
+
+      {/* ============================================================== */}
+      {/* HEALTHCLUES COMPANION FINALE (BEFORE WORLD ENTRY)              */}
+      {/* ============================================================== */}
+      {step === "mascot_ready" && (
+        <ImageBackground
+          source={require("../../assets/game/regions/healthclues-world-overworld.webp")}
+          style={styles.mascotOnboardingBackground}
+          resizeMode="cover"
+        >
+          <View style={styles.mascotOnboardingVignette} />
+          <View style={styles.mascotFinaleContent}>
+            <View style={styles.mascotProgressPill}>
+              <Check size={13} color="#d1fae5" />
+              <Text style={styles.mascotProgressText}>SẴN SÀNG LÊN ĐƯỜNG</Text>
+            </View>
+            <MascotSprout
+              mood={mascotMood}
+              onPress={handleMascotTap}
+              size={110}
+              showBubbleHint={false}
+              accessibilityLabel="Linh vật Mầm Nhỏ đang vẫy chào"
+            />
+            <View style={styles.mascotDialogueCard}>
+              <Text style={styles.mascotDialogueName}>Lumi</Text>
+              <Text style={styles.mascotDialogueTitle}>{t().quizNarrative.finaleTitle}</Text>
+              <Text style={styles.mascotDialogueBody}>{t().quizNarrative.finaleBody}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.mascotPrimaryCta}
+              accessibilityRole="button"
+              accessibilityLabel="mascot-enter-healthclues-realm-btn"
+              activeOpacity={0.86}
+              onPress={handleEnterWorld}
+              disabled={completing}
+            >
+              {completing ? (
+                <ActivityIndicator size="small" color="#052e2b" />
+              ) : (
+                <>
+                  <Text style={styles.mascotPrimaryCtaText}>{t().quizNarrative.enterWorldBtn}</Text>
+                  <ArrowRight size={19} color="#052e2b" />
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
       )}
     </SafeAreaView>
   );
@@ -1388,11 +1702,80 @@ const styles = StyleSheet.create({
   noteLine: { width: 32, height: 1, backgroundColor: "rgba(230, 205, 136, 0.3)" },
   bottomWorldNoteText: { fontFamily: fonts.uiBold, fontSize: 10.5, fontWeight: "800", color: "rgba(230, 205, 136, 0.78)", letterSpacing: 1 },
 
+  mascotOnboardingBackground: { flex: 1, width: "100%", height: "100%" },
+  mascotOnboardingVignette: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(4, 28, 22, 0.62)" },
+  mascotOnboardingContent: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+  },
+  mascotFinaleContent: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+  },
+  mascotProgressPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderRadius: radius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "rgba(4, 43, 33, 0.9)",
+    borderWidth: 1,
+    borderColor: "rgba(253, 224, 71, 0.6)",
+    marginBottom: 6,
+  },
+  mascotProgressText: { fontFamily: fonts.uiBold, fontSize: 10.5, fontWeight: "800", color: "#fef08a", letterSpacing: 0.7 },
+  mascotTouchTarget: { width: "100%", maxWidth: 350, alignItems: "center", minHeight: 258 },
+  mascotMotionWrap: { width: 282, height: 282, position: "relative", alignItems: "center", justifyContent: "center" },
+  mascotSprite: { ...StyleSheet.absoluteFillObject },
+  mascotTouchTargetCompact: { width: 84, minHeight: 84, flexShrink: 0 },
+  mascotMotionWrapCompact: { width: 80, height: 80 },
+  mascotDialogueCard: {
+    width: "100%",
+    maxWidth: 500,
+    backgroundColor: "rgba(4, 43, 33, 0.94)",
+    borderWidth: 1.5,
+    borderColor: "rgba(253, 224, 71, 0.58)",
+    borderRadius: radius.xxl,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    alignItems: "center",
+    shadowColor: "#000000",
+    shadowOpacity: 0.3,
+    shadowRadius: 14,
+    elevation: 6,
+  },
+  mascotDialogueName: { fontFamily: fonts.uiExtraBold, fontSize: 11, fontWeight: "900", color: "#6ee7b7", letterSpacing: 0.7, textTransform: "uppercase", marginBottom: 4 },
+  mascotDialogueTitle: { fontFamily: fonts.displayBold, fontSize: 22, lineHeight: 28, fontWeight: "900", color: "#fff7cf", textAlign: "center", marginBottom: 7 },
+  mascotDialogueBody: { fontFamily: fonts.ui, fontSize: 14, lineHeight: 20, color: "rgba(255,255,255,0.9)", textAlign: "center" },
+  mascotTapCaption: { fontFamily: fonts.uiSemiBold, fontSize: 11.5, fontWeight: "700", color: "rgba(255,255,255,0.76)", textAlign: "center", marginTop: 10 },
+  mascotHintText: { fontFamily: fonts.uiSemiBold, fontSize: 12, lineHeight: 17, color: "#fef08a", textAlign: "center", marginTop: 6, maxWidth: 360 },
+  mascotPrimaryCta: {
+    width: "100%",
+    maxWidth: 500,
+    minHeight: 54,
+    marginTop: spacing.md,
+    borderRadius: radius.xl,
+    backgroundColor: "#e6cd88",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 9,
+    paddingHorizontal: spacing.md,
+  },
+  mascotPrimaryCtaText: { fontFamily: fonts.uiExtraBold, fontSize: 15.5, fontWeight: "900", color: "#052e2b" },
+
   stepViewportContainer: { flex: 1, backgroundColor: "#071713" },
   stepTrailFixedWrap: {
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
-    paddingBottom: 4,
+    paddingTop: 4,
+    paddingBottom: 0,
     maxWidth: 640,
     width: "100%",
     alignSelf: "center",
@@ -1401,7 +1784,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: spacing.sm,
+    marginBottom: 3,
   },
   stepTrailPill: {
     flex: 1,
@@ -1409,7 +1792,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 4,
-    paddingVertical: 6,
+    paddingVertical: 3,
     paddingHorizontal: 6,
     borderRadius: radius.full,
     backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -1432,20 +1815,21 @@ const styles = StyleSheet.create({
   innerScroll: { flex: 1, backgroundColor: "#071713" },
   innerScrollContent: { paddingHorizontal: spacing.md, paddingVertical: spacing.md, maxWidth: 640, width: "100%", alignSelf: "center" },
   innerScrollContentWithSticky: {
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.xl,
+    flexGrow: 1,
+    paddingHorizontal: 0,
+    paddingTop: 4,
+    paddingBottom: 0,
     maxWidth: 640,
     width: "100%",
     alignSelf: "center",
   },
   stickyBottomBar: {
-    backgroundColor: "#f5efe0",
+    backgroundColor: "#fbf8f0",
     borderTopWidth: 1,
-    borderTopColor: "#dcd1b0",
+    borderTopColor: "#e6ddcc",
     paddingHorizontal: spacing.md,
     paddingTop: 10,
-    paddingBottom: 12,
+    paddingBottom: 14,
   },
   stickyBottomBarDark: {
     backgroundColor: "#091e18",
@@ -1471,11 +1855,44 @@ const styles = StyleSheet.create({
   chapterInfo: { flex: 1 },
   chapterKicker: { fontFamily: fonts.uiBold, fontSize: 11, fontWeight: "800", color: colors.emeraldLight, letterSpacing: 0.4 },
   chapterTitle: { fontFamily: fonts.uiBold, fontSize: 15, fontWeight: "700", color: "#ffffff", marginTop: 2 },
-  parchmentCard: { backgroundColor: "#fbf8f0", borderRadius: radius.xxl, padding: spacing.lg },
+  parchmentCard: {
+    flexGrow: 1,
+    flex: 1,
+    minHeight: 600,
+    backgroundColor: "#fbf8f0",
+    borderRadius: radius.xxl,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl,
+    justifyContent: "flex-start",
+  },
+  discoveryMascotRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    backgroundColor: "#ecfdf5",
+    borderWidth: 1.5,
+    borderColor: "#6ee7b7",
+    borderRadius: radius.xxl,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 16,
+    shadowColor: "#047857",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  discoveryMascotSpeech: { flex: 1, paddingHorizontal: 4 },
+  discoveryMascotName: { fontFamily: fonts.uiExtraBold, fontSize: 14, fontWeight: "900", color: "#047857", letterSpacing: 0.35, marginBottom: 4 },
+  discoveryMascotCopy: { fontFamily: fonts.uiSemiBold, fontSize: 13, lineHeight: 19, fontWeight: "600", color: "#134e4a" },
+  quickChoiceIcon: { fontSize: 16, color: "#8a6820" },
   parchmentKickerRow: { flexDirection: "row", alignItems: "center", gap: 5 },
   parchmentKicker: { fontFamily: fonts.uiExtraBold, fontSize: 11, fontWeight: "900", color: "#047857", letterSpacing: 0.8 },
-  parchmentTitle: { fontFamily: fonts.displayBold, fontSize: 22, fontWeight: "900", color: "#132a22", marginTop: 4, marginBottom: 6, lineHeight: 29 },
-  parchmentDesc: { fontFamily: fonts.ui, fontSize: 13.5, lineHeight: 19.5, color: "#3f594e", marginBottom: spacing.md },
+  parchmentTitle: { fontFamily: fonts.displayBold, fontSize: 19, fontWeight: "900", color: "#132a22", marginTop: 1, marginBottom: 5, lineHeight: 24 },
+  parchmentDesc: { fontFamily: fonts.ui, fontSize: 12, lineHeight: 16, color: "#3f594e", marginBottom: 7 },
   lockNoticeBanner: {
     flexDirection: "row",
     alignItems: "center",
@@ -1541,23 +1958,28 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
   stepBadgePillText: { fontSize: 10.5, fontWeight: "800", color: "#856526" },
-  concernsGrid: { gap: 8, marginBottom: spacing.md },
+  concernsGrid: { gap: 10, marginBottom: 14 },
   concernChipCard: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
     backgroundColor: "#ffffff",
     borderWidth: 1.5,
     borderColor: "#ded9c5",
-    borderRadius: radius.lg,
-    paddingHorizontal: 12,
-    paddingVertical: 11,
+    borderRadius: radius.xl,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    minHeight: 52,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 3,
   },
   concernChipCardActive: { borderColor: "#9c7b33", backgroundColor: "#fff4d1" },
   concernCheckSquare: {
-    width: 20,
-    height: 20,
-    borderRadius: 6,
+    width: 24,
+    height: 24,
+    borderRadius: 7,
     borderWidth: 1.5,
     borderColor: "#cfc6ab",
     backgroundColor: "#faf8f0",
@@ -1588,16 +2010,16 @@ const styles = StyleSheet.create({
   focusStarPillActive: { backgroundColor: "#1b4a3e", borderColor: "#1b4a3e" },
   focusStarText: { fontSize: 11.5, fontWeight: "700", color: "#294235" },
   focusStarTextActive: { color: "#fff6db" },
-  inputFieldBox: { marginBottom: spacing.md },
-  parchmentInputLabel: { fontSize: 12.5, fontWeight: "800", color: "#233d32", marginBottom: 6 },
+  inputFieldBox: { marginTop: 4, marginBottom: 8 },
+  parchmentInputLabel: { fontSize: 12, fontWeight: "800", color: "#233d32", marginBottom: 6 },
   parchmentTextInput: {
     backgroundColor: "#ffffff",
     borderWidth: 1.5,
     borderColor: "#c9be9a",
-    borderRadius: radius.md,
-    paddingHorizontal: 12,
+    borderRadius: radius.lg,
+    paddingHorizontal: 14,
     paddingVertical: 10,
-    fontSize: 13.5,
+    fontSize: 13,
     color: "#132a22",
   },
   discoveryErrorBox: { backgroundColor: "#fee2e2", borderRadius: radius.md, padding: spacing.sm, marginBottom: spacing.md },

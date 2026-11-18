@@ -76,7 +76,7 @@ spawnSync("powershell.exe", ["-NoProfile", "-Command", "Start-Sleep -Seconds 1"]
 console.log("Starting Next.js on port 3329...");
 const logFile = path.join(demoRoot, "owner-demo-next.log");
 const logFd = openSync(logFile, "a");
-const server = spawn(process.execPath, [nextBin, "start", buildDir, "--hostname", "127.0.0.1", "--port", "3329"], {
+const server = spawn(process.execPath, [nextBin, "start", buildDir, "--hostname", "0.0.0.0", "--port", "3329"], {
   cwd: buildDir,
   env: buildEnv,
   detached: true,

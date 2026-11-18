@@ -12,7 +12,9 @@ import {
   ScrollView,
   GestureResponderEvent,
   LayoutChangeEvent,
+  DeviceEventEmitter,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -45,10 +47,11 @@ import {
   Home,
   Heart,
   Users,
+  Search,
 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { colors, fonts, typography, spacing, radius } from "@/theme";
-import { t } from "@/localization";
+import { t, useLocale } from "@/localization";
 import { TopHud } from "@/components/common/TopHud";
 import { ExpGain } from "@/components/game/ExpGain";
 import { RewardReveal } from "@/components/game/RewardReveal";
@@ -56,6 +59,23 @@ import { useAuth } from "@/hooks/useAuth";
 import { useWorld } from "@/hooks/useWorld";
 import { useWorldPresence, RemoteAdventurer } from "@/hooks/useWorldPresence";
 import { useLivingVillageVisitors, SimulatedVisitor } from "@/hooks/useLivingVillageVisitors";
+import { World3DView, World3DInteractionEvent, HighlightLandmarkTarget } from "@/components/game/World3DView";
+import {
+  VillageCinematicTourModal,
+  VILLAGE_CINEMATIC_TOUR_COMPLETED_KEY,
+  setCinematicTourOpen,
+  isCinematicTourOpen,
+} from "@/modules/tour/VillageCinematicTourModal";
+import { HerbalGardenModal } from "@/modules/herbal/HerbalGardenModal";
+import { SoundGardenModal } from "@/modules/sound/SoundGardenModal";
+import { ZenBreathModal } from "@/modules/breath/ZenBreathModal";
+import { BodyScienceLibraryModal } from "@/modules/bodyscience/BodyScienceLibraryModal";
+import {
+  PostTourRoadmapModal,
+  POST_TOUR_ROADMAP_REVIEWED_KEY,
+} from "@/modules/roadmap/PostTourRoadmapModal";
+import { DetectiveWebViewModal } from "@/modules/detective/DetectiveWebViewModal";
+import { getCurrentTourStep, TOUR_CHANGE_EVENT } from "@/modules/tour/villageTourService";
 import {
   AUTHORED_PATHS,
   snapToWalkableRoad,
@@ -131,72 +151,72 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
     },
     {
       id: "botanical",
-      titleVi: "Vườn Thảo Mộc Thư Giãn",
-      titleEn: "Botanical Relaxation Garden",
-      roleVi: "Dược Thảo Tự Nhiên",
-      roleEn: "Herbal Medicine",
+      titleVi: "Nhà Thảo Mộc",
+      titleEn: "Herbal Apothecary & Garden",
+      roleVi: "Dược Thảo & Trà Tự Nhiên",
+      roleEn: "Herbal Medicine & Teas",
       isNpc: true,
-      npcName: "Nhà Thực Vật Học",
-      npcRole: "Chuyên Gia Thảo Mộc Y Khoa",
+      npcName: "Tiên Nữ Flora",
+      npcRole: "Dược Thảo Sĩ Cổ Kính",
       npcAvatar: require("../../assets/game/regions/npc-botanist-distinct.webp"),
       IconComponent: Flower2,
       x: 1250,
       y: 480,
       approachX: 1180,
       approachY: 530,
-      greetingVi: "Hoa cúc La Mã (Chamomile) và Lạc tiên chứa apigenin tự nhiên giúp thư giãn tinh thần trước khi ngủ.",
-      greetingEn: "Chamomile contains apigenin binding GABA receptors for natural calm.",
-      detailsVi: "Tài liệu y học: Các hợp chất thảo mộc hỗ trợ cơ chế thư giãn thần kinh tự nhiên mà không gây phụ thuộc.",
-      detailsEn: "Herbal compounds promote relaxation without dependency risks.",
-      actionTextVi: "Đọc Sổ Tay Thảo Dược",
-      actionTextEn: "Read Herbal Lore",
-      badge: "Tri thức",
+      greetingVi: "Chào bạn lữ khách! Ta là Flora canh giữ Nhà Thảo Mộc. Nơi đây lưu giữ các loại thảo dược tự nhiên và công thức hãm trà chữa lành.",
+      greetingEn: "Welcome traveler! Flora guards the Herbal Apothecary with natural remedies.",
+      detailsVi: "Xem các loại trà dược liệu: Dây Thìa Canh, Hoa Cúc, Bạc Hà Rừng... Tra cứu nhiệt độ hãm chuẩn và đưa vào Hành Trình sống khỏe.",
+      detailsEn: "Explore herbal tea rituals and add wellness habits to your Journey.",
+      actionTextVi: "Vào Nhà Thảo Mộc 🌿",
+      actionTextEn: "Enter Herbal Garden 🌿",
+      badge: "Dược Thảo",
     },
     {
       id: "sanctuary",
-      titleVi: "Thánh Địa Tĩnh Lặng",
-      titleEn: "Serenity Sanctuary",
-      roleVi: "Thực Hành Thở 4-7-8",
-      roleEn: "Breathwork Therapy",
+      titleVi: "Thiền Đường - Hơi Thở",
+      titleEn: "Zen Breath Sanctuary",
+      roleVi: "Kỹ Thuật Thở & Thư Giãn",
+      roleEn: "Breathwork & Meditation",
       isNpc: true,
-      npcName: "Người Hướng Dẫn Sống Khỏe",
-      npcRole: "Chuyên Gia Thư Giãn",
+      npcName: "Tiên Nữ Aura",
+      npcRole: "Tiên Khí Tức Tĩnh Tâm",
       npcAvatar: require("../../assets/game/regions/npc-wellness-guide-distinct.webp"),
       IconComponent: Flower2,
       x: 180,
       y: 720,
       approachX: 300,
       approachY: 730,
-      greetingVi: "Hãy thả lỏng vai và hàm. Kỹ thuật thở 4-7-8 kích hoạt hệ thần kinh đối giao cảm giúp nhịp tim chậm lại.",
-      greetingEn: "Drop your shoulders and unclench your jaw. 4-7-8 breathing activates parasympathetic tone.",
-      detailsVi: "Thực hành: Hít vào 4 giây qua mũi, giữ hơi 7 giây, thở ra 8 giây qua miệng. Lặp lại 4 chu kỳ.",
-      detailsEn: "Practice: Inhale 4s, hold 7s, exhale 8s. Repeat for 4 cycles.",
-      actionTextVi: "Bắt đầu bài tập thở 4-7-8",
-      actionTextEn: "Start 4-7-8 Breathing",
-      badge: "Thư giãn",
+      greetingVi: "Hít vào bình yên, thở ra muộn phiền. Tiên Nữ Aura sẽ đồng hành hướng dẫn bạn các nhịp thở 4-7-8, thở hộp và thôi miên ru ngủ.",
+      greetingEn: "Breathe in peace, breathe out stress. Practice 4-7-8 and box breathing with Aura.",
+      detailsVi: "Kỹ thuật thở sâu khoa học giúp kích hoạt hệ thần kinh phó giao cảm, hạ cortisol và nhịp tim tức thì.",
+      detailsEn: "Scientific breathwork activates parasympathetic tone and lowers cortisol.",
+      actionTextVi: "Vào Thiền Đường Luyện Thở 🧘",
+      actionTextEn: "Enter Zen Breath Hall 🧘",
+      badge: "Hơi Thở",
     },
     {
       id: "movement",
-      titleVi: "Đường Mòn Vận Động Rừng Đêm",
-      titleEn: "Twilight Movement Trail",
-      roleVi: "Vận Động Nhẹ Nhàng",
-      roleEn: "Gentle Exercise",
+      titleVi: "Vườn Âm Thanh",
+      titleEn: "Whispering Sound Garden",
+      roleVi: "Thanh Âm Thiên Nhiên & Sóng Não",
+      roleEn: "Soundscape & Frequencies",
       isNpc: true,
-      npcName: "Nhà Thám Hiểm Trail",
-      npcRole: "Hướng Dẫn Viên Vận Động",
+      npcName: "Tiên Nữ Lyra",
+      npcRole: "Tiên Nữ Thanh Âm",
       npcAvatar: require("../../assets/game/regions/npc-trail-explorer-distinct.webp"),
       IconComponent: Footprints,
       x: 640,
       y: 740,
       approachX: 680,
       approachY: 720,
-      greetingVi: "Đi bộ nhẹ 15-20 phút sau bữa tối giúp hạ đường huyết và hỗ trợ tiết melatonin tự nhiên trước giờ ngủ.",
-      greetingEn: "A gentle 15-20 min post-dinner walk improves glycemic regulation and natural melatonin.",
-      detailsVi: "Khuyến nghị: Không tập luyện cường độ cao trong vòng 2 tiếng trước khi đi ngủ.",
-      detailsEn: "Guideline: Avoid vigorous workouts within 2 hours before bedtime.",
-      actionTextVi: "Ghi nhận đi bộ 15 phút",
-      actionTextEn: "Log 15-min Walk",
-      badge: "Vận động",
+      greetingVi: "Lắng nghe những giai điệu dịu lành của thung lũng! Tiên Nữ Lyra mang đến tiếng mưa rơi, suối chảy và tần số sóng não 432Hz ru ngủ.",
+      greetingEn: "Listen to soothing valley melodies, rain, streams, and 432Hz delta sleep frequencies.",
+      detailsVi: "Bộ công cụ Sound Mixer đa tầng: Cho phép bạn bật song song nhiều âm thanh cùng lúc và hẹn giờ tắt đi ngủ.",
+      detailsEn: "Multi-track soundscape mixer with sleep timer for deep relaxation.",
+      actionTextVi: "Khám Phá Vườn Âm Thanh 🎶",
+      actionTextEn: "Open Sound Garden 🎶",
+      badge: "Âm Thanh",
     },
     {
       id: "library",
@@ -284,66 +304,66 @@ const REGION_LANDMARKS: Record<ActiveRegion, LandmarkStation[]> = {
       roleEn: "Botanical Nutrition",
       isNpc: true,
       npcName: "Nhà Thực Vật Học",
-      npcRole: "Dược Tính Tự Nhiên",
+      npcRole: "Dược Thảo Sĩ Cổ Kính",
       npcAvatar: require("../../assets/game/regions/npc-botanist-distinct.webp"),
       IconComponent: Flower2,
       x: 1250,
       y: 480,
       approachX: 1180,
       approachY: 530,
-      greetingVi: "Khu vườn bảo tồn các loại thảo dược tự nhiên. Tìm hiểu các nhóm thực phẩm giàu flavonoid và anthocyanin.",
-      greetingEn: "Botanical garden preserving healing flora. Discover polyphenol-rich foods.",
-      detailsVi: "Tri thức dinh dưỡng: Quả mọng và cần tây giàu chất chống oxy hóa tự nhiên, hỗ trợ chuyển hóa lành mạnh.",
-      detailsEn: "Nutritional lore: Berries and herbs provide antioxidants supporting metabolic wellness.",
-      actionTextVi: "Đọc Sổ Tay Tri Thức",
-      actionTextEn: "Read Lorebook",
-      badge: "Tri thức thực vật",
+      greetingVi: "Chào bạn lữ khách! Ta là Flora canh giữ Nhà Thảo Mộc. Nơi đây lưu giữ các loại thảo dược tự nhiên và công thức hãm trà chữa lành.",
+      greetingEn: "Welcome traveler! Flora guards the Herbal Apothecary with natural remedies.",
+      detailsVi: "Xem các loại trà dược liệu: Dây Thìa Canh, Hoa Cúc, Bạc Hà Rừng... Tra cứu nhiệt độ hãm chuẩn và đưa vào Hành Trình sống khỏe.",
+      detailsEn: "Explore herbal tea rituals and add wellness habits to your Journey.",
+      actionTextVi: "Vào Nhà Thảo Mộc 🌿",
+      actionTextEn: "Enter Herbal Garden 🌿",
+      badge: "Dược Thảo",
     },
     {
       id: "sanctuary",
-      titleVi: "Đền Thờ Thanh Lọc Thể Chất",
-      titleEn: "Purification Sanctuary",
-      roleVi: "Liệu Pháp Nước & Nghỉ Ngơi",
-      roleEn: "Hydration & Rest",
+      titleVi: "Thiền Đường - Hơi Thở",
+      titleEn: "Zen Breath Sanctuary",
+      roleVi: "Kỹ Thuật Thở & Thư Giãn",
+      roleEn: "Breathwork & Meditation",
       isNpc: true,
-      npcName: "Người Hướng Dẫn Sống Khỏe",
-      npcRole: "Chuyên Gia Phục Hồi Khớp",
+      npcName: "Tiên Nữ Aura",
+      npcRole: "Tiên Khí Tức Tĩnh Tâm",
       npcAvatar: require("../../assets/game/regions/npc-wellness-guide-distinct.webp"),
       IconComponent: Flower2,
       x: 180,
       y: 720,
       approachX: 300,
       approachY: 730,
-      greetingVi: "Nước là dung môi bài tiết tự nhiên tốt nhất. Bài tập thở thư giãn giúp giảm co thắt mạch máu ngoại biên.",
-      greetingEn: "Water is nature's best solvent. Relaxed breathing improves peripheral circulation.",
-      detailsVi: "Thực hành bài tập thở 4-7-8 giúp xoa dịu thần kinh và tăng lưu thông máu đến khớp bị mỏi.",
-      detailsEn: "4-7-8 breathing calms nociceptive signaling and enhances microcirculation.",
-      actionTextVi: "Bắt đầu bài tập thở 4-7-8",
-      actionTextEn: "Start Breathing",
-      badge: "Phục hồi",
+      greetingVi: "Hít vào bình yên, thở ra muộn phiền. Tiên Nữ Aura sẽ đồng hành hướng dẫn bạn các nhịp thở 4-7-8, thở hộp và thôi miên ru ngủ.",
+      greetingEn: "Breathe in peace, breathe out stress. Practice 4-7-8 and box breathing with Aura.",
+      detailsVi: "Kỹ thuật thở sâu khoa học giúp kích hoạt hệ thần kinh phó giao cảm, hạ cortisol và nhịp tim tức thì.",
+      detailsEn: "Scientific breathwork activates parasympathetic tone and lowers cortisol.",
+      actionTextVi: "Vào Thiền Đường Luyện Thở 🧘",
+      actionTextEn: "Enter Zen Breath Hall 🧘",
+      badge: "Hơi Thở",
     },
     {
       id: "movement",
-      titleVi: "Đường Mòn Vận Động Khớp",
-      titleEn: "Joint-Friendly Trail",
-      roleVi: "Vận Động Không Áp Lực",
-      roleEn: "Low-Impact Activity",
+      titleVi: "Vườn Âm Thanh",
+      titleEn: "Whispering Sound Garden",
+      roleVi: "Thanh Âm Thiên Nhiên & Sóng Não",
+      roleEn: "Soundscape & Frequencies",
       isNpc: true,
-      npcName: "Nhà Thám Hiểm Trail",
-      npcRole: "Vận Động Trị Liệu",
+      npcName: "Tiên Nữ Lyra",
+      npcRole: "Tiên Nữ Thanh Âm",
       npcAvatar: require("../../assets/game/regions/npc-trail-explorer-distinct.webp"),
       IconComponent: Footprints,
       x: 640,
       y: 740,
       approachX: 680,
       approachY: 720,
-      greetingVi: "Vận động nhẹ 15 phút kích thích tiết dịch khớp mà không gây tổn thương sụn.",
-      greetingEn: "Low-impact exercise stimulates synovial fluid without cartilage impact.",
-      detailsVi: "Quy tắc an toàn: Dừng lại ngay khi khớp có dấu hiệu sưng đau cấp tính. Không tập nặng.",
-      detailsEn: "Safety rule: Cease physical loading during acute inflammation.",
-      actionTextVi: "Ghi nhận 15 phút vận động",
-      actionTextEn: "Log Movement",
-      badge: "Vận động",
+      greetingVi: "Lắng nghe những giai điệu dịu lành của thung lũng! Tiên Nữ Lyra mang đến tiếng mưa rơi, suối chảy và tần số sóng não 432Hz ru ngủ.",
+      greetingEn: "Listen to soothing valley melodies, rain, streams, and 432Hz delta sleep frequencies.",
+      detailsVi: "Bộ công cụ Sound Mixer đa tầng: Cho phép bạn bật song song nhiều âm thanh cùng lúc và hẹn giờ tắt đi ngủ.",
+      detailsEn: "Multi-track soundscape mixer with sleep timer for deep relaxation.",
+      actionTextVi: "Khám Phá Vườn Âm Thanh 🎶",
+      actionTextEn: "Open Sound Garden 🎶",
+      badge: "Âm Thanh",
     },
     {
       id: "library",
@@ -775,7 +795,7 @@ const NEIGHBORHOOD_HOUSES: NeighborHouse[] = [
 export default function WorldScreen() {
   const router = useRouter();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-  const strings = t();
+  const { locale, strings } = useLocale();
   const { isAuthenticated, session } = useAuth();
   const {
     world,
@@ -802,7 +822,126 @@ export default function WorldScreen() {
   }, [visitedHouses]);
 
   const [mode, setMode] = useState<RegionMode>("exploration");
-  const [activeRegion, setActiveRegion] = useState<ActiveRegion>("sleep-valley");
+  const [worldViewMode, setWorldViewMode] = useState<"3d" | "2d">("3d");
+  const [activeRegion, setActiveRegion] = useState<ActiveRegion>("healthclues-realm");
+  const [camera3DView, setCamera3DView] = useState<"close" | "overview">("close");
+  const [showCinematicTour, setShowCinematicTour] = useState(false);
+  const [tourHighlightLandmark, setTourHighlightLandmark] = useState<HighlightLandmarkTarget | null>(null);
+  const [showDetectiveGame, setShowDetectiveGame] = useState(false);
+  const [showHerbalGarden, setShowHerbalGarden] = useState(false);
+  const [showSoundGarden, setShowSoundGarden] = useState(false);
+  const [showZenBreath, setShowZenBreath] = useState(false);
+  const [showBodyScienceLibrary, setShowBodyScienceLibrary] = useState(false);
+  const [showRoadmapSuggestions, setShowRoadmapSuggestions] = useState(false);
+  const [activeTourStep, setActiveTourStep] = useState(getCurrentTourStep());
+
+  const isDetectiveHighlighted =
+    showCinematicTour &&
+    (tourHighlightLandmark?.actionId === "OPEN_CLOUD_THERAPY" ||
+      tourHighlightLandmark?.landmarkId === "cloud_therapy" ||
+      tourHighlightLandmark?.buildingInstanceId === "bld_watermill");
+
+  useEffect(() => {
+    AsyncStorage.getItem(VILLAGE_CINEMATIC_TOUR_COMPLETED_KEY).then((tourDone) => {
+      if (!tourDone) {
+        setCinematicTourOpen(true);
+        setShowCinematicTour(true);
+        setCamera3DView("overview");
+      } else {
+        // If tour is completed, check if roadmap was reviewed
+        AsyncStorage.getItem(POST_TOUR_ROADMAP_REVIEWED_KEY).then((reviewed) => {
+          if (!reviewed) {
+            setShowRoadmapSuggestions(true);
+          }
+        });
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const tourSub = DeviceEventEmitter.addListener(TOUR_CHANGE_EVENT, setActiveTourStep);
+    const detSub = DeviceEventEmitter.addListener("OPEN_DETECTIVE_GAME_MODAL", () => {
+      setShowDetectiveGame(true);
+    });
+    const herbSub = DeviceEventEmitter.addListener("OPEN_HERBAL_GARDEN_MODAL", () => {
+      setShowHerbalGarden(true);
+    });
+    const bodySub = DeviceEventEmitter.addListener("OPEN_BODY_SCIENCE_MODAL", () => {
+      setShowBodyScienceLibrary(true);
+    });
+    const roadSub = DeviceEventEmitter.addListener("OPEN_ROADMAP_MODAL", () => {
+      setShowRoadmapSuggestions(true);
+    });
+
+    if (typeof window !== "undefined") {
+      (window as any).__OPEN_HERBAL_GARDEN__ = () => setShowHerbalGarden(true);
+      (window as any).__OPEN_SOUND_GARDEN__ = () => setShowSoundGarden(true);
+      (window as any).__OPEN_ZEN_BREATH__ = () => setShowZenBreath(true);
+      (window as any).__OPEN_ROADMAP__ = () => setShowRoadmapSuggestions(true);
+      (window as any).__OPEN_BODY_SCIENCE__ = () => setShowBodyScienceLibrary(true);
+      (window as any).__CLOSE_ALL_MODALS__ = () => {
+        setShowHerbalGarden(false);
+        setShowSoundGarden(false);
+        setShowZenBreath(false);
+        setShowBodyScienceLibrary(false);
+      };
+    }
+
+    return () => {
+      tourSub.remove();
+      detSub.remove();
+      herbSub.remove();
+      bodySub.remove();
+      roadSub.remove();
+    };
+  }, []);
+
+  const handle3DInteraction = useCallback((event: World3DInteractionEvent) => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    } catch {}
+
+    const action = (((event as any).actionId || (event as any).action || "") as string).toUpperCase();
+    const id = (((event as any).buildingInstanceId || (event as any).landmarkId || (event as any).id || "") as string).toLowerCase();
+
+    if (action === "OPEN_HERBAL_SHOP" || action === "OPEN_HERBAL_GARDEN" || id.includes("herbal") || id.includes("potion") || id.includes("flora")) {
+      setShowHerbalGarden(true);
+      return;
+    }
+    if (action === "OPEN_SOUND_GARDEN" || id.includes("sound") || id.includes("lyra") || id.includes("bookshop") || id.includes("âm thanh")) {
+      setShowSoundGarden(true);
+      return;
+    }
+    if (action === "OPEN_ZEN_BREATH" || id.includes("breath") || id.includes("zen") || id.includes("aura") || id.includes("sanctuary") || id.includes("great_hall")) {
+      setShowZenBreath(true);
+      return;
+    }
+    if (id.includes("watermill") || id.includes("guồng")) {
+      setActionSuccessMsg("Guồng Nước Suối: Tiếng suối róc rách thanh bình bên sườn núi.");
+      return;
+    }
+    if (action === "OPEN_BODY_SCIENCE" || action === "OPEN_KNOWLEDGE_LIBRARY" || id.includes("science")) {
+      setShowBodyScienceLibrary(true);
+      return;
+    }
+    if (action === "OPEN_CLOUD_THERAPY" || id.includes("detective")) {
+      setShowDetectiveGame(true);
+      return;
+    }
+    if (id.includes("great_hall") || id.includes("home") || action === "OPEN_HOME") {
+      router.push("/(game)/home");
+      return;
+    }
+    if (id.includes("well") || id.includes("plaza")) {
+      setActionSuccessMsg("Quảng Trường & Giếng Ước: Bạn đã uống ngụm nước trong lành (+10 EXP)!");
+      setExpGain({ visible: true, amount: 10 });
+      return;
+    }
+
+    if ((event as any).label) {
+      setActionSuccessMsg(`Đã ghé thăm: ${(event as any).label}`);
+    }
+  }, [router]);
   const [zoomMode, setZoomMode] = useState<"close" | "overview">("close");
   const [cameraFollow, setCameraFollow] = useState<boolean>(true);
   const [diorama25D, setDiorama25D] = useState<boolean>(true);
@@ -1273,23 +1412,18 @@ export default function WorldScreen() {
     } else if (landmark.id === "sanctuary") {
       setSelectedLandmark(null);
       setActiveTalkLandmark(null);
-      setBreathingOpen(true);
+      setShowZenBreath(true);
+      return;
     } else if (landmark.id === "botanical") {
-      setActionSuccessMsg("Đã lưu tri thức thực vật giàu flavonoid vào Sổ Tay Tri Thức!");
-      try {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      } catch {}
-    } else if (landmark.id === "library") {
-      setActionSuccessMsg("Mẹo chuyển hóa: Uống nước rải đều cả ngày, ưu tiên rau xanh & đạm ít purine.");
-      try {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      } catch {}
+      setSelectedLandmark(null);
+      setActiveTalkLandmark(null);
+      setShowHerbalGarden(true);
+      return;
     } else if (landmark.id === "movement") {
-      setActionSuccessMsg("Đã ghi nhận mục tiêu vận động nhẹ 15 phút bảo vệ sụn khớp!");
-      setExpGain({ visible: true, amount: 10 });
-      try {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      } catch {}
+      setSelectedLandmark(null);
+      setActiveTalkLandmark(null);
+      setShowSoundGarden(true);
+      return;
     } else if (landmark.id === "observatory") {
       const lvl = Math.max(1, Math.floor(xpTotal / 100) + 1);
       setActionSuccessMsg(`Hồ sơ vinh danh hiện tại: Cấp ${lvl} · ${xpTotal} EXP tích lũy.`);
@@ -1376,148 +1510,241 @@ export default function WorldScreen() {
           accessibilityLabel="world-game-viewport"
         >
           {/* Floating Region & View Pills tucked neatly over top map edge (eliminates double opaque top bar) */}
-          <View style={styles.floatingToolbarOverlay} pointerEvents="box-none">
-            <View style={styles.topToolbarRow}>
-              <TouchableOpacity
-                style={[
-                  styles.regionPillBtn,
-                  activeRegion === "healthclues-realm" && styles.regionPillBtnActive,
-                ]}
-                accessibilityRole="button"
-                accessibilityLabel="Vương Quốc HealthClues"
-                onPress={() => {
-                  setMode("exploration");
-                  setActiveRegion("healthclues-realm");
-                  setActiveTalkLandmark(null);
-                  setSelectedLandmark(null);
-                }}
-              >
-                <MapPin size={10} color={activeRegion === "healthclues-realm" ? colors.emeraldLight : colors.textSecondary} />
-                <Text
-                  style={[
-                    styles.regionPillBtnText,
-                    activeRegion === "healthclues-realm" && styles.regionPillBtnTextActive,
-                  ]}
-                >
-                  Vương Quốc
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.regionPillBtn, { opacity: 0.78 }]}
-                accessibilityRole="button"
-                accessibilityLabel="Thung Lũng Giấc Ngủ Tạm Khóa"
-                onPress={() => {
-                  setActionSuccessMsg("Thung Lũng Giấc Ngủ đang tạm khóa để nâng cấp. Vui lòng khám phá Vương Quốc HealthClues!");
-                  try {
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                  } catch {}
-                }}
-              >
-                <Lock size={10} color="#f59e0b" />
-                <Text style={[styles.regionPillBtnText, { color: "#fcd34d" }]}>Thung Lũng</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.toolIconBtn,
-                  zoomMode === "overview" && styles.toolIconBtnActive,
-                ]}
-                accessibilityRole="button"
-                accessibilityLabel={zoomMode === "close" ? "Toàn Cảnh" : "Cận Cảnh"}
-                onPress={() => {
-                  lastScrollRef.current = { x: -999, y: -999 };
-                  setPlayerPos({ ...playerPosRef.current });
-                  setZoomMode((z) => (z === "close" ? "overview" : "close"));
-                  try {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  } catch {}
-                }}
-              >
-                {zoomMode === "close" ? (
-                  <Minimize2 size={11} color={colors.textPrimary} />
-                ) : (
-                  <Maximize2 size={11} color="#061814" />
-                )}
-                <Text
-                  style={[
-                    styles.toolBtnText,
-                    zoomMode === "overview" && { color: "#061814" },
-                  ]}
-                >
-                  {zoomMode === "close" ? "Toàn Cảnh" : "Cận Cảnh"}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.overworldToggleBtn}
-                accessibilityRole="button"
-                accessibilityLabel="8 Vùng"
-                onPress={() => {
-                  setMode("overworld");
-                  setActiveTalkLandmark(null);
-                  setSelectedLandmark(null);
-                }}
-              >
-                <Compass size={11} color={colors.goldLight} />
-                <Text style={styles.overworldToggleText}>8 Vùng</Text>
-              </TouchableOpacity>
-            </View>
-
-            {zoomMode === "close" && (
-              <View style={styles.floatingSceneControlsRight} pointerEvents="box-none">
+          {!showCinematicTour ? (
+            <View style={styles.floatingToolbarOverlay} pointerEvents="box-none">
+              <View style={styles.topToolbarRow}>
+                {/* CAMERA ZOOM TOGGLE */}
                 <TouchableOpacity
-                  style={styles.dioramaHudBtn}
+                  style={[
+                    styles.toolIconBtn,
+                    (worldViewMode === "3d" ? camera3DView === "overview" : zoomMode === "overview") &&
+                      styles.toolIconBtnActive,
+                  ]}
                   accessibilityRole="button"
-                  accessibilityLabel="world-atmosphere-toggle"
+                  accessibilityLabel={
+                    worldViewMode === "3d"
+                      ? camera3DView === "close"
+                        ? "Toàn Cảnh Thế Giới Mây"
+                        : "Cận Cảnh Nhân Vật"
+                      : zoomMode === "close"
+                      ? "Toàn Cảnh"
+                      : "Cận Cảnh"
+                  }
                   onPress={() => {
-                    const order: WorldAtmosphereMode[] = ["day", "sunset", "night", "auto"];
-                    const next = order[(order.indexOf(atmosphereMode) + 1) % order.length];
-                    setAtmosphereMode(next);
-                    const nextVisual = getAtmosphereVisuals(resolveWorldAtmosphere(next));
-                    setActionSuccessMsg(
-                      next === "auto"
-                        ? `Ánh sáng tự động (${nextVisual.labelVi})`
-                        : `Ánh sáng: ${nextVisual.labelVi}`
-                    );
+                    if (worldViewMode === "3d") {
+                      setCamera3DView((curr) => (curr === "close" ? "overview" : "close"));
+                    } else {
+                      lastScrollRef.current = { x: -999, y: -999 };
+                      setPlayerPos({ ...playerPosRef.current });
+                      setZoomMode((z) => (z === "close" ? "overview" : "close"));
+                    }
                     try {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     } catch {}
                   }}
                 >
-                  {resolvedAtmosphere === "night" ? (
-                    <Moon size={11} color="#93c5fd" />
-                  ) : atmosphereMode === "auto" ? (
-                    <Clock size={11} color={colors.emeraldLight} />
+                  {(worldViewMode === "3d" ? camera3DView === "close" : zoomMode === "close") ? (
+                    <Minimize2 size={11} color={colors.textPrimary} />
                   ) : (
-                    <Sun size={11} color={resolvedAtmosphere === "sunset" ? "#fb923c" : "#fde047"} />
+                    <Maximize2 size={11} color="#061814" />
                   )}
-                  <Text style={styles.dioramaHudText}>{atmosphereVisuals.labelVi}</Text>
+                  <Text
+                    style={[
+                      styles.toolBtnText,
+                      (worldViewMode === "3d" ? camera3DView === "overview" : zoomMode === "overview") && {
+                        color: "#061814",
+                        fontWeight: "900",
+                      },
+                    ]}
+                  >
+                    {(worldViewMode === "3d" ? camera3DView === "close" : zoomMode === "close")
+                      ? (locale === "en" ? "Close Up" : "Cận Cảnh")
+                      : (locale === "en" ? "Overview" : "Toàn Cảnh")}
+                  </Text>
                 </TouchableOpacity>
 
+                {/* Detective Game Shortcut (Giải Mã Hồ Sơ Sức Khỏe) */}
                 <TouchableOpacity
-                  style={[styles.dioramaHudBtn, diorama25D && styles.dioramaHudBtnActive]}
+                  style={[
+                    styles.toolIconBtn,
+                    {
+                      backgroundColor: "rgba(6, 26, 42, 0.92)",
+                      borderColor: "#38bdf8",
+                      borderWidth: 1.5,
+                    },
+                  ]}
                   accessibilityRole="button"
-                  accessibilityLabel="world-25d-toggle"
+                  accessibilityLabel={locale === "en" ? "Investigate Health Clues" : "Giải Mã Hồ Sơ Sức Khỏe"}
                   onPress={() => {
-                    setDiorama25D((prev) => {
-                      const next = !prev;
-                      setActionSuccessMsg(next ? "Đã bật chiều sâu 2.5D Diorama & Parallax Núi Hồ" : "Đã chuyển về mặt phẳng 2D chuẩn");
-                      return next;
-                    });
                     try {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     } catch {}
+                    setShowDetectiveGame(true);
                   }}
                 >
-                  <Sparkles size={11} color={diorama25D ? "#042f2e" : colors.textSecondary} />
-                  <Text style={[styles.dioramaHudText, diorama25D && styles.dioramaHudTextActive]}>
-                    {diorama25D ? "✨ 2.5D" : "🗺️ 2D"}
+                  <Search size={11} color="#38bdf8" />
+                  <Text
+                    style={[
+                      styles.toolBtnText,
+                      { color: "#38bdf8", fontWeight: "800" },
+                    ]}
+                  >
+                    {locale === "en" ? "Investigate" : "Giải Mã"}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* 8 BIOMES OVERWORLD TOGGLE */}
+                <TouchableOpacity
+                  style={styles.overworldToggleBtn}
+                  accessibilityRole="button"
+                  accessibilityLabel={locale === "en" ? "8 Biomes" : "8 Vùng"}
+                  onPress={() => {
+                    setMode("overworld");
+                    setActiveTalkLandmark(null);
+                    setSelectedLandmark(null);
+                  }}
+                >
+                  <Compass size={11} color={colors.goldLight} />
+                  <Text style={styles.overworldToggleText}>{locale === "en" ? "8 Biomes" : "8 Vùng"}</Text>
+                </TouchableOpacity>
+
+                {/* REPLAY CINEMATIC TOUR BUTTON */}
+                <TouchableOpacity
+                  style={[
+                    styles.toolIconBtn,
+                    {
+                      backgroundColor: "rgba(6, 28, 22, 0.95)",
+                      borderColor: "#10b981",
+                      borderWidth: 1.5,
+                      paddingHorizontal: 9,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Xem Lại Tour Làng"
+                  onPress={() => {
+                    try {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    } catch {}
+                    setCinematicTourOpen(true);
+                    setShowCinematicTour(true);
+                    setCamera3DView("overview");
+                  }}
+                >
+                  <Sparkles size={12} color="#34d399" />
+                  <Text
+                    style={[
+                      styles.toolBtnText,
+                      {
+                        color: "#ffffff",
+                        fontWeight: "900",
+                        fontSize: 11,
+                        textShadowColor: "rgba(0, 0, 0, 0.8)",
+                        textShadowOffset: { width: 0, height: 1 },
+                        textShadowRadius: 2,
+                      },
+                    ]}
+                  >
+                    Tour
                   </Text>
                 </TouchableOpacity>
               </View>
-            )}
-          </View>
+
+              {worldViewMode === "2d" && zoomMode === "close" && (
+                <View style={styles.floatingSceneControlsRight} pointerEvents="box-none">
+                  <TouchableOpacity
+                    style={styles.dioramaHudBtn}
+                    accessibilityRole="button"
+                    accessibilityLabel="world-atmosphere-toggle"
+                    onPress={() => {
+                      const order: WorldAtmosphereMode[] = ["day", "sunset", "night", "auto"];
+                      const next = order[(order.indexOf(atmosphereMode) + 1) % order.length];
+                      setAtmosphereMode(next);
+                      const nextVisual = getAtmosphereVisuals(resolveWorldAtmosphere(next));
+                      setActionSuccessMsg(
+                        next === "auto"
+                          ? `Ánh sáng tự động (${nextVisual.labelVi})`
+                          : `Ánh sáng: ${nextVisual.labelVi}`
+                      );
+                      try {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      } catch {}
+                    }}
+                  >
+                    {resolvedAtmosphere === "night" ? (
+                      <Moon size={11} color="#93c5fd" />
+                    ) : atmosphereMode === "auto" ? (
+                      <Clock size={11} color={colors.emeraldLight} />
+                    ) : (
+                      <Sun size={11} color={resolvedAtmosphere === "sunset" ? "#fb923c" : "#fde047"} />
+                    )}
+                    <Text style={styles.dioramaHudText}>{atmosphereVisuals.labelVi}</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.dioramaHudBtn, diorama25D && styles.dioramaHudBtnActive]}
+                    accessibilityRole="button"
+                    accessibilityLabel="world-25d-toggle"
+                    onPress={() => {
+                      setDiorama25D((prev) => {
+                        const next = !prev;
+                        setActionSuccessMsg(next ? "Đã bật chiều sâu 2.5D Diorama & Parallax Núi Hồ" : "Đã chuyển về mặt phẳng 2D chuẩn");
+                        return next;
+                      });
+                      try {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      } catch {}
+                    }}
+                  >
+                    <Sparkles size={11} color={diorama25D ? "#042f2e" : colors.textSecondary} />
+                    <Text style={[styles.dioramaHudText, diorama25D && styles.dioramaHudTextActive]}>
+                      {diorama25D ? "✨ 2.5D" : "🗺️ 2D"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          ) : isDetectiveHighlighted ? (
+            /* During Step 4 of Cinematic Tour: ONLY display the glowing [ Giải Mã ] button with zIndex 10005 */
+            <View style={[styles.floatingToolbarOverlay, { zIndex: 10005, top: 8 }]} pointerEvents="box-none">
+              <View style={[styles.topToolbarRow, { justifyContent: "flex-end", paddingRight: 10 }]}>
+                <TouchableOpacity
+                  style={[
+                    styles.toolIconBtn,
+                    {
+                      backgroundColor: "#0284c7",
+                      borderColor: "#38bdf8",
+                      borderWidth: 2,
+                      shadowColor: "#38bdf8",
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 1,
+                      shadowRadius: 10,
+                      elevation: 10,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 4,
+                      paddingHorizontal: 12,
+                      paddingVertical: 5,
+                      borderRadius: 18,
+                    },
+                    Platform.OS === "web" ? ({ cursor: "pointer", userSelect: "none" } as any) : null,
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Giải Mã Hồ Sơ Sức Khỏe"
+                  onPress={() => {
+                    try {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    } catch {}
+                    setShowDetectiveGame(true);
+                  }}
+                >
+                  <Search size={13} color="#ffffff" />
+                  <Text style={[styles.toolBtnText, { color: "#ffffff", fontWeight: "900", fontSize: 11.5 }]}>
+                    {locale === "en" ? "🔍 Investigate ✨ HERE!" : "🔍 Giải Mã ✨ ĐÂY!"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : null}
 
           {zoomMode === "overview" ? (
             <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.overviewScrollContent}>
@@ -1594,10 +1821,10 @@ export default function WorldScreen() {
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={styles.overviewStationTitle} numberOfLines={1}>
-                          {lm.npcName || lm.titleVi}
+                          {lm.npcName || (locale === "en" ? lm.titleEn : lm.titleVi)}
                         </Text>
                         <Text style={styles.overviewStationRole} numberOfLines={1}>
-                          {lm.roleVi}
+                          {locale === "en" ? (lm.roleEn || lm.roleVi) : lm.roleVi}
                         </Text>
                       </View>
                       <ArrowRight size={13} color={colors.emeraldLight} />
@@ -1606,6 +1833,14 @@ export default function WorldScreen() {
                 </View>
               </View>
             </ScrollView>
+          ) : worldViewMode === "3d" ? (
+            <World3DView
+              onInteract={handle3DInteraction}
+              language={locale}
+              nickname={session?.user?.email?.split("@")[0] || "Bạn"}
+              cameraView={camera3DView}
+              highlightLandmark={tourHighlightLandmark}
+            />
           ) : (
             <View style={styles.dioramaStageWrapper}>
               {/* TRUE 2.5D PARALLAX HORIZON LAYER: Separated Alpine Mountains & Lake */}
@@ -2484,6 +2719,89 @@ export default function WorldScreen() {
         iconName={rewardReveal.item.icon || "boss:key"}
         rarity="Rare"
         onClaim={() => setRewardReveal((prev) => ({ ...prev, visible: false }))}
+      />
+
+      {/* VILLAGE CINEMATIC OVERVIEW & LUMI TOUR MODAL (MASTER NARRATIVE) */}
+      <VillageCinematicTourModal
+        visible={showCinematicTour}
+        onFinish={() => {
+          setCinematicTourOpen(false);
+          setShowCinematicTour(false);
+          setCamera3DView("close");
+          setTourHighlightLandmark(null);
+          // Show AI Suggested Roadmap immediately after intro tour
+          AsyncStorage.getItem(POST_TOUR_ROADMAP_REVIEWED_KEY).then((reviewed) => {
+            if (!reviewed) {
+              setShowRoadmapSuggestions(true);
+            }
+          });
+        }}
+        onHighlightLandmark={(target) => {
+          setTourHighlightLandmark(target);
+        }}
+        onCameraViewChange={(view) => {
+          setCamera3DView(view);
+        }}
+      />
+
+      {/* AI SUGGESTED ROADMAP MODAL (POST-TOUR PERSONALIZED HABITS) */}
+      <PostTourRoadmapModal
+        visible={showRoadmapSuggestions}
+        onClose={() => setShowRoadmapSuggestions(false)}
+        onSavedGoals={(count) => {
+          setActionSuccessMsg(`Đã lưu thành công ${count} thói quen vào mục Hành Trình!`);
+          setExpGain({ visible: true, amount: 20 });
+        }}
+      />
+
+      {/* HERBAL MEDICINE & BOTANICAL GARDEN MODAL */}
+      <HerbalGardenModal
+        visible={showHerbalGarden}
+        onClose={() => setShowHerbalGarden(false)}
+        onAwardExp={(amount, reason) => {
+          setExpGain({ visible: true, amount });
+          setActionSuccessMsg(`${reason} (+${amount} EXP)!`);
+        }}
+      />
+
+      {/* SOUND GARDEN MODAL (VƯỜN ÂM THANH - TIÊN NỮ LYRA) */}
+      <SoundGardenModal
+        visible={showSoundGarden}
+        onClose={() => setShowSoundGarden(false)}
+        onAwardExp={(amount, reason) => {
+          setExpGain({ visible: true, amount });
+          setActionSuccessMsg(`${reason} (+${amount} EXP)!`);
+        }}
+      />
+
+      {/* ZEN BREATH SANCTUARY MODAL (THIỀN ĐƯỜNG - HƠI THỞ - TIÊN NỮ AURA) */}
+      <ZenBreathModal
+        visible={showZenBreath}
+        onClose={() => setShowZenBreath(false)}
+        onAwardExp={(amount, reason) => {
+          setExpGain({ visible: true, amount });
+          setActionSuccessMsg(`${reason} (+${amount} EXP)!`);
+        }}
+      />
+
+      {/* BODY SCIENCE & CIRCADIAN HYGIENE LIBRARY MODAL */}
+      <BodyScienceLibraryModal
+        visible={showBodyScienceLibrary}
+        onClose={() => setShowBodyScienceLibrary(false)}
+        onOpenDetective={() => {
+          setShowBodyScienceLibrary(false);
+          setShowDetectiveGame(true);
+        }}
+        onAwardExp={(amount, reason) => {
+          setExpGain({ visible: true, amount });
+          setActionSuccessMsg(`${reason} (+${amount} EXP)!`);
+        }}
+      />
+
+      {/* DETECTIVE CLINICAL GAME MODAL */}
+      <DetectiveWebViewModal
+        visible={showDetectiveGame}
+        onClose={() => setShowDetectiveGame(false)}
       />
     </SafeAreaView>
   );

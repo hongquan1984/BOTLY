@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
+import { Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Sparkles } from "lucide-react-native";
 import { colors } from "@/theme";
@@ -19,9 +20,11 @@ export function ExpGain({ amount, visible, onComplete }: ExpGainProps) {
     if (!visible) return;
 
     // Trigger haptic feedback safely
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    } catch {}
+    if (Platform.OS !== 'web') {
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } catch {}
+    }
 
     translateY.setValue(0);
     opacity.setValue(0);

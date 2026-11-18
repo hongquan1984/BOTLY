@@ -1,3 +1,237 @@
+## 2026-11-17 — Cycle 135: 3 Ngôi Nhà Thực Trong Làng 3D & Thư Viện Kiến Thức — Lưu Vào Túi Đồ Động
+
+- **Định Vị 3 Ngôi Nhà Thực Trong Làng 3D (`word3d`):**
+  * **🌿 Nhà Thảo Mộc (Flora):** Tiệm thuốc gỗ `bld_potion_shop` tại `[-11.56, 1.80, 8.91]` $\rightarrow$ Popup `HerbalGardenModal`.
+  * **🎵 Nhà Âm Thanh (Lyra):** Ngôi nhà ngói đỏ `bld_bookshop` bên kia cầu đá tại `[10.78, 1.80, -11.17]` $\rightarrow$ Popup `SoundGardenModal`. Guồng nước `bld_watermill` đã được loại bỏ tương tác, trở lại thành đạo cụ cảnh quan tự nhiên ven suối.
+  * **🌬️ Thiền Đường - Hơi Thở (Aura):** Đại sảnh đường 2 tầng `bld_great_hall` tại `[-3.31, 1.82, 13.88]` $\rightarrow$ Popup `ZenBreathModal`.
+- **Giao Diện Thư Viện Từng Ngôi Nhà & Khắc Phục Bố Cục Nút:**
+  * Header với ảnh đại diện Tiên Nữ bảo hộ (Flora, Lyra, Aura) và lời chào dẫn dắt được ghim cố định ở đầu Modal (`guardianTopSection`) cùng thanh bộ lọc chuyên mục (`filterPillsRow`), giúp người chơi luôn nhìn thấy nhân vật dẫn dắt ngay cả khi cuộn danh sách bên dưới.
+  * Thẻ bài tập thở (`ZenBreathModal`): Bố cục nút 2 hàng ngăn nắp:
+    - Hàng 1 (Nút chính nổi bật): `[ ▶ Luyện Thở Ngay ]` toàn chiều ngang thẻ, căn giữa, không bị cắt chữ.
+    - Hàng 2 (Nút phụ): `[ + Lưu Vào Túi Đồ (+10 EXP) ]` (hoặc `[ Đã Có Trong Túi Đồ ✓ ]`) tự co giãn `flex: 1` bên trái, nút `[ + Hành Trình ]` gọn gàng bên phải. Loại bỏ hoàn toàn lỗi tràn lẹm nút sang mép trái (`...hở Ngay`).
+- **Túi Đồ Động (Dynamic Toolkit Bag) (`inventory.tsx`):**
+  * Khởi đầu rỗng (`[]`) tạo cảm giác phiêu lưu RPG chân thực (phải đi khám phá làng và thu thập công cụ).
+  * Hiển thị Empty State với hình vẽ trang nhã và nút bấm chuyển nhanh đến Làng 3D.
+  * Thẻ công cụ đã lưu có đầy đủ nút điều khiển (Mixer phát nhạc, bộ đếm nhịp thở, hướng dẫn hãm trà) và nút `[ ✕ Bỏ Khỏi Túi Đồ ]`.
+  * Thanh phát nhạc Master Playback Bar (`✨ Đang phát X âm thanh song song 🎵`) đưa ra ngoài ScrollView, cố định nổi ở đáy màn hình (`bottom: 68px, left: 74px, right: 14px`), chừa khoảng trống cho Bé Cáo Lumi ở góc trái và không bao giờ đè lên nội dung các thẻ âm thanh. ScrollView có `paddingBottom: 150px` đảm bảo cuộn thoáng đãng.
+
+---
+
+## 2026-11-17 — Cycle 131: Tái Thiết "Túi Đồ" Thành Balo Trị Liệu 3 Gian Nhà (Flora - Lyra - Aura)
+
+- **Cấu Trúc 3 Tab Balo Trị Liệu (`inventory.tsx`):**
+  - **Tab 1: 🌿 Thảo Mộc (Tiên Nữ Flora):**
+    * Thẻ giới thiệu Tiên Nữ Flora, danh mục dược liệu kèm công thức pha chuẩn nhiệt độ và thời gian hãm.
+    * Nút `[ + Đưa vào Hành Trình (+20 EXP) ]` kết nối trực tiếp tạo thói quen uống trà vào Hành Trình.
+  - **Tab 2: 🎵 Âm Thanh (Tiên Nữ Lyra):**
+    * Thẻ giới thiệu Tiên Nữ Lyra, danh mục 6 âm thanh thiên nhiên và sóng não ru ngủ (Mưa rào, Suối thác, Chim hót, Lửa trại, Delta 432Hz, Sóng biển).
+    * Hỗ trợ phát song song nhiều track cùng lúc (Multi-track Mixer), thanh điều chỉnh âm lượng riêng biệt cho từng kênh và bộ hẹn giờ tắt (15p, 30p, 60p).
+    * Thanh Master Playback Bar nổi tinh tế ở đáy màn hình (`bottom: 72`, `paddingBottom: 120` cho ScrollView) không che khuất tab bar.
+  - **Tab 3: 🌬️ Hơi Thở (Tiên Nữ Aura):**
+    * Thẻ giới thiệu Tiên Nữ Aura, 4 bài tập thở y khoa (4-7-8 Harvard, Box Breathing 4-4-4-4, Coherent 5-5, Body Scan).
+    * Widget vòng tròn thở động (Animated Breathing Circle) co giãn nhịp nhàng theo các pha Hít vào - Giữ hơi - Thở ra kèm đếm chu kỳ và rung nhẹ haptic.
+    * Nút `[ + Đưa vào Hành Trình ]` để lưu thói quen rèn luyện hơi thở.
+- **Tối Giản Form Tự Gõ Thói Quen Hành Trình (`journey.tsx`):**
+  - Xóa bỏ các ô đo cơ học cứng nhắc ("Định mức 15 phút", "Tần suất 7 ngày/tuần").
+  - Cho phép người chơi tự do gõ mọi thói quen kiêng cữ / sinh hoạt (như *"Không uống rượu bia"*, *"Uống 2L nước"*, *"Đi bộ 15 phút"*).
+
+---
+
+## 2026-11-17 — Cycle 128: Gỡ Nút "Lộ Trình AI" Trên Thanh Đỉnh 3D & Tối Giản Form Tự Gõ Thói Quen (Hỗ Trợ Kiêng Cữ "Không Uống Rượu")
+
+- **Loại Bỏ Hoàn Toàn Nút "Lộ Trình AI" Khỏi Thanh HUD 3D (`world.tsx`):**
+  - Xóa bỏ nút `[ ✨ Lộ Trình AI ]` trên thanh công cụ đỉnh màn hình 3D, khắc phục tình trạng phân mảnh và trùng lặp với Tab **Hành Trình (📜)** dưới đáy.
+  - Thanh công cụ đỉnh trở lại trạng thái thoáng đãng, chỉ tập trung vào các công cụ 3D (`Cận Cảnh`, `Giải Mã`, `8 Vùng`, `Tour`).
+- **Đơn Giản Hóa Form Tự Gõ Thói Quen Sống Khỏe (`journey.tsx`):**
+  - Xóa bỏ hoàn toàn các trường số đo cơ học rườm rà: "Định mức mỗi lần" (15), "Đơn vị" (phút), "Tần suất" (7 / 5 / 3 ngày/tuần) gây nghẽn khi người dùng nhập thói quen hành vi như *"Không uống rượu bia"*, *"Không ăn vặt sau 8h tối"*.
+  - Thay bằng form 1-ô tự do duy nhất: *"Nhập thói quen bạn muốn rèn luyện \*"* + chọn nhóm nhanh `[ Dinh Dưỡng ] [ Vận Động ] [ Giấc Ngủ ] [ Lối Sống ]`.
+  - Lưu tức thì vào danh sách thói quen hằng ngày của người chơi, thông báo toast chúc mừng và tặng +20 EXP.
+
+---
+
+## 2026-11-16 — Cycle 114: World 3D Cinematic Overview, Floating Lumi Mascot Tour & Pulsing Building Beacons UI/UX
+
+- **Cinematic Overview Mode & Uncluttered Scene Presentation:**
+  - Upon entering the 3D World, the camera automatically sets to high-altitude Overview mode (`overview`).
+  - The top toolbar overlay (`floatingToolbarOverlay`) is hidden during the tour, offering a completely clean, unobstructed panoramic view of the floating village, waterfall, and sky.
+- **Floating Hovering Mascot (`VillageCinematicTourModal.tsx`):**
+  - Mascot Lumi hovers gently over the top-left of the bottom dialogue card with an active vertical breathing animation (`Animated.loop`, -10px translateY, 1.4s ease).
+  - Encircled with a soft radial emerald halo (`rgba(52, 211, 153, 0.25)`).
+- **Dynamic Pulsing Highlight Beacons (`SmartLandmarkOverlay.tsx`):**
+  - Highlighted landmarks during tour steps gain `@keyframes pulseGlowBeacon` (pulsing scale 1.04 $\rightarrow$ 1.20 and dynamic gold-emerald glow box-shadow) and expanding ripple rings (`@keyframes pulseBeaconRing`).
+  - Badge name tags are forced visible (`display: 'flex'`) regardless of camera distance when focused.
+- **Action Renaming to "Giải Mã":**
+  - The top toolbar button is renamed from "Phá Án" to **"Giải Mã"** with `<Search size={12} color="#38bdf8" />` and label `aria-label="Văn phòng giải mã hồ sơ bí ẩn"`.
+  - Replay button `[ ✨ Tour ]` allows instant re-triggering of the village cinematic tour at any time.
+
+---
+
+## 2026-11-15 — Cycle 111: Master Narrative Presentation, 3-Video Onboarding & Mascot Lumi UX Integration
+
+- **Dual-Tier Cinematic Viewport (`IntroStoryPlayer.tsx`):**
+  - High-performance 16:9 cinematic video player frame (`<video>` for Web, `expo-av` for Native) paired with instant poster fallback (`story_poster_1_portal.jpg`, `story_poster_2_lumi.jpg`, `story_poster_3_realm.jpg`).
+  - Zero-break guarantee: Missing or delayed MP4 files never show a black screen, spinning freeze, or missing image artifact.
+  - Atmospheric visual glow: Soft breathing emerald/gold ambient box-shadow surrounding the video container.
+- **Narrative Card & Dialogue Ergonomics:**
+  - Distinct speaker badge (`✨ Lời dẫn` / `🌱 Lumi`) with gradient emerald styling.
+  - Crisp, legible typography with ample line height (`lineHeight: 22px`, `#f3f4f6`) ensuring comfortable reading across mobile viewports.
+  - Persistent 3-segment progress indicator (`1/3`, `2/3`, `3/3`) at the top of the player.
+  - Transparent top controls: "Phát / Tạm dừng" toggle and "Bỏ qua câu chuyện" button.
+  - Prominent "Tiếp tục →" button requiring explicit user confirmation before advancing; zero forced auto-advances.
+- **Narrative Integration with Discovery Quiz:**
+  - Welcome screen features dynamic language selection (VI / EN) with immediate subtitle/dialogue update.
+  - Quiz step `quest_choice` displays The Seer's guidance kicker (`NHÀ TIÊN TRI CHỈ DẪN`) and narrative-framed question.
+  - Quiz step `discovery` frames habits around Lumi's gentle, empathetic inquiries.
+  - Quiz step `mascot_ready` concludes with Lumi's official greeting and "Bước Vào Xứ Sở Sức Khỏe" button.
+
+## 2026-11-15 — Cycle 106: Cozy Fantasy 3D World Integration & Dual-Mode 3D/2D Ergonomic Toggle
+
+- **Cozy Fantasy 3D World Presentation Layer (`world.tsx`, `World3DView.tsx`):**
+  - Integrated the 3D floating village from `word3d` into the HealthClues mobile World screen via WebView/iframe.
+  - Dedicated standalone player mode (`?mode=player`) with zero editor panels, zero debug stats, and smooth mobile touch orbit/pinch-zoom controls.
+  - 5 Fairy Guides (Flora, Aura, Lyra, Mira, Nova) and Lumi companion rendered in 3D with hovering bobbing animations and CanvasTexture nametags.
+  - Bidirectional communication bridge routes 3D touch/proximity interactions to native HealthClues features (Herbal sheet, 4-7-8 Breathing, Mystery Body Detective, Daily Care, and Quests).
+- **Dual-Mode 3D/2D Ergonomic Toggle & Instant Rollback (`world.tsx`):**
+  - Prominent toggle button (`3D Làng Nổi` / `2D Làng Núi`) on the subheader HUD allows seamless switching between 3D and 2D modes.
+  - State, EXP, coins, and player session are 100% preserved during toggle.
+  - Automatic camera re-centering on `(800, 700)` upon switching to 2D ensures immediate focus on the player character in the center plaza.
+- **Pristine 2D Swiss Village Baseline Preservation:**
+  - Full photographic sharpness preserved on `swiss-village-mobile-diorama-v1.png` with alpine chalets, turquoise lake, snow-capped mountains, cafe table, and cobblestone plaza.
+  - Semi-realistic human adventurer sprites (`player-human-idle.png`, `human-botanist.webp`, `human-explorer.webp`, `human-guide.webp`) grounded on cobblestones with zero blur and zero smudges.
+
+## 2026-11-14 — Cycle 105: Reverted to Stable Swiss Village Baseline Interface upon User Request ("Quay lại giao diện cũ")
+
+- **Reversion to Stable Swiss Village Baseline Panorama:**
+  - Discarded experimental AI image replacements, distorted compositions, and multi-layer inpainting masks.
+  - Fully restored the pristine original Swiss Alpine village background (`swiss-village-mobile-diorama-v1.png`, 1672×941) featuring the central stone fountain, turquoise lake vista, alpine chalets, and cobblestone square with 0 blur smudges and natural photographic sharpness.
+- **Restoration of Proportional Chibi Sprites & Natural Walkable Ground:**
+  - Restored player and visitor character sprites to the established Chibi set (`chibi-anna`, `chibi-leo`, `chibi-mia`, `chibi-ben`, `chibi-lily`).
+  - Restored balanced sprite scaling (`44×44px` player, `44×52px` NPC) with grounded oval shadows and natural cobblestone waypoints across the plaza (`x: 340` to `1320`, `y: 480` to `840`).
+- **Retained Approved Onboarding & UX Modules:**
+  - Preserved the parchment warm `#f5efe0` Onboarding Survey (`quiz.tsx`) with 0% black void, interactive Mầm Nhỏ mascot dialogue reactions, and standard HUD controls.
+
+## 2026-11-14 — Cycle 104: Elimination of Inpainting Smudges via Texture-Preserving Synthesis, Complete Spatial De-confliction of Landmark Pins & NPC Visitors, and 2-Round AI-Vision Verification
+
+- **Pristine Cobblestone & Village Texture Restoration (`swiss-village-mobile-diorama-v1.png`):**
+  - Eliminated biharmonic inpainting blur smudges across the central square and chalets.
+  - Reconstructed surface textures via Texture-Preserving Patch Synthesis from surrounding pristine stone and timber elements, achieving natural photographic sharpness (gradient 10.44 - 13.43).
+  - Clean alpha cutout window seamlessly reveals the turquoise alpine lake & mountain background layer `swiss-village-lake-bg.webp`.
+- **Zero-Overlap Landmark Pin & NPC Visitor Coordinates (`world.tsx`, `useLivingVillageVisitors.ts`):**
+  - Relocated `library` (Thư Viện Ánh Trăng) to elevated overlook `(800, 380)`, providing 230px vertical clearance above Anna.
+  - Relocated `botanical` (Nhà Thực Vật Học) to church garden walkway `(1220, 520)`, completely separating it from Ben and Luna.
+  - Removed stray duplicate Ben badge under church roof eaves.
+  - Centered player initial position at `(800, 700)` (>160px from nearest station), preventing auto-trigger of intrusive bottom talk sheets on initial load.
+  - Allocated distinct non-overlapping walking lanes for all 6 visitors (`Anna`, `Leo`, `Mia`, `Ben`, `Lily`, `Lucas`).
+- **2-Round AI-Vision Visual & Ergonomic Verification:**
+  - Round 1 (Mobile Portrait 390x844): Verified 0.00% black void on Discovery Survey (`quiz.tsx`), clean living village portrait view without bottom sheet clutter.
+  - Round 2 (Landscape 1024x507 & Desktop 1280x800): Preserved user's authentic village composition (chalets left, dining table, lake/mountain vista, church and cart right) with crisp photographic textures and zero blur.
+
+## 2026-11-14 — Cycle 103: Swiss Village Ground-Truth Layout Restoration, Separated 2.5D Lake/Mountain Horizon, Rigorous 2-Round AI-Vision UI/UX Audit & Zero-Void Onboarding Survey
+
+- **Ground-Truth Swiss Village Composition Restored (`world.tsx`, `swiss-village-mobile-diorama-v1.png`):**
+  - Fully restored the user's authentic reference layout from `media_1794661518192_a780174a.jpg`, eliminating arbitrary AI re-generation drift.
+  - Left chalets with cafe umbrellas, carved stone water trough fountain, round wooden dining table with checkered tablecloth and chairs, wide center cobblestone square, stone church and fruit market cart on the right.
+  - Clean biharmonic inpainting on cobblestone surface to remove stray static icons and sprites.
+- **Separated 2.5D Lake & Mountain Horizon Layer (`swiss-village-lake-bg.webp`):**
+  - Deep alpine sky, sharp snow-capped peak, and turquoise lake isolated into the background layer.
+  - Foreground diorama provides a soft-edged alpha transparency window looking out onto the lake, creating smooth, realistic 2.5D parallax depth on camera scroll.
+- **Accurate Actor Grounding & Exclusion Zones (`useLivingVillageVisitors.ts`, `world.tsx`):**
+  - Repositioned all 6 visitors (`Anna`, `Leo`, `Mia`, `Ben`, `Lily`, `Lucas`) strictly onto open cobblestone paths (`x: 580..1100, y: 600..780`), completely eliminating characters floating in the sky, sitting on roofs, or standing on dining tables/chairs.
+  - `snapSwissVillageGround` enforces exclusion zones: dining table (`x < 580`), church/cart (`x > 1140`), and sky/lake window (`y < 580`).
+- **Zero-Void Onboarding Survey & Enlarged Mầm Nhỏ Box (`quiz.tsx`):**
+  - Entire container background set to warm ivory parchment tone (`#f5efe0`).
+  - `parchmentCard` set to `flexGrow: 1, minHeight: 600px` meeting the `#fbf8f0` sticky bottom bar with zero gap, reducing black void ratio to 0.00%.
+  - Mầm Nhỏ mascot dialogue enlarged (`size={118}`), emerald border `#6ee7b7`, enhanced typography, and comfortable 56px touch target choices.
+- **Embedded 3D Chalet HUD Overlap De-confliction (`3DHOME/src/main.ts`):**
+  - Suppressed internal HTML `.hud-top` controls when rendered inside an iframe, preventing text collisions with the React Native top bar.
+
+## 2026-11-14 — Cycle 102: Photorealistic Alpine Village Square, Separated 2.5D Lake/Mountains Parallax Layer, 3D CGI Adventurer Walk Cycle, and Harmonious NPC Sizing
+
+- **Photorealistic Alpine Village Square (8K Photographic Fidelity - ZERO Flags):**
+  - High-definition alpine village diorama replacing 2D painterly art with photorealistic textures: aged timber chalets, red geranium balcony boxes, cobblestone dorfplatz plaza, stone fountain, clear turquoise mountain lake backdrop.
+  - Zero flags, national emblems, or heraldic banners on buildings, roofs, poles, or plazas, preserving a tranquil, universal mountain atmosphere.
+- **Separated 2.5D Diorama Parallax Architecture (`world.tsx`):**
+  - **Horizon Background Layer (`swiss-village-lake-bg.webp`):** Mountains, sky, and alpine lake moving at differential parallax speed (`translateX: -cameraScroll.x * 0.22`, `translateY: -cameraScroll.y * 0.08`).
+  - **Foreground Diorama Layer (`swiss-village-mobile-diorama-v1.png`):** Chalets, cobblestone plaza, stone fountain, flower beds, and café terrace with anti-aliased alpha transparency cutout revealing the distant lake and mountains.
+  - **Stage Perspective:** Ground tilt set to `rotateX: 11deg` with `perspective: 1200` for tactile 2.5D spatial depth without compromising touch coordinates.
+- **Volumetric 3D CGI Character Walk Cycle (`world.tsx`, `characters/`):**
+  - Mature human adventurer with 3D volumetric lighting, linen tunic texture, royal blue cape with golden clasp, leather satchel, and laced knee boots.
+  - 4-frame walk cycle (`player-human-idle.png`, `player-human-walk1.png`, `player-human-walk2.png`, `player-human-walk3.png`) smoothly triggered on ground clicks.
+- **Harmonious NPC Sizing & Ground Shadows (`world.tsx`):**
+  - Standardized `styles.npcSprite`, `styles.remotePlayerSprite`, and `styles.remotePlayerActor` to `48x76px` (100% height parity with the player character).
+  - Ground anchor point calibrated at `top: lm.y - 74` with bottom-aligned drop shadows (`groundShadowOuter`, `groundShadow`) eliminating floating shadows.
+  - Balanced `getWorldDepthScale` perspective scale (`0.92x` to `1.08x`) across the entire 1600x900 map.
+
+## 2026-11-14 — Cycle 98: Mobile Game FTUE — Full-Screen Dark Scrim Spotlight, Anti-Overlap Layout, Glowing Focus Frames & Clean Mascot Lifecycle
+
+- **Full-Screen Game Spotlight Scrim with Dimmed Backdrop (`InteractiveTourCard.tsx`):**
+  - **Dark Backdrop:** Full viewport coverage (`position: absolute, top: 0, bottom: 0, left: 0, right: 0`) using `backgroundColor: "rgba(3, 10, 8, 0.74)"` with backdrop blur to dim extraneous UI.
+  - **Dynamic Glowing Focus Frame:** Target elements (tabs, streak container, add habit button, check-in seals, 3D chalet stage, floating detective button) are spotlighted with an amber frame (`#fbbf24`), animated pulse scale (`0.985 - 1.015`), golden glow shadow (`shadowColor: "#f59e0b"`, `shadowRadius: 16`), and corner radar crosshairs.
+  - **Floating Focus Badges:** Dynamic labels (`✨ ĐANG FOCUS: NHẬT KÝ 7 NGÀY`, `TỰ LẬP MỤC TIÊU`, `ĐÓNG DẤU NHẬN XU`, `BIỆT THỰ GỖ 3D CHALET`, `PHÁ ÁN KIẾM XU`) positioned seamlessly atop the glowing frame.
+  - **Directional Pointer Arrows:** Animated bouncing triangle pointer (`▲` or `▼`) indicating the exact position of the target action.
+  - **Anti-Overlap Placement:** Dialogue balloon is placed safely above or below the target, ensuring habit lists and action buttons are never obscured.
+  - **HUD Controls:** Top HUD row provides step badge (`✨ HƯỚNG DẪN TÂN THỦ · BƯỚC X/6`) alongside an immediate `Bỏ qua ✕` escape button.
+- **Mascot Lifecycle De-confliction (`_layout.tsx`, `PermanentMascotHelper.tsx`):**
+  - Permanent helper icon is strictly unmounted during active tour steps (`{!tourStep && <PermanentMascotHelper />}`), eliminating card-on-mascot overlap completely.
+  - Pinned mascot mounts only after tour completion or skip at `bottom: 74, left: 14`, with breathing animation and emerald badge.
+  - Context-aware drawer slides up when tapped, displaying personal health focus, screen instructions, quick links, and tour replay.
+
+## 2026-11-14 — Cycle 97: Glowing Tab Spotlight Tour, Authentic Sprout Rabbit Sprites, Permanent Mascot Helper & gametrinhtham Full WebView UI
+
+- **Dynamic Glowing Tab Spotlight Tour Visuals (`_layout.tsx`, `InteractiveTourCard.tsx`):**
+  - When a feature is targeted during the tutorial tour, its bottom navigation tab or floating button dynamically applies `styles.highlightedTabItem`:
+    - Radiant golden border: `borderColor: "#f59e0b"`, `borderWidth: 2`, `borderRadius: 14`.
+    - Warm glowing background: `backgroundColor: "rgba(245, 158, 11, 0.22)"`.
+    - Neon glow shadow: `shadowColor: "#fbbf24"`, `shadowRadius: 10`, `elevation: 8`.
+    - Sparkle badge: Pulsing gold chip `styles.highlightedBadge` with `✨` text positioned at top-right of tab.
+  - Floating step card (`InteractiveTourCard.tsx`) uses a dark glassmorphism container (`rgba(15, 23, 42, 0.94)`) with gold borders, step indicator (`1/5`..`5/5`), Mầm Nhỏ avatar with live mood, lore quote box, and clear action button.
+- **Authentic Sprout Rabbit Sprites (`MascotSprout.tsx`):**
+  - Uses the authentic pre-generated Sprout Rabbit character assets (`healthclues-sprout-rabbit-{idle,talk,sad,wave,laugh,sulk}.png`).
+  - Continuous micro-animation loop with Reanimated breathing scale (`0.975 - 1.045`), subtle vertical float, soft wobble tilt, and radiant aura.
+  - Web Audio API dolphin chirps and giggles with zero external sound latency.
+- **Permanent Mascot Helper Drawer (`PermanentMascotHelper.tsx`):**
+  - Pinned permanently at bottom-left (`bottom: 74, left: 14`), elevated above tab bar with `zIndex: 9999`.
+  - Mascot button features a 48x48 rounded container, breathing animation, emerald border, and "Mầm Nhỏ 🌱" label pill.
+  - Tapping opens a sleek bottom drawer with dark glassmorphism, contextual advice according to the active tab, quick action buttons, and a tour reset option.
+- **Full-Screen WebView Modal for Detective Game (`DetectiveWebViewModal.tsx`):**
+  - Full-screen modal (`zIndex: 10000`) embedding `http://localhost:3329/detective` via iframe on web and `react-native-webview` on native.
+  - Persistent top HUD: Emerald `← Về Làng` back button (44px touch target), detective case title, and live `🪙 Xu` balance badge.
+  - Listens to `HEALTHCLUES_DETECTIVE_WALLET_SYNC` messages for seamless two-way economy synchronization.
+
+## 2026-11-14 — Cycle 95: Mascot Guide, High-Contrast World HUD, Body Detective Modal & 3D Chalet Shop
+
+- **Linh vật Mầm Nhỏ & Micro-animation thở (`MascotSprout.tsx`):**
+  - Mầm Nhỏ tích hợp micro-animation phập phồng liên tục (`breatheScale: 0.975 - 1.045`), lắc lư nhẹ và vầng hào quang phát sáng.
+  - Loại bỏ hoàn toàn viền focus vuông trên trình duyệt qua `outlineStyle: "none"`.
+  - Tích hợp bộ tổng hợp âm thanh cá heo Web Audio API (`playDolphinChirp`, `playDolphinWhistle`, `playDolphinGiggle`), không dùng asset âm thanh nặng.
+- **Hướng dẫn Làng 5 bước (`VillageTutorialModal.tsx`, `HouseGiftCelebration.tsx`):**
+  - Khung hướng dẫn bo góc 22px chuẩn Ghibli, 5 thanh tiến trình emerald.
+  - Phân tích gợi ý sức khỏe loại bỏ từ ngữ "AI", đổi thành cách xưng hô thân thiện (*"Mình đã nhận được thông tin..."*).
+  - Tặng nhà kèm hiệu ứng Chìa Khóa Vàng hào quang lấp lánh và giải thích động lực căn nhà trống trải cần trang trí.
+- **Nút nổi HUD Thế Giới tương phản cao (`world.tsx`):**
+  - Nút `Phá Án` (🔍) nền xanh đen đặc `rgba(4, 20, 30, 0.92)` viền sáng cyan `#38bdf8` đổ bóng neon.
+  - Nút `Mầm Nhỏ` (🌱) viền sáng ngọc lục bảo `#34d399`.
+  - Cả hai nút có `hitSlop: 8px` hỗ trợ chạm ngón cái nhanh chóng, không bị chìm trên nền hồ nước.
+- **Văn phòng Thám Tử & Cửa hàng Nội thất (`DetectiveMobileLauncher.tsx`, `HomeFurnitureShopModal.tsx`):**
+  - Nút đóng `closeBtn` được chuẩn hóa đạt kích thước chuẩn `44x44px` tròn với `hitSlop: 8px`.
+  - Màn hình kết luận vụ án bổ sung nút CTA 1-chạm lớn `[NHẬN XU & ĐÓNG VĂN PHÒNG]` giúp quay về làng tức thì.
+  - Tab Ngôi Nhà nhúng sân khấu 3D Chalet với 5 góc nhìn phòng (Khách, Bếp, Ngủ, Spa, Góc 3/4) và cửa hàng nội thất thanh toán bằng Xu Vàng.
+- **Nhân vật Người 3D & Làng Sống Khỏe (`3DHOME/village.ts`, `PlayerController.ts`):**
+  - Tích hợp mô hình 3D humanoid có hoạt ảnh bước đi thực tế (`Walk`) và nhịp thở tĩnh (`Idle`).
+  - Đổi tên toàn bộ giao diện và thanh trạng thái sang "Làng Sống Khỏe 3D (Wellness Village)".
+
+## 2026-11-14 — Cycle 94: Mầm Nhỏ mobile onboarding companion
+
+After selecting HealthClues Realm, the mobile player sees a full-screen Mầm Nhỏ welcome with a single clear continue action. One discovery screen presents four large choices (`Giảm cân`, `Chăm sóc sức khỏe`, `Tinh thần`, `Mất ngủ`) plus an optional specific-issue note. On the discovery screen, Mầm Nhỏ is a compact horizontal prompt so all choices, note and continue action fit `390×844` without scrolling. Tapping cycles a visible Reanimated float/breathe, squash/tilt and perspective `rotateY` reaction through laugh, sad and childlike sulk before returning to talk; laugh and sulk play local CC0 effects. `idle`, `talk`, `sad`, `wave`, `laugh`, and `sulk` are transparent local image states, not a PLY/3D model. The flow must not obscure actions, change bottom game navigation, or replace Lumi within HealthClues Realm.
+
+## 2026-11-14 — Cycle 93: Mobile World stage and overview interaction
+
+The World tab preserves the established bottom application tab bar. Close view uses compact region, overview and eight-region controls; visitor chatter and secondary scene pills must not obscure the main image. `Toàn Cảnh` is a live, non-scrolling tactical presentation: the full scene, all simulated visitors, moving player marker and a fixed readable legend of seven named landmarks fit in the current viewport. Narrow screens use numbered pins matching the numbered full-name legend; wider screens also show each name beside its pin. A map tap or legend tap starts movement without returning to close view. In Sleep Valley, free-tap destinations are constrained to the open cobblestone plaza, excluding the lake, fountain and building edges. Browser visual/interaction evidence is local only; physical-device review remains open.
+
+## 2026-11-13 — Cycle 92: Swiss Village mobile World presentation
+
+Sleep Valley in `healthclues-mobile` uses one dedicated Swiss Village panorama below the existing interactive mobile World layers. The player, Luna, NPCs, landmarks, camera, overview and HUD remain separate layers in the shared 1600×900 coordinate system; the scene must not embed the standalone Three.js demo. The mobile region selector and eight-region map expose Sleep Valley and HealthClues Realm as the two playable product regions. Landmark labels are shown only when their whole marker is within the current camera frame, preventing cut-off pills at the left/right edges. Web haptic feedback is a no-op instead of an unhandled browser error. Local browser visual and behavior evidence is recorded in `App/reports/V1_MOBILE_SWISS_VILLAGE_INTEGRATION_ACCEPTANCE.md`; physical-device performance/art approval remain open.
+
 ## 2026-11-12 — Cycle 87: Gout-Specific Advisor Copy, HUD Quick Sound Toggle & Profile RPG Audio Picker Modal
 
 - **`TopHud` & Onboarding Welcome Audio Controls (`TopHud.tsx`, `quiz.tsx`):** Added compact speaker toggle (`hud-audio-toggle-btn`, `welcome-audio-toggle-btn`) synced live via `AUDIO_STATE_EVENT` so players can mute/unmute game sound from any tab without leaving gameplay.
@@ -1276,3 +1510,15 @@ On narrow mobile screens (`360x800` & `390x844`), the Expo mobile onboarding flo
 - **Typography & Iconography**: Bundles `BeVietnamPro` (`Regular`..`ExtraBold`) and `Spectral` (`SemiBold`/`Bold`) via `expo-font`; raises tiny label floors (`>= 10–11px`, `9.8px` tight-tracking for `360px` 6-tab bar so `"Hành Trình"` stays single-line); replaces chrome emojis across onboarding/game cards/modals with `lucide-react-native` vector icons; adds `10px` `hitSlop` on `(i)` info buttons.
 - **World 2.5D Painterly Diorama (Ultra-Light Mobile) + Multiplayer & Simulated Villagers**: [`worldDiorama25D.ts`](file:///D:/botly/App/healthclues-mobile/src/utils/worldDiorama25D.ts), [`useWorldPresence.ts`](file:///D:/botly/App/healthclues-mobile/src/hooks/useWorldPresence.ts), [`useLivingVillageVisitors.ts`](file:///D:/botly/App/healthclues-mobile/src/hooks/useLivingVillageVisitors.ts) & [`world.tsx`](file:///D:/botly/App/healthclues-mobile/app/(game)/world.tsx) preserve the hand-painted 1600×900 region artwork as a 60fps GPU-animated (`Animated.Value` + `requestAnimationFrame`) 2.5D diorama with perspective Y-depth actor/landmark scaling (`0.76x–1.14x`), dynamic `zIndex` Y-sorting, decoupled floor shadows, real-time online peer rendering (`🟢 {nickname}`, coordinate sync, greeting modal, TopHud `onlineCount`), and 6 simulated village visitors (`Anna`, `Leo`, `Mia`, `Ben`, `Lily`, `Lucas`) walking along `AUTHORED_PATHS` with pause-on-unfocus energy saving.
 6. **Modal Grid Layout**: Eliminates the asymmetrical dark green empty space in "Hành trình của tôi"; `data-inventory-section="suggestions"` spans full width `grid-column: 1 / -1`.
+
+### 2026-11-14 — Cycle 101: Discovery Screen 1 Ergonomic Balance & Realistic Human Character Walk Cycle (`healthclues-mobile`)
+
+1. **Discovery Screen 1 Visual Balance (Zero Void & Hero Mascot Card)**:
+   - Enlarges the companion Mầm Nhỏ card in `healthclues-mobile/app/(onboarding)/quiz.tsx`: mascot avatar size `92px`, soft emerald/mint background (`#ecfdf5`), border `#a7f3d0`, bold title `🌱 Mầm Nhỏ (Bạn Đồng Hành)` with spacious 12px text.
+   - Sets `innerScrollContentWithSticky: { flexGrow: 1 }` and `parchmentCard: { flexGrow: 1, minHeight: 520 }`, eliminating 100% of the dark bottom void by expanding the parchment card down to meet the sticky action bar.
+   - Enlarge option chips (`concernChipCard`) with `24x24px` checkboxes, 13.5px typography, and generous thumb padding.
+
+2. **Realistic Human Adventurer Walk Cycle in RPG World**:
+   - Replaces static 2D chibi cartoon sprites with a realistic humanoid adventurer character model (76px height, leather boots, satchel, cape, hair).
+   - Implements a dynamic 4-frame walk cycle (`player-human-idle.png`, `player-human-walk1.png`, `player-human-walk2.png`, `player-human-walk3.png`) with moving limbs, boots stepping, cape fluttering, and direction-aware horizontal flipping (`facingScaleAnim`).
+   - Updates village NPCs to distinct realistic characters: Anna (Botanist with straw hat and herb basket), Ben (Trail Explorer with backpack and walking staff), Leo (Adventurer Companion), with magical pet fox Luna floating beside the player's shoulder.
