@@ -1,3 +1,30 @@
+## 2026-11-18 — Cycle 142: My Island 3D — Khắc Phục Lỗi Đặt Vật Phẩm (Admin & Người Chơi), Thu Gọn Menu Trang Trí & Background Alps Thụy Sĩ Siêu Thực
+**Status: 100% HOÀN THIỆN, PASSED 100% AUTOMATED PLAYWRIGHT TEST (`test_placement_and_bg.mjs`) & BỘ ẢNH MINH CHỨNG THỰC TẾ (ARTIFACTS 62-65).**
+
+- **1. Yêu Cầu Của Người Dùng:**
+  - *"góc nhìn người chơi hiện tại lại đang ko đặt đồ vật được, admin cũng đang ko đặt được"*.
+  - *"cái menu chọn vật phẩm trang trí bên dưới chiếm diện tích quá, cho nút thu nhỏ nó lại"*.
+  - *"thay background thành 1 cái ảnh nó nhìn có chiều sâu và thật 1 chút"*.
+- **2. Nguyên Nhân Kỹ Thuật & Giải Pháp Triệt Để:**
+  - **Sửa lỗi không đặt được vật phẩm trên cả 2 chế độ:**
+    * Nới lỏng hoàn toàn giới hạn va chạm cứng trước đây (`distToRiver < 1.4`, `hypot(house) < 3.2`) thành bán kính đảo tự do (`Math.hypot(x, z) + r <= 14.0`).
+    * Sửa hàm `selectItemFromTray` luôn gọi `startPlacement(itemId)` thay vì từ chối đặt khi đã có vật phẩm cùng loại trên đảo.
+    * Hỗ trợ đặt 1 chạm: Di chuột để bóng mờ di chuyển mượt mà trên thảm cỏ, nhấp chuột 1 lần lên mặt cỏ là vật phẩm được đặt ngay tức thì.
+  - **Thu gọn Menu Trang Trí:**
+    * Bổ sung nút `[ 🔽 Thu Gọn ]` vào thanh tiêu đề menu trang trí.
+    * Bấm nút sẽ co menu lại thành dạng viên thuốc nổi nhỏ gọn `[ 🛠️ CHỌN VẬT PHẨM TRANG TRÍ (58 Món) ] [ 🔼 Mở Rộng ] [ ✕ ]` nằm sát đáy màn hình, giải phóng 100% diện tích nhìn ngắm hòn đảo.
+    * Bấm `[ 🔼 Mở Rộng ]` sẽ mở bung đầy đủ 58 món đồ và bộ lọc danh mục.
+  - **Background phong cảnh dãy núi Alps Thụy Sĩ siêu thực:**
+    * Tích hợp ảnh chụp toàn cảnh thung lũng Grindelwald Thụy Sĩ `/assets/bg/swiss_grindelwald_360_real.jpg` với màu sắc trung thực `sRGBColorSpace`.
+    * Kết hợp hiệu ứng thị sai 2.5D (parallax) mượt mà theo góc xoay camera, mang lại chiều sâu không gian ấn tượng và chân thật.
+- **3. Bộ Ảnh Artifact Minh Chứng Thực Tế:**
+  - `62_decor_tray_minimized_compact.png`: Menu trang trí thu gọn thành công thành một viên thuốc nhỏ gọn ở đáy màn hình, làm nổi bật toàn bộ hòn đảo và dãy núi Alps Thụy Sĩ chân thực phía sau.
+  - `63_decor_tray_expanded_with_realistic_bg.png`: Menu trang trí khi mở rộng hiển thị đầy đủ 58 món đồ với nút `[ 🔽 Thu Gọn ]` nằm ngay ngắn bên cạnh tiêu đề.
+  - `64_admin_item_placed_successfully.png`: Admin đặt thành công cây phong đỏ Momiji lên đảo mẫu chỉ với 1 cú nhấp chuột lên bãi cỏ.
+  - `65_player_item_placed_successfully.png`: Góc nhìn người chơi hiển thị đầy đủ địa thế do Admin tạo, và người chơi đã tự do đặt thêm "Chậu Hoa Cúc Quảng Trường" thành công rực rỡ vào đảo của riêng mình!
+
+---
+
 ## 2026-11-18 — Cycle 141: My Island 3D — Xóa Suối 1 Chạm & Đồng Bộ Tuyệt Đối Giữa Admin và Người Chơi
 **Status: 100% HOÀN THIỆN, PASSED 100% AUTOMATED PLAYWRIGHT TEST (`test_stream_deletion_and_sync.mjs`) & BỘ ẢNH MINH CHỨNG THỰC TẾ (ARTIFACTS 59-61).**
 

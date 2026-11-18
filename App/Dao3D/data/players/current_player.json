@@ -24,7 +24,40 @@
       },
       "rotationY": 0.2,
       "elevation": 0.25
+    },
+    {
+      "instanceId": "inst_1794994341930_626",
+      "itemId": "nat_momiji_maple",
+      "position": {
+        "x": 1,
+        "y": 1.8,
+        "z": 1
+      },
+      "rotationY": 0,
+      "elevation": 0
+    },
+    {
+      "instanceId": "inst_1794994455458_812",
+      "itemId": "nat_momiji_maple",
+      "position": {
+        "x": 1,
+        "y": 1.8,
+        "z": 1
+      },
+      "rotationY": 0,
+      "elevation": 0
+    },
+    {
+      "instanceId": "inst_1794994743075_386",
+      "itemId": "bld_general_store",
+      "position": {
+        "x": -5,
+        "y": 1.8,
+        "z": 7.5
+      },
+      "rotationY": 0,
+      "elevation": 0
     }
   ],
-  "updatedAt": "2026-11-18T08:59:02.894Z"
+  "updatedAt": "2026-11-18T09:39:09.452Z"
 }

@@ -380,6 +380,35 @@ Giải quyết triệt để 2 vấn đề phát sinh từ hình ảnh thực t�
    - `60_stream_successfully_deleted.png`: Bấm nút `✕` trên chip suối, con suối bị xóa sạch hoàn toàn khỏi đảo ngay lập tức, không để lại bất kỳ dấu vết nào.
    - `61_player_receives_identical_mountain_and_lake.png`: Admin lưu đảo mẫu (gồm Núi Alpine, Hồ Nước Mossy Pond, Nhà Gỗ Khởi Đầu, Giếng Nước) và chuyển sang tab Người Chơi; Góc nhìn người chơi hiển thị chính xác 100% khớp hoàn toàn với thiết kế của Admin.
 
+---
+
+## 15. NGHIỆM THU: SỬA LỖI ĐẶT ĐỒ VẬT (ADMIN & NGƯỜI CHƠI), THU GỌN MENU TRANG TRÍ & BACKGROUND ẢNH THẬT CÓ CHIỀU SÂU (2026-11-18)
+
+Giải quyết triệt để 3 yêu cầu của người dùng:
+1. *"góc nhìn người chơi hiện tại lại đang ko đặt đồ vật được, admin cũng đang ko đặt được"*: Khắc phục triệt để lỗi không đặt được vật phẩm trên cả góc nhìn Admin lẫn Người chơi.
+2. *"cái menu chọn vật phẩm trang trí bên dưới chiếm diện tích quá, cho nút thu nhỏ nó lại"*: Thêm nút thu nhỏ/mở rộng thanh chọn đồ thành dạng viên thuốc gọn gàng, không che khuất màn hình.
+3. *"thay background thành 1 cái ảnh nó nhìn có chiều sâu và thật 1 chút"*: Thay nền bầu trời vẽ phẳng bằng ảnh toàn cảnh 360 dãy Alps Thụy Sĩ (Grindelwald) siêu thực, có chiều sâu không gian và hiệu ứng thị sai (parallax).
+
+### Nguyên nhân kỹ thuật & giải pháp khắc phục triệt để:
+1. **Khắc phục lỗi không đặt được đồ vật:**
+   - **Bỏ giới hạn va chạm cứng:** Trước đây hàm `validatePlacement` kiểm tra khoảng cách đến bờ suối, nhà và núi quá chặt chẽ khiến gần như toàn bộ mặt đảo bị từ chối vị trí đặt. Đã nới lỏng thành kiểm tra bán kính đảo tự do (`Math.hypot(x, z) + r <= 14.0`).
+   - **Cho phép đặt nhiều vật phẩm cùng loại:** Sửa `selectItemFromTray(itemId)` luôn kích hoạt `startPlacement(itemId)` thay vì chỉ chọn lại vật phẩm cũ đã có trên đảo.
+   - **Thao tác 1 chạm tiện lợi:** Khi đang chọn đồ đặt, người dùng di chuột trên bãi cỏ đảo bóng mờ xem trước (ghost preview) sẽ di chuyển mượt mà theo con trỏ; nhấp chuột một lần lên mặt đất đảo là vật phẩm được đặt ngay lập tức vào đảo!
+2. **Nút Thu Gọn Menu Trang Trí:**
+   - Thêm nút `[ 🔽 Thu Gọn ]` ngay trong thanh tiêu đề `decor-tray-title`.
+   - Khi bấm, menu co lại thành viên thuốc nhỏ gọn `[ 🛠️ CHỌN VẬT PHẨM TRANG TRÍ (58 Món) ] [ 🔼 Mở Rộng ] [ ✕ ]` nằm sát đáy màn hình, giải phóng 100% tầm nhìn cho người chơi ngắm đảo.
+   - Khi cần, người dùng bấm `[ 🔼 Mở Rộng ]` để mở lại đầy đủ 58 vật phẩm và các bộ lọc danh mục.
+3. **Background ảnh thật dãy núi Alps Thụy Sĩ có chiều sâu:**
+   - Tích hợp texture chất lượng cao `/assets/bg/swiss_grindelwald_360_real.jpg` với không gian màu `sRGBColorSpace`.
+   - Kết hợp chuyển động thị sai 2.5D (parallax) mượt mà theo góc xoay và độ nghiêng của camera, tạo cảm giác hùng vĩ như đang đứng giữa thung lũng Grindelwald ngắm nhìn hòn đảo bay.
+
+### Bằng chứng ảnh chụp kiểm thử tự động Playwright (`test_placement_and_bg.mjs` - 100% Passed):
+- `62_decor_tray_minimized_compact.png`: Menu trang trí thu gọn thành công thành một viên thuốc nhỏ gọn ở đáy màn hình, làm nổi bật toàn bộ hòn đảo và dãy núi Alps Thụy Sĩ chân thực phía sau.
+- `63_decor_tray_expanded_with_realistic_bg.png`: Menu trang trí khi mở rộng hiển thị đầy đủ 58 món đồ với nút `[ 🔽 Thu Gọn ]` nằm ngay ngắn bên cạnh tiêu đề.
+- `64_admin_item_placed_successfully.png`: Admin đặt thành công cây phong đỏ Momiji lên đảo mẫu chỉ với 1 cú nhấp chuột lên bãi cỏ.
+- `65_player_item_placed_successfully.png`: Góc nhìn người chơi hiển thị đầy đủ địa thế do Admin tạo, và người chơi đã tự do đặt thêm "Chậu Hoa Cúc Quảng Trường" thành công rực rỡ vào đảo của riêng mình!
+
+
 
 
 

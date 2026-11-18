@@ -238,8 +238,24 @@
       box-shadow: 0 0 10px rgba(52, 211, 153, 0.45);
       color: #a7f3d0;
     }
+    .placed-item-chip.locked {
+      border-color: #475569;
+      background: rgba(15, 23, 42, 0.75);
+    }
     .placed-item-chip .chip-label {
       cursor: pointer;
+    }
+    .placed-item-chip .chip-lock-tag {
+      font-size: 10px;
+      font-weight: 700;
+      color: #94a3b8;
+      background: rgba(51, 65, 85, 0.6);
+      padding: 1px 5px;
+      border-radius: 6px;
+      letter-spacing: 0.2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
     }
     .placed-item-chip .chip-delete-btn {
       background: transparent;
@@ -1455,14 +1471,14 @@
     camera.add(bgPlane);
     window.bgPlane = bgPlane;
 
-    // Realistic photorealistic mountain background with depth & atmospheric perspective
+    // Vast floating islands archipelago background with deep atmospheric perspective & distant sky islands
     const texLoader = new THREE.TextureLoader();
-    texLoader.load('/assets/bg/swiss_grindelwald_360_real.jpg', (tex) => {
+    texLoader.load('/assets/textures/floating_islands_archipelago_bg.jpg', (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
       bgMat.map = tex;
       bgMat.needsUpdate = true;
     }, undefined, () => {
-      texLoader.load('/assets/bg/swiss_panorama_360_real.webp', (tex) => {
+      texLoader.load('/assets/bg/swiss_grindelwald_360_real.jpg', (tex) => {
         tex.colorSpace = THREE.SRGBColorSpace;
         bgMat.map = tex;
         bgMat.needsUpdate = true;
@@ -2860,17 +2876,33 @@
     document.getElementById('side-btn-rot').onclick = handleRotate;
     document.getElementById('side-btn-del').onclick = handleDelete;
 
+    function openDecorTray(forceOpen = true) {
+      const tray = document.getElementById('decor-tray');
+      if (!tray) return;
+      if (forceOpen) {
+        tray.classList.add('open');
+        tray.classList.remove('minimized');
+        isTrayMinimized = false;
+        const btn = document.getElementById('btn-minimize-decor-tray');
+        if (btn) btn.textContent = '🔽 Thu Gọn';
+        renderDecorTray();
+      } else {
+        tray.classList.remove('open');
+      }
+    }
+    window.openDecorTray = openDecorTray;
+
     // Attach to Dock Decor Button
     document.getElementById('btn-toggle-decor').onclick = () => {
       isDecorationMode = true;
       const tray = document.getElementById('decor-tray');
       if (tray) {
-        tray.classList.toggle('open');
         if (tray.classList.contains('open')) {
-          renderDecorTray();
-          showToast('🛠️ Đang mở Thanh Chọn Đồ — Nhấp vào món bất kỳ để chọn!');
+          openDecorTray(false);
+          showToast('Đã đóng thanh chọn đồ');
         } else {
-          showToast('Đã thu gọn thanh chọn đồ');
+          openDecorTray(true);
+          showToast('🛠️ Đang mở Thanh Chọn Đồ — Nhấp vào món bất kỳ để chọn!');
         }
       }
     };
