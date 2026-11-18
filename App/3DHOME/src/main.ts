@@ -15,6 +15,9 @@ import { PlayerController } from './world/PlayerController';
 import { DecorationManager, PLACEABLE_ITEMS } from './world/DecorationManager';
 import { HybridAssetLoader } from './assets/HybridAssetLoader';
 import { QualityPreset, ViewMode } from './types';
+import { convertFbxToGlb } from './tools/speedtreeExporter';
+
+(window as unknown as Record<string, unknown>).__CONVERT_FBX__ = convertFbxToGlb;
 
 const isMobileDevice =
   /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth < 768;
@@ -113,12 +116,11 @@ waterMesh.visible = true;
 scene.add(waterMesh);
 
 const grassField = createInstancedGrass({
-  count: isMobileDevice ? 2600 : 5800,
+  count: 0,
   getGroundHeight,
   isForbidden: isGardenGrassForbidden,
 });
-grassField.mesh.visible = true;
-scene.add(grassField.mesh);
+grassField.mesh.visible = false;
 
 const chalet = buildSwissChalet(assetLoader);
 scene.add(chalet.group);
@@ -139,10 +141,9 @@ phase2Promise = (async () => {
   updateStatus();
 })();
 
-// Keep interior wall/glass boundaries & furniture colliders active so character stays cleanly inside
+// Colliders from chalet structure and interior furniture
 const allColliders = [
   ...chalet.colliders,
-  { minX: -4.6, maxX: 4.6, minZ: 4.95, maxZ: 5.5, tag: 'interior-glass-front' },
 ];
 
 // =========================================================
@@ -181,62 +182,68 @@ interface RoomOrbitPreset {
 
 const ROOM_PRESETS: Record<'overview' | 'kitchen' | 'bedroom' | 'bathroom', RoomOrbitPreset> = {
   overview: {
-    target: new THREE.Vector3(0.15, 1.52, 2.05),
-    defaultAz: THREE.MathUtils.degToRad(-46),
-    defaultEl: THREE.MathUtils.degToRad(5.0),
-    defaultDist: 3.65,
+    target: new THREE.Vector3(0.0, 1.40, 4.20),
+    defaultAz: THREE.MathUtils.degToRad(-10),
+    defaultEl: THREE.MathUtils.degToRad(5.5),
+    defaultDist: 4.10,
     elMin: THREE.MathUtils.degToRad(-6),
     elMax: THREE.MathUtils.degToRad(26),
     distMin: 1.85,
-    distMax: 4.10,
-    bounds: { minX: -3.55, maxX: 3.75, minY: 1.02, maxY: 3.30, minZ: 0.25, maxZ: 4.65 },
+    distMax: 6.50,
+    bounds: { minX: -3.55, maxX: 3.75, minY: 1.02, maxY: 3.30, minZ: -2.00, maxZ: 4.65 },
     rxFactor: 0.85,
     rzFactor: 0.95,
   },
   kitchen: {
-    target: new THREE.Vector3(-0.35, 1.48, -2.05),
-    defaultAz: THREE.MathUtils.degToRad(-38),
-    defaultEl: THREE.MathUtils.degToRad(6.0),
-    defaultDist: 3.15,
+    target: new THREE.Vector3(1.00, 1.40, -1.85),
+    defaultAz: THREE.MathUtils.degToRad(58),
+    defaultEl: THREE.MathUtils.degToRad(5.0),
+    defaultDist: 3.35,
     elMin: THREE.MathUtils.degToRad(-6),
     elMax: THREE.MathUtils.degToRad(28),
     distMin: 1.65,
-    distMax: 3.75,
-    bounds: { minX: -3.65, maxX: 3.65, minY: 1.05, maxY: 3.30, minZ: -3.85, maxZ: -0.35 },
-    rxFactor: 0.90,
+    distMax: 5.60,
+    bounds: { minX: -3.65, maxX: 3.65, minY: 1.05, maxY: 3.30, minZ: -4.50, maxZ: -0.35 },
+    rxFactor: 0.88,
     rzFactor: 0.85,
   },
   bedroom: {
-    target: new THREE.Vector3(2.25, 1.52, -7.85),
-    defaultAz: THREE.MathUtils.degToRad(-155),
-    defaultEl: THREE.MathUtils.degToRad(4.5),
-    defaultDist: 3.15,
+    target: new THREE.Vector3(2.40, 1.40, -8.60),
+    defaultAz: THREE.MathUtils.degToRad(182),
+    defaultEl: THREE.MathUtils.degToRad(4.2),
+    defaultDist: 3.85,
     elMin: THREE.MathUtils.degToRad(-8),
     elMax: THREE.MathUtils.degToRad(28),
     distMin: 1.65,
-    distMax: 3.85,
-    bounds: { minX: 0.45, maxX: 3.95, minY: 1.05, maxY: 3.30, minZ: -10.90, maxZ: -4.85 },
-    rxFactor: 0.72,
-    rzFactor: 0.85,
+    distMax: 6.20,
+    bounds: { minX: 0.85, maxX: 3.95, minY: 1.05, maxY: 3.30, minZ: -10.90, maxZ: -4.30 },
+    rxFactor: 0.75,
+    rzFactor: 0.90,
   },
   bathroom: {
-    target: new THREE.Vector3(-1.85, 1.38, -8.60),
-    defaultAz: THREE.MathUtils.degToRad(128),
-    defaultEl: THREE.MathUtils.degToRad(8.0),
-    defaultDist: 2.85,
+    target: new THREE.Vector3(-2.85, 1.35, -8.45),
+    defaultAz: THREE.MathUtils.degToRad(-142),
+    defaultEl: THREE.MathUtils.degToRad(3.0),
+    defaultDist: 3.35,
     elMin: THREE.MathUtils.degToRad(-8),
     elMax: THREE.MathUtils.degToRad(28),
     distMin: 1.55,
-    distMax: 3.50,
-    bounds: { minX: -3.95, maxX: -0.45, minY: 1.05, maxY: 3.30, minZ: -10.90, maxZ: -4.85 },
-    rxFactor: 0.72,
-    rzFactor: 0.85,
+    distMax: 5.40,
+    bounds: { minX: -3.95, maxX: -0.45, minY: 1.05, maxY: 3.30, minZ: -10.90, maxZ: -4.20 },
+    rxFactor: 0.80,
+    rzFactor: 0.88,
   },
 };
 
 function getHomeBaseFov(): number {
   const aspect = window.innerWidth / Math.max(1, window.innerHeight);
-  return aspect < 1.0 ? 68 : 60;
+  // Lock Horizontal FOV to ~75° (true 20mm wide angle architectural coverage)
+  // tan(V/2) = tan(H/2) / aspect => V-FOV expands proportionally to fill 100% of the tall screen!
+  const targetH = aspect < 0.62 ? 76 : aspect < 1.0 ? 74 : 70;
+  const radH = THREE.MathUtils.degToRad(targetH);
+  const radV = 2 * Math.atan(Math.tan(radH / 2) / Math.max(0.2, aspect));
+  const degV = THREE.MathUtils.radToDeg(radV);
+  return THREE.MathUtils.clamp(degV, 45, 118);
 }
 
 let currentMode: ViewMode = 'overview';
@@ -262,13 +269,14 @@ let transitionToFov = 60;
 const _tmpMat = new THREE.Matrix4();
 
 // Character follow camera state (Mode C)
-let charCamYaw = 2.78;
+let charCamYaw = Math.PI; // Look straight south towards panoramic glass doors & lake
 let charCamPitch = 0.16;
 let charCamDist = 2.45;
 const CHAR_CAM_FOV = 52;
 
 // 3/4 Elevated Cutaway Camera state (Mode B: view34 — scaled for 16.8m full luxury villa)
-const VIEW34_TARGET = new THREE.Vector3(0.0, 1.35, -2.6);
+const VIEW34_DEFAULT_TARGET = new THREE.Vector3(0.0, 1.35, -2.6);
+const view34Target = new THREE.Vector3(0.0, 1.35, -2.6);
 let view34Azimuth = THREE.MathUtils.degToRad(-35);
 let view34Elevation = THREE.MathUtils.degToRad(34);
 let view34Dist = 18.2;
@@ -290,16 +298,17 @@ function computeView34Pose(
   el: number,
   dist: number,
   outPos: THREE.Vector3,
-  outQuat: THREE.Quaternion
+  outQuat: THREE.Quaternion,
+  target: THREE.Vector3 = view34Target
 ): void {
-  // Centered around -Z looking toward +Z lake & Alps (az=0 -> due -Z looking +Z)
+  // Centered around target looking toward target
   const hDist = Math.cos(el) * dist;
   outPos.set(
-    VIEW34_TARGET.x - Math.sin(az) * hDist,
-    VIEW34_TARGET.y + Math.sin(el) * dist,
-    VIEW34_TARGET.z - Math.cos(az) * hDist
+    target.x - Math.sin(az) * hDist,
+    target.y + Math.sin(el) * dist,
+    target.z - Math.cos(az) * hDist
   );
-  _tmpMat.lookAt(outPos, VIEW34_TARGET, camera.up);
+  _tmpMat.lookAt(outPos, target, camera.up);
   outQuat.setFromRotationMatrix(_tmpMat);
 }
 
@@ -319,25 +328,42 @@ function computeCharacterCameraPose(outPos: THREE.Vector3, outQuat: THREE.Quater
   const offsetY = Math.sin(charCamPitch) * effDist + 0.24;
   const offsetZ = Math.cos(charCamYaw) * Math.cos(charCamPitch) * effDist;
 
-  // Respect spine wall if character enters Master Bedroom (x > 0) or Spa Bathroom (x < 0)
-  let minXClamp = -3.92;
-  let maxXClamp = 3.92;
-  let minZClamp = -10.85;
-  let maxZClamp = 4.65;
-  if (player.position.z < -4.3) {
-    minZClamp = -10.90;
-    if (player.position.x >= 0) {
-      minXClamp = 0.38;
-    } else {
-      maxXClamp = -0.38;
-    }
-  }
+  // Check if player is inside the chalet vs outside on the deck or in the garden
+  const isInsideChalet =
+    player.position.x >= -4.5 &&
+    player.position.x <= 4.5 &&
+    player.position.z >= -11.5 &&
+    player.position.z <= 5.1;
 
-  outPos.set(
-    THREE.MathUtils.clamp(target.x + offsetX, minXClamp, maxXClamp),
-    THREE.MathUtils.clamp(target.y + offsetY, 0.92, 3.25),
-    THREE.MathUtils.clamp(target.z + offsetZ, minZClamp, maxZClamp)
-  );
+  if (isInsideChalet) {
+    let minXClamp = -3.92;
+    let maxXClamp = 3.92;
+    let minZClamp = -10.85;
+    let maxZClamp = 4.85;
+    if (player.position.z < -4.3) {
+      minZClamp = -10.90;
+      if (player.position.x >= 0) {
+        minXClamp = 0.38;
+      } else {
+        maxXClamp = -0.38;
+      }
+    }
+
+    outPos.set(
+      THREE.MathUtils.clamp(target.x + offsetX, minXClamp, maxXClamp),
+      THREE.MathUtils.clamp(target.y + offsetY, 0.92, 3.25),
+      THREE.MathUtils.clamp(target.z + offsetZ, minZClamp, maxZClamp)
+    );
+  } else {
+    // Outside on the deck or freely walking across the entire garden, lawn, and lakeside!
+    const groundY = getGroundHeight(target.x + offsetX, target.z + offsetZ);
+    const minOutsideY = Math.max(0.65, groundY + 0.35);
+    outPos.set(
+      target.x + offsetX,
+      Math.max(minOutsideY, target.y + offsetY),
+      target.z + offsetZ
+    );
+  }
   _tmpMat.lookAt(outPos, target, camera.up);
   outQuat.setFromRotationMatrix(_tmpMat);
 }
@@ -381,9 +407,10 @@ function resetHomeView(instant = false): void {
     targetView34Azimuth = THREE.MathUtils.degToRad(-35);
     targetView34Elevation = THREE.MathUtils.degToRad(34);
     targetView34Dist = 18.2;
+    view34Target.copy(VIEW34_DEFAULT_TARGET);
     const destPos = new THREE.Vector3();
     const destQuat = new THREE.Quaternion();
-    computeView34Pose(targetView34Azimuth, targetView34Elevation, targetView34Dist, destPos, destQuat);
+    computeView34Pose(targetView34Azimuth, targetView34Elevation, targetView34Dist, destPos, destQuat, VIEW34_DEFAULT_TARGET);
     if (instant) {
       view34Azimuth = targetView34Azimuth;
       view34Elevation = targetView34Elevation;
@@ -421,19 +448,20 @@ function resetHomeView(instant = false): void {
   });
   document.getElementById('mobile-controls')!.classList.add('hidden');
 
+  const isPortraitPhone = (window.innerWidth / Math.max(1, window.innerHeight)) < 0.62;
   const room = ROOM_PRESETS[targetRoomMode];
   targetHomeAzimuth = room.defaultAz;
-  targetHomeElevation = room.defaultEl;
-  targetHomeDist = room.defaultDist;
+  targetHomeElevation = isPortraitPhone ? room.defaultEl + THREE.MathUtils.degToRad(1.2) : room.defaultEl;
+  targetHomeDist = isPortraitPhone ? Math.min(room.distMax, room.defaultDist * 1.12) : room.defaultDist;
   const baseFov = getHomeBaseFov();
   const destPos = new THREE.Vector3();
   const destQuat = new THREE.Quaternion();
-  computeHomeOrbitPose(room.defaultAz, room.defaultEl, room.defaultDist, destPos, destQuat);
+  computeHomeOrbitPose(targetHomeAzimuth, targetHomeElevation, targetHomeDist, destPos, destQuat);
 
   if (instant) {
-    homeAzimuth = room.defaultAz;
-    homeElevation = room.defaultEl;
-    homeDist = room.defaultDist;
+    homeAzimuth = targetHomeAzimuth;
+    homeElevation = targetHomeElevation;
+    homeDist = targetHomeDist;
     camera.position.copy(destPos);
     camera.quaternion.copy(destQuat);
     camera.fov = baseFov;
@@ -446,16 +474,21 @@ function resetHomeView(instant = false): void {
     transitionToPos.copy(destPos);
     transitionToQuat.copy(destQuat);
     transitionToFov = baseFov;
-    homeAzimuth = room.defaultAz;
-    homeElevation = room.defaultEl;
-    homeDist = room.defaultDist;
+    homeAzimuth = targetHomeAzimuth;
+    homeElevation = targetHomeElevation;
+    homeDist = targetHomeDist;
     transitionStartMs = performance.now();
     transitionT = 0.0;
   }
   updateStatus();
 }
 
+let customCameraActive = false;
+const customEye = new THREE.Vector3();
+const customTarget = new THREE.Vector3();
+
 function switchView(mode: ViewMode, instant = false): void {
+  customCameraActive = false;
   const normalized: ViewMode =
     mode === 'character' || mode === 'view34' || mode === 'kitchen' || mode === 'bedroom' || mode === 'bathroom'
       ? mode
@@ -467,10 +500,12 @@ function switchView(mode: ViewMode, instant = false): void {
   });
 
   const mobileControls = document.getElementById('mobile-controls')!;
-  player.mesh.visible = normalized === 'character';
+  // Always keep player visible so user can control the character in view34, overview & character modes!
+  player.mesh.visible = true;
+  mobileControls.classList.toggle('hidden', !isMobileDevice && window.innerWidth > 900);
+
   if (normalized === 'character') {
     chalet.setCutaway(false);
-    mobileControls.classList.toggle('hidden', !isMobileDevice && window.innerWidth > 900);
     const destPos = new THREE.Vector3();
     const destQuat = new THREE.Quaternion();
     computeCharacterCameraPose(destPos, destQuat);
@@ -496,15 +531,15 @@ function switchView(mode: ViewMode, instant = false): void {
 
   if (normalized === 'view34') {
     chalet.setCutaway(true);
-    mobileControls.classList.add('hidden');
     resetHomeView(instant);
+    updateStatus();
     return;
   }
 
   // Switching to Room Interior Orbit (overview | kitchen | bedroom | bathroom)
   chalet.setCutaway(false);
-  mobileControls.classList.add('hidden');
   resetHomeView(instant);
+  updateStatus();
 }
 
 function updateCharacterCamera(lerpAlpha: number): void {
@@ -550,10 +585,6 @@ function applyQuality(preset: QualityPreset, scaleLevel = autoScaleLevel): void 
 
   waterUniforms.uHighQuality.value = isHigh ? 1.0 : 0.0;
   envResult.setHighDetail(isHigh);
-
-  const grassTarget =
-    scaleLevel >= 2 ? 1200 : scaleLevel === 1 ? 1800 : preset === 'high' ? 5800 : 2600;
-  grassField.rebuild(grassTarget);
 }
 
 selectQuality.value = currentQuality;
@@ -707,9 +738,26 @@ canvas.addEventListener('pointerdown', (e) => {
 canvas.addEventListener('pointerup', (e) => {
   if (e.isPrimary) isDraggingCam = false;
   const moved = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
-  if (moved < 8 && e.button === 0 && decorManager.active) {
-    decorManager.handleLeftClick(e.clientX, e.clientY, canvas, camera);
-    updateStatus();
+  if (moved < 10 && e.button === 0) {
+    if (decorManager.active) {
+      decorManager.handleLeftClick(e.clientX, e.clientY, canvas, camera);
+      updateStatus();
+    } else {
+      // Raycasting: Click on player character to focus!
+      const rect = canvas.getBoundingClientRect();
+      const mouse = new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
+      );
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObject(player.mesh, true);
+      if (hits.length > 0) {
+        // Tapped character -> Smoothly focus camera on character!
+        switchView('character');
+        updateStatus();
+      }
+    }
   }
 });
 
@@ -842,13 +890,20 @@ document.getElementById('btn-mobile-interact')!.addEventListener('click', toggle
 // =========================================================
 // 8. RESIZE, STATUS & VERIFICATION API
 // =========================================================
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / Math.max(1, window.innerHeight);
-  if (currentMode === 'overview') {
+function handleViewportResize(): void {
+  const w = window.innerWidth;
+  const h = Math.max(1, window.innerHeight);
+  camera.aspect = w / h;
+  if (currentMode === 'overview' || currentMode === 'kitchen' || currentMode === 'bedroom' || currentMode === 'bathroom') {
     camera.fov = getHomeBaseFov();
   }
   camera.updateProjectionMatrix();
   applyQuality(currentQuality, autoScaleLevel);
+}
+
+window.addEventListener('resize', handleViewportResize);
+window.addEventListener('orientationchange', () => {
+  setTimeout(handleViewportResize, 150);
 });
 
 function updateStatus(): void {
@@ -869,6 +924,9 @@ function updateStatus(): void {
 }
 
 (window as unknown as Record<string, unknown>).__CHALET_API__ = {
+  scene,
+  camera,
+  assetLoader,
   switchView: (m: ViewMode) => switchView(m, true),
   resetView: (instant = false) => resetHomeView(instant),
   waitPhase2: () => waitPhase2(),
@@ -883,7 +941,7 @@ function updateStatus(): void {
       currentMode = 'overview';
     }
     chalet.setCutaway(false);
-    player.mesh.visible = false;
+    player.mesh.visible = true;
     transitionT = 1.0;
     targetHomeAzimuth = THREE.MathUtils.degToRad(azDeg);
     targetHomeElevation = THREE.MathUtils.degToRad(elDeg);
@@ -935,6 +993,18 @@ function updateStatus(): void {
     selectQuality.value = q;
     applyQuality(q, 0);
   },
+  allColliders,
+  canStandAt: (x: number, z: number, r = 0.34) => {
+    // Check which collider blocks
+    const blocked: any[] = [];
+    if ((x < -23 || x > 14 || z < -25 || z > 22)) blocked.push('bounds');
+    for (const c of allColliders) {
+      if (x + r > c.minX && x - r < c.maxX && z + r > c.minZ && z - r < c.maxZ) {
+        blocked.push(c);
+      }
+    }
+    return { ok: blocked.length === 0, blocked };
+  },
   getPlayerPos: () => ({ x: player.position.x, y: player.position.y, z: player.position.z }),
   movePlayerTo: (x: number, z: number) => {
     player.position.set(x, player.getSupportHeight(x, z), z);
@@ -961,9 +1031,126 @@ function updateStatus(): void {
     hudTop.classList.remove('hidden');
     hudBottom.classList.remove('hidden');
   },
+  setCustomCamera: (
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
+    targetX: number,
+    targetY: number,
+    targetZ: number,
+    fov = 48
+  ) => {
+    customCameraActive = true;
+    player.mesh.visible = false;
+    chalet.setCutaway(false);
+    customEye.set(eyeX, eyeY, eyeZ);
+    customTarget.set(targetX, targetY, targetZ);
+    camera.position.copy(customEye);
+    camera.lookAt(customTarget);
+    camera.fov = fov;
+    camera.updateProjectionMatrix();
+  },
+  resetCustomCamera: () => {
+    customCameraActive = false;
+    switchView('overview', true);
+  },
 };
 
-switchView('overview', true);
+const urlParams = new URLSearchParams(window.location.search);
+const isEmbedded = window.self !== window.top;
+const hideHudParam = urlParams.get('hideHud') === '1' || urlParams.get('showHud') === '0' || isEmbedded;
+const showHud = !hideHudParam;
+const viewParam = (urlParams.get('view') as ViewMode) || 'overview';
+
+if (showHud) {
+  document.documentElement.classList.add('show-hud-mode');
+  hudTop?.classList.remove('hidden');
+  if (hudTop) (hudTop as HTMLElement).style.removeProperty('display');
+  hudBottom?.classList.remove('hidden');
+  if (hudBottom) (hudBottom as HTMLElement).style.removeProperty('display');
+  const mobileControls = document.getElementById('mobile-controls');
+  if (mobileControls) {
+    mobileControls.classList.remove('hidden');
+    (mobileControls as HTMLElement).style.removeProperty('display');
+  }
+} else {
+  document.documentElement.classList.add('hide-hud-mode');
+  hudTop?.classList.add('hidden');
+  hudBottom?.classList.add('hidden');
+  decoratePanel?.classList.add('hidden');
+  document.getElementById('mobile-controls')?.classList.add('hidden');
+  document.getElementById('btn-restore-hud')?.classList.add('hidden');
+  if (hudTop) (hudTop as HTMLElement).style.display = 'none';
+  if (hudBottom) (hudBottom as HTMLElement).style.display = 'none';
+}
+
+switchView(viewParam, true);
+
+// Collapsible Mobile Menu Logic
+const btnMobileMenu = document.getElementById('btn-mobile-menu');
+const btnCloseMobileMenu = document.getElementById('btn-close-mobile-menu');
+const hudCollapsible = document.getElementById('hud-collapsible');
+
+function setMobileMenuOpen(open: boolean): void {
+  if (!hudCollapsible) return;
+  hudCollapsible.classList.toggle('is-open', open);
+  if (btnMobileMenu) {
+    btnMobileMenu.setAttribute('aria-expanded', String(open));
+    const chevron = btnMobileMenu.querySelector('.menu-chevron');
+    if (chevron) chevron.textContent = open ? '▴' : '▾';
+  }
+}
+
+if (btnMobileMenu) {
+  btnMobileMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = hudCollapsible?.classList.contains('is-open') ?? false;
+    setMobileMenuOpen(!isOpen);
+  });
+}
+
+if (btnCloseMobileMenu) {
+  btnCloseMobileMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setMobileMenuOpen(false);
+  });
+}
+
+// Auto-close menu when choosing a room view on mobile
+document.querySelectorAll<HTMLButtonElement>('.view-tabs [data-view], #btn-reset-view').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    if (window.innerWidth <= 900 || window.innerHeight <= 520) {
+      setMobileMenuOpen(false);
+    }
+  });
+});
+
+// Click outside menu to close
+document.addEventListener('click', (e) => {
+  if (hudCollapsible && hudCollapsible.classList.contains('is-open')) {
+    const target = e.target as HTMLElement | null;
+    if (target && !hudCollapsible.contains(target) && target !== btnMobileMenu && !btnMobileMenu?.contains(target)) {
+      setMobileMenuOpen(false);
+    }
+  }
+});
+
+// Listen to parent postMessage from HealthClues Mobile App
+window.addEventListener('message', (event) => {
+  try {
+    const data = event.data;
+    if (!data || typeof data !== 'object') return;
+    if (data.type === 'CHALET_SET_VIEW' && data.view) {
+      switchView(data.view as ViewMode, false);
+    } else if (data.type === 'CHALET_RESET_VIEW') {
+      resetHomeView(false);
+    } else if (data.type === 'CHALET_TOGGLE_DOOR') {
+      toggleDoors();
+    } else if (data.type === 'CHALET_TOGGLE_LIGHTS') {
+      toggleLights();
+    }
+  } catch {}
+});
 
 // =========================================================
 // 9. ANIMATION LOOP & AUTO-FPS THERMAL THROTTLE
@@ -1017,7 +1204,11 @@ function animate(): void {
   player.update(dt, currentMode === 'character' ? charCamYaw : activeCamYaw, allColliders);
 
   // Smooth transitions & damped Fixed View / Character Follow cameras
-  if (transitionT < 1.0) {
+  if (customCameraActive) {
+    camera.position.copy(customEye);
+    camera.lookAt(customTarget);
+    camera.updateProjectionMatrix();
+  } else if (transitionT < 1.0) {
     transitionT = Math.min(1.0, (performance.now() - transitionStartMs) / (TRANSITION_DURATION * 1000));
     const ease = transitionT < 0.5
       ? 4 * transitionT * transitionT * transitionT
@@ -1033,6 +1224,12 @@ function animate(): void {
   } else if (currentMode === 'character') {
     updateCharacterCamera(Math.min(1, dt * 8.5));
   } else if (currentMode === 'view34') {
+    // Softly bias 3/4 cutaway view target towards player so they stay beautifully framed as they walk across rooms and yard
+    const desiredX = THREE.MathUtils.clamp(player.position.x * 0.40, -4.2, 4.2);
+    const desiredZ = THREE.MathUtils.clamp(-2.6 + (player.position.z + 2.6) * 0.32, -7.0, 4.8);
+    view34Target.x += (desiredX - view34Target.x) * Math.min(1, dt * 2.8);
+    view34Target.z += (desiredZ - view34Target.z) * Math.min(1, dt * 2.8);
+
     const damp = 1 - Math.exp(-9 * dt);
     view34Azimuth = THREE.MathUtils.lerp(view34Azimuth, targetView34Azimuth, damp);
     view34Elevation = THREE.MathUtils.lerp(view34Elevation, targetView34Elevation, damp);

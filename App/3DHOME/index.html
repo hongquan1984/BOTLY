@@ -15,53 +15,73 @@
       <canvas id="scene-canvas"></canvas>
 
       <!-- Top Viewpoint & Mode Bar -->
-      <header class="hud-top">
-        <div class="brand-pill">
-          <span class="brand-dot"></span>
-          <span>Alpine Chalet 3D</span>
+      <header class="hud-top" id="hud-top">
+        <div class="hud-top-bar">
+          <div class="brand-pill">
+            <span class="brand-dot"></span>
+            <span>Alpine Chalet 3D</span>
+          </div>
+
+          <!-- Mobile Compact Floating Trigger (Zero Screen Waste) -->
+          <button class="mobile-menu-trigger" id="btn-mobile-menu" aria-expanded="false" aria-label="Mở menu góc nhìn và tiện ích">
+            <span class="menu-icon">☰</span>
+            <span class="menu-label">Góc nhìn & Menu</span>
+            <span class="menu-chevron">▾</span>
+          </button>
         </div>
 
-        <nav class="view-tabs" aria-label="Chế độ xem">
-          <button class="hud-btn active" data-view="overview" id="btn-view-overview" title="Phòng khách ven hồ">
-            🏠 Khách
-          </button>
-          <button class="hud-btn" data-view="kitchen" id="btn-view-kitchen" title="Bếp đảo & bàn ăn">
-            🍳 Bếp & Ăn
-          </button>
-          <button class="hud-btn" data-view="bedroom" id="btn-view-bedroom" title="Phòng ngủ Master view rừng thông">
-            🛏️ Phòng ngủ
-          </button>
-          <button class="hud-btn" data-view="bathroom" id="btn-view-bathroom" title="Phòng tắm Spa & WC">
-            🛁 Phòng tắm
-          </button>
-          <button class="hud-btn" data-view="view34" id="btn-view-34" title="Góc 3/4 mặt cắt biệt thự">
-            🏛️ Góc 3/4
-          </button>
-          <button class="hud-btn" data-view="character" id="btn-view-character" title="Điều khiển nhân vật">
-            🚶 Nhân vật
-          </button>
-          <button class="hud-btn" id="btn-reset-view" title="Trở về góc toàn cảnh mặc định">
-            ↺ Toàn cảnh
-          </button>
-        </nav>
+        <!-- Collapsible Content (Inline on Desktop, Compact Glass Overlay on Mobile) -->
+        <div class="hud-collapsible" id="hud-collapsible">
+          <div class="collapsible-header">
+            <span class="collapsible-title">🏔️ Chọn Góc Nhìn & Tiện Ích</span>
+            <button class="collapsible-close" id="btn-close-mobile-menu" aria-label="Đóng menu">✕</button>
+          </div>
 
-        <div class="hud-actions">
-          <button class="hud-btn" id="btn-decorate" title="Đặt đồ trang trí">
-            🪑 Đặt đồ
-          </button>
-          <button class="hud-btn" id="btn-door" title="Đóng / Mở cửa kính trượt">
-            🚪 Cửa kính: Mở
-          </button>
-          <button class="hud-btn" id="btn-lights" title="Bật / Tắt đèn lồng & lò sưởi">
-            🔥 Đèn & Lửa
-          </button>
-          <select class="hud-select" id="select-quality" aria-label="Chất lượng đồ họa">
-            <option value="high">Desktop — HIGH</option>
-            <option value="balanced">Mobile — BALANCED</option>
-          </select>
-          <button class="hud-btn icon-only" id="btn-toggle-hud" title="Ẩn/Hiện giao diện">
-            👁️
-          </button>
+          <nav class="view-tabs" aria-label="Chế độ xem">
+            <button class="hud-btn active" data-view="overview" id="btn-view-overview" title="Phòng khách ven hồ">
+              🏠 Khách
+            </button>
+            <button class="hud-btn" data-view="kitchen" id="btn-view-kitchen" title="Bếp đảo & bàn ăn">
+              🍳 Bếp & Ăn
+            </button>
+            <button class="hud-btn" data-view="bedroom" id="btn-view-bedroom" title="Phòng ngủ Master view rừng thông">
+              🛏️ Phòng ngủ
+            </button>
+            <button class="hud-btn" data-view="bathroom" id="btn-view-bathroom" title="Phòng tắm Spa & WC">
+              🛁 Phòng tắm
+            </button>
+            <button class="hud-btn" data-view="view34" id="btn-view-34" title="Góc 3/4 mặt cắt biệt thự">
+              🏛️ Góc 3/4
+            </button>
+            <button class="hud-btn" data-view="character" id="btn-view-character" title="Điều khiển nhân vật">
+              🚶 Nhân vật
+            </button>
+            <button class="hud-btn" id="btn-reset-view" title="Trở về góc toàn cảnh mặc định">
+              ↺ Toàn cảnh
+            </button>
+          </nav>
+
+          <div class="hud-actions">
+            <a class="hud-btn" href="/village.html" title="Bước ra quảng trường Làng Sống Khỏe 3D" style="text-decoration:none;">
+              🏘️ Làng 3D
+            </a>
+            <button class="hud-btn" id="btn-decorate" title="Đặt đồ trang trí">
+              🪑 Đặt đồ
+            </button>
+            <button class="hud-btn" id="btn-door" title="Đóng / Mở cửa kính trượt">
+              🚪 Cửa kính: Mở
+            </button>
+            <button class="hud-btn" id="btn-lights" title="Bật / Tắt đèn lồng & lò sưởi">
+              🔥 Đèn & Lửa
+            </button>
+            <select class="hud-select" id="select-quality" aria-label="Chất lượng đồ họa">
+              <option value="high">Desktop — HIGH</option>
+              <option value="balanced">Mobile — BALANCED</option>
+            </select>
+            <button class="hud-btn icon-only" id="btn-toggle-hud" title="Ẩn/Hiện giao diện">
+              👁️
+            </button>
+          </div>
         </div>
       </header>
 
@@ -96,14 +116,14 @@
           <span><b>Kéo chuột / Vuốt</b> xoay góc nhìn</span>
           <span><b>Cuộn / Chụm</b> zoom quang học</span>
           <span><b>R</b> hoặc <b>↺ Toàn cảnh</b> đặt lại góc</span>
-          <span><b>WASD</b> đi lại (Chế độ Nhân vật)</span>
+          <span><b>WASD / Phím mũi tên</b> điều khiển nhân vật</span>
           <span><b>E</b> cửa / đèn</span>
         </div>
         <div class="status-pill" id="status-pill">Đang tải...</div>
       </footer>
 
       <!-- Mobile Touch Controls -->
-      <div class="mobile-controls hidden" id="mobile-controls">
+      <div class="mobile-controls" id="mobile-controls">
         <div class="joystick-zone" id="joystick-zone">
           <div class="joystick-base">
             <div class="joystick-knob" id="joystick-knob"></div>

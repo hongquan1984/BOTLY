@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Ngôi Làng Sống Khỏe 3D — Wellness Village</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🏔️</text></svg>"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="village-panorama" aria-hidden="true"></div>
+      <canvas id="scene-canvas"></canvas>
+
+      <!-- Top Viewpoint & Mode Navigation Bar -->
+      <header class="hud-top">
+        <div class="brand-pill">
+          <span class="brand-dot"></span>
+          <span>Làng Sống Khỏe 3D</span>
+        </div>
+
+        <nav class="view-tabs" aria-label="Góc nhìn ngôi làng">
+          <button class="hud-btn active" data-view="overview" id="btn-view-overview" title="Toàn cảnh quảng trường làng & núi tuyết Alps">
+            🏔️ Toàn cảnh
+          </button>
+          <button class="hud-btn" data-view="planner" id="btn-view-planner" title="Góc nhìn quy hoạch trên cao (Toàn cảnh để dễ nhìn sắp xếp)">
+            🗺️ Trên Cao
+          </button>
+          <button class="hud-btn" data-view="archway" id="btn-view-archway" title="Cổng vòm đá leo dây leo">
+            ⛩️ Cổng Vòm
+          </button>
+          <button class="hud-btn" data-view="fountain" id="btn-view-fountain" title="Đài phun nước trung tâm quảng trường">
+            ⛲ Đài Phun Nước
+          </button>
+          <button class="hud-btn" data-view="overlook" id="btn-view-overlook" title="Vọng cảnh bờ hồ Brienz xanh ngọc">
+            🌊 Bờ Hồ
+          </button>
+          <button class="hud-btn" data-view="character" id="btn-view-character" title="Góc nhìn thứ 3 theo nhân vật">
+            🚶 Nhân vật
+          </button>
+          <button class="hud-btn" id="btn-reset-view" title="Trở về góc nhìn mặc định">
+            ↺ Đặt lại
+          </button>
+        </nav>
+
+        <div class="hud-actions">
+          <button class="hud-btn" id="btn-editor-toggle" title="Mở bảng điều khiển tự sắp xếp & phóng to thu nhỏ mô hình 3D">
+            🛠️ Sắp Xếp & Thu Phóng
+          </button>
+          <button class="hud-btn" id="btn-lights" title="Bật / Tắt đèn đường & đèn lồng">
+            🔥 Đèn: Bật
+          </button>
+          <a class="hud-btn" href="/" title="Vào tham quan biệt thự gỗ Chalet (3D Home)" style="text-decoration:none;">
+            🏠 Vào Nhà (Home)
+          </a>
+          <a class="hud-btn" href="http://localhost:8081/iphone.html" title="Trở về giao diện game RPG Mobile" style="text-decoration:none;">
+            📱 Game RPG
+          </a>
+        </div>
+      </header>
+
+      <!-- Controls Hint & Status Footer -->
+      <footer class="hud-bottom" id="hud-bottom">
+        <div class="controls-hint" id="controls-hint">
+          <span><b>Kéo chuột / Vuốt</b> xoay camera</span>
+          <span><b>Cuộn / Chụm</b> phóng to thu nhỏ</span>
+          <span><b>WASD / Phím mũi tên</b> điều khiển nhân vật chạy trên quảng trường</span>
+          <span><b>Hậu cảnh 2.5D</b> thị sai tự nhiên theo góc nhìn</span>
+        </div>
+        <div class="status-pill" id="status-pill">Đang tải ngôi làng 3D...</div>
+      </footer>
+
+      <!-- Mobile Virtual Joystick -->
+      <div class="mobile-controls hidden" id="mobile-controls">
+        <div class="joystick-zone" id="joystick-zone">
+          <div class="joystick-base">
+            <div class="joystick-knob" id="joystick-knob"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/village.ts"></script>
+  </body>
+</html>

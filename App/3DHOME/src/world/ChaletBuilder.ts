@@ -38,6 +38,7 @@ export function buildSwissChalet(assets?: HybridAssetLoader): ChaletBuildResult 
   const pierStoneTex = loadPolyHavenPBR('cobblestone_05', 0.9, 2.2);
   const chimneyStoneTex = loadPolyHavenPBR('cobblestone_05', 1.0, 2.4);
   const roofSlateTex = loadPolyHavenPBR('castle_wall_slates', 6, 4);
+  const slateFloorTex = loadPolyHavenPBR('castle_wall_slates', 3.2, 5.0);
 
   // Shared PBR Materials
   const deckMat = new THREE.MeshStandardMaterial({
@@ -204,10 +205,14 @@ export function buildSwissChalet(assets?: HybridAssetLoader): ChaletBuildResult 
   });
 
   const slateMat = new THREE.MeshStandardMaterial({
-    color: '#34383e',
-    roughness: 0.72,
+    map: slateFloorTex.map,
+    normalMap: slateFloorTex.normalMap,
+    normalScale: new THREE.Vector2(0.85, 0.85),
+    roughnessMap: slateFloorTex.roughnessMap,
+    color: '#828790',
+    roughness: 0.65,
     metalness: 0.08,
-    envMapIntensity: 0.32,
+    envMapIntensity: 0.38,
   });
 
   const quartzMat = new THREE.MeshStandardMaterial({
@@ -628,15 +633,15 @@ export function buildSwissChalet(assets?: HybridAssetLoader): ChaletBuildResult 
   slideRightPanel.traverse((o) => (o.userData.dynamic = true));
   group.add(slideLeftPanel, slideRightPanel);
 
-  // Sliding door colliders (left & right fixed panel barriers, plus dynamic center collider when closed!)
-  colliders.push({ minX: -3.7, maxX: doorLeftX + panelW, minZ: 5.05, maxZ: 5.45, tag: 'door-fixed-l' });
-  colliders.push({ minX: doorRightX - panelW, maxX: 4.5, minZ: 5.05, maxZ: 5.45, tag: 'door-fixed-r' });
+  // Sliding door colliders (left & right fixed panel barriers, leaving a wide open center passage x: -2.0 .. +2.2)
+  colliders.push({ minX: -3.7, maxX: -2.0, minZ: 5.05, maxZ: 5.45, tag: 'door-fixed-l' });
+  colliders.push({ minX: 2.2, maxX: 4.5, minZ: 5.05, maxZ: 5.45, tag: 'door-fixed-r' });
   const centerDoorCollider: AABBCollider = {
-    minX: doorLeftX + panelW,
-    maxX: doorRightX - panelW,
-    minZ: 5.05,
-    maxZ: 5.45,
-    maxY: 0, // When open, set maxY = -10 or move out of bounds; we'll toggle minZ/maxZ
+    minX: -2.0,
+    maxX: 2.2,
+    minZ: -999,
+    maxZ: -998,
+    maxY: 0,
     tag: 'door-center',
   };
   colliders.push(centerDoorCollider);
@@ -645,7 +650,7 @@ export function buildSwissChalet(assets?: HybridAssetLoader): ChaletBuildResult 
   let doorOpenRatio = 1.0;
 
   const syncCenterCollider = () => {
-    if (doorOpenRatio > 0.65) {
+    if (doorOpenRatio > 0.4) {
       // Open: move collider out of walkable path
       centerDoorCollider.minZ = -999;
       centerDoorCollider.maxZ = -998;

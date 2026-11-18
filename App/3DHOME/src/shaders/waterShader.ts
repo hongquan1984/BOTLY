@@ -77,7 +77,9 @@ export function createAlpineWater(sunDirection: THREE.Vector3, waterLevel = -0.3
     // Approximate peninsula shore distance for shallow-to-deep color gradient
     float shoreFactor(vec2 xz) {
       float frontShoreZ = 20.5 + sin(xz.x * 0.12) * 1.8 + cos(xz.x * 0.25) * 0.7;
-      float rightShoreX = 11.2 + sin(xz.y * 0.11) * 1.9;
+      float tEast = clamp((6.0 - xz.y) / 4.5, 0.0, 1.0);
+      tEast = tEast * tEast * (3.0 - 2.0 * tEast);
+      float rightShoreX = mix(11.2 + sin(xz.y * 0.11) * 1.9, 55.0, tEast);
       float d = max(xz.y - frontShoreZ, xz.x - rightShoreX);
       return d;
     }
@@ -134,8 +136,10 @@ export function createAlpineWater(sunDirection: THREE.Vector3, waterLevel = -0.3
       // Distance atmospheric haze + seamless horizon kiss into 2.5D forest shore (R=132m)
       float radialDist = length(vWorldPos.xz);
       if (radialDist > 134.0) discard;
-      // Clip water behind the rear wall of the chalet (Z < -11.8) so it never shows through bedroom window
+      // Natural organic water clipping: lake is in front of the chalet (+Z)
+      if (dShore < -0.3) discard;
       if (vWorldPos.z < -11.8) discard;
+      if (vWorldPos.z < 2.0 && vWorldPos.x > 6.0) discard;
       float horizonMist = smoothstep(104.0, 133.5, radialDist);
       float fogFactor = 1.0 - exp(-pow(distCam * uFogDensity, 2.0));
       col = mix(col, uFogColor, clamp(fogFactor, 0.0, 0.65));

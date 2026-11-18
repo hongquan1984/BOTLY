@@ -19,6 +19,13 @@ export interface AABBCollider {
   maxZ: number;
   maxY?: number;
   tag?: string;
+  obb?: {
+    cx: number;
+    cz: number;
+    halfW: number;
+    halfD: number;
+    rotY: number;
+  };
 }
 
 export interface BoundingDimensions {
@@ -51,3 +58,16 @@ export interface SurfaceZone {
   zone: 'interior' | 'deck' | 'garden';
   mesh: THREE.Object3D;
 }
+
+export interface VillageEntityRecord {
+  id: string;
+  name: string;
+  badge: string;
+  category: 'building' | 'prop';
+  x: number;
+  y: number;
+  z: number;
+  rotY: number;
+  scale: number;
+}
+

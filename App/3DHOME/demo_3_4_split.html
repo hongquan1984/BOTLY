@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HealthClues Chalet 3D - Split 3/4 UI Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      background-color: #0b0f14;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Mobile Status & EXP bar */
+    .top-status-bar {
+      height: 48px;
+      background: linear-gradient(180deg, rgba(11, 15, 20, 0.95) 0%, rgba(11, 15, 20, 0.75) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 10;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .badge-exp {
+      background: #e67e22;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 8px rgba(230, 126, 34, 0.35);
+    }
+    .badge-coins {
+      background: rgba(241, 196, 15, 0.15);
+      border: 1px solid rgba(241, 196, 15, 0.4);
+      color: #f1c40f;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .top-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ecf0f1;
+      font-size: 14px;
+    }
+
+    /* 3D Viewport container (Takes ~72% of remaining height) */
+    .viewport-3d-wrapper {
+      flex: 1;
+      position: relative;
+      background: #000;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+      border-bottom: 2px solid rgba(245, 175, 25, 0.3);
+    }
+    .viewport-3d-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Floating View Label & Photo Mode pill */
+    .view-indicator {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+    }
+    .view-indicator::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #2ecc71;
+      box-shadow: 0 0 8px #2ecc71;
+    }
+
+    .fullscreen-toggle-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f8fafc;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Bottom Control Dock (Takes ~28% of height) */
+    .bottom-control-dock {
+      height: 235px;
+      background: #0f172a;
+      background: linear-gradient(180deg, #131d31 0%, #0a0f1d 100%);
+      padding: 12px 14px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 20;
+    }
+
+    .dock-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px 2px 4px;
+    }
+    .dock-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 700;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dock-hint {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    /* Room Selector Tabs */
+    .room-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .room-tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 9px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .room-tab-btn.active {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%);
+      border-color: #f59e0b;
+      color: #fbbf24;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    }
+    .room-tab-btn .icon {
+      font-size: 16px;
+    }
+
+    /* Action toggles (Door, Lights, 3/4) */
+    .action-toggles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .toggle-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 8px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .toggle-btn.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    /* Primary CTA / Shop Button */
+    .cta-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 2px;
+    }
+    .shop-btn {
+      flex: 1;
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+      cursor: pointer;
+    }
+    .reset-cam-btn {
+      width: 44px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #cbd5e1;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Game Status Header -->
+  <header class="top-status-bar">
+    <div class="badge-exp">
+      <span>Lv.2</span>
+      <span>⭐ 120 EXP</span>
+    </div>
+    <div class="badge-coins">
+      <span>🪙</span>
+      <span>250 Xu</span>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" title="Âm thanh">🔊</button>
+      <button class="icon-btn" title="Cài đặt">⚙️</button>
+    </div>
+  </header>
+
+  <!-- 3D Viewport: Clean ~72% Canvas (Wider Aspect Ratio 4:5, Zero Occlusion) -->
+  <main class="viewport-3d-wrapper">
+    <div class="view-indicator" id="view-indicator">Phòng Khách • Góc Rộng 4:5</div>
+    <button class="fullscreen-toggle-btn" id="photo-mode-btn">
+      <span>📷</span>
+      <span>Ngắm Cảnh</span>
+    </button>
+    <iframe id="chalet-iframe" src="http://localhost:5173/?view=overview&hideHud=1"></iframe>
+  </main>
+
+  <!-- Bottom Dark Control Dock: ~28% Screen Height (Zero Finger Block on 3D) -->
+  <footer class="bottom-control-dock" id="bottom-dock">
+    <div class="dock-header">
+      <span class="dock-title">
+        <span>🏡</span>
+        <span>Bảng Điều Khiển Biệt Thự</span>
+      </span>
+      <span class="dock-hint">Vuốt 3D phía trên để xoay</span>
+    </div>
+
+    <!-- 1. Room Switcher Tabs -->
+    <div class="room-tabs">
+      <button class="room-tab-btn active" data-room="overview">
+        <span class="icon">🛋️</span>
+        <span>Khách</span>
+      </button>
+      <button class="room-tab-btn" data-room="kitchen">
+        <span class="icon">🍳</span>
+        <span>Bếp & Ăn</span>
+      </button>
+      <button class="room-tab-btn" data-room="bedroom">
+        <span class="icon">🛏️</span>
+        <span>Phòng Ngủ</span>
+      </button>
+      <button class="room-tab-btn" data-room="bathroom">
+        <span class="icon">🛁</span>
+        <span>Phòng Tắm</span>
+      </button>
+    </div>
+
+    <!-- 2. Interactive Environment Toggles -->
+    <div class="action-toggles">
+      <button class="toggle-btn active" id="door-toggle">
+        <span>🚪</span>
+        <span id="door-label">Cửa: Mở</span>
+      </button>
+      <button class="toggle-btn active" id="lights-toggle">
+        <span>💡</span>
+        <span id="lights-label">Đèn & Lửa: Bật</span>
+      </button>
+      <button class="toggle-btn" id="view34-toggle">
+        <span>📐</span>
+        <span>Góc Cắt 3/4</span>
+      </button>
+    </div>
+
+    <!-- 3. Primary Game Action & Reset Camera -->
+    <div class="cta-row">
+      <button class="shop-btn">
+        <span>🛍️</span>
+        <span>Sắm Đồ Nội Thất Chalet</span>
+      </button>
+      <button class="reset-cam-btn" id="reset-cam" title="Đặt lại góc nhìn">
+        <span>🔄</span>
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    const iframe = document.getElementById('chalet-iframe');
+    const indicator = document.getElementById('view-indicator');
+    const roomBtns = document.querySelectorAll('.room-tab-btn');
+    const roomNames = {
+      overview: 'Phòng Khách • Góc Rộng 4:5',
+      kitchen: 'Bếp & Phòng Ăn • Góc Rộng 4:5',
+      bedroom: 'Phòng Ngủ Suite • Góc Rộng 4:5',
+      bathroom: 'Phòng Tắm Spa • Góc Rộng 4:5',
+    };
+
+    function postToIframe(msg) {
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage(msg, '*');
+      }
+    }
+
+    roomBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        roomBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const room = btn.dataset.room;
+        indicator.textContent = roomNames[room] || 'Chalet 3D';
+        postToIframe({ type: 'CHALET_SET_VIEW', view: room });
+      });
+    });
+
+    let doorOpen = true;
+    const doorBtn = document.getElementById('door-toggle');
+    const doorLabel = document.getElementById('door-label');
+    doorBtn.addEventListener('click', () => {
+      doorOpen = !doorOpen;
+      doorBtn.classList.toggle('active', doorOpen);
+      doorLabel.textContent = doorOpen ? 'Cửa: Mở' : 'Cửa: Đóng';
+      postToIframe({ type: 'CHALET_TOGGLE_DOOR' });
+    });
+
+    let lightsOn = true;
+    const lightsBtn = document.getElementById('lights-toggle');
+    const lightsLabel = document.getElementById('lights-label');
+    lightsBtn.addEventListener('click', () => {
+      lightsOn = !lightsOn;
+      lightsBtn.classList.toggle('active', lightsOn);
+      lightsLabel.textContent = lightsOn ? 'Đèn & Lửa: Bật' : 'Đèn: Tắt';
+      postToIframe({ type: 'CHALET_TOGGLE_LIGHTS' });
+    });
+
+    let isView34 = false;
+    const view34Btn = document.getElementById('view34-toggle');
+    view34Btn.addEventListener('click', () => {
+      isView34 = !isView34;
+      view34Btn.classList.toggle('active', isView34);
+      if (isView34) {
+        roomBtns.forEach(b => b.classList.remove('active'));
+        indicator.textContent = 'Toàn Cảnh Cắt Mái 3/4';
+        postToIframe({ type: 'CHALET_SET_VIEW', view: 'view34' });
+      } else {
+        const activeRoom = 'overview';
+        document.querySelector('[data-room="overview"]').classList.add('active');
+        indicator.textContent = roomNames['overview'];
+        postToIframe({ type: 'CHALET_SET_VIEW', view: 'overview' });
+      }
+    });
+
+    document.getElementById('reset-cam').addEventListener('click', () => {
+      postToIframe({ type: 'CHALET_RESET_VIEW' });
+    });
+  </script>
+</body>
+</html>

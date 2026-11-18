@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { HybridAssetLoader } from '../assets/HybridAssetLoader';
 import {
+  createBarkTexture,
   createGraniteTextures,
+  createLeafClusterTexture,
   createSoftShadowTexture,
   loadPolyHavenPBR,
 } from '../textures/proceduralTextures';
@@ -44,7 +46,9 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
 
 export function getPeninsulaDistance(x: number, z: number): number {
   const frontShoreZ = 20.5 + Math.sin(x * 0.12) * 1.8 + Math.cos(x * 0.25) * 0.7;
-  const rightShoreX = 11.2 + Math.sin(z * 0.11) * 1.9;
+  // Peninsula front lake overlook: lake water is in front (+Z), while East side beside bedroom is continuous alpine meadow
+  const tEast = smoothstep(6.0, 1.5, z);
+  const rightShoreX = (1.0 - tEast) * (11.2 + Math.sin(z * 0.11) * 1.9) + tEast * 55.0;
   const backShoreZ = -48.0;
   const leftShoreX = -32.0;
 
@@ -68,7 +72,7 @@ export function getGroundHeight(x: number, z: number): number {
   const penDist = getPeninsulaDistance(x, z);
 
   // Flat yard pad around extended chalet (Z: -10.3..+5.3), deck & stepping stones
-  const padDist = Math.max(Math.abs(x + 1.0) - 13.0, Math.abs(z - 0.5) - 14.5);
+  const padDist = Math.max(Math.abs(x + 1.0) - 17.0, Math.abs(z - 0.5) - 14.5);
   const flatHouseMask = smoothstep(0.0, 9.0, padDist);
   const microRoll = (fbm2(x * 0.08 + 5.2, z * 0.08 - 3.1, 3) - 0.5) * 0.20 * flatHouseMask;
 
@@ -79,7 +83,8 @@ export function getGroundHeight(x: number, z: number): number {
 }
 
 export function isGardenGrassForbidden(x: number, z: number): boolean {
-  if (x > -7.5 && x < 5.7 && z > -6.1 && z < 9.35) return true;
+  if (x > -4.8 && x < 4.8 && z > -11.8 && z < 5.3) return true; // Chalet footprint
+  if (x > -7.5 && x < 5.7 && z >= 5.0 && z < 9.35) return true; // Front deck
   if (x > -5.5 && x < -2.9 && z >= 9.0 && z < 10.35) return true;
   if (getPeninsulaDistance(x, z) > -1.0) return true;
   for (const s of STEPPING_STONES) {
@@ -127,10 +132,10 @@ export function buildAlpineEnvironment(
 
   const pos = terrainGeo.attributes.position;
   const colors = new Float32Array(pos.count * 3);
-  const cLawn = new THREE.Color('#53a522');
-  const cWetBank = new THREE.Color('#6b6352');
-  const cDryShore = new THREE.Color('#978c74');
-  const cMeadow = new THREE.Color('#428426');
+  const cLawn = new THREE.Color('#48b628'); // Fresh, vibrant lush lawn
+  const cWetBank = new THREE.Color('#4c6b3e');
+  const cDryShore = new THREE.Color('#688c4e');
+  const cMeadow = new THREE.Color('#3ca720'); // Deep lush emerald meadow
   const tmpCol = new THREE.Color();
 
   for (let i = 0; i < pos.count; i++) {
@@ -215,8 +220,7 @@ export function buildAlpineEnvironment(
           vec2 uvB = mat2(0.80, 0.60, -0.60, 0.80) * wp * (sc * 0.68) + vec2(0.37, 0.71);
           float w = tNoise(wp * 0.16);
           vec3 col = mix(texture2D(tex, uvA).rgb, texture2D(tex, uvB).rgb, w);
-          // Custom uniform textures are sampled raw; decode sRGB -> Linear for realistic AgX green depth
-          return pow(max(col, vec3(0.001)), vec3(2.2));
+          return col;
         }`
       )
       .replace(
@@ -224,22 +228,21 @@ export function buildAlpineEnvironment(
         `#include <color_fragment>
         float micro = tNoise(vTerrainWorldPos.xz * 0.42) * 0.62 + tNoise(vTerrainWorldPos.xz * 1.75) * 0.38;
         if (vTerrainWorldPos.y < 10.5) {
-          vec3 pbrLawn = sampleAntiTile(uLawnTex, vTerrainWorldPos.xz, 0.32);
-          vec3 pbrMeadow = sampleAntiTile(uMeadowTex, vTerrainWorldPos.xz, 0.24);
-          vec3 pbrRockGrass = sampleAntiTile(uRockGrassTex, vTerrainWorldPos.xz, 0.17);
+          vec3 pbrLawn = sampleAntiTile(uLawnTex, vTerrainWorldPos.xz, 0.30);
+          vec3 pbrMeadow = sampleAntiTile(uMeadowTex, vTerrainWorldPos.xz, 0.22);
 
           float distHome = length(vTerrainWorldPos.xz - vec2(0.2, 5.5));
-          float meadowPatchNoise = tNoise(vTerrainWorldPos.xz * 0.14);
-          float meadowBlend = clamp(smoothstep(13.5, 22.0, distHome) * 0.72 + meadowPatchNoise * 0.25, 0.0, 1.0);
-          float slopeBlend = smoothstep(0.95, 5.8, vTerrainWorldPos.y);
-
+          float meadowBlend = clamp(smoothstep(12.0, 24.0, distHome) * 0.50, 0.0, 1.0);
           vec3 grassAlbedo = mix(pbrLawn, pbrMeadow, meadowBlend);
-          grassAlbedo = mix(grassAlbedo, pbrRockGrass, slopeBlend * 0.78);
-          float grassMask = (1.0 - smoothstep(4.5, 10.5, vTerrainWorldPos.y)) * smoothstep(-0.28, 0.04, vTerrainWorldPos.y);
-          vec3 modulatedTurf = grassAlbedo * vec3(0.76, 1.05, 0.68) * (0.88 + micro * 0.26);
-          diffuseColor.rgb = mix(diffuseColor.rgb * (0.86 + micro * 0.28), modulatedTurf, grassMask * 0.88);
-          float damp = smoothstep(0.05, -0.35, vTerrainWorldPos.y);
-          diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 0.62, damp);
+
+          // Rich, vibrant, fresh green lawn tint ("xanh mướt")
+          vec3 lushTint = vec3(0.86, 1.28, 0.72);
+          vec3 lushLawn = grassAlbedo * lushTint * (0.95 + micro * 0.15);
+
+          float grassMask = (1.0 - smoothstep(5.5, 11.0, vTerrainWorldPos.y)) * smoothstep(-0.28, 0.04, vTerrainWorldPos.y);
+          diffuseColor.rgb = mix(diffuseColor.rgb, lushLawn, grassMask * 0.95);
+          float damp = smoothstep(0.04, -0.35, vTerrainWorldPos.y);
+          diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 0.72, damp);
         } else {
           // Craggy alpine granite strata & crisp snow ridges
           float strata = sin(vTerrainWorldPos.y * 0.95 + micro * 4.5) * 0.5 + 0.5;
@@ -407,11 +410,8 @@ export function buildAlpineEnvironment(
   buildInstancedGltfBotanicals(group, isMobile, assets);
   buildPathBollards(group);
 
-  // 6. Real CC0 Deciduous Trees (Tree Small 02 from 3DSky / Poly Haven replicated across entire garden & yard)
-  buildSmallDeciduousTrees(group, isMobile, assets, colliders);
-
-  // 7. Near/Midground Real CC0 Alpine Pine GLBs (background mountain slope behind chalet)
-  buildNearPineGltfs(group, isMobile, assets);
+  // 6. Flowering Spring Alpine Trees (Hero blossom tree with curved trunk & white flowers, replicated across yard)
+  buildFloweringGardenTrees(group, isMobile, colliders);
 
   const setHighDetail = (_high: boolean) => {
     // Near 3D detail stays crisp; background 2.5D diorama has fixed 3 draw calls
@@ -491,7 +491,8 @@ function buildInstancedGltfBotanicals(
         const z = site.z + Math.sin(a) * d;
         if (getPeninsulaDistance(x, z) > -0.7) continue;
         // Never overlap chalet or deck pad or stepping stones
-        if (x > -7.3 && x < 5.5 && z > -5.7 && z < 9.15) continue;
+        if (x > -4.8 && x < 4.8 && z > -11.8 && z < 5.3) continue;
+        if (x > -7.3 && x < 5.5 && z >= 5.0 && z < 9.15) continue;
         if (STEPPING_STONES.some((st) => Math.hypot(x - st.x, z - st.z) < st.r + 0.42)) continue;
 
         const y = getGroundHeight(x, z);
@@ -527,6 +528,8 @@ function buildInstancedGltfBotanicals(
       { x: -11.4, z: 12.2, count: 2, radius: 1.4 },
       { x: -7.5, z: 4.5, count: 2, radius: 1.5 },
       { x: 6.2, z: 9.2, count: 2, radius: 1.3 },
+      { x: 6.0, z: -7.6, count: 3, radius: 1.2 }, // Master Bedroom East window garden
+      { x: 7.2, z: -4.8, count: 2, radius: 1.2 },
     ],
     0.55,
     0.85,
@@ -538,6 +541,8 @@ function buildInstancedGltfBotanicals(
       { x: -10.2, z: 14.2, count: 3, radius: 1.6 },
       { x: 3.4, z: 9.4, count: 2, radius: 1.0 },
       { x: 7.5, z: 13.5, count: 2, radius: 1.5 },
+      { x: 7.5, z: -9.2, count: 3, radius: 1.3 }, // Master Bedroom East window garden
+      { x: 10.8, z: -6.2, count: 2, radius: 1.4 },
     ],
     0.45,
     0.72,
@@ -549,6 +554,8 @@ function buildInstancedGltfBotanicals(
       { x: -3.2, z: 18.8, count: 2, radius: 1.4 },
       { x: -8.8, z: 16.5, count: 2, radius: 1.6 },
       { x: 8.2, z: 6.2, count: 2, radius: 1.4 },
+      { x: 6.8, z: -10.5, count: 2, radius: 1.3 }, // Master Bedroom East garden
+      { x: 11.5, z: -8.8, count: 2, radius: 1.4 },
     ],
     0.50,
     0.80,
@@ -562,6 +569,8 @@ function buildInstancedGltfBotanicals(
       { x: -10.5, z: 13.2, count: 2, radius: 1.4 },
       { x: -6.2, z: 15.5, count: 2, radius: 1.3 },
       { x: -8.5, z: 17.5, count: 2, radius: 1.4 },
+      { x: 7.0, z: -7.5, count: 4, radius: 1.2 }, // Master Bedroom East window flowers
+      { x: 8.8, z: -9.0, count: 3, radius: 1.2 },
     ],
     0.26,
     0.42,
@@ -574,6 +583,8 @@ function buildInstancedGltfBotanicals(
       { x: -2.0, z: 9.45, count: 4, radius: 1.0 },
       { x: 2.2, z: 9.45, count: 4, radius: 1.2 },
       { x: 5.3, z: 8.8, count: 3, radius: 1.0 },
+      { x: 6.2, z: -8.4, count: 5, radius: 1.0 }, // Master Bedroom window view flowers
+      { x: 8.0, z: -6.8, count: 4, radius: 1.1 },
     ],
     0.26,
     0.38,
@@ -586,6 +597,8 @@ function buildInstancedGltfBotanicals(
       { x: -7.4, z: 16.3, count: 4, radius: 1.4 },
       { x: 0.4, z: 9.45, count: 4, radius: 1.1 },
       { x: 4.5, z: 17.5, count: 5, radius: 1.8 },
+      { x: 5.8, z: -7.2, count: 6, radius: 1.0 }, // Master Bedroom direct window sill flowers
+      { x: 8.4, z: -8.2, count: 5, radius: 1.2 },
     ],
     0.22,
     0.34,
@@ -597,6 +610,8 @@ function buildInstancedGltfBotanicals(
       { x: -5.4, z: 14.6, count: 4, radius: 1.5 },
       { x: 1.2, z: 17.8, count: 4, radius: 1.8 },
       { x: 6.0, z: 11.2, count: 4, radius: 1.5 },
+      { x: 6.5, z: -6.6, count: 4, radius: 1.1 },
+      { x: 9.2, z: -9.4, count: 4, radius: 1.3 },
     ],
     0.24,
     0.36,
@@ -608,6 +623,8 @@ function buildInstancedGltfBotanicals(
       { x: -11.8, z: 10.5, count: 4, radius: 1.5 },
       { x: -2.8, z: 18.2, count: 4, radius: 1.4 },
       { x: 4.2, z: 14.8, count: 4, radius: 1.6 },
+      { x: 7.8, z: -7.8, count: 4, radius: 1.2 },
+      { x: 10.5, z: -10.0, count: 3, radius: 1.2 },
     ],
     0.22,
     0.34,
@@ -621,58 +638,16 @@ function buildInstancedGltfBotanicals(
       { x: -3.5, z: 18.8, count: 4, radius: 1.4 },
       { x: 6.8, z: 8.6, count: 4, radius: 1.3 },
       { x: -7.4, z: 4.2, count: 3, radius: 1.2 },
+      { x: 5.6, z: -6.4, count: 4, radius: 0.9 }, // Lush ferns framing bedroom stone base
+      { x: 6.4, z: -9.2, count: 4, radius: 1.0 },
+      { x: 8.0, z: -11.0, count: 3, radius: 1.1 },
     ],
     0.36,
     0.56,
     true
   );
 
-  // --- C. Realistic Multi-Tier 3D Grass & Wildflower Meadow System ---
-  // Low manicured green turf tufts (grass_bermuda_01) skirting stepping stones & patio edges
-  spawnSpecies(
-    'grass_bermuda_01',
-    [
-      { x: -3.2, z: 10.6, count: 10, radius: 2.4 },
-      { x: 3.4, z: 10.8, count: 10, radius: 2.4 },
-      { x: -1.6, z: 13.4, count: 8, radius: 1.9 },
-      { x: 2.4, z: 13.6, count: 8, radius: 1.9 },
-      { x: -9.8, z: 13.8, count: 10, radius: 3.4 },
-      { x: -4.5, z: 15.8, count: 10, radius: 3.6 },
-      { x: 2.0, z: 16.2, count: 10, radius: 3.8 },
-      { x: 6.4, z: 12.0, count: 8, radius: 3.2 },
-    ],
-    0.16,
-    0.27,
-    false
-  );
-  // Mid-height green meadow tufts along rock borders, path shoulders & lakeside shore
-  spawnSpecies(
-    'grass_medium_02',
-    [
-      { x: -11.0, z: 15.0, count: 7, radius: 2.6 },
-      { x: -6.2, z: 16.5, count: 7, radius: 2.6 },
-      { x: 0.5, z: 18.2, count: 7, radius: 2.8 },
-      { x: 5.5, z: 9.8, count: 6, radius: 2.4 },
-      { x: -8.2, z: 12.2, count: 6, radius: 2.2 },
-    ],
-    0.24,
-    0.40,
-    false
-  );
-  // Tall lakeside & slope wildflower meadow clusters (Innerscene CC0 cropped meadow_patch)
-  spawnSpecies(
-    'meadow_patch',
-    [
-      { x: -10.8, z: 14.5, count: 3, radius: 1.8 },
-      { x: -5.4, z: 16.8, count: 3, radius: 1.8 },
-      { x: 3.8, z: 16.8, count: 3, radius: 1.9 },
-      { x: 6.8, z: 10.2, count: 3, radius: 1.8 },
-      { x: -9.0, z: 6.2, count: 2, radius: 1.5 },
-    ],
-    0.46,
-    0.66,
-    false
-  );
+  // --- C. Moss on shoreline rocks ---
   spawnSpecies(
     'moss_01',
     [
@@ -680,6 +655,9 @@ function buildInstancedGltfBotanicals(
       { x: -6.6, z: 15.5, count: 6, radius: 1.8 },
       { x: -3.2, z: 18.3, count: 6, radius: 1.8 },
       { x: 5.2, z: 17.0, count: 5, radius: 1.7 },
+      { x: 5.4, z: -8.0, count: 6, radius: 1.2 }, // Soft moss along East bedroom foundation wall
+      { x: 5.4, z: -6.8, count: 5, radius: 1.0 },
+      { x: 16.8, z: -8.5, count: 6, radius: 1.8 },
     ],
     0.08,
     0.16,
@@ -687,63 +665,192 @@ function buildInstancedGltfBotanicals(
   );
 }
 
-function buildSmallDeciduousTrees(
+let sharedBarkMat: THREE.MeshStandardMaterial | null = null;
+let sharedLeafMat: THREE.MeshStandardMaterial | null = null;
+let sharedBlossomMat: THREE.MeshStandardMaterial | null = null;
+let sharedCardGeo: THREE.PlaneGeometry | null = null;
+let sharedBlossomGeo: THREE.IcosahedronGeometry | null = null;
+
+function getSharedTreeMaterials() {
+  if (!sharedBarkMat) {
+    const barkTex = createBarkTexture();
+    sharedBarkMat = new THREE.MeshStandardMaterial({
+      map: barkTex,
+      color: '#8a705b',
+      roughness: 0.92,
+    });
+  }
+  if (!sharedLeafMat) {
+    const leafTex = createLeafClusterTexture();
+    sharedLeafMat = new THREE.MeshStandardMaterial({
+      map: leafTex,
+      alphaTest: 0.38,
+      roughness: 0.65,
+      side: THREE.DoubleSide,
+    });
+  }
+  if (!sharedBlossomMat) {
+    sharedBlossomMat = new THREE.MeshStandardMaterial({
+      color: '#fdfbf7',
+      roughness: 0.60,
+    });
+  }
+  if (!sharedCardGeo) {
+    sharedCardGeo = new THREE.PlaneGeometry(1.85, 1.85);
+  }
+  if (!sharedBlossomGeo) {
+    sharedBlossomGeo = new THREE.IcosahedronGeometry(0.10, 0);
+  }
+  return {
+    barkMat: sharedBarkMat,
+    leafMat: sharedLeafMat,
+    blossomMat: sharedBlossomMat,
+    cardGeo: sharedCardGeo,
+    blossomGeo: sharedBlossomGeo,
+  };
+}
+
+function buildCurvedTrunkGeo(botR: number, topR: number, height: number, bendX: number): THREE.BufferGeometry {
+  const geo = new THREE.CylinderGeometry(topR, botR, height, 12, 8);
+  geo.translate(0, height * 0.5, 0);
+  const p = geo.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const y = p.getY(i);
+    const t = y / height;
+    p.setX(i, p.getX(i) + Math.sin(t * Math.PI * 0.85) * bendX);
+    if (t < 0.14) {
+      const flare = 1.0 + (0.14 - t) * 2.2;
+      p.setX(i, p.getX(i) * flare);
+      p.setZ(i, p.getZ(i) * flare);
+    }
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function createBranchGeo(rBot: number, rTop: number, len: number): THREE.BufferGeometry {
+  const geo = new THREE.CylinderGeometry(rTop, rBot, len, 8);
+  geo.translate(0, len * 0.5, 0);
+  return geo;
+}
+
+function buildFloweringGardenTree(scale = 1.0): THREE.Group {
+  const { barkMat, leafMat, blossomMat, cardGeo, blossomGeo } = getSharedTreeMaterials();
+  const tree = new THREE.Group();
+
+  // Main curved trunk
+  const trunk = new THREE.Mesh(buildCurvedTrunkGeo(0.46, 0.28, 4.6, 0.28), barkMat);
+  trunk.castShadow = true;
+  trunk.receiveShadow = true;
+  tree.add(trunk);
+
+  // Trunk fork origin at y = 4.3, x ≈ 0.26
+  const forkX = 0.26, forkY = 4.3, forkZ = 0.0;
+
+  // Seamless natural boughs originating directly inside the trunk top
+  const boughDefs = [
+    { start: [forkX, forkY, forkZ], rot: [0.1, 0.15, -0.78], len: 4.2, r: 0.16 },
+    { start: [forkX + 0.05, forkY + 0.2, forkZ - 0.1], rot: [-0.2, 0.25, -1.05], len: 3.8, r: 0.12 },
+    { start: [forkX - 0.08, forkY + 0.1, forkZ - 0.1], rot: [-0.35, 0.1, 0.55], len: 3.2, r: 0.14 },
+    { start: [forkX + 0.02, forkY + 0.25, forkZ + 0.1], rot: [0.45, -0.1, -0.42], len: 3.0, r: 0.13 },
+    { start: [forkX - 0.04, forkY + 0.35, forkZ - 0.05], rot: [-0.4, -0.2, 0.25], len: 2.8, r: 0.11 },
+  ];
+
+  for (const b of boughDefs) {
+    const branch = new THREE.Mesh(createBranchGeo(b.r, b.r * 0.52, b.len), barkMat);
+    branch.position.set(b.start[0], b.start[1], b.start[2]);
+    branch.rotation.set(b.rot[0], b.rot[1], b.rot[2]);
+    branch.castShadow = true;
+    branch.receiveShadow = true;
+    tree.add(branch);
+  }
+
+  // Foliage cluster centers across the canopy
+  const clusterCenters: Array<[number, number, number, number]> = [
+    [0.25, 5.5, 0.1, 1.32],
+    [1.85, 5.7, -0.2, 1.24],
+    [3.35, 5.9, -0.6, 1.18],
+    [4.65, 6.0, -0.9, 1.05],
+    [5.85, 6.1, -1.1, 0.94],
+    [-1.15, 5.3, -0.8, 1.18],
+    [0.95, 5.5, 1.4, 1.15],
+    [2.55, 5.4, 0.9, 1.10],
+    [1.25, 6.4, -0.3, 1.15],
+    [3.15, 6.5, -0.5, 1.05],
+    [-0.5, 5.8, 0.8, 1.10],
+    [2.1, 6.2, 0.3, 1.20],
+  ];
+
+  clusterCenters.forEach(([lx, ly, lz, sc], idx) => {
+    for (let k = 0; k < 3; k++) {
+      const card = new THREE.Mesh(cardGeo, leafMat);
+      card.position.set(lx + (k - 1) * 0.22, ly + (k === 1 ? 0.18 : -0.1), lz + (k - 1) * 0.15);
+      card.rotation.set(0.35 * (k - 1), idx * 0.8 + k * 1.05, 0.25 * (k - 1));
+      card.scale.setScalar(sc);
+      card.castShadow = true;
+      card.receiveShadow = true;
+      tree.add(card);
+    }
+  });
+
+  // White spring Alpine blossoms clustered among the boughs
+  const blossomCount = 64;
+  const blossoms = new THREE.InstancedMesh(blossomGeo, blossomMat, blossomCount);
+  const bDummy = new THREE.Object3D();
+  for (let i = 0; i < blossomCount; i++) {
+    const [cx, cy, cz, sc] = clusterCenters[i % clusterCenters.length];
+    const ang = i * 2.39996;
+    const r = (0.2 + (i % 5) * 0.16) * sc;
+    bDummy.position.set(cx + Math.cos(ang) * r, cy + Math.sin(i * 1.7) * 0.35, cz + Math.sin(ang) * r);
+    bDummy.scale.setScalar(0.85 + (i % 3) * 0.25);
+    bDummy.updateMatrix();
+    blossoms.setMatrixAt(i, bDummy.matrix);
+  }
+  blossoms.castShadow = true;
+  blossoms.receiveShadow = true;
+  tree.add(blossoms);
+
+  if (scale !== 1.0) {
+    tree.scale.setScalar(scale);
+  }
+  return tree;
+}
+
+function buildFloweringGardenTrees(
   parent: THREE.Group,
-  isMobile: boolean,
-  assets?: HybridAssetLoader,
+  _isMobile: boolean,
   colliders?: Array<{ minX: number; maxX: number; minZ: number; maxZ: number; tag?: string }>
 ): void {
-  if (!assets) return;
-
-  // Real CC0 Deciduous Trees (Tree Small 02 from 3DSky / Poly Haven) replicated across entire yard & garden
+  // Replicating THIS exact flowering blossom tree across the entire yard & garden!
   const sites = [
-    { x: -12.4, z: 12.1, h: 5.6, ry: 0.65 },  // Front-left garden path hero tree (replacing ugly truncated tree)
-    { x: -8.8,  z: 13.8, h: 4.8, ry: 1.85 },  // Stepping stone entry left
-    { x: -5.2,  z: 16.5, h: 4.2, ry: 2.40 },  // Lakeside path left
-    { x: 2.8,   z: 17.2, h: 4.5, ry: 0.95 },  // Lakeside path right
-    { x: 7.8,   z: 15.2, h: 4.8, ry: 3.10 },  // Front driveway / lakeside corner
-    { x: 9.2,   z: 11.5, h: 5.2, ry: 1.45 },  // Right garden lawn
-    { x: 7.2,   z: 7.8,  h: 4.9, ry: 2.20 },  // Right lawn by fireplace terrace
-    { x: -10.8, z: 2.5,  h: 5.0, ry: 1.30 },  // Left terrace garden flank
-    { x: -13.6, z: 6.2,  h: 4.6, ry: 2.80 },  // West garden boundary
-    { x: -14.2, z: 10.0, h: 4.3, ry: 0.40 },  // Front entrance walkway approach
-    { x: 6.5,   z: 4.2,  h: 4.7, ry: 1.70 },  // Near side-deck transition
+    { x: -12.4, z: 12.1, sc: 1.05, ry: 0.65 }, // Front-left hero tree (the exact tree in the user's photo!)
+    { x: -5.6,  z: 16.8, sc: 0.95, ry: 2.10 }, // Lakeside shore left
+    { x: 3.8,   z: 17.2, sc: 0.92, ry: 1.15 }, // Lakeside shore right
+    { x: 11.2,  z: 14.5, sc: 0.98, ry: 3.00 }, // Far-right lakeside corner
+    { x: 10.5,  z: 8.2,  sc: 0.95, ry: 1.60 }, // Right garden lawn by fireplace
+    { x: 9.8,   z: 0.6,  sc: 0.90, ry: 2.45 }, // East living room flank
+    { x: -11.0, z: -3.5, sc: 0.92, ry: 0.90 }, // West rear garden
+    { x: -15.5, z: 4.8,  sc: 0.94, ry: 2.75 }, // West perimeter border
+    // Master Bedroom East Private Garden (hero flowering blossom trees):
+    { x: 14.5,  z: -12.5, sc: 0.92, ry: 2.10 }, // Hero flowering tree: arched branches & white blossoms framing the right window edge!
+    { x: 20.5,  z: -14.2, sc: 0.88, ry: 0.95 }, // Supporting flowering tree in distance
   ];
 
   for (const s of sites) {
-    const tree = assets.cloneNormalized('tree_small_02', s.h);
-    if (tree) {
-      const gy = getGroundHeight(s.x, s.z);
-      tree.position.set(s.x, gy - 0.04, s.z);
-      tree.rotation.y = s.ry;
-      tree.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.castShadow = !isMobile;
-          child.receiveShadow = true;
-          if (child.material) {
-            const mats = Array.isArray(child.material) ? child.material : [child.material];
-            for (const m of mats) {
-              if (m.name && m.name.toLowerCase().includes('leaves')) {
-                m.transparent = false;
-                m.alphaTest = 0.45;
-                m.depthWrite = true;
-                m.side = THREE.DoubleSide;
-              }
-            }
-          }
-        }
-      });
-      parent.add(tree);
+    const tree = buildFloweringGardenTree(s.sc);
+    const gy = getGroundHeight(s.x, s.z);
+    tree.position.set(s.x, gy - 0.05, s.z);
+    tree.rotation.y = s.ry;
+    parent.add(tree);
 
-      if (colliders) {
-        colliders.push({
-          minX: s.x - 0.45,
-          maxX: s.x + 0.45,
-          minZ: s.z - 0.45,
-          maxZ: s.z + 0.45,
-          tag: 'tree-small-02',
-        });
-      }
+    if (colliders) {
+      colliders.push({
+        minX: s.x - 0.5,
+        maxX: s.x + 0.5,
+        minZ: s.z - 0.5,
+        maxZ: s.z + 0.5,
+        tag: 'flowering-tree',
+      });
     }
   }
 }
@@ -764,6 +871,14 @@ function buildNearPineGltfs(
     // Left rear hill behind bathroom wall (framing bedroom view on the left)
     { x: -7.5, z: -15.5, h: 5.6, id: 'pine_sapling_small' },
     { x: -9.8, z: -18.2, h: 6.2, id: 'fir_sapling' },
+    // East bedroom garden pines framing side window (framing the view gently on left & right!):
+    { x: 12.5, z: -3.5, h: 5.8, id: 'fir_sapling' }, // Left window frame border
+    { x: 16.0, z: -2.2, h: 6.8, id: 'pine_sapling_small' }, // Far left background
+    { x: 10.5, z: -10.2, h: 5.2, id: 'fir_sapling' }, // Right window frame border
+    { x: 17.5, z: -13.8, h: 7.2, id: 'pine_sapling_small' }, // Far right background
+    // Rear bedroom pines directly outside rear window (Z < -11.53)
+    { x: 1.2, z: -15.5, h: 6.2, id: 'fir_sapling' },
+    { x: 3.2, z: -16.8, h: 6.6, id: 'pine_sapling_small' },
     // Right rear hill (framing bedroom view on the right, keeping X: 0.2..4.2 window view clear!)
     { x: 5.8, z: -15.2, h: 5.5, id: 'fir_sapling' },
     { x: 7.6, z: -18.0, h: 6.0, id: 'pine_sapling_small' },
