@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Cyberpunk & Soldier Comparison</title>
+  <style>
+    body { margin: 0; background: #0f172a; overflow: hidden; font-family: sans-serif; color: white; }
+    #labels {
+      position: absolute; top: 10px; width: 100%; display: flex;
+      justify-content: space-around; font-size: 16px; font-weight: bold;
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="labels">
+    <div>1. Cyberpunk Human</div>
+    <div>2. Soldier Human</div>
+  </div>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#1e293b');
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.2, 3.8);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.4);
+    hemi.position.set(0, 20, 0);
+    scene.add(hemi);
+
+    const dir = new THREE.DirectionalLight(0xfffbeb, 1.6);
+    dir.position.set(3, 8, 5);
+    dir.castShadow = true;
+    scene.add(dir);
+
+    // Floor
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(20, 20),
+      new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    const loader = new GLTFLoader();
+    const mixers = [];
+
+    // 1. Cyberpunk Human
+    loader.load('/assets/characters/Cyberpunk_Character.glb', (gltf) => {
+      const m = gltf.scene;
+      m.position.set(-0.9, 0, 0);
+      m.scale.setScalar(0.7);
+      m.traverse(c => { if (c.isMesh) c.castShadow = true; });
+      scene.add(m);
+
+      if (gltf.animations.length > 0) {
+        const mixer = new THREE.AnimationMixer(m);
+        const clip = gltf.animations.find(a => a.name.includes('Walk') || a.name.includes('Idle_Neutral')) || gltf.animations[0];
+        mixer.clipAction(clip).play();
+        mixers.push(mixer);
+      }
+    });
+
+    // 2. Soldier Human
+    loader.load('/assets/characters/Soldier.glb', (gltf) => {
+      const m = gltf.scene;
+      m.position.set(0.9, 0, 0);
+      m.scale.setScalar(0.7);
+      m.traverse(c => { if (c.isMesh) c.castShadow = true; });
+      scene.add(m);
+
+      if (gltf.animations.length > 0) {
+        const mixer = new THREE.AnimationMixer(m);
+        const clip = gltf.animations.find(a => a.name === 'Walk') || gltf.animations[0];
+        mixer.clipAction(clip).play();
+        mixers.push(mixer);
+      }
+    });
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      mixers.forEach(mix => mix.update(delta));
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>

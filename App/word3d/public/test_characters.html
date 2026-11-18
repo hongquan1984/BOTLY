@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Character Comparison</title>
+  <style>
+    body { margin: 0; background: #1a202c; color: white; font-family: sans-serif; overflow: hidden; }
+    #labels {
+      position: absolute; top: 10px; left: 0; width: 100%; display: flex;
+      justify-content: space-around; pointer-events: none; font-weight: bold; font-size: 16px;
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="labels">
+    <div>1. RobotExpressive (Cute Bot)</div>
+    <div>2. Platformer Chibi (Quaternius)</div>
+    <div>3. Knight (Fantasy RPG)</div>
+  </div>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#1e293b');
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.5, 6);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+    hemi.position.set(0, 20, 0);
+    scene.add(hemi);
+
+    const dir = new THREE.DirectionalLight(0xffffff, 1.5);
+    dir.position.set(5, 10, 7);
+    dir.castShadow = true;
+    scene.add(dir);
+
+    // Floor
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(20, 20),
+      new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    const loader = new GLTFLoader();
+    const mixers = [];
+
+    // 1. RobotExpressive at x = -2.2
+    loader.load('/assets/characters/RobotExpressive.glb', (gltf) => {
+      const m = gltf.scene;
+      m.position.set(-2.2, 0, 0);
+      m.scale.setScalar(0.7);
+      m.traverse(c => { if (c.isMesh) c.castShadow = true; });
+      scene.add(m);
+      if (gltf.animations.length > 0) {
+        const mixer = new THREE.AnimationMixer(m);
+        const clip = gltf.animations.find(a => a.name === 'Idle' || a.name === 'Wave') || gltf.animations[0];
+        mixer.clipAction(clip).play();
+        mixers.push(mixer);
+      }
+    });
+
+    // 2. Platformer Chibi at x = 0
+    loader.load('/assets/characters/Platformer_Character.glb', (gltf) => {
+      const m = gltf.scene;
+      m.position.set(0, 0, 0);
+      m.scale.setScalar(1.0);
+      m.traverse(c => { if (c.isMesh) c.castShadow = true; });
+      scene.add(m);
+      if (gltf.animations.length > 0) {
+        const mixer = new THREE.AnimationMixer(m);
+        const clip = gltf.animations.find(a => a.name.includes('Idle') || a.name.includes('Wave')) || gltf.animations[0];
+        mixer.clipAction(clip).play();
+        mixers.push(mixer);
+      }
+    });
+
+    // 3. KnightCharacter at x = 2.2
+    loader.load('/assets/characters/KnightCharacter.glb', (gltf) => {
+      const m = gltf.scene;
+      m.position.set(2.2, 0, 0);
+      m.scale.setScalar(0.9);
+      m.traverse(c => { if (c.isMesh) c.castShadow = true; });
+      scene.add(m);
+      if (gltf.animations.length > 0) {
+        const mixer = new THREE.AnimationMixer(m);
+        const clip = gltf.animations.find(a => a.name.includes('Idle')) || gltf.animations[0];
+        mixer.clipAction(clip).play();
+        mixers.push(mixer);
+      }
+    });
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      mixers.forEach(mix => mix.update(delta));
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>

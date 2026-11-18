@@ -1,0 +1,414 @@
+{
+  "source": "HealthClues_-_Cozy_Village_Compact_V2.glb",
+  "extractedAt": "2026-11-14T18:15:51.881Z",
+  "totalOriginalPlacements": 49,
+  "totalUniqueAssets": 22,
+  "categories": [
+    "houses",
+    "trees",
+    "bridges",
+    "rocks",
+    "vegetation",
+    "props",
+    "terrain",
+    "other"
+  ],
+  "assets": [
+    {
+      "id": "great_hall",
+      "name": "Great Hall (Nhà sinh hoạt chung)",
+      "filename": "house_great_hall.glb",
+      "category": "houses",
+      "relativePath": "assets-extracted/houses/house_great_hall.glb",
+      "triangles": 1656,
+      "vertices": 3905,
+      "fileSizeBytes": 161796,
+      "fileSizeKb": "158.0 KB",
+      "dimensions": {
+        "width": 5.95,
+        "height": 5.44,
+        "depth": 8.28
+      },
+      "instancesInOriginalVillage": 1,
+      "description": "Tòa nhà sinh hoạt cộng đồng lớn nhất làng, mái dốc đôi và kết cấu gỗ đá ấm cúng."
+    },
+    {
+      "id": "general_store",
+      "name": "General Store (Nhà Lumi / Cửa hàng tạp hóa)",
+      "filename": "house_general_store.glb",
+      "category": "houses",
+      "relativePath": "assets-extracted/houses/house_general_store.glb",
+      "triangles": 3780,
+      "vertices": 9051,
+      "fileSizeBytes": 372548,
+      "fileSizeKb": "363.8 KB",
+      "dimensions": {
+        "width": 4.6,
+        "height": 4.72,
+        "depth": 5.87
+      },
+      "instancesInOriginalVillage": 2,
+      "description": "Nhà dân cư kết hợp buôn bán với hiên che và cửa sổ phát sáng ban đêm."
+    },
+    {
+      "id": "bld_general_store_01",
+      "name": "Library Cottage (Nhà Thư Viện / Nhà Tham Quan)",
+      "filename": "house_library_cottage.glb",
+      "category": "houses",
+      "relativePath": "assets-extracted/houses/house_library_cottage.glb",
+      "triangles": 1028,
+      "vertices": 2124,
+      "fileSizeBytes": 90160,
+      "fileSizeKb": "88.0 KB",
+      "dimensions": {
+        "width": 3.42,
+        "height": 3.16,
+        "depth": 3.77
+      },
+      "instancesInOriginalVillage": 2,
+      "description": "Ngôi nhà nhỏ cổ kính dùng làm thư viện lưu trữ tri thức và không gian đọc sách."
+    },
+    {
+      "id": "shade_tree_park_01",
+      "name": "Shade Tree (Cây viền làng bóng mát)",
+      "filename": "tree_shade_park.glb",
+      "category": "trees",
+      "relativePath": "assets-extracted/trees/tree_shade_park.glb",
+      "triangles": 16424,
+      "vertices": 43820,
+      "fileSizeBytes": 1776040,
+      "fileSizeKb": "1734.4 KB",
+      "dimensions": {
+        "width": 3.07,
+        "height": 5.21,
+        "depth": 3.05
+      },
+      "instancesInOriginalVillage": 10,
+      "description": "Cây bóng mát tán rộng bao quanh viền làng, tạo độ che phủ tự nhiên."
+    },
+    {
+      "id": "lineside_oak",
+      "name": "Lineside Oak (Cây sồi ven đường)",
+      "filename": "tree_lineside_oak.glb",
+      "category": "trees",
+      "relativePath": "assets-extracted/trees/tree_lineside_oak.glb",
+      "triangles": 743,
+      "vertices": 1827,
+      "fileSizeBytes": 76104,
+      "fileSizeKb": "74.3 KB",
+      "dimensions": {
+        "width": 3.37,
+        "height": 4.21,
+        "depth": 3.84
+      },
+      "instancesInOriginalVillage": 4,
+      "description": "Cây sồi tán nhọn thanh lịch mọc dọc các lối đi và cạnh luống hoa."
+    },
+    {
+      "id": "momiji_maple_01",
+      "name": "Momiji Maple (Cây phong đỏ trung tâm khu nghỉ)",
+      "filename": "tree_momiji_maple.glb",
+      "category": "trees",
+      "relativePath": "assets-extracted/trees/tree_momiji_maple.glb",
+      "triangles": 9984,
+      "vertices": 29952,
+      "fileSizeBytes": 1199536,
+      "fileSizeKb": "1171.4 KB",
+      "dimensions": {
+        "width": 3.24,
+        "height": 2.97,
+        "depth": 2.95
+      },
+      "instancesInOriginalVillage": 1,
+      "description": "Cây lá phong đỏ đặc sắc tạo điểm nhấn cảnh quan nổi bật trung tâm làng."
+    },
+    {
+      "id": "moss_rock_01",
+      "name": "Moss Rock (Tảng đá phủ rêu)",
+      "filename": "rock_moss_boulder.glb",
+      "category": "rocks",
+      "relativePath": "assets-extracted/rocks/rock_moss_boulder.glb",
+      "triangles": 2426,
+      "vertices": 7278,
+      "fileSizeBytes": 292576,
+      "fileSizeKb": "285.7 KB",
+      "dimensions": {
+        "width": 2.02,
+        "height": 0.98,
+        "depth": 2
+      },
+      "instancesInOriginalVillage": 6,
+      "description": "Khối đá tảng tự nhiên có mảng rêu xanh ven bờ suối và bãi cỏ."
+    },
+    {
+      "id": "mums_in_pot",
+      "name": "Mums in Pot (Chậu hoa cúc quảng trường)",
+      "filename": "plant_mums_flowerpot.glb",
+      "category": "vegetation",
+      "relativePath": "assets-extracted/vegetation/plant_mums_flowerpot.glb",
+      "triangles": 30002,
+      "vertices": 90002,
+      "fileSizeBytes": 3601516,
+      "fileSizeKb": "3517.1 KB",
+      "dimensions": {
+        "width": 0.8,
+        "height": 0.9,
+        "depth": 0.81
+      },
+      "instancesInOriginalVillage": 2,
+      "description": "Chậu hoa cúc vàng nở rộ đặt trang trí quanh đài phun và ghế nghỉ."
+    },
+    {
+      "id": "library_potted_plant",
+      "name": "Library Potted Plant (Chậu cây cảnh thư viện)",
+      "filename": "plant_library_flowerpot.glb",
+      "category": "vegetation",
+      "relativePath": "assets-extracted/vegetation/plant_library_flowerpot.glb",
+      "triangles": 4480,
+      "vertices": 13432,
+      "fileSizeBytes": 538756,
+      "fileSizeKb": "526.1 KB",
+      "dimensions": {
+        "width": 0.78,
+        "height": 0.96,
+        "depth": 0.76
+      },
+      "instancesInOriginalVillage": 2,
+      "description": "Chậu cây kiểng lá xanh trang trí lối vào thư viện và bậc thềm."
+    },
+    {
+      "id": "mulch_bed_tile",
+      "name": "Mulch Bed Tile (Luống đất vườn thảo mộc)",
+      "filename": "bed_mulch_tile.glb",
+      "category": "vegetation",
+      "relativePath": "assets-extracted/vegetation/bed_mulch_tile.glb",
+      "triangles": 516,
+      "vertices": 1328,
+      "fileSizeBytes": 55284,
+      "fileSizeKb": "54.0 KB",
+      "dimensions": {
+        "width": 4,
+        "height": 0.66,
+        "depth": 4
+      },
+      "instancesInOriginalVillage": 2,
+      "description": "Mảng đất mùn hữu cơ dùng làm nền trồng thảo mộc và hoa cảnh."
+    },
+    {
+      "id": "moss_patch_01",
+      "name": "Moss Patch (Thảm rêu phủ nền)",
+      "filename": "moss_patch.glb",
+      "category": "vegetation",
+      "relativePath": "assets-extracted/vegetation/moss_patch.glb",
+      "triangles": 3378,
+      "vertices": 10134,
+      "fileSizeBytes": 406752,
+      "fileSizeKb": "397.2 KB",
+      "dimensions": {
+        "width": 1.76,
+        "height": 0.19,
+        "depth": 1.46
+      },
+      "instancesInOriginalVillage": 2,
+      "description": "Thảm rêu cỏ mọc sát đất làm phong phú bề mặt địa hình."
+    },
+    {
+      "id": "acanthus_scatter",
+      "name": "Acanthus Scatter (Bụi cây thấp acanthus)",
+      "filename": "grass_acanthus_scatter.glb",
+      "category": "vegetation",
+      "relativePath": "assets-extracted/vegetation/grass_acanthus_scatter.glb",
+      "triangles": 11186,
+      "vertices": 33558,
+      "fileSizeBytes": 1343792,
+      "fileSizeKb": "1312.3 KB",
+      "dimensions": {
+        "width": 1.11,
+        "height": 1.11,
+        "depth": 1.16
+      },
+      "instancesInOriginalVillage": 3,
+      "description": "Bụi cây cỏ thấp điểm xuyết dưới gốc cây và chân tường nhà."
+    },
+    {
+      "id": "lawn_tuft_scatter",
+      "name": "Lawn Tuft Scatter (Khóm cỏ xanh rải rác)",
+      "filename": "grass_lawn_tuft.glb",
+      "category": "vegetation",
+      "relativePath": "assets-extracted/vegetation/grass_lawn_tuft.glb",
+      "triangles": 368,
+      "vertices": 944,
+      "fileSizeBytes": 39820,
+      "fileSizeKb": "38.9 KB",
+      "dimensions": {
+        "width": 1.65,
+        "height": 0.18,
+        "depth": 1.52
+      },
+      "instancesInOriginalVillage": 3,
+      "description": "Khóm cỏ nhỏ tạo nét sinh động và tự nhiên cho thảm cỏ."
+    },
+    {
+      "id": "plaza_planter_01",
+      "name": "Plaza Planter (Bồn hoa quảng trường trung tâm)",
+      "filename": "prop_plaza_planter.glb",
+      "category": "props",
+      "relativePath": "assets-extracted/props/prop_plaza_planter.glb",
+      "triangles": 600,
+      "vertices": 1438,
+      "fileSizeBytes": 60324,
+      "fileSizeKb": "58.9 KB",
+      "dimensions": {
+        "width": 1.37,
+        "height": 0.73,
+        "depth": 0.6
+      },
+      "instancesInOriginalVillage": 1,
+      "description": "Bồn hoa tròn bằng đá trang trí ngay trung tâm quảng trường."
+    },
+    {
+      "id": "park_bench_01",
+      "name": "Park Bench (Ghế băng công viên gỗ)",
+      "filename": "prop_park_bench.glb",
+      "category": "props",
+      "relativePath": "assets-extracted/props/prop_park_bench.glb",
+      "triangles": 5876,
+      "vertices": 16854,
+      "fileSizeBytes": 678616,
+      "fileSizeKb": "662.7 KB",
+      "dimensions": {
+        "width": 1.9,
+        "height": 1.4,
+        "depth": 0.76
+      },
+      "instancesInOriginalVillage": 4,
+      "description": "Ghế ngồi nghỉ chân khung gỗ thanh lịch đặt dọc lối đi."
+    },
+    {
+      "id": "picket_fence",
+      "name": "Picket Fence (Hàng rào cọc gỗ vườn)",
+      "filename": "prop_picket_fence.glb",
+      "category": "props",
+      "relativePath": "assets-extracted/props/prop_picket_fence.glb",
+      "triangles": 436,
+      "vertices": 1121,
+      "fileSizeBytes": 46936,
+      "fileSizeKb": "45.8 KB",
+      "dimensions": {
+        "width": 2.06,
+        "height": 1.18,
+        "depth": 0.17
+      },
+      "instancesInOriginalVillage": 4,
+      "description": "Đoạn hàng rào cọc gỗ mộc mạc bao quanh vườn thảo dược."
+    },
+    {
+      "id": "stream_meandering_s_01",
+      "name": "Suối Uốn Lượn Chữ S (S-Curve Stream)",
+      "filename": "stream_meandering_s_01.glb",
+      "category": "terrain",
+      "relativePath": "assets-extracted/terrain/stream_meandering_s_01.glb",
+      "triangles": 1420,
+      "vertices": 4260,
+      "fileSizeBytes": 1032868,
+      "fileSizeKb": "1008.7 KB",
+      "dimensions": {
+        "width": 5.4,
+        "height": 0.8,
+        "depth": 11
+      },
+      "instancesInOriginalVillage": 1,
+      "description": "Dòng suối uốn lượn hình chữ S dài 11m với dòng chảy gợn sóng lấp lánh chuyển động, bờ đá cuội và phiến đá qua suối."
+    },
+    {
+      "id": "stream_winding_river_01",
+      "name": "Suối Lượn Sóng Đôi (Winding River)",
+      "filename": "stream_winding_river_01.glb",
+      "category": "terrain",
+      "relativePath": "assets-extracted/terrain/stream_winding_river_01.glb",
+      "triangles": 1680,
+      "vertices": 5040,
+      "fileSizeBytes": 1084604,
+      "fileSizeKb": "1059.2 KB",
+      "dimensions": {
+        "width": 6.2,
+        "height": 0.85,
+        "depth": 13
+      },
+      "instancesInOriginalVillage": 1,
+      "description": "Dòng suối rộng uốn lượn đa tầng mềm mại dài 13m, nước chảy chuyển động lấp lánh và bờ đá rêu phong."
+    },
+    {
+      "id": "stream_bend_90_01",
+      "name": "Khúc Cua Suối 90° (Meander Bend 90)",
+      "filename": "stream_bend_90_01.glb",
+      "category": "terrain",
+      "relativePath": "assets-extracted/terrain/stream_bend_90_01.glb",
+      "triangles": 1240,
+      "vertices": 3720,
+      "fileSizeBytes": 783800,
+      "fileSizeKb": "765.4 KB",
+      "dimensions": {
+        "width": 6.5,
+        "height": 0.8,
+        "depth": 6.5
+      },
+      "instancesInOriginalVillage": 1,
+      "description": "Khúc ngoặt dòng chảy 90 độ tự nhiên với dòng nước cuộn sóng chuyển động nhịp nhàng."
+    },
+    {
+      "id": "stream_fork_junction_01",
+      "name": "Suối Ngã Ba Chữ Y (Stream Fork Junction)",
+      "filename": "stream_fork_junction_01.glb",
+      "category": "terrain",
+      "relativePath": "assets-extracted/terrain/stream_fork_junction_01.glb",
+      "triangles": 1950,
+      "vertices": 5850,
+      "fileSizeBytes": 1248820,
+      "fileSizeKb": "1219.6 KB",
+      "dimensions": {
+        "width": 7.8,
+        "height": 0.8,
+        "depth": 11.2
+      },
+      "instancesInOriginalVillage": 1,
+      "description": "Dòng suối uốn lượn tách làm 2 nhánh rẽ quanh đảo đá trung tâm, nước chảy chuyển động sống động."
+    },
+    {
+      "id": "stream_pond_01",
+      "name": "Hồ Nước Đá Rêu (Mossy Rock Pond)",
+      "filename": "stream_pond_01.glb",
+      "category": "terrain",
+      "relativePath": "assets-extracted/terrain/stream_pond_01.glb",
+      "triangles": 2480,
+      "vertices": 7150,
+      "fileSizeBytes": 248988,
+      "fileSizeKb": "243.2 KB",
+      "dimensions": {
+        "width": 6.1,
+        "height": 0.58,
+        "depth": 5.26
+      },
+      "instancesInOriginalVillage": 1,
+      "description": "Hồ nước tròn tự nhiên với mặt nước gợn sóng chuyển động, hoa súng bập bềnh và viền đá rêu."
+    },
+    {
+      "id": "stream_waterfall_step_01",
+      "name": "Bậc Thác Nước Đá (Stepped Rock Cascade)",
+      "filename": "stream_waterfall_step_01.glb",
+      "category": "terrain",
+      "relativePath": "assets-extracted/terrain/stream_waterfall_step_01.glb",
+      "triangles": 508,
+      "vertices": 1101,
+      "fileSizeBytes": 44852,
+      "fileSizeKb": "43.8 KB",
+      "dimensions": {
+        "width": 4.44,
+        "height": 1.88,
+        "depth": 4.6
+      },
+      "instancesInOriginalVillage": 1,
+      "description": "Tầng ghềnh thác đổ bọt nước trắng và hồ chứa phía dưới."
+    }
+  ]
+}

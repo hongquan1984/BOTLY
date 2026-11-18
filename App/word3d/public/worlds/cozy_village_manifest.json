@@ -1,0 +1,1826 @@
+{
+  "schemaVersion": 2,
+  "worldId": "cozy_fantasy_village",
+  "worldName": "Làng Nổi Cozy Fantasy",
+  "version": "2.0.0",
+  "updatedAt": "2026-11-15T13:44:47.472Z",
+  "allowlistActions": [
+    "OPEN_HERBAL_GARDEN",
+    "OPEN_CLOUD_THERAPY",
+    "OPEN_KNOWLEDGE_LIBRARY",
+    "OPEN_JOURNEY_HOUSE",
+    "OPEN_TASK_SQUARE",
+    "OPEN_VILLAGE_SQUARE"
+  ],
+  "buildings": [
+    {
+      "buildingInstanceId": "bld_watermill",
+      "name": "Guồng Nước (Water Wheel)",
+      "displayName": {
+        "vi": "Liệu Pháp Trên Mây",
+        "en": "Cloud Therapy"
+      },
+      "type": "waterWheel",
+      "transform": {
+        "position": [
+          6.657,
+          3.3,
+          -0.962
+        ],
+        "rotation": [
+          0,
+          -4.712,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          0.9
+        ]
+      },
+      "hasFunction": true,
+      "landmarkId": "cloud_therapy",
+      "actionId": "OPEN_CLOUD_THERAPY",
+      "iconId": "☁️",
+      "enabled": true,
+      "interaction": {
+        "mode": "walk_then_enter",
+        "anchorLocal": [
+          0,
+          0,
+          2.8
+        ],
+        "labelAnchorLocal": [
+          0,
+          4.2,
+          0
+        ],
+        "radius": 2.5
+      }
+    },
+    {
+      "buildingInstanceId": "bld_potion_shop",
+      "name": "Lumi's Potion Shop",
+      "displayName": {
+        "vi": "Vườn Thảo Mộc",
+        "en": "Herbal Garden"
+      },
+      "type": "cottage",
+      "transform": {
+        "position": [
+          -11.562,
+          1.8,
+          8.911
+        ],
+        "rotation": [
+          0,
+          2.021,
+          0
+        ],
+        "scale": [
+          0.623,
+          0.623,
+          0.623
+        ]
+      },
+      "hasFunction": true,
+      "landmarkId": "herbal_garden",
+      "actionId": "OPEN_HERBAL_GARDEN",
+      "iconId": "🌿",
+      "enabled": true,
+      "interaction": {
+        "mode": "walk_then_enter",
+        "anchorLocal": [
+          0,
+          0,
+          2.8
+        ],
+        "labelAnchorLocal": [
+          0,
+          4.2,
+          0
+        ],
+        "radius": 2.5
+      }
+    },
+    {
+      "buildingInstanceId": "bld_bookshop",
+      "name": "Arcane Bookshop",
+      "displayName": {
+        "vi": "Thư Viện Tri Thức",
+        "en": "Knowledge Library"
+      },
+      "type": "cottage",
+      "transform": {
+        "position": [
+          10.783,
+          1.8,
+          -11.173
+        ],
+        "rotation": [
+          0,
+          -0.7,
+          0
+        ],
+        "scale": [
+          0.95,
+          0.95,
+          0.95
+        ]
+      },
+      "hasFunction": true,
+      "landmarkId": "knowledge_library",
+      "actionId": "OPEN_KNOWLEDGE_LIBRARY",
+      "iconId": "📖",
+      "enabled": true,
+      "interaction": {
+        "mode": "walk_then_enter",
+        "anchorLocal": [
+          0,
+          0,
+          2.5
+        ],
+        "labelAnchorLocal": [
+          0,
+          3.8,
+          0
+        ],
+        "radius": 2.5
+      }
+    },
+    {
+      "buildingInstanceId": "bld_plaza_well",
+      "name": "Plaza Well",
+      "displayName": {
+        "vi": "Quảng Trường Nhiệm Vụ",
+        "en": "Task Square"
+      },
+      "type": "well",
+      "transform": {
+        "position": [
+          -4.132,
+          1.05,
+          -0.15
+        ],
+        "rotation": [
+          0,
+          -1.571,
+          0
+        ],
+        "scale": [
+          1.378,
+          1.378,
+          1.378
+        ]
+      },
+      "hasFunction": true,
+      "landmarkId": "task_square",
+      "actionId": "OPEN_TASK_SQUARE",
+      "iconId": "⛲",
+      "enabled": true,
+      "interaction": {
+        "mode": "walk_then_enter",
+        "anchorLocal": [
+          0,
+          0,
+          2
+        ],
+        "labelAnchorLocal": [
+          0,
+          2.6,
+          0
+        ],
+        "radius": 2
+      }
+    },
+    {
+      "buildingInstanceId": "bld_great_hall",
+      "name": "Great Hall (Nhà sinh hoạt chung)_8967_52",
+      "displayName": {
+        "vi": "Hành Trình Của Tôi",
+        "en": "My Journey"
+      },
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/houses/house_great_hall.glb",
+      "transform": {
+        "position": [
+          -3.306,
+          1.82,
+          13.88
+        ],
+        "rotation": [
+          0,
+          -3.142,
+          0
+        ],
+        "scale": [
+          0.573,
+          0.573,
+          0.573
+        ]
+      },
+      "hasFunction": true,
+      "landmarkId": "journey_house",
+      "actionId": "OPEN_JOURNEY_HOUSE",
+      "iconId": "🏰",
+      "enabled": true,
+      "interaction": {
+        "mode": "walk_then_enter",
+        "anchorLocal": [
+          0,
+          0,
+          3.2
+        ],
+        "labelAnchorLocal": [
+          0,
+          4.5,
+          0
+        ],
+        "radius": 3
+      }
+    },
+    {
+      "buildingInstanceId": "bld_plaza_well",
+      "name": "Mums in Pot (Chậu hoa cúc quảng trường)_9694_64",
+      "displayName": {
+        "vi": "Quảng Trường Nhiệm Vụ",
+        "en": "Task Square"
+      },
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/vegetation/plant_mums_flowerpot.glb",
+      "transform": {
+        "position": [
+          -6.783,
+          1.82,
+          9.612
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.392,
+          1.392,
+          1.392
+        ]
+      },
+      "hasFunction": true,
+      "landmarkId": "task_square",
+      "actionId": "OPEN_TASK_SQUARE",
+      "iconId": "⛲",
+      "enabled": true,
+      "interaction": {
+        "mode": "walk_then_enter",
+        "anchorLocal": [
+          0,
+          0,
+          2
+        ],
+        "labelAnchorLocal": [
+          0,
+          2.6,
+          0
+        ],
+        "radius": 2
+      }
+    },
+    {
+      "buildingInstanceId": "bld_fantasy_cottage",
+      "name": "fantasy_house_9348",
+      "displayName": {
+        "vi": "Nhà Nghỉ Chân",
+        "en": "Rest Cottage"
+      },
+      "type": "custom_model",
+      "modelStorageKey": "model_fantasy_house_9348",
+      "transform": {
+        "position": [
+          -14.906,
+          1.67,
+          2.672
+        ],
+        "rotation": [
+          0,
+          -10.996,
+          0
+        ],
+        "scale": [
+          5,
+          5,
+          5
+        ]
+      },
+      "hasFunction": false,
+      "iconId": "🏡",
+      "enabled": false,
+      "interaction": {
+        "mode": "walk_then_enter",
+        "anchorLocal": [
+          0,
+          0,
+          2.5
+        ],
+        "labelAnchorLocal": [
+          0,
+          3.5,
+          0
+        ],
+        "radius": 2
+      }
+    },
+    {
+      "buildingInstanceId": "bld_stone_cottage",
+      "name": "stone_house_7483",
+      "displayName": {
+        "vi": "Nhà Đá Cổ",
+        "en": "Ancient Stone Cottage"
+      },
+      "type": "custom_model",
+      "modelStorageKey": "model_stone_house_7483",
+      "transform": {
+        "position": [
+          -13.638,
+          1.37,
+          -6.316
+        ],
+        "rotation": [
+          0,
+          -4.712,
+          0
+        ],
+        "scale": [
+          5,
+          5,
+          5
+        ]
+      },
+      "hasFunction": false,
+      "iconId": "🏡",
+      "enabled": false,
+      "interaction": {
+        "mode": "walk_then_enter",
+        "anchorLocal": [
+          0,
+          0,
+          2.5
+        ],
+        "labelAnchorLocal": [
+          0,
+          3.5,
+          0
+        ],
+        "radius": 2
+      }
+    }
+  ],
+  "environmentObjects": [
+    {
+      "name": "Dòng Sông (River Stream)",
+      "type": "river",
+      "transform": {
+        "position": [
+          2.243,
+          1.77,
+          -8.59
+        ],
+        "rotation": [
+          0,
+          -7.854,
+          0
+        ],
+        "scale": [
+          0.882,
+          0.882,
+          0.882
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Thác Nước Đảo Nổi (Edge Waterfall)",
+      "type": "waterfall",
+      "transform": {
+        "position": [
+          -2.1,
+          0,
+          9.347
+        ],
+        "rotation": [
+          0,
+          -0.785,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Hand Cart",
+      "type": "cart",
+      "transform": {
+        "position": [
+          -10.142,
+          1.8,
+          13.34
+        ],
+        "rotation": [
+          0,
+          1.985,
+          0
+        ],
+        "scale": [
+          0.833,
+          0.833,
+          0.833
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Street Lamp #1",
+      "type": "lampPost",
+      "transform": {
+        "position": [
+          -10.596,
+          1.8,
+          -6.439
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Street Lamp #2",
+      "type": "lampPost",
+      "transform": {
+        "position": [
+          -8.634,
+          1.65,
+          10.935
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Street Lamp #3",
+      "type": "lampPost",
+      "transform": {
+        "position": [
+          5.569,
+          1.8,
+          4.085
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Street Lamp #4",
+      "type": "lampPost",
+      "transform": {
+        "position": [
+          -7.655,
+          1.5,
+          -10.682
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Street Lamp #5",
+      "type": "lampPost",
+      "transform": {
+        "position": [
+          -2.421,
+          1.8,
+          11.173
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Street Lamp #6",
+      "type": "lampPost",
+      "transform": {
+        "position": [
+          -10.488,
+          1.55,
+          -1.743
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Tree #1",
+      "type": "treeOak",
+      "transform": {
+        "position": [
+          -13.396,
+          1.8,
+          -1.105
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.1,
+          1.1,
+          1.1
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Tree #2",
+      "type": "treeOak",
+      "transform": {
+        "position": [
+          17.233,
+          1.6,
+          -0.708
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.2,
+          1.2,
+          1.2
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Tree #3",
+      "type": "treeOak",
+      "transform": {
+        "position": [
+          -4.997,
+          1.7,
+          16.696
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.689,
+          0.689,
+          0.689
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Tree #4",
+      "type": "treeOak",
+      "transform": {
+        "position": [
+          0.438,
+          1.3,
+          -14.526
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.15,
+          1.15,
+          1.15
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Tree #5",
+      "type": "treeOak",
+      "transform": {
+        "position": [
+          16.985,
+          1.8,
+          4.444
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.638,
+          0.638,
+          0.638
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Tree #7",
+      "type": "treeOak",
+      "transform": {
+        "position": [
+          -13.695,
+          1.05,
+          11.765
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.1,
+          1.1,
+          1.1
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Boulder #1",
+      "type": "rock",
+      "transform": {
+        "position": [
+          -0.28,
+          1.8,
+          -9.495
+        ],
+        "rotation": [
+          0,
+          0.5,
+          0
+        ],
+        "scale": [
+          1.2,
+          1.2,
+          1.2
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Boulder #2",
+      "type": "rock",
+      "transform": {
+        "position": [
+          1.817,
+          1.8,
+          6.628
+        ],
+        "rotation": [
+          0,
+          1.2,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          0.9
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Boulder #3",
+      "type": "rock",
+      "transform": {
+        "position": [
+          0.987,
+          1.6,
+          -7.532
+        ],
+        "rotation": [
+          0,
+          -0.4,
+          0
+        ],
+        "scale": [
+          1.1,
+          1.1,
+          1.1
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Boulder #4",
+      "type": "rock",
+      "transform": {
+        "position": [
+          2.668,
+          1.6,
+          -2.749
+        ],
+        "rotation": [
+          0,
+          0.8,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Boulder #5",
+      "type": "rock",
+      "transform": {
+        "position": [
+          4.584,
+          1.6,
+          16.738
+        ],
+        "rotation": [
+          0,
+          1.5,
+          0
+        ],
+        "scale": [
+          1.3,
+          1.3,
+          1.3
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Boulder #6",
+      "type": "rock",
+      "transform": {
+        "position": [
+          15.457,
+          1.6,
+          -1.256
+        ],
+        "rotation": [
+          0,
+          -1,
+          0
+        ],
+        "scale": [
+          1.4,
+          1.4,
+          1.4
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Boulder #7",
+      "type": "rock",
+      "transform": {
+        "position": [
+          11.275,
+          1.6,
+          -2.384
+        ],
+        "rotation": [
+          0,
+          0.3,
+          0
+        ],
+        "scale": [
+          1.5,
+          1.5,
+          1.5
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Boulder #8",
+      "type": "rock",
+      "transform": {
+        "position": [
+          1.857,
+          1.75,
+          -0.996
+        ],
+        "rotation": [
+          0,
+          0.9,
+          0
+        ],
+        "scale": [
+          1.3,
+          1.3,
+          1.3
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Picket Fence #1",
+      "type": "fence",
+      "transform": {
+        "position": [
+          -8.215,
+          1.8,
+          8.464
+        ],
+        "rotation": [
+          0,
+          -2.156,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          0.9
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Picket Fence #2",
+      "type": "fence",
+      "transform": {
+        "position": [
+          -10.978,
+          1.8,
+          7.121
+        ],
+        "rotation": [
+          0,
+          0.1,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          0.9
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Picket Fence #3",
+      "type": "fence",
+      "transform": {
+        "position": [
+          -4.421,
+          1.8,
+          17.44
+        ],
+        "rotation": [
+          0,
+          -0.1,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          0.9
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Picket Fence #4",
+      "type": "fence",
+      "transform": {
+        "position": [
+          0.966,
+          1.8,
+          -11.175
+        ],
+        "rotation": [
+          0,
+          1.4,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          0.9
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Picket Fence #5",
+      "type": "fence",
+      "transform": {
+        "position": [
+          7.759,
+          1.8,
+          -4.828
+        ],
+        "rotation": [
+          0,
+          0.6,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          0.9
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Barrel #1",
+      "type": "barrel",
+      "transform": {
+        "position": [
+          -7.682,
+          1.8,
+          13.457
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          0.9
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Barrel #2",
+      "type": "barrel",
+      "transform": {
+        "position": [
+          4.861,
+          1.8,
+          14.315
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.8,
+          0.8,
+          0.8
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Supply Crate #1",
+      "type": "crate",
+      "transform": {
+        "position": [
+          -9.096,
+          1.8,
+          -10.017
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Barrel #3",
+      "type": "barrel",
+      "transform": {
+        "position": [
+          0.789,
+          1.8,
+          10.62
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          0.9
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Supply Crate #2",
+      "type": "crate",
+      "transform": {
+        "position": [
+          3.118,
+          1.8,
+          14.202
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Barrel #4",
+      "type": "barrel",
+      "transform": {
+        "position": [
+          -8.159,
+          1.8,
+          14.248
+        ],
+        "rotation": [
+          0,
+          2.042,
+          0
+        ],
+        "scale": [
+          0.765,
+          0.765,
+          0.765
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Berry Bush #1",
+      "type": "bush",
+      "transform": {
+        "position": [
+          7.113,
+          1.8,
+          9.39
+        ],
+        "rotation": [
+          -3.142,
+          1.1,
+          -3.142
+        ],
+        "scale": [
+          0.765,
+          0.765,
+          0.765
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Berry Bush #2",
+      "type": "bush",
+      "transform": {
+        "position": [
+          1.968,
+          1.8,
+          -6.14
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.638,
+          0.638,
+          0.638
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Berry Bush #3",
+      "type": "bush",
+      "transform": {
+        "position": [
+          -8.691,
+          1.82,
+          5.548
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Berry Bush #4",
+      "type": "bush",
+      "transform": {
+        "position": [
+          13.789,
+          1.82,
+          -9.458
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Berry Bush #5",
+      "type": "bush",
+      "transform": {
+        "position": [
+          2.188,
+          1.8,
+          10.27
+        ],
+        "rotation": [
+          0,
+          -1.421,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Berry Bush #6",
+      "type": "bush",
+      "transform": {
+        "position": [
+          8.842,
+          1.8,
+          11.166
+        ],
+        "rotation": [
+          0,
+          -1.1,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Berry Bush #7",
+      "type": "bush",
+      "transform": {
+        "position": [
+          -0.342,
+          1.82,
+          14.858
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "isCustomSpawn": false,
+      "isColorBlended": false
+    },
+    {
+      "name": "Thảm Rêu_2716_53",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/vegetation/moss_patch.glb",
+      "transform": {
+        "position": [
+          13.566,
+          1.82,
+          -1.921
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          2.467,
+          2.467,
+          2.467
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Thảm Rêu_8059_54",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/vegetation/moss_patch.glb",
+      "transform": {
+        "position": [
+          3.363,
+          2.12,
+          6.319
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.305,
+          1.305,
+          1.305
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Momiji Maple (Cây phong đỏ trung tâm khu nghỉ)_9368_55",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/trees/tree_momiji_maple.glb",
+      "transform": {
+        "position": [
+          -12.595,
+          1.82,
+          1.224
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.656,
+          0.656,
+          0.656
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "snowy_mountain_-_terrain_1678",
+      "type": "custom_model",
+      "modelStorageKey": "model_snowy_mountain_-_terrain_1678",
+      "transform": {
+        "position": [
+          -10.839,
+          1.82,
+          8.727
+        ],
+        "rotation": [
+          0,
+          -0.785,
+          0
+        ],
+        "scale": [
+          5,
+          5,
+          5
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": true
+    },
+    {
+      "name": "Momiji Maple (Cây phong đỏ trung tâm khu nghỉ)_4596_54",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/trees/tree_momiji_maple.glb",
+      "transform": {
+        "position": [
+          -10.111,
+          4.4,
+          -14.068
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.241,
+          1.241,
+          1.241
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Đoạn Suối Thẳng (Straight River Stream)_6515_55",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/terrain/stream_straight_01.glb",
+      "transform": {
+        "position": [
+          -4.073,
+          1.52,
+          -11.364
+        ],
+        "rotation": [
+          0,
+          -2.356,
+          0
+        ],
+        "scale": [
+          0.656,
+          0.656,
+          0.656
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Đoạn Suối Thẳng (Straight River Stream)_6515_55_copy_6361",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/terrain/stream_straight_01.glb",
+      "transform": {
+        "position": [
+          11.324,
+          1.97,
+          -0.927
+        ],
+        "rotation": [
+          0,
+          -1.571,
+          0
+        ],
+        "scale": [
+          0.873,
+          0.873,
+          0.873
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Đoạn Suối Thẳng (Straight River Stream)_6515_55_copy_6361_copy_4593_copy_6731_copy_9977",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/terrain/stream_straight_01.glb",
+      "transform": {
+        "position": [
+          0.534,
+          1.82,
+          14.043
+        ],
+        "rotation": [
+          0,
+          -3.141,
+          0
+        ],
+        "scale": [
+          0.531,
+          0.531,
+          0.531
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Đá Phủ Rêu_3204_61",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/rocks/rock_moss_boulder.glb",
+      "transform": {
+        "position": [
+          6.98,
+          1.82,
+          -3.387
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Cây Cầu Gỗ (Wooden Bridge)_copy_3190",
+      "type": "bridge",
+      "templateType": "bridge",
+      "transform": {
+        "position": [
+          4.023,
+          1.8,
+          -5.914
+        ],
+        "rotation": [
+          3.142,
+          2.491,
+          3.142
+        ],
+        "scale": [
+          0.725,
+          0.725,
+          0.725
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Moss Patch (Thảm rêu phủ nền)_3419_63",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/vegetation/moss_patch.glb",
+      "transform": {
+        "position": [
+          3.254,
+          1.97,
+          -3.675
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Thảm Rêu_8059_54_copy_1408",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/vegetation/moss_patch.glb",
+      "transform": {
+        "position": [
+          1.181,
+          2.12,
+          17.229
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.737,
+          1.737,
+          1.737
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "9111845d59db7180982f909907d1716f_2066",
+      "type": "custom_model",
+      "modelStorageKey": "model_9111845d59db7180982f909907d1716f_2066",
+      "transform": {
+        "position": [
+          -9.398,
+          3.5,
+          -13.282
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          5,
+          5,
+          5
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "ced05ec5688fa0becd4f7aedf904adcd_8510",
+      "type": "custom_model",
+      "modelStorageKey": "model_ced05ec5688fa0becd4f7aedf904adcd_8510",
+      "transform": {
+        "position": [
+          -4.836,
+          1.82,
+          -16.661
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          5,
+          5,
+          5
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Momiji Maple (Cây phong đỏ trung tâm khu nghỉ)_4596_54_copy_7070",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/trees/tree_momiji_maple.glb",
+      "transform": {
+        "position": [
+          4.636,
+          1.82,
+          -9.504
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          2.594,
+          2.594,
+          2.594
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Đoạn Suối Thẳng (Straight River Stream)_6515_55_copy_9058",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/terrain/stream_straight_01.glb",
+      "transform": {
+        "position": [
+          0.257,
+          1.52,
+          7.867
+        ],
+        "rotation": [
+          0,
+          -3.141,
+          0
+        ],
+        "scale": [
+          0.656,
+          0.656,
+          0.656
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Đoạn Suối Thẳng (Straight River Stream)_6515_55_copy_9058_copy_2038_copy_8902",
+      "type": "extracted_asset",
+      "assetUrl": "assets-extracted/terrain/stream_straight_01.glb",
+      "transform": {
+        "position": [
+          3.435,
+          1.52,
+          1.393
+        ],
+        "rotation": [
+          0,
+          -0.785,
+          0
+        ],
+        "scale": [
+          0.656,
+          0.656,
+          0.656
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "bridge_and_japanese_garden_2650",
+      "type": "custom_model",
+      "modelStorageKey": "model_bridge_and_japanese_garden_2650",
+      "transform": {
+        "position": [
+          6.457,
+          4.52,
+          1.168
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.72,
+          0.72,
+          0.72
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Tree #4_copy_2992",
+      "type": "treeOak",
+      "templateType": "treeOak",
+      "transform": {
+        "position": [
+          9.809,
+          1.3,
+          14.366
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.15,
+          1.15,
+          1.15
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "Oak Tree #2_copy_7280",
+      "type": "treeOak",
+      "templateType": "treeOak",
+      "transform": {
+        "position": [
+          -11.93,
+          1.45,
+          -9.829
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.037,
+          1.037,
+          1.037
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    },
+    {
+      "name": "9111845d59db7180982f909907d1716f_2066_copy_1527",
+      "type": "custom_model",
+      "modelStorageKey": "model_9111845d59db7180982f909907d1716f_2066",
+      "transform": {
+        "position": [
+          -7.301,
+          3.5,
+          -15.166
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          5,
+          5,
+          5
+        ]
+      },
+      "isCustomSpawn": true,
+      "isColorBlended": false
+    }
+  ]
+}

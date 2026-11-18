@@ -554,18 +554,28 @@
       bottom: 24px;
       left: 20px;
       right: 20px;
-      background: rgba(6, 28, 22, 0.95);
+      background: rgba(6, 28, 22, 0.98);
       border: 1.5px solid #10b981;
       border-radius: 20px;
       padding: 12px 16px;
-      z-index: 25;
+      z-index: 60;
       display: none;
       flex-direction: column;
       gap: 10px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.7);
     }
     .placement-bar.open {
       display: flex;
+    }
+    .placement-hint {
+      font-size: 11px;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px dashed rgba(52, 211, 153, 0.45);
     }
     .placement-header {
       display: flex;
@@ -819,14 +829,58 @@
       color: #f1f5f9;
       font-size: 12px;
       font-weight: 700;
-      width: 22px;
-      height: 22px;
-      border-radius: 11px;
+      width: 24px;
+      height: 24px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-left: 6px;
+      transition: all 0.15s;
+    }
+    .decor-close-btn:hover {
+      background: #dc2626;
+      color: #fff;
+    }
+    .decor-mini-btn {
+      background: #064e3b;
+      border: 1px solid #10b981;
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .decor-mini-btn:hover {
+      background: #047857;
+      color: #fff;
+    }
+    .decor-tray.minimized {
+      padding: 6px 14px;
+      gap: 0;
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      bottom: 74px;
+      width: auto;
+      min-width: 320px;
+      border-radius: 24px;
+    }
+    .decor-tray.minimized .decor-scroll-container,
+    .decor-tray.minimized .decor-filter-btn {
+      display: none !important;
+    }
+    .decor-tray.minimized .decor-tray-header {
+      border-bottom: none;
+      padding-bottom: 0;
+      gap: 12px;
     }
     .decor-scroll-container {
       display: flex;
@@ -1051,6 +1105,7 @@
       <div class="decor-tray-title">
         <span>🛠️ CHỌN VẬT PHẨM TRANG TRÍ</span>
         <span class="decor-count" id="decor-tray-count">(58 Món)</span>
+        <button class="decor-mini-btn" id="btn-minimize-decor-tray" title="Thu gọn / Mở rộng menu">🔽 Thu Gọn</button>
       </div>
       <div class="decor-tray-actions">
         <button class="decor-filter-btn active" data-cat="all">Tất Cả</button>
@@ -1111,6 +1166,7 @@
 
   <!-- PLACEMENT & EDITING CONTROLS BAR -->
   <div class="placement-bar" id="placement-bar">
+    <div class="placement-hint" id="placement-hint">💡 Nhấp chuột lên bãi cỏ đảo để đặt ngay tại vị trí con trỏ, hoặc bấm nút Đặt bên dưới!</div>
     <div class="placement-header">
       <div style="display: flex; align-items: center; gap: 8px;">
         <span class="placement-name" id="txt-placement-name">Vật Phẩm</span>
@@ -1123,8 +1179,8 @@
       <button class="ctrl-btn elevate-btn" id="btn-elevate-down" title="Hạ thấp mô hình">⬇️ Xuống (-)</button>
       <button class="ctrl-btn rotate-btn" id="btn-rotate" title="Xoay mô hình 45 độ">🔄 Xoay</button>
       <button class="ctrl-btn delete-btn" id="btn-delete" title="Xóa vật phẩm khỏi đảo và cất lại vào kho đồ">🗑️ Xóa</button>
-      <button class="ctrl-btn cancel-btn" id="btn-cancel" title="Hủy bỏ / Đóng bảng chỉnh">✕ Đóng</button>
-      <button class="ctrl-btn confirm-btn" id="btn-confirm" title="Xác nhận đặt hoặc lưu vị trí">✅ Lưu</button>
+      <button class="ctrl-btn cancel-btn" id="btn-cancel" title="Hủy bỏ / Đóng bảng chỉnh">✕ Hủy</button>
+      <button class="ctrl-btn confirm-btn" id="btn-confirm" title="Xác nhận đặt hoặc lưu vị trí">✅ Đặt Tại Đây</button>
     </div>
   </div>
 
@@ -1261,8 +1317,8 @@
     window.FULL_CATALOG = FULL_CATALOG;
 
     let playerCoins = 500;
-    // CHO TOÀN BỘ 58 MÔ HÌNH VÀO KHO ĐỒ THEO YÊU CẦU CỦA USER
-    let ownedInventory = FULL_CATALOG.map(c => ({ itemId: c.id, count: 3 }));
+    // CHO TOÀN BỘ 58 MÔ HÌNH VÀO KHO ĐỒ THEO YÊU CẦU CỦA USER (MỖI MÓN 20 CHIẾC THOẢI MÁI TRANG TRÍ)
+    let ownedInventory = FULL_CATALOG.map(c => ({ itemId: c.id, count: 20 }));
     let placedItems = [];
     window.placedItems = placedItems;
 
@@ -1397,14 +1453,21 @@
     bgPlane.renderOrder = -1000;
     bgPlane.position.z = -bgDistance;
     camera.add(bgPlane);
+    window.bgPlane = bgPlane;
 
-    // Try loading realistic 2.5D sky texture if present
+    // Realistic photorealistic mountain background with depth & atmospheric perspective
     const texLoader = new THREE.TextureLoader();
-    texLoader.load('/textures/sky/fantasy_sky_worlds_25d.jpg', (tex) => {
+    texLoader.load('/assets/bg/swiss_grindelwald_360_real.jpg', (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
       bgMat.map = tex;
       bgMat.needsUpdate = true;
-    }, undefined, () => {});
+    }, undefined, () => {
+      texLoader.load('/assets/bg/swiss_panorama_360_real.webp', (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        bgMat.map = tex;
+        bgMat.needsUpdate = true;
+      });
+    });
 
     let bgScaleW = 1;
     let bgScaleH = 1;
@@ -2028,16 +2091,6 @@
         itemsList.forEach(it => spawnPlacedItem(it));
       }
       if (typeof updatePlacedChips === 'function') updatePlacedChips();
-      if (placedItems.length > 0) {
-        setTimeout(() => {
-          selectPlacedItem(placedItems[0].instanceId);
-          const tray = document.getElementById('decor-tray');
-          if (tray) {
-            tray.classList.add('open');
-            renderDecorTray();
-          }
-        }, 200);
-      }
     }
 
     window.spawnPlacedItem = spawnPlacedItem;
@@ -2204,12 +2257,9 @@
     let previewRotY = 0;
     let isPlacementValid = true;
 
-    function validatePlacement(x, z, r = 1.0) {
-      if (Math.hypot(x, z) + r > 13.5) return false;
-      if (Math.hypot(x - (-2.5), z - 2.2) < 3.2 + r) return false; // starter house
-      if (Math.hypot(x - (-10.0), z - (-8.0)) < 5.8 + r) return false; // alpine mountain
-      if (distToRiver(x, z) < 1.4 + r) return false; // crystal riverbed
-      return true;
+    function validatePlacement(x, z, r = 0.5) {
+      // Allows free placement across the entire island pasture surface (radius 13.8m)
+      return Math.hypot(x, z) + r <= 14.0;
     }
 
     container.addEventListener('pointerdown', (e) => {
@@ -2221,12 +2271,7 @@
     });
 
     window.addEventListener('pointermove', (e) => {
-      if (!isInteracting) return;
-      const dx = e.clientX - lastX;
-      const dy = e.clientY - lastY;
-      lastX = e.clientX;
-      lastY = e.clientY;
-
+      // 1. If in placement mode: preview ghost follows the pointer smoothly across terrain
       if (isDecorationMode && activePreviewItemId) {
         const raycaster = new THREE.Raycaster();
         const normX = (e.clientX / window.innerWidth) * 2 - 1;
@@ -2239,15 +2284,26 @@
           previewPos.z = Math.round(pt.z * 2) / 2;
 
           isPlacementValid = validatePlacement(previewPos.x, previewPos.z);
-          cursor.position.set(previewPos.x, 1.85, previewPos.z);
+          cursor.position.set(previewPos.x, 1.82, previewPos.z);
           ghostGroup.position.set(previewPos.x, 1.8 + previewElevation, previewPos.z);
           cursor.material.color.set(isPlacementValid ? '#10b981' : '#ef4444');
 
           const statusEl = document.getElementById('txt-placement-status');
-          statusEl.textContent = isPlacementValid ? '✓ Vị trí hợp lệ' : '✗ Vị trí không hợp lệ';
-          statusEl.className = 'placement-status ' + (isPlacementValid ? '' : 'invalid');
+          if (statusEl) {
+            statusEl.textContent = isPlacementValid ? '✓ Nhấp lên đảo để đặt' : '✗ Vị trí ngoài đảo';
+            statusEl.className = 'placement-status ' + (isPlacementValid ? '' : 'invalid');
+          }
         }
-      } else {
+      }
+
+      // 2. Camera orbit if dragging
+      if (!isInteracting) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+
+      if (!activePreviewItemId) {
         cameraAzimuth -= dx * 0.005;
         cameraPolar = Math.max(Math.PI / 8.0, Math.min(Math.PI / 2.3, cameraPolar - dy * 0.005));
         updateCamera();
@@ -2258,7 +2314,22 @@
       isInteracting = false;
       const moved = Math.hypot(e.clientX - downX, e.clientY - downY);
       if (moved < 14) {
-        // Tap to select ANY object on the island
+        // A. If in placement mode: Tapping on the 3D island directly places the item!
+        if (isDecorationMode && activePreviewItemId) {
+          // Avoid triggering when tapping buttons or bars
+          if (e.target.closest('#placement-bar') || e.target.closest('#decor-tray') || e.target.closest('#bottom-dock') || e.target.closest('.mode-switcher-bar') || e.target.closest('#floating-quick-tools')) {
+            return;
+          }
+          if (isPlacementValid) {
+            confirmPlacement();
+            return;
+          } else {
+            showToast('⚠️ Vị trí này nằm ngoài phạm vi hòn đảo!');
+            return;
+          }
+        }
+
+        // B. If NOT placing: Tap to select ANY object on the island
         const raycaster = new THREE.Raycaster();
         const normX = (e.clientX / window.innerWidth) * 2 - 1;
         const normY = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -2518,20 +2589,31 @@
     }
 
     function startPlacement(itemId) {
+      if (selectedInstanceId) {
+        selectedInstanceId = null;
+      }
       modalInv.classList.remove('open');
       modalShop.classList.remove('open');
+      if (typeof minimizeDecorTray === 'function') {
+        minimizeDecorTray(true); // Minimize tray during placement so user has full view of the island!
+      }
+
       isDecorationMode = true;
       activePreviewItemId = itemId;
       const def = FULL_CATALOG.find(c => c.id === itemId);
-      document.getElementById('txt-placement-name').textContent = def.nameVi;
+      document.getElementById('txt-placement-name').textContent = def ? `Đang đặt: ${def.nameVi}` : itemId;
+      document.getElementById('txt-placement-status').textContent = '✓ Nhấp lên bãi cỏ đảo để đặt';
+      document.getElementById('txt-placement-status').className = 'placement-status';
+      document.getElementById('btn-confirm').textContent = '✅ Đặt Tại Vị Trí Này';
+      document.getElementById('btn-delete').textContent = '✕ Hủy Bỏ';
       placementBar.classList.add('open');
       cursor.visible = true;
 
       // Create ghost
       ghostGroup.clear();
       const ghostMesh = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.9, 0.9, 1.2, 16),
-        new THREE.MeshStandardMaterial({ color: '#6ee7b7', transparent: true, opacity: 0.65 })
+        new THREE.CylinderGeometry(0.8, 0.8, 1.2, 16),
+        new THREE.MeshStandardMaterial({ color: '#34d399', transparent: true, opacity: 0.65 })
       );
       ghostMesh.position.y = 0.6;
       ghostGroup.add(ghostMesh);
@@ -2543,13 +2625,20 @@
           const m = gltf.scene;
           const s = def.scale || 1.0;
           m.scale.set(s, s, s);
+          m.traverse(c => {
+            if (c.isMesh) {
+              c.material = c.material.clone();
+              c.material.transparent = true;
+              c.material.opacity = 0.82;
+            }
+          });
           ghostGroup.add(m);
         }, undefined, () => {});
       }
 
-      previewPos = { x: 2.0, z: 2.0 };
-      cursor.position.set(2.0, 1.85, 2.0);
-      ghostGroup.position.set(2.0, 1.8 + previewElevation, 2.0);
+      previewPos = { x: 0, z: 0 };
+      cursor.position.set(0, 1.82, 0);
+      ghostGroup.position.set(0, 1.8 + previewElevation, 0);
     }
 
     function updateElevationDisplay() {
@@ -2624,14 +2713,10 @@
       const def = FULL_CATALOG.find(c => c.id === itemId);
       if (!def) return;
 
-      const existing = placedItems.find(p => p.itemId === itemId);
-      if (existing) {
-        selectPlacedItem(existing.instanceId);
-      } else {
-        startPlacement(itemId);
-      }
+      // Always enter placement mode so user can place new objects freely
+      startPlacement(itemId);
       renderDecorTray();
-      showToast(`Đã chọn: "${def.nameVi}"! Dùng ⬆️ ⬇️ để nâng hạ, 🗑️ để xóa`);
+      showToast(`Đang đặt "${def.nameVi}" — Nhấp chuột lên bãi cỏ đảo để đặt ngay!`);
     }
     window.selectItemFromTray = selectItemFromTray;
 
@@ -2808,6 +2893,44 @@
       };
     }
 
+    let isTrayMinimized = false;
+    function toggleMinimizeDecorTray() {
+      const tray = document.getElementById('decor-tray');
+      const btn = document.getElementById('btn-minimize-decor-tray');
+      if (!tray) return;
+      isTrayMinimized = !isTrayMinimized;
+      if (isTrayMinimized) {
+        tray.classList.add('minimized');
+        if (btn) btn.textContent = '🔼 Mở Rộng';
+      } else {
+        tray.classList.remove('minimized');
+        if (btn) btn.textContent = '🔽 Thu Gọn';
+      }
+    }
+    function minimizeDecorTray(forceMin = true) {
+      const tray = document.getElementById('decor-tray');
+      const btn = document.getElementById('btn-minimize-decor-tray');
+      if (!tray) return;
+      isTrayMinimized = forceMin;
+      if (forceMin) {
+        tray.classList.add('minimized');
+        if (btn) btn.textContent = '🔼 Mở Rộng';
+      } else {
+        tray.classList.remove('minimized');
+        if (btn) btn.textContent = '🔽 Thu Gọn';
+      }
+    }
+    window.toggleMinimizeDecorTray = toggleMinimizeDecorTray;
+    window.minimizeDecorTray = minimizeDecorTray;
+
+    const btnMiniTray = document.getElementById('btn-minimize-decor-tray');
+    if (btnMiniTray) {
+      btnMiniTray.onclick = (e) => {
+        e.stopPropagation();
+        toggleMinimizeDecorTray();
+      };
+    }
+
     document.getElementById('btn-cancel').onclick = () => {
       placementBar.classList.remove('open');
       cursor.visible = false;
@@ -2816,21 +2939,25 @@
       selectedInstanceId = null;
     };
 
-    document.getElementById('btn-confirm').onclick = () => {
+    function confirmPlacement() {
       if (selectedInstanceId) {
-        // Confirm editing of existing placed item
         const item = placedItems.find(p => p.instanceId === selectedInstanceId);
         const def = item ? FULL_CATALOG.find(c => c.id === item.itemId) : null;
         selectedInstanceId = null;
         cursor.visible = false;
         placementBar.classList.remove('open');
+        updatePlacedChips();
         showToast(`Đã lưu vị trí "${def ? def.nameVi : 'Vật phẩm'}"!`);
         return;
       }
 
-      if (!isPlacementValid || !activePreviewItemId) return;
-      const def = FULL_CATALOG.find(c => c.id === activePreviewItemId);
+      if (!activePreviewItemId) return;
+      if (!isPlacementValid) {
+        showToast('⚠️ Vị trí không hợp lệ hoặc nằm ngoài đảo!');
+        return;
+      }
 
+      const def = FULL_CATALOG.find(c => c.id === activePreviewItemId);
       const instId = 'inst_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
       spawnPlacedItem({
         instanceId: instId,
@@ -2840,20 +2967,19 @@
         elevation: previewElevation
       });
 
-      // Deduct 1 from inventory if in player mode
-      const invItem = ownedInventory.find(i => i.itemId === activePreviewItemId);
-      if (invItem && invItem.count > 0) {
-        invItem.count -= 1;
-      }
-
       placementBar.classList.remove('open');
       cursor.visible = false;
       ghostGroup.clear();
+      const placedName = def ? def.nameVi : 'Vật phẩm';
       activePreviewItemId = null;
       renderInvList();
       renderDecorTray();
-      showToast(`Đã đặt "${def ? def.nameVi : 'Vật phẩm'}" lên đảo thành công!`);
-    };
+      updatePlacedChips();
+      showToast(`🎉 Đã đặt thành công "${placedName}" lên đảo!`);
+    }
+    window.confirmPlacement = confirmPlacement;
+
+    document.getElementById('btn-confirm').onclick = confirmPlacement;
 
     // -----------------------------------------------------------------
     // ADMIN MASTER TEMPLATE & PLAYER REAL EXPERIENCE SYSTEM
