@@ -14,7 +14,6 @@ import {
   DeviceEventEmitter,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import {
   Backpack,
@@ -70,8 +69,6 @@ import { toolkitStorage } from "@/services/toolkitStorage";
 
 export type ToolkitTab = "herbs" | "sounds" | "breath";
 
-const BOOKMARKS_STORAGE_KEY = "hc_mobile_botanical_bookmarks";
-
 const DEFAULT_STARTER_HERB_IDS = [
   "matricaria-chamomilla",
   "passiflora-incarnata",
@@ -118,16 +115,33 @@ export default function InventoryScreen() {
   const [savedSoundIds, setSavedSoundIds] = useState<string[]>([]);
   const [savedBreathIds, setSavedBreathIds] = useState<string[]>([]);
   const [expandedHerbId, setExpandedHerbId] = useState<string | null>(null);
+  const [toolkitLoading, setToolkitLoading] = useState(true);
+  const [toolkitError, setToolkitError] = useState<string | null>(null);
 
   // Sync all toolkit saved items from storage and listen to live changes
   useEffect(() => {
+    let isMounted = true;
     const reloadAll = async () => {
-      const herbs = await toolkitStorage.getSavedHerbIds();
-      const sounds = await toolkitStorage.getSavedSoundIds();
-      const breaths = await toolkitStorage.getSavedBreathIds();
-      setBookmarkedHerbIds(herbs);
-      setSavedSoundIds(sounds);
-      setSavedBreathIds(breaths);
+      if (isMounted) {
+        setToolkitLoading(true);
+        setToolkitError(null);
+      }
+      try {
+        const state = await toolkitStorage.getState();
+        if (isMounted) {
+          setBookmarkedHerbIds(state.herbs);
+          setSavedSoundIds(state.sounds);
+          setSavedBreathIds(state.breaths);
+        }
+      } catch {
+        if (isMounted) setToolkitError(
+          locale === "en"
+            ? "Your Bag could not be loaded. Check your connection and try again."
+            : "Không thể tải Túi Đồ. Hãy kiểm tra kết nối rồi thử lại."
+        );
+      } finally {
+        if (isMounted) setToolkitLoading(false);
+      }
     };
     reloadAll();
 
@@ -135,9 +149,10 @@ export default function InventoryScreen() {
       reloadAll();
     });
     return () => {
+      isMounted = false;
       sub.remove();
     };
-  }, []);
+  }, [locale]);
 
   // --- TAB 1: HERBS ---
   const collectedHerbs = useMemo(() => {
@@ -155,9 +170,13 @@ export default function InventoryScreen() {
 
   const handleRemoveHerb = async (id: string, name: string) => {
     triggerHaptic();
-    const updated = await toolkitStorage.removeHerb(id);
-    setBookmarkedHerbIds(updated);
-    showToast(locale === "en" ? `Removed ${name} from Bag.` : `Đã bỏ ${name} khỏi Túi Đồ.`);
+    try {
+      const updated = await toolkitStorage.removeHerb(id);
+      setBookmarkedHerbIds(updated);
+      showToast(locale === "en" ? `Removed ${name} from Bag.` : `Đã bỏ ${name} khỏi Túi Đồ.`);
+    } catch {
+      setToolkitError(locale === "en" ? "Could not update your Bag. Try again." : "Không thể cập nhật Túi Đồ. Hãy thử lại.");
+    }
   };
 
   const handleAddHerbToJourney = async (herb: HerbalArticle) => {
@@ -253,9 +272,13 @@ export default function InventoryScreen() {
       soundscape.stopTrack(id);
       setActiveSoundIds((prev) => prev.filter((item) => item !== id));
     }
-    const updated = await toolkitStorage.removeSound(id);
-    setSavedSoundIds(updated);
-    showToast(locale === "en" ? `Removed "${name}" from Bag.` : `Đã bỏ "${name}" khỏi Túi Đồ.`);
+    try {
+      const updated = await toolkitStorage.removeSound(id);
+      setSavedSoundIds(updated);
+      showToast(locale === "en" ? `Removed "${name}" from Bag.` : `Đã bỏ "${name}" khỏi Túi Đồ.`);
+    } catch {
+      setToolkitError(locale === "en" ? "Could not update your Bag. Try again." : "Không thể cập nhật Túi Đồ. Hãy thử lại.");
+    }
   };
 
   // --- TAB 3: BREATHWORK STATE ---
@@ -382,9 +405,13 @@ export default function InventoryScreen() {
       setIsBreathRunning(false);
       setActiveBreathId(null);
     }
-    const updated = await toolkitStorage.removeBreath(id);
-    setSavedBreathIds(updated);
-    showToast(locale === "en" ? `Removed "${name}" from Bag.` : `Đã bỏ "${name}" khỏi Túi Đồ.`);
+    try {
+      const updated = await toolkitStorage.removeBreath(id);
+      setSavedBreathIds(updated);
+      showToast(locale === "en" ? `Removed "${name}" from Bag.` : `Đã bỏ "${name}" khỏi Túi Đồ.`);
+    } catch {
+      setToolkitError(locale === "en" ? "Could not update your Bag. Try again." : "Không thể cập nhật Túi Đồ. Hãy thử lại.");
+    }
   };
 
   const triggerHaptic = () => {
@@ -422,6 +449,29 @@ export default function InventoryScreen() {
         <View style={styles.toastBox}>
           <Sparkles size={16} color={colors.gold} />
           <Text style={styles.toastText}>{toastMsg}</Text>
+        </View>
+      )}
+
+      {toolkitLoading && (
+        <View style={styles.toolkitStatus} accessibilityLiveRegion="polite">
+          <ActivityIndicator size="small" color={colors.emerald} />
+          <Text style={styles.toolkitStatusText}>
+            {locale === "en" ? "Loading your Bag…" : "Đang tải Túi Đồ…"}
+          </Text>
+        </View>
+      )}
+      {toolkitError && !toolkitLoading && (
+        <View style={styles.toolkitError} accessibilityLiveRegion="assertive">
+          <Text style={styles.toolkitErrorText}>{toolkitError}</Text>
+          <TouchableOpacity
+            style={styles.toolkitRetryButton}
+            onPress={() => DeviceEventEmitter.emit("HEALTHCLUES_TOOLKIT_CHANGED")}
+            accessibilityRole="button"
+            accessibilityLabel={locale === "en" ? "Retry loading Bag" : "Thử tải lại Túi Đồ"}
+          >
+            <RotateCcw size={14} color="#082018" />
+            <Text style={styles.toolkitRetryText}>{locale === "en" ? "Retry" : "Thử lại"}</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -1247,6 +1297,55 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#fef08a",
     fontWeight: "700",
+  },
+  toolkitStatus: {
+    marginHorizontal: 14,
+    marginTop: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 10,
+    backgroundColor: "rgba(52, 211, 153, 0.10)",
+    borderWidth: 1,
+    borderColor: "rgba(52, 211, 153, 0.28)",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  toolkitStatusText: {
+    fontFamily: fonts.uiMedium,
+    fontSize: 12,
+    color: colors.emeraldLight,
+  },
+  toolkitError: {
+    marginHorizontal: 14,
+    marginTop: 8,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: "rgba(248, 113, 113, 0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(248, 113, 113, 0.45)",
+    gap: 9,
+  },
+  toolkitErrorText: {
+    fontFamily: fonts.uiMedium,
+    fontSize: 12,
+    lineHeight: 17,
+    color: "#fecaca",
+  },
+  toolkitRetryButton: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 8,
+    backgroundColor: colors.emerald,
+  },
+  toolkitRetryText: {
+    fontFamily: fonts.uiBold,
+    fontSize: 12,
+    color: "#082018",
   },
   tabsBar: {
     flexDirection: "row",

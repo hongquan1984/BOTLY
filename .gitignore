@@ -45,7 +45,12 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+# scratch / test outputs
 /scratch/
+/App/scratch/
+/App/word3d/scratch/
+*.ppm
+
 /data/private-ebooks/
 Music_Voice/
 *.epub
@@ -63,7 +68,9 @@ Music_Voice/
 .expo/
 **/.expo/
 **/dist/
+**/dist-*/
 **/dist-web/
+**/.export-archive/
 *.log
 
 

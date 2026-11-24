@@ -1,0 +1,980 @@
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { ObstacleCollider } from './villageBuilder';
+import { waterAnimationManager } from './waterAnimation';
+import { createAmbientBirds } from './ambientBirds';
+
+export interface CozyVillageBuildResult {
+  group: THREE.Group;
+  colliders: ObstacleCollider[];
+  readyPromise: Promise<void>;
+  update: (time: number) => void;
+  walkableRaycastPlane: THREE.Mesh;
+  editableObjects: THREE.Object3D[];
+  templates: Map<string, THREE.Group>;
+  setQuality?: (quality: 'low' | 'medium' | 'high') => void;
+}
+
+export function buildCozyVillage(): CozyVillageBuildResult {
+  const group = new THREE.Group();
+  group.name = 'CozyFantasyVillageScene';
+
+  const colliders: ObstacleCollider[] = [];
+  const gltfLoader = new GLTFLoader();
+  const textureLoader = new THREE.TextureLoader();
+
+  // Load the shared night emission texture for warm window & lantern glow
+  const emissionMap = textureLoader.load('/assets/medieval_village/Textures/T_Village_Emission.png');
+  emissionMap.flipY = false;
+
+  // Track dynamic animated elements
+  let waterWheel: THREE.Group | null = null;
+  const waterfallMeshes: THREE.Mesh[] = [];
+  const lanternLights: THREE.PointLight[] = [];
+  let headwaterSplashMesh: THREE.Mesh | null = null;
+  let mountainMistMesh: THREE.Mesh | null = null;
+
+  // Track editable objects & catalog templates for Layout Editor & 3D Upload
+  const editableObjects: THREE.Object3D[] = [];
+  const templates = new Map<string, THREE.Group>();
+
+  function registerEditable(obj: THREE.Object3D, type: string, name: string) {
+    obj.userData = {
+      ...obj.userData,
+      editable: true,
+      type,
+      name,
+      initialPos: obj.position.clone(),
+      initialRot: obj.rotation.clone(),
+      initialScale: obj.scale.clone(),
+    };
+    if (!editableObjects.includes(obj)) {
+      editableObjects.push(obj);
+    }
+  }
+
+  // 1. Build the Organic Floating Island Base
+  const islandGroup = new THREE.Group();
+  islandGroup.name = 'CozyIslandBase';
+
+  // Terrain top surface geometry: natural sculpted terrain with river canyon depression
+  const islandRadiusX = 18.0;
+  const islandRadiusZ = 18.5;
+  const terrainGeo = new THREE.CylinderGeometry(
+    islandRadiusX,
+    0.8,
+    18.0,
+    80,
+    32,
+    false
+  );
+
+  const posAttr = terrainGeo.attributes.position;
+  const colors: number[] = [];
+  const v = new THREE.Vector3();
+
+  const colGrass = new THREE.Color('#58a649');     // Lush highland meadow
+  const colGrassDeep = new THREE.Color('#468a38'); // Rich grass
+  const colPathEarth = new THREE.Color('#78634a'); // Warm beaten footpath earth
+  const colPathStone = new THREE.Color('#5e4e3b'); // Weathered gravel footpath rim
+  const colLoam = new THREE.Color('#453123');      // Rich dark soil rim
+  const colCliff = new THREE.Color('#5a4e44');     // Weathered sedimentary cliff
+  const colBasalt = new THREE.Color('#322b25');    // Deep basalt keel
+
+  // Footpath segments connecting key landmarks safely without clipping
+  function distToSegment(px: number, pz: number, ax: number, az: number, bx: number, bz: number): number {
+    const dx = bx - ax;
+    const dz = bz - az;
+    const l2 = dx * dx + dz * dz;
+    if (l2 === 0) return Math.hypot(px - ax, pz - az);
+    const t = Math.max(0, Math.min(1, ((px - ax) * dx + (pz - az) * dz) / l2));
+    return Math.hypot(px - (ax + t * dx), pz - (az + t * dz));
+  }
+
+  const pathSegments = [
+    { ax: -2.8, az: 4.2, bx: -0.8, bz: 1.2 },  // Great Hall to Bridge
+    { ax: -0.8, az: 1.2, bx: 2.2, bz: -1.5 },   // Bridge to Plaza Well
+    { ax: 2.2, az: -1.5, bx: 4.8, bz: -4.5 },   // Plaza Well to Lumi Store
+    { ax: 2.2, az: -1.5, bx: -4.5, bz: -1.8 },  // Plaza Well to Library
+    { ax: 2.2, az: -1.5, bx: 0.5, bz: -2.8 },   // Plaza Well to Potion Shop
+    { ax: 2.2, az: -1.5, bx: -2.2, bz: -4.2 },  // Plaza Well to Watermill trail lower
+    { ax: -2.2, az: -4.2, bx: -6.5, bz: -7.2 }, // Trail climbing to Watermill terrace
+  ];
+
+  for (let i = 0; i < posAttr.count; i++) {
+    v.fromBufferAttribute(posAttr, i);
+
+    const angle = Math.atan2(v.z, v.x);
+    const normalizedY = (v.y + 9.0) / 18.0; // 0 at bottom, 1 at top
+
+    // Top surface sculpting: river valley, terrace elevation, and natural undulation
+    if (normalizedY >= 0.98) {
+      // Stream path from upper-left ([-6, -7]) to lower-right ([6, 6])
+      const riverDist = Math.abs((v.x * 0.7 - v.z * 0.7 + 0.8));
+      const inRiver = riverDist < 2.2;
+
+      // Higher terrace on upper-left for Watermill & Mountain cascade
+      const isWatermillHill = (v.x < -4 && v.z < -4);
+      if (isWatermillHill) {
+        v.y += 1.4 * (1.0 - Math.hypot(v.x + 7, v.z + 7) / 8.0);
+      }
+
+      // River depression
+      if (inRiver && v.x > -8 && v.x < 11 && v.z > -8 && v.z < 10) {
+        v.y -= Math.max(0, 0.45 * (1.0 - riverDist / 2.2));
+      }
+
+      // Pond depression on the right
+      const pondDist = Math.hypot(v.x - 6.5, v.z - 3.5);
+      if (pondDist < 4.0) {
+        v.y -= Math.max(0, 0.4 * (1.0 - pondDist / 4.0));
+      }
+
+      // Subtle organic ground wobble
+      v.y += Math.sin(v.x * 0.8) * Math.cos(v.z * 0.8) * 0.12;
+    } else {
+      // Natural organic rock strata underside keel
+      const cosA = Math.cos(angle);
+      const sinA = Math.sin(angle);
+
+      // Squircle transition into pointed rocky peak
+      const p = 1.0 - 0.25 * normalizedY;
+      const sqX = Math.sign(cosA) * Math.pow(Math.abs(cosA), p);
+      const sqZ = Math.sign(sinA) * Math.pow(Math.abs(sinA), p);
+
+      const rockStrata = 1.0 + Math.sin(normalizedY * Math.PI * 14) * 0.04;
+      const wobble = 1.0 + 0.06 * Math.sin(angle * 5 + 1.2) + 0.04 * Math.cos(angle * 7 - 0.6);
+      const taper = Math.pow(normalizedY, 0.46);
+
+      v.x = sqX * islandRadiusX * wobble * rockStrata * taper;
+      v.z = sqZ * islandRadiusZ * wobble * rockStrata * taper;
+
+      if (normalizedY < 0.25) {
+        v.x += (0.25 - normalizedY) * 3.0;
+        v.z -= (0.25 - normalizedY) * 1.8;
+      }
+    }
+
+    posAttr.setXYZ(i, v.x, v.y, v.z);
+
+    // Color gradient
+    const c = new THREE.Color();
+    if (normalizedY >= 0.95) {
+      c.copy(colGrass).lerp(colGrassDeep, (Math.sin(v.x * 2.0 + v.z * 2.0) + 1.0) * 0.5);
+
+      // Blend warm beaten earth & cobblestone footpath tone along landmark walking paths
+      let minPathDist = 999;
+      for (let p = 0; p < pathSegments.length; p++) {
+        const seg = pathSegments[p];
+        const d = distToSegment(v.x, v.z, seg.ax, seg.az, seg.bx, seg.bz);
+        if (d < minPathDist) minPathDist = d;
+      }
+
+      if (minPathDist < 1.15) {
+        const pathWeight = (1.15 - minPathDist) / 1.15;
+        const stoneMix = (Math.sin(v.x * 5.0 + v.z * 5.0) + 1.0) * 0.5;
+        const targetPathCol = colPathEarth.clone().lerp(colPathStone, stoneMix);
+        c.lerp(targetPathCol, pathWeight * 0.85);
+      }
+    } else if (normalizedY > 0.8) {
+      c.copy(colLoam).lerp(colCliff, (0.95 - normalizedY) * 6.0);
+    } else if (normalizedY > 0.3) {
+      c.copy(colCliff).lerp(colBasalt, (0.8 - normalizedY) * 2.0);
+    } else {
+      c.copy(colBasalt);
+    }
+
+    colors.push(c.r, c.g, c.b);
+  }
+
+  terrainGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  terrainGeo.computeVertexNormals();
+
+  const islandMat = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.86,
+    metalness: 0.02,
+    flatShading: true,
+  });
+
+  const islandMesh = new THREE.Mesh(terrainGeo, islandMat);
+  islandMesh.position.y = -9.0 + 1.8; // Align top surface with Y ~ 1.8m
+  islandMesh.receiveShadow = true;
+  islandMesh.castShadow = true;
+  islandGroup.add(islandMesh);
+
+  // 2. Translucent River Stream & Pond Water
+  const waterShape = new THREE.Shape();
+  waterShape.moveTo(-7.5, -8.0);
+  waterShape.quadraticCurveTo(-4.0, -3.0, -0.5, 1.5);
+  waterShape.quadraticCurveTo(3.0, 5.0, 8.5, 6.0);
+  waterShape.lineTo(9.5, 2.0);
+  waterShape.quadraticCurveTo(5.0, 1.0, 1.5, -0.5);
+  waterShape.quadraticCurveTo(-2.0, -4.0, -5.5, -8.5);
+  waterShape.closePath();
+
+  const waterGeo = new THREE.ShapeGeometry(waterShape, 24);
+  waterGeo.rotateX(-Math.PI / 2);
+
+  const waterMat = new THREE.MeshStandardMaterial({
+    color: '#38bdf8',
+    roughness: 0.08,
+    metalness: 0.45,
+    transparent: true,
+    opacity: 0.88,
+    side: THREE.DoubleSide,
+    depthWrite: false, // Prevents z-fighting and sorting clipping with grass layers
+  });
+  waterAnimationManager.upgradeToAnimatedWater(waterMat, 1.25, 0.038);
+
+  const streamMesh = new THREE.Mesh(waterGeo, waterMat);
+  streamMesh.receiveShadow = true;
+
+  const streamGroup = new THREE.Group();
+  streamGroup.name = 'RiverStreamGroup';
+  streamGroup.position.set(0, 1.62, 0);
+  streamGroup.add(streamMesh);
+  group.add(streamGroup);
+  registerEditable(streamGroup, 'river', 'Dòng Sông (River Stream)');
+  templates.set('river', streamGroup);
+
+  // Crystal Pool / Pond (Right side)
+  const pondGeo = new THREE.CircleGeometry(4.2, 32);
+  pondGeo.rotateX(-Math.PI / 2);
+  const pondMesh = new THREE.Mesh(pondGeo, waterMat);
+  pondMesh.receiveShadow = true;
+
+  const pondGroup = new THREE.Group();
+  pondGroup.name = 'CrystalPondGroup';
+  pondGroup.position.set(6.8, 1.58, 3.2);
+  pondGroup.add(pondMesh);
+  group.add(pondGroup);
+  registerEditable(pondGroup, 'pond', 'Hồ Nước (Crystal Pond)');
+  templates.set('pond', pondGroup);
+
+  // Modular Stream Ribbon template for placing custom streams anywhere on the island
+  const streamSectionGroup = new THREE.Group();
+  streamSectionGroup.name = 'StreamSection';
+  const streamGeo = new THREE.PlaneGeometry(6.5, 2.6, 20, 6);
+  streamGeo.rotateX(-Math.PI / 2);
+  const streamRibbon = new THREE.Mesh(streamGeo, waterMat);
+  streamRibbon.position.set(0, 0.03, 0);
+  streamRibbon.receiveShadow = true;
+  streamSectionGroup.add(streamRibbon);
+
+  // Decorative riverbed pebble banks
+  const pebbleMat = new THREE.MeshStandardMaterial({ color: '#57534e', roughness: 0.85, metalness: 0.05 });
+  const bankL = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.08, 0.25), pebbleMat);
+  bankL.position.set(0, 0.04, 1.35);
+  const bankR = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.08, 0.25), pebbleMat);
+  bankR.position.set(0, 0.04, -1.35);
+  streamSectionGroup.add(bankL, bankR);
+  templates.set('streamSection', streamSectionGroup);
+
+  // 3. Cascading Waterfalls
+  // A. Cliff-edge Main Waterfall plunging off the island rim into the clouds below!
+  const wfGroup = new THREE.Group();
+  wfGroup.name = 'EdgeWaterfallPlunge';
+
+  const wfSlices = 36;
+  const wfPos: number[] = [];
+  const wfUv: number[] = [];
+  const wfNorm: number[] = [];
+  const wfInd: number[] = [];
+
+  // Waterfall trajectory: extends seamlessly from village stream exit (X=8.6, Z=4.2, Y=1.62)
+  // curves gently over the rock weir, then plunges 17m down into the cloud ocean (Y=-15.5)
+  for (let s = 0; s <= wfSlices; s++) {
+    const u = s / wfSlices;
+    const y = 1.62 - u * 16.8;
+    const outwardCurl = Math.sin(u * 1.15) * 1.45;
+    const cx = 8.6 + outwardCurl * 0.85;
+    const cz = 4.2 + outwardCurl * 0.75;
+
+    // Waterfall width: 2.8m at lip, pinches to 2.4m mid-fall, fans to 3.8m at cloud base
+    const width = 2.8 - Math.sin(u * Math.PI) * 0.4 + (u > 0.65 ? (u - 0.65) * 3.5 : 0);
+    const halfW = width / 2;
+
+    const nx = -0.65;
+    const nz = 0.76;
+
+    const px1 = cx + nx * halfW;
+    const pz1 = cz + nz * halfW;
+    const px2 = cx - nx * halfW;
+    const pz2 = cz - nz * halfW;
+
+    wfPos.push(px1, y, pz1);
+    wfUv.push(0, u * 5.0);
+    wfNorm.push(0.76, 0.1, 0.65);
+
+    wfPos.push(px2, y, pz2);
+    wfUv.push(1, u * 5.0);
+    wfNorm.push(0.76, 0.1, 0.65);
+
+    if (s > 0) {
+      const baseIdx = s * 2;
+      wfInd.push(baseIdx - 2, baseIdx, baseIdx - 1);
+      wfInd.push(baseIdx - 1, baseIdx, baseIdx + 1);
+    }
+  }
+
+  const wfGeo = new THREE.BufferGeometry();
+  wfGeo.setAttribute('position', new THREE.Float32BufferAttribute(wfPos, 3));
+  wfGeo.setAttribute('uv', new THREE.Float32BufferAttribute(wfUv, 2));
+  wfGeo.setAttribute('normal', new THREE.Float32BufferAttribute(wfNorm, 3));
+  wfGeo.setIndex(wfInd);
+
+  const mainWaterfallMat = waterAnimationManager.createAnimatedWaterfallMaterial(2.6);
+  const mainWaterfall = new THREE.Mesh(wfGeo, mainWaterfallMat);
+  mainWaterfall.receiveShadow = true;
+  wfGroup.add(mainWaterfall);
+  waterfallMeshes.push(mainWaterfall);
+
+  // Natural rocky weir boulders at island edge flanking stream mouth
+  const rockMat = new THREE.MeshStandardMaterial({ color: '#57534e', roughness: 0.85, metalness: 0.05, flatShading: true });
+  const mossRockMat = new THREE.MeshStandardMaterial({ color: '#3f4e3c', roughness: 0.88, metalness: 0.02, flatShading: true });
+
+  const rockLeft = new THREE.Mesh(new THREE.DodecahedronGeometry(0.75, 1), mossRockMat);
+  rockLeft.scale.set(1.2, 0.8, 1.2);
+  rockLeft.position.set(8.2, 1.85, 5.8);
+  wfGroup.add(rockLeft);
+
+  const rockRight = new THREE.Mesh(new THREE.DodecahedronGeometry(0.78, 1), rockMat);
+  rockRight.scale.set(1.1, 0.85, 1.3);
+  rockRight.position.set(9.4, 1.85, 2.6);
+  wfGroup.add(rockRight);
+
+  // Rock weir ridge under the lip
+  const weirRidge = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.35, 2.6), rockMat);
+  weirRidge.rotation.y = -0.7;
+  weirRidge.position.set(8.5, 1.5, 4.3);
+  wfGroup.add(weirRidge);
+
+  // Frothing white water lip churn ribbon right before plunging
+  const lipGeo = new THREE.PlaneGeometry(2.6, 0.55);
+  lipGeo.rotateX(-Math.PI / 2);
+  lipGeo.rotateY(-0.7);
+  const foamMat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.85, depthWrite: false });
+  const lipFoam = new THREE.Mesh(lipGeo, foamMat);
+  lipFoam.position.set(8.55, 1.64, 4.3);
+  wfGroup.add(lipFoam);
+
+  // Swirling misty landing foam ring in the cloud ocean below
+  const baseSplashGeo = new THREE.RingGeometry(1.2, 3.8, 24);
+  baseSplashGeo.rotateX(-Math.PI / 2);
+  const baseSplashMat = new THREE.MeshBasicMaterial({ color: '#e0f2fe', transparent: true, opacity: 0.65, depthWrite: false, side: THREE.DoubleSide });
+  const baseSplash = new THREE.Mesh(baseSplashGeo, baseSplashMat);
+  baseSplash.position.set(9.6, -14.8, 4.9);
+  wfGroup.add(baseSplash);
+
+  group.add(wfGroup);
+  registerEditable(wfGroup, 'waterfall', 'Thác Nước Đảo Nổi (Edge Waterfall)');
+
+  // B. Headwater mountain is placed and customized by user
+
+  // E. Ambient Fantasy Birds
+  const ambientBirds = createAmbientBirds();
+  group.add(ambientBirds.group);
+
+  // 4. Arched Wooden Bridge over the stream
+  const bridgeGroup = new THREE.Group();
+  bridgeGroup.name = 'WoodenArchedBridge';
+  bridgeGroup.position.set(-0.8, 1.8, 1.2);
+  bridgeGroup.rotation.y = 0.65;
+
+  // Bridge deck curve
+  const deckLength = 4.2;
+  const deckWidth = 1.6;
+  const plankMat = new THREE.MeshStandardMaterial({
+    color: '#854d0e',
+    roughness: 0.72,
+    metalness: 0.04,
+  });
+  const railMat = new THREE.MeshStandardMaterial({
+    color: '#a16207',
+    roughness: 0.68,
+    metalness: 0.02,
+  });
+
+  const plankGeo = new THREE.BoxGeometry(0.24, 0.08, deckWidth);
+  const plankCount = 14;
+  for (let p = 0; p < plankCount; p++) {
+    const plank = new THREE.Mesh(plankGeo, plankMat);
+    const t = (p / (plankCount - 1)) - 0.5; // -0.5 to 0.5
+    const px = t * deckLength;
+    const py = 0.22 - Math.pow(t * 2.0, 2.0) * 0.22; // Gentle arch
+    plank.position.set(px, py, 0);
+    plank.rotation.z = -t * 0.35;
+    plank.castShadow = true;
+    plank.receiveShadow = true;
+    bridgeGroup.add(plank);
+  }
+
+  // Bridge Stone Piers / Abutments
+  const stoneMat = new THREE.MeshStandardMaterial({
+    color: '#64748b',
+    roughness: 0.88,
+    metalness: 0.05,
+  });
+  const pierGeo = new THREE.BoxGeometry(0.8, 1.2, deckWidth + 0.4);
+  const pierL = new THREE.Mesh(pierGeo, stoneMat);
+  pierL.position.set(-deckLength * 0.52, -0.4, 0);
+  pierL.castShadow = true;
+  bridgeGroup.add(pierL);
+
+  const pierR = new THREE.Mesh(pierGeo, stoneMat);
+  pierR.position.set(deckLength * 0.52, -0.4, 0);
+  pierR.castShadow = true;
+  bridgeGroup.add(pierR);
+
+  // Railing posts & handrails
+  const postGeo = new THREE.BoxGeometry(0.08, 0.7, 0.08);
+  [-deckWidth * 0.5, deckWidth * 0.5].forEach((sideZ) => {
+    for (let r = 0; r < 5; r++) {
+      const t = (r / 4) - 0.5;
+      const post = new THREE.Mesh(postGeo, railMat);
+      const px = t * (deckLength - 0.4);
+      const py = 0.35 - Math.pow(t * 2.0, 2.0) * 0.22;
+      post.position.set(px, py + 0.3, sideZ);
+      post.castShadow = true;
+      bridgeGroup.add(post);
+    }
+  });
+
+  group.add(bridgeGroup);
+  registerEditable(bridgeGroup, 'bridge', 'Cây Cầu Gỗ (Wooden Bridge)');
+  templates.set('bridge', bridgeGroup);
+
+  // 5. Rotating Water Wheel beside the Watermill
+  const wheelHolder = new THREE.Group();
+  wheelHolder.name = 'WaterWheelHolder';
+  wheelHolder.position.set(-6.2, 2.4, -7.5);
+  wheelHolder.rotation.y = Math.PI / 4;
+
+  const wheelGroup = new THREE.Group();
+  wheelGroup.name = 'WaterWheel';
+
+  const rimGeo = new THREE.TorusGeometry(1.6, 0.09, 8, 24);
+  const wheelWoodMat = new THREE.MeshStandardMaterial({
+    color: '#713f12',
+    roughness: 0.75,
+    metalness: 0.02,
+  });
+
+  const rim1 = new THREE.Mesh(rimGeo, wheelWoodMat);
+  rim1.position.z = -0.22;
+  wheelGroup.add(rim1);
+
+  const rim2 = new THREE.Mesh(rimGeo, wheelWoodMat);
+  rim2.position.z = 0.22;
+  wheelGroup.add(rim2);
+
+  // Wheel spokes & paddles
+  const paddleGeo = new THREE.BoxGeometry(0.08, 0.45, 0.48);
+  const paddleCount = 12;
+  for (let pd = 0; pd < paddleCount; pd++) {
+    const rad = (pd / paddleCount) * Math.PI * 2;
+    const paddle = new THREE.Mesh(paddleGeo, wheelWoodMat);
+    paddle.position.set(Math.cos(rad) * 1.5, Math.sin(rad) * 1.5, 0);
+    paddle.rotation.z = rad;
+    paddle.castShadow = true;
+    wheelGroup.add(paddle);
+
+    // Spoke rod
+    const spokeGeo = new THREE.CylinderGeometry(0.04, 0.04, 3.0, 6);
+    if (pd < 6) {
+      const spoke = new THREE.Mesh(spokeGeo, wheelWoodMat);
+      spoke.rotation.z = rad;
+      wheelGroup.add(spoke);
+    }
+  }
+
+  // Central axle
+  const axleGeo = new THREE.CylinderGeometry(0.18, 0.18, 1.2, 8);
+  axleGeo.rotateX(Math.PI / 2);
+  const axle = new THREE.Mesh(axleGeo, wheelWoodMat);
+  wheelGroup.add(axle);
+
+  wheelHolder.add(wheelGroup);
+  group.add(wheelHolder);
+  waterWheel = wheelGroup; // waterWheel variable rotates only the inner wheel
+  registerEditable(wheelHolder, 'waterWheel', 'Guồng Nước (Water Wheel)');
+  templates.set('waterWheel', wheelHolder);
+
+  // 6. Wooden Lake Pier / Dock extending into the pond
+  const dockGroup = new THREE.Group();
+  dockGroup.position.set(8.2, 1.72, 3.2);
+  dockGroup.rotation.y = -0.4;
+
+  const dockPlankGeo = new THREE.BoxGeometry(2.4, 0.1, 1.4);
+  const dockMesh = new THREE.Mesh(dockPlankGeo, plankMat);
+  dockMesh.castShadow = true;
+  dockMesh.receiveShadow = true;
+  dockGroup.add(dockMesh);
+
+  // Dock wooden pilings
+  const pileGeo = new THREE.CylinderGeometry(0.08, 0.08, 1.2, 6);
+  [[-0.9, -0.5], [0.9, -0.5], [-0.9, 0.5], [0.9, 0.5]].forEach(([px, pz]) => {
+    const pile = new THREE.Mesh(pileGeo, plankMat);
+    pile.position.set(px, -0.5, pz);
+    pile.castShadow = true;
+    dockGroup.add(pile);
+  });
+  group.add(dockGroup);
+  registerEditable(dockGroup, 'dock', 'Cầu Tàu Bến Gỗ (Wooden Pier)');
+  templates.set('dock', dockGroup);
+
+  group.add(islandGroup);
+
+  // 7. Walkable Raycast Plane for Click-to-Move
+  const raycastGeo = new THREE.CircleGeometry(17.5, 32);
+  raycastGeo.rotateX(-Math.PI / 2);
+  const raycastMat = new THREE.MeshBasicMaterial({ visible: false });
+  const walkableRaycastPlane = new THREE.Mesh(raycastGeo, raycastMat);
+  walkableRaycastPlane.position.y = 1.82;
+  group.add(walkableRaycastPlane);
+
+  // 8. Place Asset Pack Models: Cottages, Well, Lamp Posts, Trees, Market
+  const assetPaths = {
+    cottage: '/assets/medieval_village/GLTF/Buildings/SM_Cottage_Small.gltf',
+    well: '/assets/medieval_village/GLTF/Props/SM_Well.gltf',
+    marketStall: '/assets/medieval_village/GLTF/Market/SM_Market_Stall_Red.gltf',
+    lampPost: '/assets/medieval_village/GLTF/Lighting/SM_Lamp_Post.gltf',
+    treeOak: '/assets/medieval_village/GLTF/Nature/SM_Tree_Oak.gltf',
+    rock: '/assets/medieval_village/GLTF/Nature/SM_Rock_Boulder.gltf',
+    bush: '/assets/medieval_village/GLTF/Nature/SM_Bush.gltf',
+    fence: '/assets/medieval_village/GLTF/Props/SM_Fence_Picket.gltf',
+    barrel: '/assets/medieval_village/GLTF/Props/SM_Barrel.gltf',
+    crate: '/assets/medieval_village/GLTF/Props/SM_Crate.gltf',
+    cart: '/assets/medieval_village/GLTF/Carts/SM_Hand_Cart.gltf',
+  };
+
+  // Helper to load GLTF safely
+  function loadGLTF(url: string): Promise<THREE.Group> {
+    return new Promise((resolve) => {
+      gltfLoader.load(
+        url,
+        (gltf) => {
+          // Apply materials setup & emission
+          gltf.scene.traverse((child) => {
+            if ((child as THREE.Mesh).isMesh) {
+              const mesh = child as THREE.Mesh;
+              mesh.castShadow = true;
+              mesh.receiveShadow = true;
+
+              const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+              for (const m of mats) {
+                if (!m) continue;
+                const std = m as THREE.MeshStandardMaterial;
+                std.roughness = 0.72;
+                std.metalness = 0.03;
+
+                // Connect emission map for warm glowing windows and lamps
+                if (std.name.includes('Glow') || std.name.includes('Atlas')) {
+                  std.emissiveMap = emissionMap;
+                  std.emissive = new THREE.Color('#fbbf24');
+                  std.emissiveIntensity = 1.4;
+                }
+              }
+            }
+          });
+          resolve(gltf.scene);
+        },
+        undefined,
+        (err) => {
+          console.warn(`[cozyVillage] Failed to load ${url}:`, err);
+          resolve(new THREE.Group());
+        }
+      );
+    });
+  }
+
+  // Colliders for navigation
+  // 1. Potion Shop
+  colliders.push({
+    id: 'potion-shop-building',
+    centerX: -8.5,
+    centerZ: 5.0,
+    minX: -11.5,
+    maxX: -5.5,
+    minZ: 2.2,
+    maxZ: 7.8,
+  });
+
+  // 2. Watermill Cottage
+  colliders.push({
+    id: 'watermill-building',
+    centerX: -8.5,
+    centerZ: -7.5,
+    minX: -11.5,
+    maxX: -5.5,
+    minZ: -10.5,
+    maxZ: -4.5,
+  });
+
+  // 3. Sunspire Guild Hall
+  colliders.push({
+    id: 'guild-hall-building',
+    centerX: 0.0,
+    centerZ: -9.5,
+    minX: -3.5,
+    maxX: 3.5,
+    minZ: -12.5,
+    maxZ: -6.5,
+  });
+
+  // 4. Arcane Bookshop
+  colliders.push({
+    id: 'bookshop-building',
+    centerX: 8.5,
+    centerZ: -5.5,
+    minX: 5.5,
+    maxX: 11.5,
+    minZ: -8.5,
+    maxZ: -2.5,
+  });
+
+  // 5. Central Well Fountain
+  colliders.push({
+    id: 'central-well',
+    centerX: 2.2,
+    centerZ: -0.8,
+    radius: 1.4,
+    minX: 0.8,
+    maxX: 3.6,
+    minZ: -2.2,
+    maxZ: 0.6,
+  });
+
+  // 6. River Bank Left (Water impassable)
+  colliders.push({
+    id: 'river-bank-nw',
+    centerX: -4.0,
+    centerZ: -4.0,
+    minX: -5.5,
+    maxX: -2.5,
+    minZ: -7.0,
+    maxZ: -1.0,
+  });
+
+  // 7. River Bank Right / Pond
+  colliders.push({
+    id: 'pond-water',
+    centerX: 6.8,
+    centerZ: 3.5,
+    radius: 3.5,
+    minX: 3.3,
+    maxX: 10.3,
+    minZ: 0.0,
+    maxZ: 7.0,
+  });
+
+  // Load and assemble all assets
+  const readyPromise = Promise.all([
+    loadGLTF(assetPaths.cottage),
+    loadGLTF(assetPaths.well),
+    loadGLTF(assetPaths.marketStall),
+    loadGLTF(assetPaths.lampPost),
+    loadGLTF(assetPaths.treeOak),
+    loadGLTF(assetPaths.rock),
+    loadGLTF(assetPaths.bush),
+    loadGLTF(assetPaths.fence),
+    loadGLTF(assetPaths.barrel),
+    loadGLTF(assetPaths.crate),
+    loadGLTF(assetPaths.cart),
+  ]).then(([cottage, well, marketStall, lampPost, treeOak, rock, bush, fence, barrel, crate, cart]) => {
+    // Register templates for catalog spawning
+    templates.set('cottage', cottage);
+    templates.set('well', well);
+    templates.set('marketStall', marketStall);
+    templates.set('lampPost', lampPost);
+    templates.set('treeOak', treeOak);
+    templates.set('rock', rock);
+    templates.set('bush', bush);
+    templates.set('fence', fence);
+    templates.set('barrel', barrel);
+    templates.set('crate', crate);
+    templates.set('cart', cart);
+
+    // A. Cottage 1: Lumi's Potion & Herbal Shop (Lower Left)
+    const potionShop = cottage.clone(true);
+    potionShop.position.set(-8.5, 1.8, 5.0);
+    potionShop.rotation.y = 0.45;
+    potionShop.scale.setScalar(0.95);
+    group.add(potionShop);
+    registerEditable(potionShop, 'cottage', "Lumi's Potion Shop");
+
+    // Potion counter in front of shop with striped awning
+    const potionStall = marketStall.clone(true);
+    potionStall.position.set(-6.2, 1.8, 3.8);
+    potionStall.rotation.y = -1.1;
+    potionStall.scale.setScalar(0.85);
+    group.add(potionStall);
+    registerEditable(potionStall, 'marketStall', 'Herbal Counter');
+
+    // Glowing potion bottles on the counter
+    const flaskGroup = new THREE.Group();
+    flaskGroup.name = 'PotionBottlesGroup';
+    const flaskColors = ['#06b6d4', '#a855f7', '#fbbf24', '#ef4444', '#10b981'];
+    flaskColors.forEach((color, idx) => {
+      const flaskGeo = new THREE.DodecahedronGeometry(0.12, 1);
+      const flaskMat = new THREE.MeshStandardMaterial({
+        color,
+        emissive: color,
+        emissiveIntensity: 2.0,
+        roughness: 0.1,
+      });
+      const flask = new THREE.Mesh(flaskGeo, flaskMat);
+      flask.position.set(-6.5 + (idx * 0.18), 2.65, 3.6 + (idx * 0.08));
+      flask.castShadow = true;
+      flaskGroup.add(flask);
+    });
+    group.add(flaskGroup);
+    registerEditable(flaskGroup, 'flasks', 'Bình Thuốc Phép (Potion Bottles)');
+
+    // B. Cottage 2: The Whispering Watermill (Upper Left, mountain terrace)
+    const watermillCottage = cottage.clone(true);
+    watermillCottage.position.set(-8.5, 2.8, -7.5);
+    watermillCottage.rotation.y = 0.8;
+    watermillCottage.scale.setScalar(1.0);
+    group.add(watermillCottage);
+    registerEditable(watermillCottage, 'cottage', 'Whispering Watermill');
+
+    // C. Cottage 3: Sunspire Guild Hall & Town Hall (Center Back)
+    const guildHall = cottage.clone(true);
+    guildHall.position.set(0.0, 2.2, -9.5);
+    guildHall.rotation.y = 0.0;
+    guildHall.scale.set(1.25, 1.35, 1.25);
+    group.add(guildHall);
+    registerEditable(guildHall, 'cottage', 'Sunspire Guild Hall');
+
+    // Heraldic Blue Banners on Guild Hall
+    const bannerGroup = new THREE.Group();
+    bannerGroup.name = 'GuildHallBannersGroup';
+    const bannerGeo = new THREE.PlaneGeometry(0.6, 1.4);
+    const bannerMat = new THREE.MeshStandardMaterial({
+      color: '#1d4ed8',
+      roughness: 0.6,
+      side: THREE.DoubleSide,
+    });
+    [-1.2, 1.2].forEach((bx) => {
+      const banner = new THREE.Mesh(bannerGeo, bannerMat);
+      banner.position.set(bx, 4.2, -7.8);
+      banner.castShadow = true;
+      bannerGroup.add(banner);
+    });
+    group.add(bannerGroup);
+    registerEditable(bannerGroup, 'banner', 'Cờ Hiệu (Guild Banners)');
+
+    // D. Cottage 4: Arcane Library & Bookshop (Upper Right)
+    const bookshop = cottage.clone(true);
+    bookshop.position.set(8.5, 1.8, -5.5);
+    bookshop.rotation.y = -0.7;
+    bookshop.scale.setScalar(0.95);
+    group.add(bookshop);
+    registerEditable(bookshop, 'cottage', 'Arcane Bookshop');
+
+    // Open Book Sign mounted above door
+    const bookSignGroup = new THREE.Group();
+    bookSignGroup.name = 'BookSignGroup';
+    bookSignGroup.position.set(6.6, 3.8, -4.2);
+    bookSignGroup.rotation.y = -0.7;
+
+    const pageMat = new THREE.MeshStandardMaterial({ color: '#fef3c7', roughness: 0.7 });
+    const coverMat = new THREE.MeshStandardMaterial({ color: '#7c2d12', roughness: 0.5 });
+    const pageL = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.04, 0.5), pageMat);
+    pageL.position.x = -0.16;
+    pageL.rotation.z = 0.2;
+    const pageR = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.04, 0.5), pageMat);
+    pageR.position.x = 0.16;
+    pageR.rotation.z = -0.2;
+    bookSignGroup.add(pageL, pageR);
+    group.add(bookSignGroup);
+    registerEditable(bookSignGroup, 'sign', 'Biển Hiệu Sách (Book Sign)');
+
+    // E. Central Plaza Well Fountain
+    const centralWell = well.clone(true);
+    centralWell.position.set(2.2, 1.8, -0.8);
+    centralWell.scale.setScalar(1.15);
+    group.add(centralWell);
+    registerEditable(centralWell, 'well', 'Plaza Well');
+
+    // F. Hand Cart in Plaza
+    const plazaCart = cart.clone(true);
+    plazaCart.position.set(3.8, 1.8, -2.8);
+    plazaCart.rotation.y = 1.2;
+    plazaCart.scale.setScalar(0.85);
+    group.add(plazaCart);
+    registerEditable(plazaCart, 'cart', 'Hand Cart');
+
+    // G. Market Stall in Plaza
+    const plazaStall = marketStall.clone(true);
+    plazaStall.position.set(-1.2, 1.8, -4.2);
+    plazaStall.rotation.y = 0.15;
+    plazaStall.scale.setScalar(0.85);
+    group.add(plazaStall);
+    registerEditable(plazaStall, 'marketStall', 'Plaza Stall');
+
+    // H. Street Lamp Posts with Warm Point Lights
+    const lampPositions = [
+      [-3.2, 1.8, 2.5],   // Potion shop entrance
+      [0.6, 1.8, 0.6],    // Bridge exit / plaza start
+      [4.2, 1.8, -1.8],   // Plaza east
+      [0.2, 1.8, -3.2],   // Plaza north
+      [6.2, 1.8, 1.2],    // Dock approach
+      [-5.5, 2.6, -5.5],  // Watermill terrace path
+    ];
+
+    lampPositions.forEach((pos, idx) => {
+      const lamp = lampPost.clone(true);
+      lamp.position.set(pos[0], pos[1], pos[2]);
+      lamp.scale.setScalar(0.85);
+
+      // Warm glowing lantern point light attached as child of lamp
+      const pLight = new THREE.PointLight('#fbbf24', 1.8, 9);
+      pLight.position.set(0, 2.9, 0);
+      lamp.add(pLight);
+      lanternLights.push(pLight);
+
+      group.add(lamp);
+      registerEditable(lamp, 'lampPost', `Street Lamp #${idx + 1}`);
+    });
+
+    // I. Stylized Oak Trees
+    const treePositions = [
+      { x: -11.5, y: 1.8, z: 2.0, s: 1.1 },
+      { x: -11.2, y: 2.8, z: -9.8, s: 1.2 },
+      { x: -3.5, y: 2.6, z: -10.5, s: 1.05 },
+      { x: 3.5, y: 2.2, z: -11.0, s: 1.15 },
+      { x: 11.5, y: 1.8, z: -8.5, s: 1.2 },
+      { x: 12.0, y: 1.8, z: -2.0, s: 1.0 },
+      { x: 10.5, y: 1.8, z: 6.5, s: 1.1 },
+    ];
+
+    treePositions.forEach((tp, idx) => {
+      const tree = treeOak.clone(true);
+      tree.position.set(tp.x, tp.y, tp.z);
+      tree.scale.setScalar(tp.s);
+      group.add(tree);
+      registerEditable(tree, 'treeOak', `Oak Tree #${idx + 1}`);
+    });
+
+    // J. Riverbank Rocks & Cliff Boulders
+    const rockPositions = [
+      { x: -7.5, y: 1.8, z: -4.5, s: 1.2, r: 0.5 },
+      { x: -5.2, y: 1.8, z: -2.0, s: 0.9, r: 1.2 },
+      { x: -1.8, y: 1.6, z: 0.5, s: 1.1, r: -0.4 },
+      { x: 1.5, y: 1.6, z: 2.5, s: 1.0, r: 0.8 },
+      { x: 4.5, y: 1.6, z: 4.8, s: 1.3, r: 1.5 },
+      { x: 8.5, y: 1.6, z: 4.2, s: 1.4, r: -1.0 },
+      { x: 9.2, y: 1.6, z: 7.2, s: 1.5, r: 0.3 }, // Near waterfall edge
+      { x: -7.5, y: 2.8, z: -8.8, s: 1.3, r: 0.9 }, // Near watermill cascade
+    ];
+
+    rockPositions.forEach((rp, idx) => {
+      const rk = rock.clone(true);
+      rk.position.set(rp.x, rp.y, rp.z);
+      rk.scale.setScalar(rp.s);
+      rk.rotation.y = rp.r;
+      group.add(rk);
+      registerEditable(rk, 'rock', `Boulder #${idx + 1}`);
+    });
+
+    // K. Wooden Picket Fences along cliff edge and garden
+    const fencePositions = [
+      { x: -8.5, y: 1.8, z: 8.2, r: 0.2 },
+      { x: -6.5, y: 1.8, z: 8.5, r: 0.1 },
+      { x: -4.5, y: 1.8, z: 8.4, r: -0.1 },
+      { x: 5.5, y: 1.8, z: -0.5, r: 1.4 },
+      { x: 7.0, y: 1.8, z: 0.8, r: 0.6 },
+    ];
+
+    fencePositions.forEach((fp, idx) => {
+      const fn = fence.clone(true);
+      fn.position.set(fp.x, fp.y, fp.z);
+      fn.rotation.y = fp.r;
+      fn.scale.setScalar(0.9);
+      group.add(fn);
+      registerEditable(fn, 'fence', `Picket Fence #${idx + 1}`);
+    });
+
+    // L. Barrels & Crates Props
+    const propPositions = [
+      { obj: barrel, type: 'barrel', name: 'Oak Barrel #1', x: -5.4, y: 1.8, z: 4.5, s: 0.9 },
+      { obj: barrel, type: 'barrel', name: 'Oak Barrel #2', x: -5.2, y: 1.8, z: 5.0, s: 0.8 },
+      { obj: crate, type: 'crate', name: 'Supply Crate #1', x: -5.5, y: 1.8, z: 3.2, s: 0.85 },
+      { obj: barrel, type: 'barrel', name: 'Oak Barrel #3', x: 7.8, y: 1.8, z: 2.2, s: 0.9 },
+      { obj: crate, type: 'crate', name: 'Supply Crate #2', x: 8.4, y: 1.8, z: 2.0, s: 0.85 },
+      { obj: barrel, type: 'barrel', name: 'Oak Barrel #4', x: 1.2, y: 1.8, z: -4.8, s: 0.85 },
+    ];
+
+    propPositions.forEach((pp) => {
+      const p = pp.obj.clone(true);
+      p.position.set(pp.x, pp.y, pp.z);
+      p.scale.setScalar(pp.s);
+      group.add(p);
+      registerEditable(p, pp.type, pp.name);
+    });
+
+    // M. Lush Garden Bushes
+    const bushPositions = [
+      { x: -7.5, y: 1.8, z: 2.5, s: 1.1 },
+      { x: -9.5, y: 1.8, z: 7.2, s: 1.0 },
+      { x: -4.2, y: 1.8, z: -5.8, s: 0.95 },
+      { x: 1.5, y: 1.8, z: -7.5, s: 1.05 },
+      { x: 7.5, y: 1.8, z: -3.8, s: 1.0 },
+      { x: 9.5, y: 1.8, z: -0.5, s: 1.1 },
+      { x: 5.2, y: 1.8, z: 1.8, s: 0.9 },
+    ];
+
+    bushPositions.forEach((bp, idx) => {
+      const b = bush.clone(true);
+      b.position.set(bp.x, bp.y, bp.z);
+      b.scale.setScalar(bp.s);
+      group.add(b);
+      registerEditable(b, 'bush', `Berry Bush #${idx + 1}`);
+    });
+
+    console.log('Cozy Fantasy Village Scene assembled from Medieval Village pack.');
+  });
+
+  return {
+    group,
+    colliders,
+    readyPromise,
+    walkableRaycastPlane,
+    editableObjects,
+    templates,
+    update: (time: number) => {
+      // 0. Update flowing stream water shader waves & shimmering caustics
+      waterAnimationManager.update(time);
+
+      // 1. Rotate water wheel smoothly
+      if (waterWheel) {
+        waterWheel.rotation.z = time * 1.6;
+      }
+
+      // 2. Animate waterfall texture UVs
+      waterfallMeshes.forEach((mesh, idx) => {
+        const mat = mesh.material as THREE.MeshStandardMaterial;
+        if (mat && mat.map) {
+          mat.map.offset.y = -(time * 1.8) % 1;
+        }
+        mesh.position.y += Math.sin(time * 3.0 + idx) * 0.005;
+      });
+
+      // 2b. Headwater mountain removed
+
+      // 3. Gentle lantern flicker
+      lanternLights.forEach((light, i) => {
+        light.intensity = 1.7 + Math.sin(time * 5.0 + i * 1.5) * 0.2;
+      });
+
+      // 4. Update Ambient Fantasy Birds flight trajectories & wing flapping
+      ambientBirds.update(0.016, time);
+    },
+    setQuality: (quality: 'low' | 'medium' | 'high') => {
+      ambientBirds.setQuality(quality);
+    },
+  };
+}

@@ -814,3 +814,7 @@ In `healthclues-mobile`, the onboarding wizard provides `>=38–48px` touch targ
 ### 2026-11-12 — Cycle 89: Mobile Custom Font Readability & Interactive 2.5D Diorama Exploration
 
 Players experience branded Vietnamese-diacritic typography (`Be Vietnam Pro` + `Spectral`), consistent Lucide vector icons, readable badge/tab sizing on narrow `360x800` phones, and an interactive 2.5D diorama World with perspective depth scaling, Y-sorted landmarks/actors, animated crystal fountain ripples, multi-depth ambient fireflies, and toggleable Day/Sunset/Night lighting. Verified across `360x800`, `390x844`, `430x932`, `768x1024`, `1280x800`, and `640x360`.
+## UC-Mobile-Toolkit — account-persisted Toolkit Bag selections (2026-11-22)
+
+The authenticated mobile player can save or remove herb, sound and breath library items from their station modals. The mobile client calls `/api/healthclues/mobile-toolkit`; the API authenticates the session, scopes rows to the current user, and persists the selection in `healthclues_mobile_toolkit_items`. Reopening the Bag or signing in on another supported client reads the database-backed selection. Device storage and browser-seeded state are not authoritative.
+

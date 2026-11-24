@@ -1,3 +1,9 @@
+# Case 007 — local integration update (2026-11-18)
+
+- Đã tích hợp hồ sơ `case-sleep-007` vào Chapter 3 và hai catalog `ALL_CHAPTERS`/`ALL_DETECTIVE_CASES`.
+- Scene mới dùng `public/gametrinhtham/cases/case-007/scene-main.jpg`; 6 hotspot nối tới 6 ảnh close-up bằng `closeupImageUrl`, có clue, handbook entry, conclusion candidates và reward.
+- Đây là fixture `TEST ONLY`, chưa human-reviewed và chưa có browser acceptance. TypeScript catalog/type check PASS; full campaign test hiện bị chặn bởi assertion cũ về Case 002 do thay đổi mở khóa toàn bộ đang nằm trong working tree.
+
 # BÁO CÁO NGHIỆM THU: TÍCH HỢP GAME TRINH THÁM THẬT (`gametrinhtham`), CAMERA TOÀN CẢNH / CẬN CẢNH & TÁI THIẾT KẾ HUD/MENU DI ĐỘNG
 
 **Ngày thực hiện:** 15/11/2026  

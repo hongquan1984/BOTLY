@@ -39,6 +39,8 @@ import {
   type HerbalArticle,
 } from "./herbalData";
 import { useLocale } from "@/localization";
+import { toolkitStorage } from "@/services/toolkitStorage";
+import { fetchMobileProgress, saveMobileGoals } from "@/services/healthclues";
 
 interface HerbalGardenModalProps {
   visible: boolean;
@@ -47,7 +49,6 @@ interface HerbalGardenModalProps {
 }
 
 const STARTER_PROFILE_KEY = "healthclues-starter-profile";
-const BOOKMARKS_STORAGE_KEY = "hc_mobile_botanical_bookmarks";
 const TEA_BREWED_KEY = "hc_mobile_tea_brewed_date";
 
 export function HerbalGardenModal({
@@ -63,6 +64,8 @@ export function HerbalGardenModal({
   const [brewedToday, setBrewedToday] = useState(false);
   const [brewingHerb, setBrewingHerb] = useState<HerbalArticle | null>(null);
   const [brewSuccessMsg, setBrewSuccessMsg] = useState<string | null>(null);
+  const [toolkitLoading, setToolkitLoading] = useState(false);
+  const [toolkitError, setToolkitError] = useState<string | null>(null);
 
   // Load user profile & storage states on open
   useEffect(() => {
@@ -70,6 +73,8 @@ export function HerbalGardenModal({
 
     let isMounted = true;
     const loadState = async () => {
+      setToolkitLoading(true);
+      setToolkitError(null);
       try {
         let profileObj: any = null;
         const rawProfile = await AsyncStorage.getItem(STARTER_PROFILE_KEY);
@@ -108,13 +113,8 @@ export function HerbalGardenModal({
           setProfile(profileObj);
         }
 
-        const rawBookmarks = await AsyncStorage.getItem(BOOKMARKS_STORAGE_KEY);
-        if (rawBookmarks && isMounted) {
-          try {
-            const parsed = JSON.parse(rawBookmarks);
-            if (Array.isArray(parsed)) setBookmarkedIds(parsed);
-          } catch {}
-        }
+        const savedHerbIds = await toolkitStorage.getSavedHerbIds();
+        if (isMounted) setBookmarkedIds(savedHerbIds);
 
         const todayStr = new Date().toISOString().slice(0, 10);
         const lastBrewDate = await AsyncStorage.getItem(TEA_BREWED_KEY);
@@ -124,7 +124,12 @@ export function HerbalGardenModal({
           setBrewedToday(false);
         }
       } catch (err) {
+        if (isMounted) {
+          setToolkitError(locale === "en" ? "Your Bag could not be loaded. Check your connection and try again." : "Không thể tải Túi Đồ. Hãy kiểm tra kết nối rồi thử lại.");
+        }
         console.warn("Failed to load herbal profile:", err);
+      } finally {
+        if (isMounted) setToolkitLoading(false);
       }
     };
 
@@ -132,7 +137,7 @@ export function HerbalGardenModal({
     return () => {
       isMounted = false;
     };
-  }, [visible]);
+  }, [visible, locale]);
 
   // Recommended herbs sorted by quiz profile
   const recommendedHerbs = useMemo(() => {
@@ -159,38 +164,28 @@ export function HerbalGardenModal({
   }, [activeTab, recommendedHerbs, bookmarkedIds, profile, locale]);
 
   const toggleBookmark = async (id: string) => {
+    setToolkitError(null);
     try {
-      let updated: string[];
-      if (bookmarkedIds.includes(id)) {
-        updated = bookmarkedIds.filter((item) => item !== id);
-      } else {
-        updated = [...bookmarkedIds, id];
-      }
-      setBookmarkedIds(updated);
-      await AsyncStorage.setItem(BOOKMARKS_STORAGE_KEY, JSON.stringify(updated));
-      DeviceEventEmitter.emit("HEALTHCLUES_TOOLKIT_CHANGED", { type: "herbs", ids: updated });
+      const { ids } = await toolkitStorage.toggleHerb(id);
+      setBookmarkedIds(ids);
     } catch (err) {
+      setToolkitError(locale === "en" ? "Could not update your Bag. Try again." : "Không thể cập nhật Túi Đồ. Hãy thử lại.");
       console.warn("Failed to toggle bookmark:", err);
     }
   };
 
   const handleAddToJourney = async (herb: HerbalArticle) => {
+    setToolkitError(null);
     try {
       // 1. Add to bookmarks/inventory if not yet there
       if (!bookmarkedIds.includes(herb.id)) {
-        const updated = [...bookmarkedIds, herb.id];
+        const updated = await toolkitStorage.saveHerb(herb.id);
         setBookmarkedIds(updated);
-        await AsyncStorage.setItem(BOOKMARKS_STORAGE_KEY, JSON.stringify(updated));
       }
 
-      // 2. Add goal to healthclues-user-goals
-      const rawGoals = await AsyncStorage.getItem("healthclues-user-goals");
-      let goals: any[] = [];
-      if (rawGoals) {
-        try {
-          goals = JSON.parse(rawGoals);
-        } catch {}
-      }
+      // 2. Add the goal to the authenticated account, not device storage.
+      const progress = await fetchMobileProgress();
+      const goals: any[] = [...progress.goals];
       const newHabit = {
         id: `habit-herb-${herb.id}-${Date.now()}`,
         title: `Uống 1 tách ${herb.commonName}`,
@@ -204,7 +199,7 @@ export function HerbalGardenModal({
         evidence: `PubMed PMID: ${herb.study.pmid}`,
       };
       goals.push(newHabit);
-      await AsyncStorage.setItem("healthclues-user-goals", JSON.stringify(goals));
+      await saveMobileGoals(goals);
 
       // 3. Award EXP
       const expGain = 20;
@@ -237,6 +232,7 @@ export function HerbalGardenModal({
         setBrewSuccessMsg(null);
       }, 4000);
     } catch (err) {
+      setToolkitError(locale === "en" ? "Could not update your Bag. Try again." : "Không thể cập nhật Túi Đồ. Hãy thử lại.");
       console.warn("Failed to add herb habit:", err);
     }
   };
@@ -427,6 +423,8 @@ export function HerbalGardenModal({
               <Text style={styles.toastSuccessText}>{brewSuccessMsg}</Text>
             </View>
           )}
+          {toolkitLoading && <Text style={styles.toolkitStatusText}>{locale === "en" ? "Loading your Bag…" : "Đang tải Túi Đồ…"}</Text>}
+          {toolkitError && <Text style={styles.toolkitErrorText}>{toolkitError}</Text>}
 
           {/* Herb List & Scrollable Content */}
           <ScrollView
@@ -1066,6 +1064,18 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#ffffff",
     flex: 1,
+  },
+  toolkitStatusText: {
+    color: "#94a3b8",
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  toolkitErrorText: {
+    color: "#fca5a5",
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 8,
   },
   tabContainer: {
     flexDirection: "row",

@@ -2,7 +2,7 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 
-const PORT = 8081;
+const PORT = Number(process.env.MOBILE_PORT || 8081);
 const DIST = "D:\\botly\\App\\healthclues-mobile\\dist-web";
 
 const MIME = {
@@ -16,34 +16,6 @@ const MIME = {
   ".json": "application/json",
   ".ico": "image/x-icon",
 };
-
-let cachedSupabaseToken = null;
-let tokenExpiresAt = 0;
-
-async function getValidSupabaseToken() {
-  if (cachedSupabaseToken && Date.now() < tokenExpiresAt - 60000) {
-    return cachedSupabaseToken;
-  }
-  try {
-    const res = await fetch("http://127.0.0.1:54321/auth/v1/token?grant_type=password", {
-      method: "POST",
-      headers: {
-        apikey: "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: "player@botly.vn", password: "Password123!" }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.access_token) {
-        cachedSupabaseToken = data.access_token;
-        tokenExpiresAt = Date.now() + (data.expires_in || 3600) * 1000;
-        return cachedSupabaseToken;
-      }
-    }
-  } catch (e) {}
-  return null;
-}
 
 // In-memory presence broker for multiplayer world exploration
 const mobilePresenceMap = new Map();
@@ -152,18 +124,7 @@ const server = http.createServer(async (req, res) => {
 
   // Proxy /api/ requests to Next.js API server on port 3329
   if (urlPath.startsWith("/api/")) {
-    let authHeader = req.headers.authorization;
-    if (!authHeader || authHeader.includes("demo-jwt-token")) {
-      const validToken = await getValidSupabaseToken();
-      if (validToken) {
-        authHeader = `Bearer ${validToken}`;
-      }
-    }
-
     const headers = { ...req.headers, host: "127.0.0.1:3329" };
-    if (authHeader) {
-      headers["authorization"] = authHeader;
-    }
 
     const options = {
       hostname: "127.0.0.1",
@@ -174,38 +135,6 @@ const server = http.createServer(async (req, res) => {
     };
     const proxyReq = http.request(options, (proxyRes) => {
       if (res.headersSent) return;
-
-      // If 401 unauthorized returned from backend, supply safe fallback to prevent red crashes on mobile
-      if (proxyRes.statusCode === 401 && urlPath.startsWith("/api/healthclues/world")) {
-        res.writeHead(200, {
-          "Content-Type": "application/json",
-          "access-control-allow-origin": "*",
-          "access-control-allow-headers": "*",
-          "access-control-allow-methods": "*",
-        });
-        res.end(JSON.stringify({
-          world: {
-            id: "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
-            title: "Thế Giới Khám Phá",
-            timezone: "Asia/Ho_Chi_Minh",
-            created_at: new Date().toISOString(),
-          },
-          branches: [],
-          journeys: [],
-          entries: [],
-          collection: [],
-          entryEvents: [],
-          checkins: [],
-          usage: [],
-          xpTotal: 50,
-          knowledgeCurrencies: { fragments: 0, keys: 0 },
-          rewards: [],
-          milestones: [],
-          unlocks: [],
-          wellnessPlan: null,
-        }));
-        return;
-      }
 
       try {
         res.writeHead(proxyRes.statusCode, {

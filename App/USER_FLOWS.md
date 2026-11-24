@@ -1399,3 +1399,10 @@ In `healthclues-mobile`, players progress through Welcome → `1. Vùng` → `2.
 ### 2026-11-12 — Cycle 89: Mobile 2.5D World Exploration Visual Flow
 
 Upon entering `/(game)/world`, players navigate the `HealthClues Realm` cobblestone plaza in `2.5D` diorama mode (toggleable via `world-25d-toggle`), can cycle `Ban ngày` / `Hoàng hôn` / `Ban đêm` / `Tự động` lighting (`world-atmosphere-toggle`), see 6 simulated living village adventurers (`Anna`, `Leo`, `Mia`, `Ben`, `Lily`, `Lucas`) wandering along authored roads with wellness greetings on tap, and see real-time online adventurers (`🟢 {nickname}`) with live coordinate sync and quick greeting interactions (Wave, Cheer, Offer Tea) alongside TopHud `onlineCount`.
+### Detective mobile flow — 2026-11-23
+
+Verified player path: World → Giải Mã → Hồ Sơ → Bắt đầu điều tra → Hiện trường → Sổ Manh Mối/Sổ Tay Y Khoa → Bảng kết luận. The flow is native mobile UI and is browser-smoke tested on the exported mobile bundle.
+
+### Mobile detective authenticated resume — 2026-11-24
+
+Campaign load and solve submit require the stored Supabase bearer session. Starting an investigation moves from briefing to scene; conclusion selections, wrong attempts and puzzle answers are submitted with the solve request and restored from account progress on reload.

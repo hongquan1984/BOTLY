@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { DeviceEventEmitter } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const WORLD_STATE_EVENT = "healthclues-world-state-changed";
 import {
   fetchWorld,
   submitDailyCheckin,
+  fetchMobileProgress,
+  saveMobileGoals,
+  saveMobileCheckin,
   WorldApiResponse,
   CheckinPayload,
   CheckinResult,
@@ -153,64 +155,18 @@ export function useWorld(isAuthenticated: boolean) {
     }).format(new Date());
   };
 
-  const loadLocalState = useCallback(async () => {
-    try {
-      // 1. Load Goals
-      const rawGoals = await AsyncStorage.getItem("healthclues-user-goals");
-      if (rawGoals) {
-        const parsed = JSON.parse(rawGoals) as MobileWellnessGoal[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setGoals(parsed);
-        } else {
-          setGoals(CANONICAL_STARTER_HABITS);
-          await AsyncStorage.setItem("healthclues-user-goals", JSON.stringify(CANONICAL_STARTER_HABITS));
-        }
-      } else {
-        setGoals(CANONICAL_STARTER_HABITS);
-        await AsyncStorage.setItem("healthclues-user-goals", JSON.stringify(CANONICAL_STARTER_HABITS));
-      }
-
-      // 2. Load XP
-      const rawXp = await AsyncStorage.getItem("healthclues-total-exp");
-      if (rawXp) {
-        setXpTotal(Math.max(50, parseInt(rawXp, 10) || 50));
-      }
-
-      // 3. Load Today Check-in
-      const today = getTodayStr();
-      const rawCheckin = await AsyncStorage.getItem(`healthclues-checkin-${today}`);
-      if (rawCheckin) {
-        setTodayCheckin(JSON.parse(rawCheckin));
-      }
-    } catch (e) {
-      // Fallback safe defaults
-      setGoals(CANONICAL_STARTER_HABITS);
-    }
-  }, []);
-
   const loadWorld = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     setError(null);
 
-    await loadLocalState();
-
     try {
-      const result = await fetchWorld();
+      const [result, progress] = await Promise.all([fetchWorld(), fetchMobileProgress()]);
       setData(result);
-      if (result.xpTotal && result.xpTotal > 0) {
-        setXpTotal(prev => Math.max(prev, result.xpTotal));
-      }
-      const localPlanUpdatedAt = await AsyncStorage.getItem("healthclues-local-plan-updated-at");
-      const hasLocalGoals = Boolean(await AsyncStorage.getItem("healthclues-user-goals"));
-      if (
-        !localPlanUpdatedAt &&
-        !hasLocalGoals &&
-        result.wellnessPlan?.goals &&
-        result.wellnessPlan.goals.length > 0
-      ) {
-        setGoals(result.wellnessPlan.goals as MobileWellnessGoal[]);
-      }
+      setXpTotal(Math.max(0, result.xpTotal || 0));
+      const serverGoals = progress.goals.length ? progress.goals : result.wellnessPlan?.goals;
+      setGoals(serverGoals?.length ? serverGoals as MobileWellnessGoal[] : CANONICAL_STARTER_HABITS);
+      setTodayCheckin(progress.todayCheckin ?? { statuses: {}, stars: 0, note: "", submitted: false });
     } catch (err: any) {
       // Offline / demo resilient fallback - do not surface scary session expired errors to the UI
       if (err.message && !err.message.includes("session is invalid")) {
@@ -220,7 +176,7 @@ export function useWorld(isAuthenticated: boolean) {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [loadLocalState]);
+  }, []);
 
   useEffect(() => {
     loadWorld();
@@ -228,10 +184,10 @@ export function useWorld(isAuthenticated: boolean) {
 
   useEffect(() => {
     const sub = DeviceEventEmitter.addListener(WORLD_STATE_EVENT, () => {
-      loadLocalState();
+      loadWorld(true);
     });
     return () => sub.remove();
-  }, [loadLocalState]);
+  }, [loadWorld]);
 
   const addHabit = async (newHabit: Omit<MobileWellnessGoal, "id" | "status"> & { id?: string }): Promise<MobileWellnessGoal> => {
     const habitToAdd: MobileWellnessGoal = {
@@ -248,13 +204,8 @@ export function useWorld(isAuthenticated: boolean) {
     };
 
     const updatedGoals = [...goals, habitToAdd];
+    await saveMobileGoals(updatedGoals);
     setGoals(updatedGoals);
-    await AsyncStorage.setItem("healthclues-user-goals", JSON.stringify(updatedGoals));
-
-    // Award bonus +20 EXP for establishing a new healthy habit
-    const nextXp = xpTotal + 20;
-    setXpTotal(nextXp);
-    await AsyncStorage.setItem("healthclues-total-exp", String(nextXp));
     DeviceEventEmitter.emit(WORLD_STATE_EVENT);
 
     return habitToAdd;
@@ -262,8 +213,8 @@ export function useWorld(isAuthenticated: boolean) {
 
   const removeHabit = async (habitId: string) => {
     const updatedGoals = goals.filter(g => g.id !== habitId);
+    await saveMobileGoals(updatedGoals);
     setGoals(updatedGoals);
-    await AsyncStorage.setItem("healthclues-user-goals", JSON.stringify(updatedGoals));
     DeviceEventEmitter.emit(WORLD_STATE_EVENT);
   };
 
@@ -271,8 +222,8 @@ export function useWorld(isAuthenticated: boolean) {
     const updatedGoals = goals.map(g =>
       g.id === habitId ? { ...g, status: nextStatus } : g
     );
+    await saveMobileGoals(updatedGoals);
     setGoals(updatedGoals);
-    await AsyncStorage.setItem("healthclues-user-goals", JSON.stringify(updatedGoals));
     DeviceEventEmitter.emit(WORLD_STATE_EVENT);
   };
 
@@ -293,8 +244,6 @@ export function useWorld(isAuthenticated: boolean) {
     const alreadySubmitted = !!todayCheckin.submitted;
     const stars = calculateStars(doneCount, activeGoals.length);
     const expAwarded = alreadySubmitted ? 0 : earnedSum;
-    const newTotalExp = xpTotal + expAwarded;
-
     const checkinRecord = {
       statuses,
       stars,
@@ -304,14 +253,13 @@ export function useWorld(isAuthenticated: boolean) {
     };
 
     const today = getTodayStr();
-    await AsyncStorage.setItem(`healthclues-checkin-${today}`, JSON.stringify(checkinRecord));
-    await AsyncStorage.setItem("healthclues-total-exp", String(newTotalExp));
+    const saved = await saveMobileCheckin({ localDate: today, statuses, stars, note });
 
     setTodayCheckin(checkinRecord);
-    setXpTotal(newTotalExp);
+    setXpTotal(saved.xpTotal);
     DeviceEventEmitter.emit(WORLD_STATE_EVENT);
 
-    return { stars, expAwarded, newTotalExp, alreadySubmitted };
+    return { stars, expAwarded, newTotalExp: saved.xpTotal, alreadySubmitted };
   };
 
   const checkin = async (
@@ -319,18 +267,7 @@ export function useWorld(isAuthenticated: boolean) {
     note?: string
   ): Promise<CheckinResult> => {
     if (!data?.world?.id) {
-      // Local fallback
-      const expAwarded = 10;
-      const newTotal = xpTotal + expAwarded;
-      setXpTotal(newTotal);
-      await AsyncStorage.setItem("healthclues-total-exp", String(newTotal));
-      DeviceEventEmitter.emit(WORLD_STATE_EVENT);
-      return {
-        checkin_id: `local-checkin-${Date.now()}`,
-        revision: 1,
-        xp_awarded: true,
-        xp_total: newTotal,
-      };
+      throw new Error("Tạo Wellness World trước khi lưu điểm danh.");
     }
     const worldTimezone = data.world.timezone || "Asia/Ho_Chi_Minh";
     const today = new Intl.DateTimeFormat("en-CA", {

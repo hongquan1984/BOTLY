@@ -176,7 +176,18 @@ export function ObjectInspectionModal({
 
               return (
                 <>
-                  {inspectionType === "phone" && (
+                  {sceneHotspot.closeupImageUrl && (
+                    <div className="relative w-full max-w-md h-[380px] rounded-2xl overflow-hidden border-4 border-[#8c7657] shadow-2xl bg-black flex items-center justify-center">
+                      <img
+                        src={sceneHotspot.closeupImageUrl}
+                        alt={sceneHotspot.name}
+                        className="w-full h-full object-cover"
+                      />
+                      {renderPins("amber")}
+                    </div>
+                  )}
+
+                  {!sceneHotspot.closeupImageUrl && inspectionType === "phone" && (
                     <div className="relative w-64 h-[420px] rounded-[40px] bg-slate-900 border-4 border-slate-700 shadow-2xl p-3 flex flex-col justify-between overflow-hidden ring-4 ring-black/40">
                       <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-black rounded-b-xl z-20 flex items-center justify-center">
                         <div className="w-8 h-1 rounded-full bg-slate-700" />

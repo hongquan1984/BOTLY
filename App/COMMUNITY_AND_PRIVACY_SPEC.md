@@ -185,3 +185,7 @@ The pending onboarding handoff remains encrypted and bound to the verified accou
 
 ### 2026-11-03: Pending encryption key resilience
 Pending journey encryption requires a secure AES-256-GCM key derived from `HEALTHCLUES_PENDING_JOURNEY_SECRET` (falling back to `SUPABASE_SECRET_KEY` in local development/test runtimes). No unencrypted Quiz profiles or raw health concerns are stored in client cookies, local storage, or URLs.
+
+### Mobile detective account boundary — 2026-11-24
+
+Mobile detective campaign/progress, Journey economy and Toolkit data are account-scoped. The mobile client must send a real Supabase bearer token; demo/dev fallback sessions are not permitted. Detective conclusion state is stored server-side and is not recoverable from device storage.

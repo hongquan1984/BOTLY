@@ -1,5 +1,6 @@
 import { DeviceEventEmitter } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { saveMobileGoals } from "./healthclues";
 import { getApiBaseUrl, getStoredSession } from "./api";
 import type { MobileWellnessGoal } from "../hooks/useWorld";
 
@@ -94,8 +95,6 @@ export interface AdvisorFetchResult {
 
 export const ONBOARDING_COMPLETED_KEY = "healthclues-onboarding-completed";
 export const STARTER_PROFILE_KEY = "healthclues-starter-profile";
-export const USER_GOALS_KEY = "healthclues-user-goals";
-export const TOTAL_EXP_KEY = "healthclues-total-exp";
 
 /**
  * Matches Web HealthCluesGoalFirstDiscovery concerns 1:1.
@@ -827,7 +826,7 @@ export function buildActiveGoalsFromSelection(params: {
 }
 
 /**
- * Persists completed onboarding profile & selected goals locally and emits WORLD_STATE_EVENT.
+ * Persists the onboarding presentation locally, while selected goals are saved to the account API.
  */
 export async function completeMobileOnboarding(params: {
   quest: string;
@@ -849,11 +848,7 @@ export async function completeMobileOnboarding(params: {
       expAwarded: 50,
     })
   );
-  await AsyncStorage.setItem(USER_GOALS_KEY, JSON.stringify(goals));
-  await AsyncStorage.setItem("healthclues-local-plan-updated-at", nowIso);
-
-  const existingXp = parseInt((await AsyncStorage.getItem(TOTAL_EXP_KEY)) || "0", 10) || 0;
-  await AsyncStorage.setItem(TOTAL_EXP_KEY, String(Math.max(50, existingXp)));
+  await saveMobileGoals(goals as Array<Record<string, any>>);
 
   DeviceEventEmitter.emit("healthclues-world-state-changed");
 }

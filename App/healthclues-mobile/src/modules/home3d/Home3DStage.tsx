@@ -109,14 +109,13 @@ export function Home3DStage({
     if (typeof window !== "undefined" && window.location?.hostname) {
       host = window.location.hostname;
     }
-    // Dao3D is the player's personal home/island runtime.
-    return `http://${host}:3355/`;
+    return process.env.EXPO_PUBLIC_DAO3D_URL?.trim() || `http://${host}:3355/`;
   }, []);
 
   return (
     <View style={styles.container}>
       {/* 3D WebGL Canvas / Iframe */}
-      {Platform.OS === "web" ? (
+      {Platform.OS === "web" && iframeSrc ? (
         <View style={styles.canvasContainer}>
           <iframe
             ref={iframeRef}

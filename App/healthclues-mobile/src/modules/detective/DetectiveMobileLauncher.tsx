@@ -29,7 +29,6 @@ import {
   recordCaseSolved,
 } from "./detectiveService";
 import { playDolphinChirp, playDolphinWhistle } from "../audio/dolphinAudio";
-import { useEconomy } from "../economy/useEconomy";
 
 interface DetectiveMobileLauncherProps {
   visible: boolean;
@@ -42,8 +41,6 @@ export function DetectiveMobileLauncher({
 }: DetectiveMobileLauncherProps) {
   const { width } = useWindowDimensions();
   const cardWidth = Math.min(width - 24, 460);
-  const { coins, addCoins, addExp } = useEconomy();
-
   const [solvedIds, setSolvedIds] = useState<string[]>([]);
   const [selectedCase, setSelectedCase] = useState<MobileDetectiveCase | null>(null);
   const [selectedClueIndex, setSelectedClueIndex] = useState<number | null>(null);

@@ -3,7 +3,40 @@
   "updatedBy": "Admin (World Builder)",
   "placedItems": [
     {
-      "instanceId": "inst_master_mtn",
+      "instanceId": "inst_terrain_2356",
+      "itemId": "bld_starter_cottage",
+      "position": {
+        "x": -2.5,
+        "y": 1.8,
+        "z": 2.2
+      },
+      "rotationY": 0,
+      "elevation": 0
+    },
+    {
+      "instanceId": "inst_terrain_4276",
+      "itemId": "ter_mossy_pond",
+      "position": {
+        "x": 5.5,
+        "y": 1.8,
+        "z": -3.5
+      },
+      "rotationY": 0,
+      "elevation": 0
+    },
+    {
+      "instanceId": "inst_terrain_5324",
+      "itemId": "ter_stream_meander_s",
+      "position": {
+        "x": 0,
+        "y": 1.8,
+        "z": 0
+      },
+      "rotationY": 0,
+      "elevation": 0
+    },
+    {
+      "instanceId": "inst_terrain_8739",
       "itemId": "ter_snowy_mountain",
       "position": {
         "x": -8.5,
@@ -12,51 +45,7 @@
       },
       "rotationY": 0,
       "elevation": 0
-    },
-    {
-      "instanceId": "inst_master_well",
-      "itemId": "prop_plaza_well",
-      "position": {
-        "x": 2.4,
-        "y": 2.05,
-        "z": 2.2
-      },
-      "rotationY": 0.2,
-      "elevation": 0.25
-    },
-    {
-      "instanceId": "inst_1794994341930_626",
-      "itemId": "nat_momiji_maple",
-      "position": {
-        "x": 1,
-        "y": 1.8,
-        "z": 1
-      },
-      "rotationY": 0,
-      "elevation": 0
-    },
-    {
-      "instanceId": "inst_1794994455458_812",
-      "itemId": "nat_momiji_maple",
-      "position": {
-        "x": 1,
-        "y": 1.8,
-        "z": 1
-      },
-      "rotationY": 0,
-      "elevation": 0
-    },
-    {
-      "instanceId": "inst_1794994743075_386",
-      "itemId": "bld_general_store",
-      "position": {
-        "x": -5,
-        "y": 1.8,
-        "z": 7.5
-      },
-      "rotationY": 0,
-      "elevation": 0
     }
   ],
-  "updatedAt": "2026-11-18T09:39:09.452Z"
+  "updatedAt": "2026-11-20T08:15:44.849Z"
 }

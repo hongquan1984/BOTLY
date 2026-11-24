@@ -49,7 +49,7 @@ export function computeCaseFileStatus(
   return {
     status: "locked",
     canPlay: false,
-    lockReason: "Cần hoàn thành vụ án trước đó để mở khóa hồ sơ này.",
+    lockReason: "Hồ sơ vụ án đang bị khóa. Bạn phải hoàn thành vụ án tiền đề trước.",
   };
 }
 

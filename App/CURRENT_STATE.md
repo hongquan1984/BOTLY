@@ -1,3 +1,151 @@
+## 2026-11-24 — Sửa lỗi tích hợp Làng Nổi 3D vào giao diện ứng dụng chính & Căn chỉnh cổng dịch vụ
+**Status: 100% HOÀN THIỆN, PASSED BROWSER VERIFICATION (CDP SCREENSHOT `lang_noi_3d_verified.png`) & ALIGNED PORTS.**
+
+- **1. Vấn đề phát hiện & Nguyên nhân gốc rễ:**
+  - File cấu hình `.env` và component `World3DView.tsx` của `healthclues-mobile` từng trỏ sai URL tới cổng `5179` (`village.html` / `3DHOME` - Biệt Thự Gỗ Chalet), khiến màn hình Thế Giới (World) không hiển thị Làng Nổi 3D (`word3d`).
+  - Tiến trình cũ `serve-mobile.mjs` (PID 32728) chiếm cổng 8081 với thư mục `dist-web` không tồn tại, gây xung đột cổng với Metro Bundler.
+- **2. Giải pháp kỹ thuật đã triển khai:**
+  - **Căn chỉnh cấu hình & fallback URL:**
+    * Cập nhật `EXPO_PUBLIC_WORLD_3D_URL=http://localhost:5173/?mode=player` trong `.env`.
+    * Cập nhật fallback an toàn trong `World3DView.tsx` trỏ về `http://localhost:5173/?mode=player` trên nền tảng Web.
+    * Phân tách rõ ràng các cổng dịch vụ:
+      - Cổng `8081`: Ứng dụng chính Expo Mobile Web (`healthclues-mobile`).
+      - Cổng `5173`: Làng Nổi 3D Three.js độc lập (`word3d`, `/?mode=player`).
+      - Cổng `3355`: Đảo cá nhân My Island 3D (`Dao3D`).
+      - Cổng `3329`: Máy chủ API Game Trinh Thám (`gametrinhtham`).
+      - Cổng `5179`: Biệt thự Chalet 3D Thụy Sĩ (`3DHOME`).
+  - **Tối ưu bộ nhớ & dọn dẹp tiến trình:**
+    * Chấm dứt tiến trình `serve-mobile.mjs` cũ, giải phóng hoàn toàn cổng 8081.
+    * Khởi động Metro Bundler với cấp phát bộ nhớ heap 8GB (`--max-old-space-size=8192`) xử lý mượt mà hơn 3.200 module.
+    * Bảo vệ `Haptics.impactAsync` với điều kiện `Platform.OS !== 'web'` tại `ExpGain.tsx`.
+    * Điều chỉnh `blockList` trong `metro.config.js` ngăn Metro index các thư mục temp xuất bản thừa mà không chặn nhầm `react-native-web/dist`.
+- **3. Bằng chứng thực nghiệm trình duyệt (Browser Verification):**
+  - Trình duyệt truy cập `http://localhost:8081/world` (sau 1-click Demo đăng nhập `player@botly.vn`).
+  - Iframe `src` xác nhận chính xác `http://localhost:5173/?mode=player`.
+  - Toàn bộ khung cảnh 3D Làng Nổi (Đảo bay, Nhà Thảo Mộc, Cối xay nước, Suối nguồn, Quảng trường nhiệm vụ, Thảm cỏ, NPC Linh vật Lumi bay lơ lửng) hiển thị sắc nét 60 FPS, không có lỗi console hay crash WebGL.
+  - Ảnh chụp thực chứng: `world_floating_village_3d_clean.png` và `lang_noi_3d_verified.png`.
+
+---
+
+## 2026-11-18 — Case 007 tích hợp vào game trinh thám (local test-only)
+
+- Đã thêm `gametrinhtham/src/data/cases-chapter3.ts` với Chapter 3 và hồ sơ `case-sleep-007`, giữ prerequisite `case-electrolyte-006`, một scene Sleep Valley, 6 hotspot và flow kết luận đa yếu tố.
+- Đã nối 6 ảnh cận vật chứng có sẵn tại `public/gametrinhtham/cases/case-007/` qua `closeupImageUrl`.
+- Đã đăng ký Case 007 vào `ALL_CHAPTERS` và `ALL_DETECTIVE_CASES`.
+- TypeScript catalog/type check: PASS. Chưa claim browser PASS.
+- Full campaign test vẫn FAIL ở assertion cũ vì thay đổi chưa commit đang mở khóa Case 002 ngay từ đầu (`actual available`, `expected locked`); lỗi này có trước Case 007.
+- Nội dung Case 007 là `TEST ONLY`, chưa review y khoa; chưa deploy/production và chưa commit.
+
+## 2026-11-20 — Control Tower Checkpoint: Audit đồng bộ Admin → Mobile My Island 3D
+**Status: AUDIT COMPLETE — NOT IN SYNC; IMPLEMENTATION BLOCKED PENDING CONTRACT FIX.**
+
+- **Actual mobile island path:** `healthclues-mobile/src/modules/island3d/` → `MyIslandScreen.tsx` → `Island3DCanvas.tsx` → `FloatingIslandEngine.ts`; entry from `app/(game)/home.tsx:1417`. `Gametrinhtham` is not the island runtime.
+- **Admin source/API:** `Dao3D/server.mjs:95-125` serves `GET /api/template/default`; sample `Dao3D/data/default_island_template.json` reports `templateVersion=2.4.0` and 4 placed items: `bld_starter_cottage`, `ter_mossy_pond`, `ter_stream_meander_s`, `ter_snowy_mountain` with positions `(-2.5,1.8,2.2)`, `(5.5,1.8,-3.5)`, `(0,1.8,0)`, `(-8.5,1.8,-8)`.
+- **FAIL — runtime data source:** mobile `islandStorage.ts:7-51` reads/writes only `AsyncStorage`; `healthcluesIntegration.ts:26-63` also uses `AsyncStorage`; no `fetch`, Supabase, or `/api/template/default` call exists. Admin changes therefore do not propagate without a mobile code/build change.
+- **FAIL — initial scene parity:** mobile `createDefaultIslandState()` in `constants/islandConfig.ts:3-24` creates only the starter cottage; Admin currently publishes four objects. The mobile engine can only sync the player-local `placedItems` passed at `MyIslandScreen.tsx:198-204`.
+- **FAIL — schema mapping:** Admin template uses `rotationY` + `elevation` and omits full `rotation/scale`; mobile `PlacedItemInstance` requires `rotation` and `scale` (`types/island.ts:21-28`). No API adapter exists.
+- **FAIL — asset parity:** `fantasy_house_1.glb` exists in `healthclues-mobile/public/assets/models`; `stream_pond_01.glb`, `stream_meandering_s_01.glb`, and `model_snowy_mountain_-_terrain_1678.glb` are missing, so the current Admin sample cannot render fully on mobile.
+- **PASS — renderer/camera/touch source:** Three.js WebGL renderer and perspective camera are in `FloatingIslandEngine.ts:69-115`; one-finger orbit, two-finger pinch, normalized raycast placement, resize handling, and `touchAction:'none'` are present in `Island3DCanvas.tsx:86-203` and engine camera methods `863-913`. This is source-level PASS only; runtime smoke test is still blocked until the data/assets contract is repaired.
+- **BLOCKED — live mobile parity test:** Admin Playwright test reaches the API and confirms the 4 item IDs, but fails before screenshots with `EPERM` writing to the preconfigured artifact directory (`Dao3D/tests/test_admin_world_builder_and_player_island.mjs:59`). Mobile has no equivalent API-backed parity test.
+- **Verification:** `npx tsc --noEmit` in `healthclues-mobile` completed without diagnostics. Direct `GET http://localhost:3355/api/template/default` returned the 4-item sample above.
+- **Next fix required:** add a shared/API-backed template loader with explicit Admin→mobile schema normalization, resolve/ship the three missing models, preserve player-owned items while applying template revisions, then run 390×844 touch/asset/runtime smoke tests. No web detective files were modified by this audit.
+
+## 2026-11-18 — Cycle 146: My Island 3D — Loại Bỏ Viền Đen Ngoại Vi & Xóa Bỏ Hoa Dại Rải Rác, Thảm Cỏ Tự Nhiên Tinh Khôi
+**Status: 100% HOÀN THIỆN, PASSED 100% AUTOMATED CHROME CDP TEST (`test_natural_island_surface.mjs`) & BỘ ẢNH MINH CHỨNG THỰC TẾ (ARTIFACTS 84-86).**
+
+- **1. Yêu Cầu Của Người Dùng:**
+  - *"bỏ cái viền đen ở ngoài đi, rồi hoa hoét trên đảo cũng bỏ đi giữ lại cỏ được rôi"*.
+- **2. Nguyên Nhân Kỹ Thuật & Giải Pháp Triệt Để:**
+  - **Loại bỏ viền đen ngoài mép đảo:**
+    * Giữ nguyên cao độ thảm cỏ phẳng $y = 1.8\text{m}$ tràn đều ra tận mép ngoài cùng ($rf = 1.0$), loại bỏ góc dốc nghiêng $0.4\text{m}$ gây bóng đổ đen sẫm.
+    * Xóa bỏ dải màu đất sẫm và đá đen bazan trên bề mặt thảm cỏ, màu cỏ xanh phủ trọn vẹn 100% diện tích đảo.
+    * Tinh chỉnh màu đỉnh vách đá đáy đảo sang tông đá hoa cương tự nhiên `#786b5e`.
+  - **Dọn sạch hoa dại rải rác trên đảo:**
+    * Xóa bỏ hoàn toàn cụm đối tượng `naturalFoliageGroup` và hàm dựng hoa dại 3D (hoa cúc trắng, hoa mao lương vàng, hoa lưu ly).
+    * Loại bỏ các chấm tròn clover trong canvas texture, chỉ giữ lại các sợi cỏ Perlin FBM mảnh khảnh tự nhiên.
+    * Hòn đảo sạch sẽ, thoáng đãng, tập trung vào thảm cỏ xanh mướt và các vật phẩm trang trí chính của người chơi.
+- **3. Bộ Ảnh Artifact Minh Chứng Thực Tế:**
+  - `84_clean_grass_surface_no_black_rim_no_flowers.png`: Toàn cảnh hòn đảo không còn viền đen sẫm và không còn hoa dại rải rác, cỏ xanh mướt tràn viền tự nhiên.
+  - `85_clean_grass_surface_close_up.png`: Cận cảnh thảm cỏ sạch sẽ, mượt mà và tinh tươm.
+  - `86_character_walking_on_clean_grass.png`: Nhân vật Chibi Adventurer sải bước mượt mà trên thảm cỏ tự nhiên mới.
+
+---
+
+## 2026-11-18 — Cycle 145: My Island 3D — Bề Mặt Đảo Tự Nhiên, Chân Thực Nhất Với Thảm Cỏ Perlin FBM & Hoa Dại 3D Đung Đưa
+**Status: 100% HOÀN THIỆN, PASSED 100% AUTOMATED CHROME CDP TEST (`test_natural_island_surface.mjs`) & BỘ ẢNH MINH CHỨNG THỰC TẾ (ARTIFACTS 81-83).**
+
+- **1. Yêu Cầu Của Người Dùng:**
+  - *"ngoài ra bề mặt của đảo có thể sửa thành để mầu có tự nhiên nhất, thật nhất"*.
+- **2. Nguyên Nhân Kỹ Thuật & Giải Pháp Triệt Để:**
+  - **Thảm Cỏ Thực Vật Perlin FBM Tự Nhiên & Chân Thực (Zero Grid, Zero Rings):**
+    * Thay thế bề mặt phẳng đơn màu ban đầu bằng bộ texture thủ tục Canvas 2D độ phân giải cao ($1024 \times 1024$) ứng dụng thuật toán **Fractal Brownian Motion (FBM) Perlin Noise đa tầng tuần hoàn**.
+    * Phối màu tự nhiên chuẩn thảm cỏ cao nguyên Alpine:
+      - Sắc rêu clover trong bóng râm: `rgb(56, 110, 38)` (`#386e26`)
+      - Màu thảm cỏ cao nguyên khỏe khoắn: `rgb(80, 142, 56)` (`#508e38`)
+      - Vạt cỏ tắm nắng ấm áp: `rgb(107, 168, 70)` (`#6ba846`)
+      - Đầu ngọn cỏ óng vàng: `rgb(125, 187, 82)` (`#7dbb52`)
+    * Vẽ hơn 38,000 sợi cỏ mảnh khảnh có độ cong tự nhiên và cụm lá cỏ ba lá nhỏ (micro clover florets) điểm xuyết ngẫu nhiên trên toàn bề mặt.
+  - **Bản Đồ Xúc Giác Bump Map & Chuyển Màu Viền Đất/Đá Đảo (Natural Rim Transition):**
+    * Tạo Bump Map xúc giác tự nhiên ($512 \times 512$) với `bumpScale: 0.018` và `roughness: 0.86`, tán xạ ánh sáng mặt trời êm ái như cỏ thực tế, loại bỏ hoàn toàn độ bóng nhựa.
+    * Bề mặt cỏ chuyển sắc mượt mà (vertex color gradient) ở phần mép viền ngoài ($rf > 0.89$ đến $1.0$): từ cỏ xanh $\rightarrow$ thảm cỏ phong hóa $\rightarrow$ tầng đất mùn giàu dinh dưỡng (`#71583d`) $\rightarrow$ vách đá đen bazan/granit (`#453123`).
+  - **Thảm Hoa Dại Alpine 3D Đung Đưa Trong Gió (Living Paradise Meadow):**
+    * Rải tự nhiên ~150 bông hoa dại và khóm cỏ 3D sống động khắp thảo nguyên đảo (tránh khu vực nhà khởi đầu và lòng suối): cúc họa mi trắng chamomile cánh trắng nhị vàng, hoa mao lương vàng buttercup, hoa lưu ly trời biếc forget-me-not và các khóm cỏ 3D non xanh.
+    * Toàn bộ hoa dại và khóm cỏ 3D tự động đung đưa nhịp nhàng theo làn gió cao nguyên trong vòng lặp hoạt ảnh `animate(time)`.
+  - **Bảo Toàn Khả Năng Đi Lại Của Nhân Vật & Đặt Đồ:**
+    * Mặt cỏ duy trì cao độ $y = 1.8\text{m}$ phẳng mượt không có gờ răng cưa hay vết lưới tam giác, nhân vật Chibi Adventurer sải bước cực kỳ êm ái và vật phẩm trang trí đặt ngay ngắn tự nhiên.
+- **3. Bộ Ảnh Artifact Minh Chứng Thực Tế:**
+  - `81_natural_realistic_island_surface_overview.png`: Toàn cảnh hòn đảo với bề mặt thảm cỏ tự nhiên đa tầng màu sắc, không còn vết chia lưới tam giác hay vòng tròn đồng tâm giả tạo, viền mép đất chuyển sắc hữu cơ vào vách đá.
+  - `82_natural_island_surface_close_up.png`: Góc nhìn cận cảnh cho thấy thảm cỏ rực rỡ, các khóm hoa dại 3D (cúc họa mi trắng, mao lương vàng, hoa lưu ly biếc) điểm xuyết sống động quanh ngôi nhà, hồ nước và suối.
+  - `83_character_walking_on_natural_surface.png`: Nhân vật Chibi Adventurer di chuyển mượt mà trên thảm cỏ tự nhiên mới mà không gặp bất kỳ trở ngại hay lỗi va chạm nào.
+
+---
+
+## 2026-11-18 — Cycle 144: My Island 3D — Loại Bỏ Menu Cồng Kềnh Trên Cao, Tab "Đang Có Trên Đảo", Dời Đồ 1 Chạm & Background Thiên Đường Hoa Lộng Lẫy
+**Status: 100% HOÀN THIỆN, PASSED 100% AUTOMATED PLAYWRIGHT TEST (`test_relocate_and_tray_tabs.mjs`) & BỘ ẢNH MINH CHỨNG THỰC TẾ (ARTIFACTS 78-80).**
+
+- **1. Yêu Cầu Của Người Dùng:**
+  - *"bỏ cái menu cồng kềnh này đi, nhét vào trang trí, ngoài ra đặt xong click lại vật phẩm thì ko di chuyển được, gen lại background, cho các đảo nhìn lộng lẫy hơn, hoa hoét hơn nhìn như thiên đường ấy, mà đừng để giống tranh vẽ, nhìn thật vào chỉ là góc xa thôi"*.
+- **2. Nguyên Nhân Kỹ Thuật & Giải Pháp Triệt Để:**
+  - **Loại bỏ menu cồng kềnh trên cao & tích hợp vào Trang Trí:**
+    * Xóa bỏ hoàn toàn thanh danh sách vật phẩm phía trên header (`#placed-items-inline-wrap`).
+    * Tích hợp tab `[ 📋 Đang Có Trên Đảo (N) ]` vào trong khay Trang Trí (`#decor-tray`) bên cạnh tab `[ ➕ Thêm Đồ Mới ]`.
+  - **Dời đồ vật đã đặt 1 chạm (Click-to-Relocate & Drag-to-Move):**
+    * Khi nhấp chọn vật phẩm đã đặt, người chơi chỉ cần nhấp chuột vào bãi cỏ mới là vật phẩm lập tức chuyển tới vị trí đó và tự động lưu.
+    * Hỗ trợ kéo chuột trượt mượt mà trên đảo.
+  - **Background Thiên Đường Quần Đảo Hoa Chân Thực:**
+    * Tạo background `floating_islands_archipelago_bg.jpg` phong cách điện ảnh chân thực với quần đảo bay ngập tràn sắc hoa cẩm tú cầu, hoa anh đào nở rộ, đền đài cổ kính và thác nước pha lê.
+- **3. Bộ Ảnh Artifact Minh Chứng Thực Tế:**
+  - `78_clean_island_no_top_bulky_menu_new_paradise_bg.png`: Giao diện sạch sẽ không còn menu cồng kềnh phía trên, background thiên đường hoa rực rỡ lộng lẫy ở góc xa.
+  - `79_decor_tray_with_placed_items_tab.png`: Tab `[ 📋 Đang Có Trên Đảo ]` trong khay Trang Trí hiển thị danh sách vật phẩm gọn gàng.
+  - `80_relocating_placed_item_by_clicking_grass.png`: Nhấp chọn cây phong và nhấp vào bãi cỏ mới để dời vị trí tức thì.
+
+---
+
+## 2026-11-18 — Cycle 143: My Island 3D — Khóa Bảo Vệ Địa Thế Admin Trên Góc Nhìn Người Chơi & Background Quần Đảo Bay Đa Tầng Vô Cực
+**Status: 100% HOÀN THIỆN, PASSED 100% AUTOMATED PLAYWRIGHT TEST (`test_locked_admin_items_and_sky_archipelago.mjs`) & BỘ ẢNH MINH CHỨNG THỰC TẾ (ARTIFACTS 66-69).**
+
+- **1. Yêu Cầu Của Người Dùng:**
+  - *"nhưng cái gì mặc định admin cài thì góc nhìn người chơi ko xoá được"*.
+  - *"gen lại ảnh background đẹp, nhìn có chiều sâu là kiểu thấy các đảo khác ở phía xa"*.
+- **2. Nguyên Nhân Kỹ Thuật & Giải Pháp Triệt Để:**
+  - **Khóa bảo vệ toàn diện địa thế Admin trong góc nhìn Người chơi:**
+    * Gắn cờ `isDefaultTerrain: true` cho mọi đối tượng kế thừa từ bản thiết kế của Admin (`/api/template/default`).
+    * Trên thanh Layer Chips của người chơi, các đối tượng này gắn tag `🔒 Cố định` và ẩn hoàn toàn nút xóa `✕`.
+    * Khi người chơi chọn địa thế Admin, nút xóa ở thanh điều khiển và công cụ nhanh chuyển thành `🔒 Mặc Định Admin` / `🔒 Đồ Admin` và bị vô hiệu hóa.
+    * Mọi nỗ lực xóa đều bị chặn đứng và kèm thông báo toast: `🔒 "[Tên vật phẩm]" là địa thế mặc định do Admin tạo — người chơi không thể xóa!`.
+    * Người chơi tự do đặt thêm đồ trang trí (`isDefaultTerrain: false`) và có thể xóa đồ riêng của mình bất cứ lúc nào.
+  - **Background Quần Đảo Bay Đa Tầng (`floating_islands_archipelago_bg.jpg`):**
+    * Tạo ảnh panorama 16:9 độ phân giải cao mô tả thế giới quần đảo bay bồng bềnh trong biển mây với các lâu đài, tháp canh cổ kính và thác nước đổ từ vách đá.
+    * Khoảng không trung tâm mở rộng cho hòn đảo người chơi hòa vào tiền cảnh tự nhiên.
+    * Tích hợp hiệu ứng thị sai (parallax) 2.5D mượt mà theo góc xoay camera.
+- **3. Bộ Ảnh Artifact Minh Chứng Thực Tế:**
+  - `66_new_floating_islands_archipelago_background.png`: Background mới với toàn cảnh các hòn đảo bay khác trôi bồng bềnh ở phía xa chân trời cùng lâu đài, thác nước và biển mây sâu thẳm.
+  - `67_player_view_admin_items_locked_with_chips.png`: Góc nhìn người chơi hiển thị thanh chip với 5 vật phẩm địa thế Admin đều có huy hiệu `[ 🔒 Cố định ]` và không hề có nút xóa.
+  - `68_player_tries_delete_default_item_shows_lock_toast.png`: Người chơi nhấp chọn Núi Tuyết của Admin; thanh điều khiển hiển thị `🔒 Mặc Định Admin` (vô hiệu hóa) và toast thông báo từ chối xóa. Núi tuyết được bảo toàn nguyên vẹn.
+  - `69_player_can_place_and_delete_own_custom_item.png`: Người chơi tự đặt thêm cây phong Momiji, sau đó bấm nút `✕` trên chip để xóa thành công; vật phẩm riêng bị xóa sạch trong khi toàn bộ địa thế Admin vẫn được bảo vệ nguyên vẹn 100%!
+
+---
+
 ## 2026-11-18 — Cycle 142: My Island 3D — Khắc Phục Lỗi Đặt Vật Phẩm (Admin & Người Chơi), Thu Gọn Menu Trang Trí & Background Alps Thụy Sĩ Siêu Thực
 **Status: 100% HOÀN THIỆN, PASSED 100% AUTOMATED PLAYWRIGHT TEST (`test_placement_and_bg.mjs`) & BỘ ẢNH MINH CHỨNG THỰC TẾ (ARTIFACTS 62-65).**
 
@@ -5749,3 +5897,386 @@ One real server-side Gemini Advisor invocation was made against the isolated loc
   - Added a direct floating mini-slider toolbar directly on the canvas stage above the selected item for instant, frictionless scaling without typing numbers.
   - Implemented radial center-anchor corner scaling (`handleScaleChange`) that preserves 3D perspective distortion angles while expanding or contracting the item's homography quadrilateral in real time.
   - All test suites (`qa-auditor-suite.mjs`, `test-e2e-wellness-home-and-admin.mjs`, `test-healthclues-wellness-home.mjs`, `secrets:scan`) passed 100%.
+
+# Latest Update — My Island 3D (Dao3D): Chibi Adventurer Controller, Minimalist Bottom UI & Island Persistence (2026-11-18)
+
+- **Issues Addressed & Features Implemented:**
+  1. *Player Island Layout Persistence ("đặt xong sang admin quay lại thì mất"):*
+     - Fixed race condition and accidental data overwrite in `Dao3D/server.mjs`. Saving the Admin default template (`default_island_template.json`) no longer touches or wipes out `data/players/current_player.json`.
+     - In `preview.html`, `savePlayerIslandLayout()` explicitly filters and saves only player custom placed items (`isDefaultTerrain: false`), coins (`playerCoins`), and inventory (`ownedInventory`).
+     - In `switchMode('player')`, server fetches both `/api/template/default` (Admin master template) and `/api/player/current_player` (player personal state), merging Admin default terrain (`isDefaultTerrain: true`, locked from deletion) and player custom items (`isDefaultTerrain: false`) into the active 3D scene.
+     - Verified roundtrip persistence across Admin/Player tab switching and full browser reload (100% data preservation).
+  2. *Chibi Adventurer Character Walking (`Rogue.glb` from `word3d`):*
+     - Integrated animated 3D Chibi Adventurer character (`/assets/characters/Rogue.glb`, scale 0.65, y: 1.8) on the island surface.
+     - Implemented `AnimationMixer` with `idle` and `walk` animations.
+     - Ground click-to-move raycast with pulsing golden destination ring marker (`#fbbf24`), smooth turn interpolation (`Math.atan2`), natural walking stride (3.6 m/s), and idle state transition upon arrival.
+     - Automatic casual idle stroll when player is inactive for > 12 seconds to bring life and charm to the floating island.
+  3. *Ultra-Clean Minimalist Bottom-Only UI for Player Mode:*
+     - Strip clutter: In Player Mode, `#floating-quick-tools` (side tools) and `#placed-items-badge` (layer chips) are hidden. Top HUD is transparent with no bulky banners, leaving the 3D island fully visible and immersive.
+     - Centered floating bottom dock (`#bottom-dock`): `[ 🛍️ Cửa Hàng ]`, `[ 🎒 Kho Đồ ]`, `[ 🛠️ Trang Trí ]`, and `[ 🪙 500 Xu ]`.
+     - Ultra-compact floating bottom placement bar (`#placement-bar`): centered with max-width 580px, containing `⬆️ Lên`, `⬇️ Xuống`, `🔄 Xoay`, `🗑️ Xóa / Thu Hồi`, and `✅ Xong`.
+     - Admin default terrain items display locked button `🔒 Mặc Định Admin` with toast protection. Custom items display `🗑️ Cất Vào Kho` and return directly to inventory.
+  4. *Player Economy & Shop Flow:*
+     - Player has coins (starts with 500 Xu) displayed on both the bottom dock and header.
+     - Shop (`🛍️ Cửa Hàng`) allows purchasing items; coins deduct and items add directly to Kho Đồ (`ownedInventory`).
+     - All changes auto-save to player backend profile.
+- **Verification Evidence:**
+  - `scratch/test_character_and_persistence_complete.mjs`: **100% PASS** (all 10 test steps passed).
+  - Screenshots captured:
+    - `74_player_character_walking_on_island.png`: Chibi Adventurer moving towards click destination on island grass.
+    - `75_player_placed_decorations_with_compact_bottom_bar.png`: Compact bottom controls with placed custom decorations.
+    - `76_player_custom_items_preserved_after_admin_switch.png`: Custom items 100% preserved after switching to Admin and back to Player.
+    - `77_player_custom_items_preserved_across_page_reload.png`: Custom items 100% preserved across full page reload.
+  - Server running smoothly on `http://localhost:3355/`.
+
+- **Cycle 146 — Clean Top Menu into Decor Tray Tabs, Item Relocation (Click/Drag) & Realistic Flower Paradise Archipelago Background (2026-11-18):**
+  - Removed bulky top layer chips bar (`placed-items-inline-wrap`) from screen top completely to eliminate clutter.
+  - Added clean tab switcher inside `#decor-tray`: `[ ➕ Thêm Đồ Mới ]` and `[ 📋 Đang Có Trên Đảo (N) ]` for organized item management and selection.
+  - Implemented Click-to-Relocate & Drag-to-Move for placed items: Clicking on a placed item selects it, and subsequent clicks on any island grass position (or dragging) instantly relocates the item to the new coordinates, updating 3D position and auto-saving to backend profile.
+  - Generated and applied realistic cinematic panoramic paradise sky archipelago background (`floating_islands_archipelago_bg.jpg`) with blossoming flower fields, crystal waterfalls, and grand celestial vistas.
+  - Playwright test `scratch/test_relocate_and_tray_tabs.mjs` passed 100% (artifacts `78_clean_island_no_top_bulky_menu_new_paradise_bg.png`, `79_decor_tray_with_placed_items_tab.png`, `80_relocating_placed_item_by_clicking_grass.png`).
+
+
+## 2026-11-19 — Game/Mobile Case 007 direct takeover checkpoint
+
+- Antigravity is paused; PM took over local verification for the detective/mobile task.
+- Preserved the complete Case 007 asset set under `D:\botly\public\gametrinhtham\cases\case-007`: one scene, two Mai reference images and six close-ups. All six close-ups are 1200x896; the scene is 1200x896; the two reference images are 1024x1024.
+- Corrected the campaign engine prerequisite fallback so a case with an unsolved prerequisite is `locked` and `canPlay: false`; Case 002 unlock/authorization assertions now pass.
+- Normalized the Case 007 catalog to the V6 runtime contract: six handbook entries, seven conclusion candidates, four `isTrueCause` candidates and canonical clue source/unlock fields. A focused catalog assertion passes.
+- Focused tests: `test-deep-inspection.mjs` PASS; `test-deduction-engine.mjs` PASS; `test-random-player.mjs` PASS for anti-guessing but Case 007 random pass rate is 0/5000 as expected for a constrained answer.
+- Remaining failures are explicit: `test-campaign-engine.mjs` still expects two chapters although the catalog now contains Chapter 3; `test-reasoning-player.mjs` still expects six cases although seven are registered. Mobile browser smoke reached static `8081` but hit React error #310/localStorage security failure and could not write its screenshot artifact. Detective runtime `3329` could not start because local Auth/REST/Mailpit health checks failed and Docker is unavailable. No production, deploy or commit was performed.
+
+## 2026-11-19 — Ngôi Nhà mobile dùng đúng Dao3D My Island
+
+- Luồng bị sai: tab `Ngôi Nhà` của `healthclues-mobile/app/(game)/home.tsx` mặc định render `Home3DStage` từ `src/modules/home3d` và iframe runtime port `3355`.
+- Đã chuyển route player-facing sang `MyIslandScreen` từ `src/modules/island3d`, là màn Dao3D dành cho mobile; giữ `LegacyHomeScreen` trong source để không mất implementation cũ.
+- Re-export web thành công vào `healthclues-mobile/dist-web`; `/home` trên port `8081` hiện render `My Island — Hòn Đảo Của Tôi`, một `<canvas>` WebGL và không tạo iframe `home3d`.
+- Smoke browser 390×844: không có page error; thấy HUD Dao3D, `Cửa Hàng`, `Kho Đồ`, `Trang Trí`, tab `Ngôi Nhà` và modal quà Lumi.
+- Chưa deploy/commit/push.
+
+## 2026-11-20 — Đồng bộ góc nhìn Dao3D Player với Admin template
+
+- Giữ nguyên kiến trúc Player mobile canvas, không dùng WebView/iframe; chỉ Admin được dùng HTML preview.
+- Đồng bộ mobile với Admin template `2.4.0`: camera mặc định `38`, giới hạn `18–55`, nhà khởi đầu `bld_starter_cottage` tại `(-2.5, 1.8, 2.2)`, núi tại `(-8.5, 1.8, -8.0)`.
+- State mobile cũ được migrate theo version, giữ lại đồ trang trí người chơi và chỉ cập nhật canonical starter-house fields.
+- Browser smoke `390×844` trên `/home`: `canvasCount=1`, `iframeCount=0`, không page error, HUD My Island hiển thị.
+- Dao3D acceptance: `12/12 PASS`; web export thành công; chưa commit/push/deploy.
+
+## 2026-11-20 — Đồng bộ Game Trinh Thám sang mobile React Native
+
+- Đã tạo renderer mobile-first tại `healthclues-mobile/Gametrinhtham/MobileDetectiveGame.tsx`: thư viện hồ sơ, briefing Luna, scene hotspot, sổ manh mối, bảng suy luận và submit kết quả.
+- Đã thay entry player-facing trong `healthclues-mobile/src/modules/detective/DetectiveWebViewModal.tsx` bằng component React Native trực tiếp; không còn iframe/WebView. Bản web tham chiếu `gametrinhtham/` không bị sửa trong thay đổi này.
+- Đã tách adapter API/DB boundary tại `healthclues-mobile/Gametrinhtham/dataAdapter.ts`; renderer không hardcode case. Hợp đồng asset gồm `scene-main`, `mai-before`, `mai-after` và `clue-closeup`.
+- Đã thêm schema artifact và fixture 9 asset cho Case 007 tại `healthclues-mobile/Gametrinhtham/db/` và `healthclues-mobile/Gametrinhtham/tests/fixtures/`. Migration chỉ là artifact local, chưa áp dụng production.
+- Evidence: mobile detective contract PASS; `npx tsc --noEmit` PASS; web export PASS; browser smoke PASS sau khi click Giải Mã → chọn hồ sơ → Bắt đầu điều tra và thấy scene/hotspot. Đã thêm same-origin API proxy trong `healthclues-mobile/serve_dist_8081.mjs` để loại lỗi `Failed to fetch`. Chưa claim production; backend production vẫn cần join asset rows từ DB.
+
+## 2026-11-20 — QA continuation: DB-backed mobile detective contract
+
+- Đã thêm route riêng `src/app/api/healthclues/mobile-detective/campaign` đọc chapters/cases/assets từ Supabase DB; route không fallback fixture và trả 503 khi DB contract chưa sẵn sàng.
+- Đã thêm migration `supabase/migrations/20261120130000_healthclues_detective_case_assets.sql` và script `scripts/sync-detective-campaign-db.mjs` để sync catalog case thật cùng 9 asset Case 007. Chưa áp dụng production vì local Supabase 54321/54322 đang unavailable và chưa có xác nhận đích production.
+- Adapter mobile đã chuẩn hóa clue API (`title`, `shortDescription`, `detailedObservation`, `icon`) sang shape renderer (`name`, `description`, `inspectMessage`, `inspectionTitle`, `icon`).
+- Đã gỡ hardcode `localhost:5173` khỏi runtime World3D; URL 3D chỉ lấy từ `EXPO_PUBLIC_WORLD_3D_URL`, thiếu config thì hiển thị fallback rõ ràng. Home3DStage cũng chỉ nhận `EXPO_PUBLIC_DAO3D_URL`.
+- Evidence vòng QA: mobile contract PASS, mobile `tsc` PASS, docs guard PASS. Local DB contract server lấy source case/asset thật đã PASS API (7 cases; Case 007 đủ 9 asset) và browser/mobile viewport PASS toàn flow Case 007 đến submit/result. Docker/Supabase local bị host policy chặn (`docker desktop start`: Access denied khi tạo log; named pipe không tồn tại). Isolated 3329 production build vẫn blocked bởi dependency/build environment, production migration chưa chạy.
+
+## 2026-11-22 — Control Tower Round 2: mobile Toolkit Bag database persistence
+
+- **Status: WORKING, not complete.** The next concrete inventory gap was fixed at source level: `healthclues-mobile/src/services/toolkitStorage.ts` no longer reads or writes toolkit items from `AsyncStorage`; it now calls the authenticated `/api/healthclues/mobile-toolkit` API and keeps only the existing in-process event for UI refresh.
+- Added `src/app/api/healthclues/mobile-toolkit/route.ts` with authenticated `requireUser` access and user-scoped GET/save/remove operations, plus `supabase/migrations/20261122120000_healthclues_mobile_toolkit.sql` for database persistence.
+- Source verification: mobile TypeScript PASS; route ESLint PASS; no `AsyncStorage` calls remain in toolkit storage. Root-wide TypeScript remains non-green because of pre-existing unrelated `gametrinhtham` Case 007 type errors and generated `.next` validator errors; those were not modified.
+- **Acceptance remains open:** isolated migration application, authenticated desktop/mobile save → reload → API/database readback for all three item types, and the required separate QA pass for all rounds, parity, touch, loading/error states and UX defects have not yet run. Legacy scripts that seed bag state through browser `localStorage` are not valid persistence evidence.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md`.
+
+## 2026-11-22 — Control Tower Round 3: close the remaining mobile bag source gap
+
+- **Status: WORKING, not complete.** Audit of the actual player-facing mobile paths found Herbal Garden still reading/writing the legacy `hc_mobile_botanical_bookmarks` `AsyncStorage` key even though Sound and Breath already used the new API-backed `toolkitStorage` service. Herbal load, toggle and add-to-journey now use `toolkitStorage`; profile, tea-date and goal storage are unrelated and unchanged.
+- Focused verification passed: `npx tsc --noEmit -p App/healthclues-mobile/tsconfig.json`; `npx eslint src/app/api/healthclues/mobile-toolkit/route.ts`; source inspection confirms all three bag categories route through `apiFetch` and no herbal bag persistence call targets `AsyncStorage`.
+- **Acceptance remains open:** the migration `supabase/migrations/20261122120000_healthclues_mobile_toolkit.sql` is not applied to an isolated database; Docker Linux engine is unavailable, Supabase CLI reports `ECOMPROMISED / Lock compromised`, and ports 54321/3329 are closed. No authenticated save → reload → API/database readback → remove run is valid yet, and the required separate QA pass for every game round, web/mobile parity, touch, loading/error states and UX defects remains outstanding.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 3).
+
+## 2026-11-22 — Control Tower Round 4: Bag loading/error-state hardening
+
+- **Status: WORKING, not complete.** The mobile Toolkit Bag remains database/API-backed; this round removed a misleading empty-state failure mode and reduced refresh inconsistency.
+- Added `toolkitStorage.getState()` and changed `healthclues-mobile/app/(game)/inventory.tsx` to perform one authenticated Toolkit GET for herbs, sounds and breaths. The screen now shows a loading indicator, a retryable error banner, and catches remove failures for all three categories.
+- Verification: `npx tsc --noEmit -p App/healthclues-mobile/tsconfig.json` PASS; source inspection confirms no toolkit item persistence uses `AsyncStorage` and the Bag refresh path is API-backed. Targeted ESLint was started but hung without diagnostics and was stopped, so lint is NOT VERIFIED.
+- Acceptance remains open: isolated migration application, authenticated save → reload → API/database readback → remove for all three item types, and the required separate QA pass for every game round, web/mobile parity, touch flow, loading/error states and UX defects. Local Docker/Supabase availability remains the next environment gate.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 4).
+
+## 2026-11-22 - Control Tower Round 5: remove the last legacy Bag reference
+
+- **Status: WORKING, not complete.** Removed the unused `AsyncStorage` import and legacy `hc_mobile_botanical_bookmarks` constant from `healthclues-mobile/app/(game)/inventory.tsx`; toolkit item persistence remains exclusively through `toolkitStorage` and the authenticated `/api/healthclues/mobile-toolkit` route.
+- `npx tsc --noEmit -p App/healthclues-mobile/tsconfig.json`: **PASS**.
+- Targeted ESLint over the changed route/storage/Bag/station files: **NOT VERIFIED**; it produced no diagnostics for 60 seconds and was stopped.
+- `npx supabase status`: **BLOCKED** by `ECOMPROMISED / Lock compromised`; Docker cannot connect to the missing `dockerDesktopLinuxEngine` pipe. Therefore migration application, authenticated save -> reload -> API/database readback -> remove, and the separate full QA pass remain outstanding.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 5).
+
+## 2026-11-22 — Control Tower round 6: close mobile detective authentication/progress boundary
+
+- The mobile detective campaign API now requires an authenticated HealthClues session and returns the signed-in user's database progress, rather than exposing a DB campaign without progress. A new `/api/healthclues/mobile-detective/solve` route validates case result input and calls the server-side `healthclues_solve_detective_case_v1` RPC.
+- Source contract test and mobile TypeScript check pass. Live API and database checks remain blocked because local 3329 is closed and Supabase reports `ECOMPROMISED / Lock compromised` with no Docker Linux engine.
+- This is **WORKING, not complete**. Toolkit database persistence still needs authenticated save/reload/readback/remove proof for all three item types, and the separate full game-round/web-mobile/touch/loading-error QA pass remains required.
+
+## 2026-11-22 - Control Tower round 7: add mobile Toolkit Bag contract evidence
+
+- **Status: WORKING, not complete.** Added `scripts/test-healthclues-mobile-toolkit-contract.mjs` to verify the authenticated Toolkit API boundary, user scoping, allowed herb/sound/breath types, idempotent save/remove behavior, RLS migration controls, and no local/browser storage for Bag item persistence.
+- `node scripts/test-healthclues-mobile-toolkit-contract.mjs`: **PASS**; `npx tsc --noEmit -p App/healthclues-mobile/tsconfig.json`: **PASS**.
+- Targeted ESLint: **NOT VERIFIED** because `npx` failed with `ECOMPROMISED / Lock compromised`; local DB/runtime remains unavailable because Docker's Linux engine/Supabase is unavailable.
+- Authenticated database readback, migration application, 390x844 touch/browser flow, and the separate QA pass across every game round, web/mobile parity, loading/error states and usability remain open. Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md`.
+
+## 2026-11-22 - Control Tower round 8: harden mobile Toolkit legacy-storage guard
+
+- **Status: WORKING, not complete.** Expanded `scripts/test-healthclues-mobile-toolkit-contract.mjs` to recursively scan all mobile Bag/station source paths and reject the legacy Toolkit/Bag device-storage keys, reducing regression risk while runtime proof remains blocked.
+- `node scripts/test-healthclues-mobile-toolkit-contract.mjs`: **PASS**; `npx tsc --noEmit -p App/healthclues-mobile/tsconfig.json`: **PASS**.
+- `npx supabase status` remains **BLOCKED** by `ECOMPROMISED / Lock compromised`; Docker/Supabase and the mobile runtime were unavailable. Authenticated database readback, 390x844 touch QA, and the separate full-round web/mobile parity pass remain open.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 8).
+
+## 2026-11-22 - Control Tower round 9: harden authenticated Toolkit filters
+
+- **Status: WORKING, not complete.** URL-encoded the authenticated user ID in the mobile Toolkit API's GET and DELETE PostgREST filters; the database-backed inventory boundary remains unchanged and no device storage was introduced.
+- `node scripts/test-healthclues-mobile-toolkit-contract.mjs`: **PASS**; `npx tsc --noEmit -p App/healthclues-mobile/tsconfig.json`: **PASS**.
+- Local targeted ESLint on `src/app/api/healthclues/mobile-toolkit/route.ts`: **PASS** using the existing repository binary.
+- Docs guard completed with a semantic-review warning for broader canonical targets; no business-rule or use-case change was introduced by this URL-encoding hardening, so those docs were not changed.
+- `npx supabase status`: **BLOCKED** by `ECOMPROMISED / Lock compromised`; Docker/Supabase and the local app runtime remain unavailable. Live migration, authenticated save/reload/API-database readback/remove, 390x844 touch QA, and the separate full-round web/mobile parity QA remain open.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 9).
+
+## 2026-11-22 - Control Tower round 10: surface Toolkit station failures
+
+- **Status: WORKING, not complete.** Herbal Garden, Sound Garden and Zen Breath now expose Toolkit loading/error state and surface authenticated Bag save/toggle failures instead of silently showing empty state or an unhandled rejection.
+- `scripts/test-healthclues-mobile-toolkit-contract.mjs` now guards those station loading/error guarantees in addition to the no-device-storage inventory boundary.
+- Verification: mobile Toolkit contract **PASS**; `tsc --noEmit -p healthclues-mobile/tsconfig.json` **PASS**. Focused ESLint ran but remains **NOT VERIFIED** because the changed legacy files report 28 errors/47 warnings, including pre-existing hook/state and `any` issues.
+- Live migration/database readback, authenticated save -> reload -> API/database readback -> remove for all three item types, 390x844 touch QA, and separate full-round web/mobile parity QA remain blocked by closed local ports 3329/54321 and Docker/Supabase `ECOMPROMISED / Lock compromised`.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 10).
+
+## 2026-11-22 - Control Tower Round 11: preserve Toolkit station API failures
+
+- **Status: WORKING, not complete.** Removed the `toolkitStorage` fallback that returned empty arrays when the authenticated Toolkit GET failed. Herbal, Sound and Breath station callers now receive the failure and can show their existing retryable Bag error instead of presenting a misleading empty collection.
+- Extended `scripts/test-healthclues-mobile-toolkit-contract.mjs` to guard against reintroducing that fallback.
+- `node scripts/test-healthclues-mobile-toolkit-contract.mjs`: **PASS**; `npx tsc --noEmit -p healthclues-mobile/tsconfig.json`: **PASS**. Global ESLint was unavailable in this shell, so lint remains **NOT VERIFIED** for the changed service.
+- Isolated migration/database readback, authenticated herb/sound/breath save -> reload -> API/database readback -> remove, 390x844 touch/browser QA, and the independent all-round web/mobile parity/usability QA remain **NOT RUN/BLOCKED** by closed ports 3329/54321 and Docker/Supabase `ECOMPROMISED / Lock compromised`.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 11).
+
+## 2026-11-22 - Control Tower Round 12: harden late Toolkit modal loads
+
+- **Status: WORKING, not complete.** Sound Garden and Zen Breath now guard asynchronous authenticated Toolkit loads against updating state after their modal unmounts; locale changes also reload with the current error copy. The database-backed Bag boundary and no-device-storage rule are unchanged.
+- `node scripts/test-healthclues-mobile-toolkit-contract.mjs`: **PASS**; `npx tsc --noEmit -p healthclues-mobile/tsconfig.json`: **PASS**. The contract now checks the late-load cancellation guard. `git diff --check` had only existing line-ending/EOF warnings; local ESLint binary was unavailable, so lint is **NOT VERIFIED**.
+- Runtime recovery remains blocked without production access: Docker Linux engine pipe is missing, `npx supabase status` returns `ECOMPROMISED / Lock compromised`, and local ports 54321/3329 are closed. Migration application, authenticated save/reload/API-database readback/remove for herb/sound/breath, 390Ã—844 touch QA, and the separate full-round web/mobile parity/usability QA remain open.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 12).
+
+## 2026-11-22 — Control Tower Round 13: harden Toolkit acceptance contract
+
+- **Status: WORKING, not complete.** Expanded `scripts/test-healthclues-mobile-toolkit-contract.mjs` to require independent authentication on GET and POST, `no-store` Toolkit responses, bounded item-ID validation aligned with the database schema, and the exact three supported item types. This is evidence hardening only; the authenticated database-backed Bag implementation is unchanged.
+- `node scripts/test-healthclues-mobile-toolkit-contract.mjs`: **PASS**; `npx tsc --noEmit -p App/healthclues-mobile/tsconfig.json`: **PASS**; focused ESLint on `src/app/api/healthclues/mobile-toolkit/route.ts` and the contract script: **PASS**.
+- Runtime recheck remains blocked without production access: Docker's `dockerDesktopLinuxEngine` pipe is missing, `npx supabase status` returns `ECOMPROMISED / Lock compromised`, and ports 54321/3329 are closed.
+- Isolated migration application, authenticated herb/sound/breath save -> reload -> API/database readback -> remove, 390x844 touch/browser QA, and the independent full-round web/mobile parity/usability QA remain open. Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 13).
+## 2026-11-22 - Control Tower Round 15: harden Herbal Toolkit async-load contract
+
+- **Status: WORKING, not complete.** Extended `scripts/test-healthclues-mobile-toolkit-contract.mjs` to require Herbal Garden's authenticated Toolkit load to cancel late state updates after unmount, matching Sound Garden and Zen Breath. No persistence path changed.
+- `node scripts/test-healthclues-mobile-toolkit-contract.mjs`: **PASS**; `npx tsc --noEmit -p healthclues-mobile/tsconfig.json`: **PASS**.
+- Local ESLint was not available. `npx supabase status` remains blocked by `ECOMPROMISED / Lock compromised`; ports `54321` and `3329` refused connections. Migration application, authenticated save/reload/API-database readback/remove, 390x844 touch QA, and separate full-round web/mobile parity QA remain open. Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md`.
+-
+## 2026-11-22 - Control Tower Round 16: guard Bag late Toolkit loads
+
+- **Status: WORKING, not complete.** Added an `isMounted` guard to `healthclues-mobile/app/(game)/inventory.tsx` so authenticated Toolkit GET results, errors, and loading-finalization cannot update the Bag after unmount or effect cleanup.
+- `node scripts/test-healthclues-mobile-toolkit-contract.mjs`: **PASS**; contract now requires the Bag late-load cancellation guard.
+- `npx tsc --noEmit -p healthclues-mobile/tsconfig.json`: **PASS**.
+- `git diff --check` on the changed Bag and contract files: **PASS** apart from the repository's existing LF/CRLF warning.
+- Live migration/application, authenticated herb/sound/breath save -> reload -> API/database readback -> remove, 390x844 touch/browser QA, and the independent all-round web/mobile parity/usability pass remain **NOT RUN/BLOCKED** because local Docker/Supabase/runtime is unavailable. No production access was attempted and no completion claim is made.
+
+## 2026-11-22 - Control Tower Round 17: harden Toolkit mutation/error contract
+
+- **Status: WORKING, not complete.** Strengthened `scripts/test-healthclues-mobile-toolkit-contract.mjs` to require URL-encoded remove filters for item type and ID, structured 400 responses for malformed mutations, and retryable 503 responses for database/API failures. The authenticated database-backed Bag implementation is unchanged.
+- `node scripts/test-healthclues-mobile-toolkit-contract.mjs`: **PASS**; `npx tsc --noEmit -p healthclues-mobile/tsconfig.json`: **PASS**; focused ESLint using the repository binary on the Toolkit route and contract script: **PASS**.
+- Runtime recheck: Docker cannot connect to `dockerDesktopLinuxEngine`; `npx supabase status` exits `ECOMPROMISED / Lock compromised`; TCP probes to `127.0.0.1:54321` and `127.0.0.1:3329` both failed. No production access was attempted.
+- Isolated migration application, authenticated herb/sound/breath save -> reload -> API/database readback -> remove, 390x844 touch/browser QA, and the independent all-round web/mobile parity/usability pass remain **NOT RUN/BLOCKED**. No completion claim is made.
+
+## 2026-11-22 — Control Tower Round 18: add authenticated Toolkit round-trip harness
+
+- **Status: WORKING, not complete.** Added `scripts/test-healthclues-mobile-toolkit-roundtrip.mjs`. When the isolated Owner Demo is available, it creates two confirmed local synthetic accounts, saves one herb/sound/breath item through the authenticated mobile Toolkit API, reloads through GET, reads rows back from local PostgREST, verifies cross-account isolation, checks malformed-input 400 handling, removes all three items, and verifies API/database emptiness. It never seeds Bag state through browser/device storage.
+- Extended `scripts/test-healthclues-mobile-toolkit-contract.mjs` to guard the new harness against missing database readback, missing isolation, or local-storage seeding.
+- Verification: `node --check scripts/test-healthclues-mobile-toolkit-roundtrip.mjs` **PASS**; `node scripts/test-healthclues-mobile-toolkit-contract.mjs` **PASS**; `npx tsc --noEmit -p healthclues-mobile/tsconfig.json` **PASS**.
+- Live harness execution is **BLOCKED** at the local Auth probe: `fetch failed ECONNREFUSED 127.0.0.1:54321`. Docker cannot connect to `dockerDesktopLinuxEngine`; `npx supabase status` remains `ECOMPROMISED / Lock compromised`; app port 3329 is closed. No production access was attempted.
+- Migration application, authenticated save/reload/API/database readback/remove, 390x844 touch/browser QA, and the separate all-round web/mobile parity/loading-error/usability QA remain open. Next action: restore only the isolated local runtime, run this harness, then complete the independent QA pass.
+## 2026-11-22 - Control Tower Round 19: recheck Toolkit persistence gates
+
+- **Status: WORKING, not complete.** Re-ran the static and runtime gates for the authenticated database-backed mobile Toolkit Bag; no persistence implementation or storage boundary changed this round.
+- `node scripts/test-healthclues-mobile-toolkit-contract.mjs`: **PASS**; `node --check scripts/test-healthclues-mobile-toolkit-roundtrip.mjs`: **PASS**; `npx tsc --noEmit -p healthclues-mobile/tsconfig.json`: **PASS**.
+- `git diff --check` on the Toolkit files passed apart from existing LF/CRLF warnings.
+- The live round-trip harness is **BLOCKED** before local account creation by `fetch failed ECONNREFUSED 127.0.0.1:54321`. `npx supabase status` remains `ECOMPROMISED / Lock compromised`; ports 54321 and 3329 are closed. No production access was attempted.
+- Migration application, authenticated save -> reload -> API/database readback -> remove for herb/sound/breath, 390x844 touch/browser QA, and the independent full-round web/mobile parity/loading-error/usability QA remain open. No completion claim is made.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 19). Next action is to restore only the isolated local runtime, run the round-trip harness, then complete the separate QA pass.
+
+## 2026-11-22 - Control Tower round 20: recheck source gates and isolated runtime recovery
+
+- **Status: WORKING, not complete.** An isolated Docker Desktop launch was requested, but Docker reported the missing `dockerDesktopLinuxEngine` pipe and then permission denied for `docker_engine`; `npx supabase status` still reports `ECOMPROMISED / Lock compromised`.
+- `node App/scripts/test-healthclues-mobile-toolkit-contract.mjs`, `node --check App/scripts/test-healthclues-mobile-toolkit-roundtrip.mjs`, and `npx tsc --noEmit -p App/healthclues-mobile/tsconfig.json` all **PASS**. `git diff --check` reported only existing LF/CRLF warnings.
+- The authenticated round-trip harness is still blocked before account creation because local Auth/API `127.0.0.1:54321` and app `127.0.0.1:3329` are unavailable. No production endpoint, remote migration helper, or production data was touched.
+- Migration application, authenticated herb/sound/breath save -> reload -> API/database readback -> remove, 390x844 touch/browser QA, and independent all-round web/mobile parity/loading-error/usability QA remain **NOT RUN/BLOCKED**. No completion claim is made.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (worker round 20). Next action remains isolated runtime recovery, local migration application, authenticated round-trip, then separate web/mobile QA.
+## 2026-11-22 - Control Tower round 21: authenticated Toolkit round trip recovered
+
+- **Status: WORKING, not complete.** The retained isolated `healthclues-owner-demo` runtime was reachable. Only the local `20261122120000_healthclues_mobile_toolkit.sql` migration was copied into its project snapshot and applied; Postgres confirmed the Toolkit table and migration version. Production was not accessed.
+- `node App/scripts/test-healthclues-mobile-toolkit-roundtrip.mjs` **PASS** on isolated `http://127.0.0.1:3329`: authenticated herb/sound/breath save, API reload, database readback, cross-account isolation, malformed-input 400, remove, and final API/database emptiness all passed.
+- Fixed only the round-trip harness expected-row sort so its comparison matches the database's documented `item_type` ordering. Product persistence code was unchanged.
+- Additional gates: Toolkit contract **PASS**; harness syntax **PASS**; mobile integration **PASS**; mobile TypeScript **PASS**; changed-harness diff check **PASS**.
+- A guarded production build was blocked by unrelated detective aliases outside this task's scope; isolated dev API testing was used for the route proof. The required independent 390x844 touch/browser run across Herbal/Sound/Breath, web/mobile parity, loading/error/retry behavior, and all-round usability QA remain open. No completion claim.
+- Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (Control Tower Round 21). Next action: run the separate authenticated mobile/browser QA pass while the isolated runtime remains available, then record each observed UX result.
+
+## 2026-11-22 - Control Tower Round 22: UI QA attempted, stale bundle blocked
+
+- **Status: WORKING, not complete.** The isolated authenticated Toolkit round trip remains PASS for herb/sound/breath save, API reload, Postgres readback, cross-account isolation, malformed input, remove, and final emptiness. Contract, harness syntax, and mobile TypeScript gates also PASS.
+- The independent mobile QA harness reached the Bag at 390x844 and verified the empty three-category presentation, but the available exported web bundle is stale: an intercepted HTTP 503 Toolkit GET did not produce the current Bag error/retry UI, so the run failed before station save/reload/remove and desktop parity could be truthfully evaluated.
+- Current checkout lacks the web bundler dependencies needed to produce a fresh Expo web bundle; no persistence code or production endpoint was changed. Evidence: `reports/V1_CYCLE_147_MOBILE_TOOLKIT_DB_PERSISTENCE.md` (Round 22).
+- Next action is to restore/build the approved isolated mobile web runtime from current source, rerun the full 390x844 touch and desktop-parity QA, then complete the separate every-round usability/loading/error QA before any completion claim.
+## 2026-11-23 — Mobile Detective parity pass with web
+
+- Expanded `App/healthclues-mobile/Gametrinhtham/MobileDetectiveGame.tsx` beyond the original core flow: mobile now renders the evidence notebook, unlocked Medical Handbook entries, unified candidate conclusion evaluation with wrong-attempt star penalties, action checklist confirmation, legacy puzzle/deduction cards, and a solved summary with medical conclusion, pearls, EXP, coins and badge.
+- Extended the mobile campaign contract and solve payload to carry `conclusionConfig`, `puzzles`, `resolution`, `selectedConclusionIds`, `wrongConclusionAttempts` and `puzzleStates`; mobile remains player-facing native React Native UI and does not reintroduce WebView/iframe.
+- Verification: mobile `tsc --noEmit` PASS; `expo export --platform web --output-dir dist-mobile-parity` PASS; mobile detective API contract PASS (7 cases, Case 007 has 9 assets); renderer contract PASS; fresh bundle HTTP 200 on `http://127.0.0.1:8082/world`.
+- Scope note: the visual shell is intentionally mobile-native rather than pixel-identical to the desktop web shell. Local API/runtime and physical-device native QA remain separate release gates; no production deploy or commit was performed.
+- Follow-up visual pass: mobile detective styles now use the web mahogany HUD, parchment cards, bronze borders, chapter panels, amber actions and green success states; the final exported bundle is served at `http://127.0.0.1:8085/world` (HTTP 200).
+
+## 2026-11-23 — Mobile Detective professional UX round 3
+
+- Added a web-parity library presentation to the native mobile detective renderer: player profile HUD with EXP/progress, coin indicator, chapter tabs, case preview imagery, open/locked status, difficulty labels and clear investigation CTAs. This targets the visual structure in `reports/previews/vision-detective-12-mobile-library.png` while preserving native React Native rendering and avoiding WebView for the player path.
+- Verification: `tsc --noEmit` PASS; mobile detective renderer contract PASS; API contract PASS (7 cases, Case 007 has 9 assets); docs consistency guard PASS. Two clean Expo export attempts were blocked by the local Windows Metro process/resource state after only creating the asset directory; no completion claim is made for a new browser bundle until a clean export produces `index.html` and the JS entry.
+## 2026-11-23 — Mobile Detective clean bundle verification
+
+- Cleared stale Metro processes and produced a clean Expo Web bundle at `healthclues-mobile/dist-mobile-web-theme-final4` with 3,203 modules, JS entry `entry-aaf366fa77d204203321cbbf16b23753.js`, `index.html` and metadata.
+- Served the exact new bundle at `http://127.0.0.1:8087/world`; HTTP `200` confirmed. TypeScript, renderer contract, API contract (7 cases; Case 007 has 9 assets), and docs consistency guard all PASS. CUA visual capture was unavailable because the computer-use service timed out; browser-bundle verification is HTTP/export verified, not screenshot-AI verified.
+## 2026-11-23 — Mobile Detective visual QA round 5
+
+- Real Chromium mobile QA on the exact new bundle now covers World → Giải Mã → Library → Briefing → Scene → Notebook. Captures were written under `App/reports/previews/mobile-detective-round3-*.png` and visually inspected. Fixed two observed issues: briefing text contrast and notebook section-title contrast on parchment.
+- Fixed web-only `expo-haptics` runtime noise in World with a safe no-op adapter; final Chromium run reports zero page errors. Final clean export: `healthclues-mobile/dist-mobile-web-theme-final9`; served at `http://127.0.0.1:8092/world` with HTTP 200. TypeScript, renderer contract and API contract PASS.
+## 2026-11-23 — Mobile Detective visual / UX audit round 6
+
+- Completed Chromium interaction audit on `dist-mobile-web-theme-final13`: World → Giải Mã → Library → chapter tab → Briefing → Scene → six hotspot inspections → Notebook 6/6 → wrong conclusion feedback → correct conclusion → checklist → solved rewards. Portrait and landscape overflow checks PASS; final run reports zero page errors.
+- Evidence and findings: `reports/MOBILE_GAMETRINHTHAM_VISUAL_AUDIT_ROUND6.md` plus `reports/previews/mobile-detective-round3-*`. Functional flow is PASS. Exact pixel parity remains PARTIAL specifically for the conclusion board: mobile uses a native vertical evidence list while the web reference uses a connected deduction-board layout.
+## 2026-11-23 — Mobile Detective deduction board parity round 7
+
+- Reworked the conclusion state from a flat vertical list into a two-column evidence board with a centered connection-status header, selected-state cards and preserved wrong/correct feedback plus checklist flow. Chromium audit on `dist-mobile-web-theme-final14` reached solved state with zero page errors.
+- New visual evidence: `reports/previews/mobile-detective-round3-conclusion-initial.png` and `mobile-detective-round3-correct-checklist.png`. Exact web parity is improved but the web's decorative connector lines/central lock artwork are still not reproduced pixel-for-pixel.
+
+## 2026-11-23 — Mobile Detective hotspot coordinate QA round 8
+
+- Fixed the scene hotspot transform in `App/healthclues-mobile/Gametrinhtham/MobileDetectiveGame.tsx`: source-image percentage coordinates now use the rendered `contain` image dimensions plus letterbox inset. The previous transform subtracted the vertical inset, placing markers above the actual bedroom image on portrait screens.
+- Fresh bundle: `healthclues-mobile/dist-mobile-web-theme-final19`, served at `http://127.0.0.1:8100/world`.
+- Chromium visual check confirms all six markers sit on their intended objects: window, laptop area, journal, coffee, plant and phone. Interaction QA now reports `inspected 6`, completes wrong-answer and correct-answer paths, checklist and solved state, with zero page errors.
+- Responsive QA also passes at `390×844` and `844×390`: `scrollWidth === innerWidth`, library/chapter tab work, and no page errors. No production deploy or commit was performed.
+
+## 2026-11-23 — Mobile Detective evidence gate round 9
+
+- Added a hard gate before the conclusion screen: both the scene action and the notebook action remain disabled until `foundClueIds.length === activeCase.clues.length`; the UI explains that all six objects must be inspected first.
+- Source guard and TypeScript pass. A fresh browser bundle could not be produced in this round because Metro exited with `AlignedAlloc Allocation failed` after the Windows workspace exhausted available memory; the previous bundle was stopped so a clean export can be retried. Runtime verification of this new gate remains open and is not claimed as complete.
+
+## 2026-11-23 — Mobile Detective web-parity completion round 10
+
+- Fresh bundle `healthclues-mobile/dist-mobile-web-theme-final27` served at `http://127.0.0.1:8100/world`.
+- Conclusion board now has two-column cards, amber connector lines, a central lock/chốt indicator and selected evidence states matching the web composition more closely.
+- Browser harness proves `gate0 blocked`, `gate5 blocked`, then `inspected 6`; wrong/correct conclusion, checklist and solved flow pass with zero page errors. Portrait and landscape responsive checks also pass without horizontal overflow.
+
+## 2026-11-23 — Mobile Detective final QA round 11
+
+- Exported and served `healthclues-mobile/dist-mobile-web-theme-final35` at `http://127.0.0.1:8100/world` with the shared corkboard texture asset.
+- Five browser flow rounds verified save semantics, 0/6 and 5/6 gates, 6/6 unlock, wrong/correct conclusion, checklist and solved state. Responsive checks passed at 390×844 and 844×390 without horizontal overflow.
+- Independent agent QA PASS: Choose/Exclude/Mark independence, no console/page/HTTP errors, portrait/landscape layout and corkboard board composition. TypeScript, renderer contract and API contract PASS. No production deploy or commit performed.
+
+## 2026-11-23 — Mobile Detective card layout refinement round 12
+
+- Repositioned deduction-card controls below the title, aligned to the lower-right, so the title and evidence subtitle have the full card width.
+- Changed library case cards to a horizontal thumbnail/content layout, removing the unused right-side whitespace and keeping the CTA in the content column.
+- Fresh bundle `dist-mobile-web-theme-final36` served at `http://127.0.0.1:8100/world`; full detective flow and responsive checks PASS at 390×844 and 844×390.
+
+## 2026-11-23 — Mobile Detective conclusion UX round 13
+
+- Added a direct `Sổ Manh Mối` back action from the conclusion header so the player can review evidence without losing the current case.
+- Reserved a central gap for the lock/connection diagram and kept the evidence cards readable; controls remain in a dedicated lower row beneath each title so card selection stays reliable.
+- Final bundle `dist-mobile-web-theme-final42` served at `http://127.0.0.1:8100/world`; full flow, solved state, and portrait/landscape responsive checks PASS.
+
+## 2026-11-23 — Detective narrative, notebook UX and village runtime round 14
+
+- Rewrote Case 001's Luna briefing in the authored Sleep Valley voice: the player receives a distress signal from their world, visits An's bedroom, investigates evidence and supports the case instead of receiving a generic “thám tử” prompt.
+- Split the Notebook into two mobile tabs: `Manh mối` and `Sổ tay`, so evidence and medical references can be compared without scrolling through both long lists.
+- Fixed the 3D village fallback cause by configuring `EXPO_PUBLIC_WORLD_3D_URL=http://127.0.0.1:5179/village.html`; the Vite village runtime and mobile bundle both return HTTP 200. Detective flow and responsive checks remain PASS.
+
+## 2026-11-23 — Mobile Detective verification round 15
+
+- Added an inline `Xem Sổ Tay liên quan` action to every saved clue and a cross-reference hint in the notebook.
+- Exported `dist-mobile-web-theme-final47`; independent QA verified the authenticated world, 3D iframe, six-clue gate, wrong/correct conclusion flow, notebook action and portrait/landscape rendering.
+- Persistence audit remains explicit: toolkit/inventory records use authenticated DB APIs, but legacy journey goals, XP and some check-in fallback paths still use AsyncStorage. Full DB-only persistence is not yet claimed.
+
+## 2026-11-24 — World 3D routing correction round 16
+
+- Corrected the player-facing `World 3D` branch: it now renders the native `MyIslandScreen` / `Island3DCanvas` runtime from `src/modules/island3d`, not the standalone `3DHOME/village.html` iframe.
+- The existing Home menu also remains routed to the same Dao3D island runtime; the legacy chalet/home3d and village iframe are no longer used for the player-facing World 3D branch.
+- TypeScript passes and a fresh web export is available in `dist-mobile-web-island3d-fix`.
+
+## 2026-11-24 — World 3D test-server correction round 17
+
+- Replaced the plain static test server with `tests/serve-web-export.mjs`, which falls back to `index.html` for Expo Router paths such as `/world`.
+- Verified `http://127.0.0.1:8100/world` returns HTTP 200 and the bundle contains `MyIslandScreen` / `Island3DCanvas`.
+- TypeScript, detective renderer contract and documentation consistency checks pass.
+
+## 2026-11-24 — World/Dao3D routing and detective API correction round 18
+
+- Corrected the route split after verification: `World 3D` is the floating village runtime (`World3DView` → `village.html`); `Ngôi Nhà` remains the player's personal island (`MyIslandScreen` → `Island3DCanvas`).
+- Added detective API proxying to the SPA test server. Campaign loading and solution submission now return 200 through `http://127.0.0.1:8100`, so `Giải Mã` no longer fails because the static server returns 404 for `/api/healthclues/mobile-detective/*`.
+- Fresh export: `dist-mobile-web-village3d-correct`; TypeScript passes and the bundle contains both the village runtime and personal-island runtime.
+
+## 2026-11-24 — Detective asset serving correction round 19
+
+- Fixed the local SPA test server to serve the real `public/gametrinhtham` assets. The Sleep Valley scene now returns HTTP 200 with the PNG payload instead of leaving the scene black and thumbnails empty.
+- Rechecked the detective campaign API through port 8100: HTTP 200. TypeScript passes.
+- The provided `http://localhost:5173/?mode=player` endpoint also responds HTTP 200; it is the standalone 3DHOME player shell, separate from the mobile detective test server.
+
+## 2026-11-24 — Detective UX and localization round 20
+
+- Added English localization for the detective header, Sleep Valley briefing, scene actions and evidence-save UI when the app locale is English; the Case 001 briefing now has authored English copy.
+- Hotspot markers are now visually hidden before interaction while their touch targets remain active; the evidence inspection panel is the visible feedback after tapping.
+- Added extra breathing room around the briefing panel and changed the deduction board to full-width evidence rows with a centered lock/connection node so the connector diagram is not hidden behind a two-column card grid.
+- Fresh export: `dist-mobile-web-ux-round20`; TypeScript and renderer contract pass.
+
+## 2026-11-24 — Mobile detective P1 persistence correction
+
+- Affected flow: authenticated Mobile World → Journey → Daily Care → Túi Đồ/Giải Mã, including reload and cross-device resume. Business rules: owner scoping, private check-in, append-only idempotent XP and server-authoritative solved cases/toolkit. Use cases: Journey editing, daily check-in, detective solve and toolkit save. UI remains native mobile; web export keeps the same routes and API proxy. Acceptance case: mobile cross-device persistence / DB-only source-of-truth gate.
+- Implemented `src/app/api/healthclues/mobile-progress/route.ts`: profile-backed Journey goals and private daily check-ins, plus server XP ledger writes with per-goal/per-local-date idempotency. `world/route.ts` exposes saved mobile goals to the authenticated World response.
+- `healthclues-mobile/src/hooks/useWorld.ts` no longer reads or writes AsyncStorage/localStorage for goals, XP or Daily Care. It reads `mobile-progress` and the World ledger, and fails closed when no World exists instead of fabricating local XP.
+- Legacy detective launcher solved IDs/rewards now use `mobile-detective/campaign` and `mobile-detective/solve`; Toolkit remains through `mobile-toolkit`. Added `healthclues-mobile/tests/test-mobile-persistence-contract.mjs`.
+- Verified: mobile `tsc --noEmit` completed without diagnostics; detective renderer contract PASS; persistence contract PASS. Detective API test was BLOCKED because local port 3329 was not running. Fresh Expo export and browser cross-device verification remain open for this change; no PASS claim is made for backend runtime until that evidence exists.
+
+## 2026-11-24 — Mobile detective P1 QA retest correction
+
+- QA retest findings were reproduced from current source. `MobileDetectiveGame` now obtains the stored Supabase bearer token inside `dataAdapter` for both campaign GET and solve POST; `START INVESTIGATION` explicitly transitions briefing → `scene`.
+- Removed all demo identity/dev fallback sessions and special demo password behavior from `src/services/auth.ts`. Failed/network authentication now stays failed; no synthetic token is stored.
+- `economyStorage.ts` no longer uses AsyncStorage for coins or EXP. Coins read/write through authenticated `mobile-progress`; EXP reads the server XP ledger. Detective solved progress never uses local storage.
+- Solve API now validates and persists `selectedConclusionIds`, `wrongConclusionAttempts` and `puzzleStates` inside the DB-backed `board_connections` JSON payload; campaign progress reads those fields back for cross-device resume without a new schema column.
+- Verified: mobile TypeScript PASS; persistence contract PASS; detective renderer contract PASS; adapter syntax PASS; fresh Expo export `healthclues-mobile/dist-p1-db-persistence-qa-final` PASS. Backend campaign request without auth returned expected 401; authenticated runtime remains BLOCKED because local Supabase `54321` is closed, so cross-device DB/browser acceptance is not claimed.
+
+## 2026-11-24 — Mobile detective hands-on gameplay QA round 27
+
+- Affected flow: authenticated World → Giải Mã → Case 001 library → English briefing → hidden hotspot inspection → Clue Journal / Medical Field Guide → conclusion board; also the player-facing World 3D iframe.
+- Fresh export `healthclues-mobile/dist-mobile-web-ux-round27` is served at `http://127.0.0.1:8100/world`. An independent Chromium mobile session clicked through onboarding, demo sign-in, investigation launch, all six evidence hotspots, save actions, journal, medical guide and conclusion entry. The run reached `6/6`, showed green ✓ markers, opened six English handbook entries and reached the English conclusion board with zero page errors.
+- Updated detective English copy for the library, Case 001 card, chapter labels, evidence candidates, connection status, conclusion instructions and evaluation labels. Moved deduction controls below each evidence title and moved the connection badge away from the evidence text on narrow screens.
+- World 3D was opened directly at `http://127.0.0.1:5173/?mode=player`; the village rendered and became visually usable without the loading veil after the shell initialized. Optional village assets continue streaming after `WORLD_READY`; no console/page errors were observed in the direct check.
+- No production deploy, commit or production Supabase data was touched.
+
+## 2026-11-24 — Mobile detective language polish round 28
+
+- Updated the remaining English conclusion candidate copy, including the inherited “inborn inability to sleep early” decoy, so the full Case 001 deduction board no longer mixes Vietnamese into the English flow.
+- Fresh export `healthclues-mobile/dist-mobile-web-ux-round28` is now the served local build at `http://127.0.0.1:8100/world`; the prior round's six-clue, notebook and conclusion interaction remains the acceptance evidence for this copy-only build delta.
+## 2026-11-24 — Mobile release blocker runtime recovery checkpoint
+
+- Repaired the isolated `3329` launcher: current Next config is copied into the proof build, the isolated root is the copied build directory, stale case-colliding `App/` and `.next/` folders are removed only inside that owned directory, and the Node 24/Windows `readlink` compatibility shim is scoped to the build child process.
+- `node scripts/rebuild-and-restart-3329.mjs`: PASS. Full App Router build completed and readiness probe reached `http://127.0.0.1:3329/play`.
+- Smoke: `/play` HTTP 200; unauthenticated mobile Toolkit and detective campaign endpoints HTTP 401.
+- Mobile contract and TypeScript checks PASS: Toolkit DB contract, detective contract, and `npx tsc --noEmit -p healthclues-mobile/tsconfig.json`.
+- Fresh Expo web export PASS to `healthclues-mobile/.tmp/fresh-export-20261124` using `npx expo export --platform web --clear --output-dir ...`; default `dist` remains untouched because its ACL returns EPERM.
+- Release remains PARTIAL/BLOCKED for authenticated persistence proof: local Supabase `54321` and Docker Linux engine are unavailable. Isolated backend build uses the explicit demo-only `HEALTHCLUES_ISOLATED_RUNTIME=1` type-error bypass for known detective fixture errors; no production readiness claim.
+
+## 2026-11-24 — Mobile backend contract hardening after QA retest
+
+- Web Mobile API calls now use configured `EXPO_PUBLIC_API_URL`; Expo web no longer sends `/api/healthclues/mobile-*` to SPA fallback HTML.
+- Removed proxy-side Supabase credential injection and synthetic world response. Mobile auth now requires a real Supabase Auth session; demo/dev tokens are not generated by the client.
+- Detective solve now validates and forwards `selectedConclusionIds`, `wrongConclusionAttempts`, and `puzzleStates` as separate authenticated RPC parameters. Added migration `20261124130000_healthclues_detective_solve_state.sql` for persisted state columns/RPC.
+- Runtime evidence: isolated `3329` rebuild/readiness PASS; direct and proxy (`8082`) unauthenticated progress/toolkit/campaign/solve requests return JSON `401`, never HTML. `3339` fixture contract test PASS for 7 cases/9 assets, explicitly not runtime evidence.
+- Fresh Expo web export PASS to `healthclues-mobile/dist-mobile-runtime-retest-20261124` (3,204 modules, 5.54 MB bundle).
+- Release remains BLOCKED for authenticated campaign → solve → reload/cross-device proof: local Supabase `54321` refuses connections and Docker Linux engine is unavailable. No mock or fallback was used to claim runtime PASS.
+

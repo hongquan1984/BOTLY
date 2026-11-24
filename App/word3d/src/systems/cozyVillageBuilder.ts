@@ -192,9 +192,9 @@ export function buildCozyVillage(): CozyVillageBuildResult {
 
   const islandMat = new THREE.MeshStandardMaterial({
     vertexColors: true,
-    roughness: 0.86,
+    roughness: 0.82,
     metalness: 0.02,
-    flatShading: true,
+    flatShading: false,
   });
 
   const islandMesh = new THREE.Mesh(terrainGeo, islandMat);

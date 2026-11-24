@@ -94,9 +94,10 @@ export const World3DView: React.FC<World3DViewProps> = ({
     }
   }, [highlightLandmark, isLoading]);
 
-  // World must use the standalone floating-village runtime from word3d.
+  // World must use the standalone floating-village runtime from word3d (port 5173).
   // Port 5179 belongs to the separate Chalet/Home experience.
-  const playerModeUrl = "http://localhost:5173/?mode=player";
+  const playerModeUrl = process.env.EXPO_PUBLIC_WORLD_3D_URL?.trim() ||
+    (Platform.OS === "web" ? "http://localhost:5173/?mode=player" : null);
 
   // PostMessage listener on Web
   useEffect(() => {
@@ -153,7 +154,7 @@ export const World3DView: React.FC<World3DViewProps> = ({
   const handleRetry = () => {
     setHasError(false);
     setIsLoading(true);
-    if (Platform.OS === "web" && iframeRef.current) {
+    if (Platform.OS === "web" && iframeRef.current && playerModeUrl) {
       iframeRef.current.src = playerModeUrl;
     } else if (webViewRef.current) {
       webViewRef.current.reload();
@@ -162,7 +163,7 @@ export const World3DView: React.FC<World3DViewProps> = ({
 
   return (
     <View style={styles.container}>
-      {Platform.OS === "web" ? (
+      {Platform.OS === "web" && playerModeUrl ? (
         <iframe
           ref={iframeRef}
           src={playerModeUrl}
@@ -185,6 +186,16 @@ export const World3DView: React.FC<World3DViewProps> = ({
           }}
         />
       ) : (
+        <View style={styles.nativeFallback}>
+          <AlertCircle size={38} color="#f59e0b" />
+          <Text style={styles.fallbackTitle}>Làng 3D chưa được cấu hình</Text>
+          <Text style={styles.fallbackSubtitle}>Bạn vẫn có thể tiếp tục dùng các chức năng của Xứ Sở Sức Khỏe.</Text>
+        </View>
+      )}
+
+      {/* Native fallback for a configured URL is kept below; mobile apps should
+          use the platform-specific WebView only when a real configured URL exists. */}
+      {Platform.OS !== "web" && playerModeUrl ? (
         (() => {
           // Dynamic require for react-native-webview on native platforms
           const { WebView } = require("react-native-webview");
@@ -205,10 +216,10 @@ export const World3DView: React.FC<World3DViewProps> = ({
             />
           );
         })()
-      )}
+      ) : null}
 
       {/* Loading Overlay */}
-      {isLoading && !hasError && (
+      {isLoading && !hasError && !!playerModeUrl && (
         <View style={styles.loadingOverlay} pointerEvents="none">
           <ActivityIndicator size="large" color={colors.emeraldLight} />
           <Text style={styles.loadingTitle}>
@@ -255,6 +266,27 @@ const styles = StyleSheet.create({
   webView: {
     flex: 1,
     backgroundColor: "transparent",
+  },
+  nativeFallback: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 28,
+    gap: 10,
+  },
+  fallbackTitle: {
+    fontFamily: fonts.uiBold,
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#f59e0b",
+    textAlign: "center",
+  },
+  fallbackSubtitle: {
+    fontFamily: fonts.ui,
+    fontSize: 13,
+    color: "rgba(255, 255, 255, 0.75)",
+    textAlign: "center",
+    lineHeight: 18,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,

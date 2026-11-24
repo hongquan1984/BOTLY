@@ -96,6 +96,12 @@ export interface CheckinResult {
   xp_total: number;
 }
 
+export interface MobileProgressResponse {
+  goals: Array<Record<string, any>>;
+  todayCheckin: { localDate: string; statuses: Record<string, "done" | "not_yet" | "skipped">; stars: number; note: string; submitted: true; timestamp: string } | null;
+  coins: number;
+}
+
 export async function fetchWorld(): Promise<WorldApiResponse> {
   return apiFetch<WorldApiResponse>("/api/healthclues/world");
 }
@@ -107,6 +113,30 @@ export async function submitDailyCheckin(
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export async function fetchMobileProgress(): Promise<MobileProgressResponse> {
+  return apiFetch<MobileProgressResponse>("/api/healthclues/mobile-progress");
+}
+
+export async function saveMobileGoals(goals: Array<Record<string, any>>): Promise<MobileProgressResponse> {
+  return apiFetch<MobileProgressResponse>("/api/healthclues/mobile-progress", { method: "POST", body: JSON.stringify({ action: "save_goals", goals }) });
+}
+
+export async function saveMobileCheckin(payload: { localDate: string; statuses: Record<string, "done" | "not_yet" | "skipped">; stars: number; note?: string }): Promise<{ checkin: MobileProgressResponse["todayCheckin"]; xpTotal: number }> {
+  return apiFetch<{ checkin: MobileProgressResponse["todayCheckin"]; xpTotal: number }>("/api/healthclues/mobile-progress", { method: "POST", body: JSON.stringify({ action: "save_checkin", ...payload }) });
+}
+
+export async function addMobileCoins(amount: number): Promise<number> {
+  const result = await apiFetch<{ coins: number }>("/api/healthclues/mobile-progress", { method: "POST", body: JSON.stringify({ action: "add_coins", amount }) });
+  return result.coins;
+}
+
+export async function spendMobileCoins(amount: number): Promise<boolean> {
+  try {
+    await apiFetch<{ coins: number }>("/api/healthclues/mobile-progress", { method: "POST", body: JSON.stringify({ action: "spend_coins", amount }) });
+    return true;
+  } catch { return false; }
 }
 
 export async function updateProfile(payload: {

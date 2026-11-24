@@ -26,58 +26,7 @@ export async function signInWithEmailPassword(
 ): Promise<MobileSession> {
   const cleanEmail = email.trim().toLowerCase();
 
-  // Try authenticating with Supabase for real session
-  try {
-    const url = `${getSupabaseUrl().replace(/\/$/, "")}/auth/v1/token?grant_type=password`;
-    const passwordToUse = (cleanEmail === "player@botly.vn" && (!pass || pass.trim() === "123456" || pass.trim() === "Password123!"))
-      ? "Password123!"
-      : pass;
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: authHeaders(),
-      body: JSON.stringify({ email: cleanEmail, password: passwordToUse }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      const session: MobileSession = {
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-        expires_at: data.expires_at || Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
-        user: {
-          id: data.user.id,
-          email: data.user.email,
-        },
-      };
-
-      await storeSession(session);
-      return session;
-    }
-  } catch (e) {
-    // Continue to fallback
-  }
-
-  // Fast path for test/demo credentials fallback
-  if (
-    cleanEmail === "player@botly.vn" ||
-    cleanEmail === "demo@botly.vn" ||
-    cleanEmail === "tester@botly.vn" ||
-    cleanEmail === "admin@botly.vn"
-  ) {
-    const demoSession: MobileSession = {
-      access_token: "demo-jwt-token-" + Date.now(),
-      refresh_token: "demo-refresh-token",
-      expires_at: Math.floor(Date.now() / 1000) + 86400 * 30, // 30 days
-      user: {
-        id: "0e89703a-218c-443c-ae92-eb2a61749c7c",
-        email: cleanEmail,
-      },
-    };
-    await storeSession(demoSession);
-    return demoSession;
-  }
-
+  // Every player session must be issued by Supabase Auth.
   try {
     const url = `${getSupabaseUrl().replace(/\/$/, "")}/auth/v1/token?grant_type=password`;
     const response = await fetch(url, {
@@ -88,43 +37,19 @@ export async function signInWithEmailPassword(
 
     if (!response.ok) {
       let message = "Đăng nhập thất bại";
-      try {
-        const err = await response.json();
-        message = err.error_description || err.msg || err.error || message;
-      } catch {}
+      try { const err = await response.json(); message = err.error_description || err.msg || err.error || message; } catch {}
       throw new Error(message);
     }
-
     const data = await response.json();
     const session: MobileSession = {
       access_token: data.access_token,
       refresh_token: data.refresh_token,
       expires_at: data.expires_at || Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
-      user: {
-        id: data.user.id,
-        email: data.user.email,
-      },
+      user: { id: data.user.id, email: data.user.email },
     };
-
     await storeSession(session);
     return session;
-  } catch (err: any) {
-    // If network / CORS error ("Failed to fetch"), provide safe local session for development testing
-    if (err.name === "TypeError" || err.message?.includes("fetch") || err.message?.includes("Failed")) {
-      const fallbackSession: MobileSession = {
-        access_token: "dev-fallback-token-" + Date.now(),
-        refresh_token: "dev-fallback-refresh",
-        expires_at: Math.floor(Date.now() / 1000) + 86400 * 30,
-        user: {
-          id: "dev-player-" + Date.now(),
-          email: cleanEmail,
-        },
-      };
-      await storeSession(fallbackSession);
-      return fallbackSession;
-    }
-    throw err;
-  }
+  } catch (err) { throw err; }
 }
 
 export async function signUpWithEmailPassword(

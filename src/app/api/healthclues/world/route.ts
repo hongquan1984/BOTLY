@@ -63,7 +63,8 @@ export async function GET(request: Request) {
       return candidate.worldId === world.id && Number.isInteger(candidate.version) && Array.isArray(candidate.goals) && (typeof candidate.contextKey !== "string" || candidate.contextKey === currentContextKey);
     }) as Array<{ worldId: string; version: number; goals: unknown[]; confirmedAt: string }> : [];
     const wellnessPlan = eligiblePlans.sort((a, b) => b.version - a.version)[0] ?? null;
-    return NextResponse.json({ world, branches, journeys, entries, collection, entryEvents, checkins, usage, xpTotal: xp.reduce((sum, row) => sum + row.amount, 0), knowledgeCurrencies, rewards: rewardDetails, milestones, unlocks, wellnessPlan }, { headers: noStore });
+    const mobileJourneyGoals = Array.isArray(currentProfile?.mobileJourneyGoals) ? currentProfile.mobileJourneyGoals : null;
+    return NextResponse.json({ world, branches, journeys, entries, collection, entryEvents, checkins, usage, xpTotal: xp.reduce((sum, row) => sum + row.amount, 0), knowledgeCurrencies, rewards: rewardDetails, milestones, unlocks, wellnessPlan: wellnessPlan && mobileJourneyGoals ? { ...wellnessPlan, goals: mobileJourneyGoals } : wellnessPlan }, { headers: noStore });
   } catch {
     return NextResponse.json({ error: "Your Wellness World could not be loaded. Please try again." }, { status: 503, headers: noStore });
   }

@@ -1,20 +1,31 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DeviceEventEmitter } from "react-native";
+import { apiFetch } from "./api";
 
-export const STORAGE_KEY_HERBS = "hc_mobile_botanical_bookmarks";
-export const STORAGE_KEY_SOUNDS = "hc_mobile_toolkit_sounds";
-export const STORAGE_KEY_BREATHS = "hc_mobile_toolkit_breaths";
 export const TOOLKIT_CHANGE_EVENT = "HEALTHCLUES_TOOLKIT_CHANGED";
 
+type ToolkitType = "herb" | "sound" | "breath";
+type ToolkitState = { herbs: string[]; sounds: string[]; breaths: string[] };
+
+async function loadToolkit(): Promise<ToolkitState> {
+  return apiFetch<ToolkitState>("/api/healthclues/mobile-toolkit");
+}
+
+async function mutateToolkit(action: "save" | "remove", itemType: ToolkitType, itemId: string): Promise<string[]> {
+  await apiFetch("/api/healthclues/mobile-toolkit", { method: "POST", body: JSON.stringify({ action, itemType, itemId }) });
+  const state = await loadToolkit();
+  const ids = state[`${itemType}s` as "herbs" | "sounds" | "breaths"];
+  DeviceEventEmitter.emit(TOOLKIT_CHANGE_EVENT, { type: `${itemType}s`, ids });
+  return ids;
+}
+
 export const toolkitStorage = {
+  async getState(): Promise<ToolkitState> {
+    return loadToolkit();
+  },
+
   // Sounds
   async getSavedSoundIds(): Promise<string[]> {
-    try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY_SOUNDS);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+    return (await loadToolkit()).sounds;
   },
   async isSoundSaved(id: string): Promise<boolean> {
     const ids = await this.getSavedSoundIds();
@@ -23,19 +34,12 @@ export const toolkitStorage = {
   async saveSound(id: string): Promise<string[]> {
     const ids = await this.getSavedSoundIds();
     if (!ids.includes(id)) {
-      const updated = [...ids, id];
-      await AsyncStorage.setItem(STORAGE_KEY_SOUNDS, JSON.stringify(updated));
-      DeviceEventEmitter.emit(TOOLKIT_CHANGE_EVENT, { type: "sounds", ids: updated });
-      return updated;
+      return mutateToolkit("save", "sound", id);
     }
     return ids;
   },
   async removeSound(id: string): Promise<string[]> {
-    const ids = await this.getSavedSoundIds();
-    const updated = ids.filter((item) => item !== id);
-    await AsyncStorage.setItem(STORAGE_KEY_SOUNDS, JSON.stringify(updated));
-    DeviceEventEmitter.emit(TOOLKIT_CHANGE_EVENT, { type: "sounds", ids: updated });
-    return updated;
+    return mutateToolkit("remove", "sound", id);
   },
   async toggleSound(id: string): Promise<{ saved: boolean; ids: string[] }> {
     const ids = await this.getSavedSoundIds();
@@ -50,12 +54,7 @@ export const toolkitStorage = {
 
   // Breaths
   async getSavedBreathIds(): Promise<string[]> {
-    try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY_BREATHS);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+    return (await loadToolkit()).breaths;
   },
   async isBreathSaved(id: string): Promise<boolean> {
     const ids = await this.getSavedBreathIds();
@@ -64,19 +63,12 @@ export const toolkitStorage = {
   async saveBreath(id: string): Promise<string[]> {
     const ids = await this.getSavedBreathIds();
     if (!ids.includes(id)) {
-      const updated = [...ids, id];
-      await AsyncStorage.setItem(STORAGE_KEY_BREATHS, JSON.stringify(updated));
-      DeviceEventEmitter.emit(TOOLKIT_CHANGE_EVENT, { type: "breaths", ids: updated });
-      return updated;
+      return mutateToolkit("save", "breath", id);
     }
     return ids;
   },
   async removeBreath(id: string): Promise<string[]> {
-    const ids = await this.getSavedBreathIds();
-    const updated = ids.filter((item) => item !== id);
-    await AsyncStorage.setItem(STORAGE_KEY_BREATHS, JSON.stringify(updated));
-    DeviceEventEmitter.emit(TOOLKIT_CHANGE_EVENT, { type: "breaths", ids: updated });
-    return updated;
+    return mutateToolkit("remove", "breath", id);
   },
   async toggleBreath(id: string): Promise<{ saved: boolean; ids: string[] }> {
     const ids = await this.getSavedBreathIds();
@@ -91,12 +83,7 @@ export const toolkitStorage = {
 
   // Herbs
   async getSavedHerbIds(): Promise<string[]> {
-    try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY_HERBS);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+    return (await loadToolkit()).herbs;
   },
   async isHerbSaved(id: string): Promise<boolean> {
     const ids = await this.getSavedHerbIds();
@@ -105,19 +92,12 @@ export const toolkitStorage = {
   async saveHerb(id: string): Promise<string[]> {
     const ids = await this.getSavedHerbIds();
     if (!ids.includes(id)) {
-      const updated = [...ids, id];
-      await AsyncStorage.setItem(STORAGE_KEY_HERBS, JSON.stringify(updated));
-      DeviceEventEmitter.emit(TOOLKIT_CHANGE_EVENT, { type: "herbs", ids: updated });
-      return updated;
+      return mutateToolkit("save", "herb", id);
     }
     return ids;
   },
   async removeHerb(id: string): Promise<string[]> {
-    const ids = await this.getSavedHerbIds();
-    const updated = ids.filter((item) => item !== id);
-    await AsyncStorage.setItem(STORAGE_KEY_HERBS, JSON.stringify(updated));
-    DeviceEventEmitter.emit(TOOLKIT_CHANGE_EVENT, { type: "herbs", ids: updated });
-    return updated;
+    return mutateToolkit("remove", "herb", id);
   },
   async toggleHerb(id: string): Promise<{ saved: boolean; ids: string[] }> {
     const ids = await this.getSavedHerbIds();

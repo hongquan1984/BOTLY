@@ -1,4 +1,4 @@
-import { cpSync, existsSync, openSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, openSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import nextEnv from "@next/env";
@@ -8,15 +8,21 @@ const demoRoot = path.join(root, "App", ".tmp", "healthclues-owner-demo");
 const buildDir = path.join(demoRoot, "proof-title-20261105");
 const pidFile = path.join(demoRoot, "next-proof-title-20261105.pid");
 const nextBin = path.join(root, "node_modules", "next", "dist", "bin", "next");
+const node24ReadlinkShim = path.join(root, "scripts", "next-node24-readlink-shim.cjs");
 
 console.log("=== REBUILDING PROOF-TITLE-20261105 ===");
+
+// This build directory is an owned isolated proof workspace. Remove only its
+// stale case-colliding App copy and prior Next output before syncing source.
+rmSync(path.join(buildDir, "App"), { recursive: true, force: true });
+rmSync(path.join(buildDir, ".next"), { recursive: true, force: true });
 
 // 1. Sync updated src
 cpSync(path.join(root, "src"), path.join(buildDir, "src"), { recursive: true, force: true });
 cpSync(path.join(root, "public", "gametrinhtham"), path.join(buildDir, "public", "gametrinhtham"), { recursive: true, force: true });
 cpSync(path.join(root, "App", "gametrinhtham"), path.join(buildDir, "gametrinhtham"), { recursive: true, force: true });
-cpSync(path.join(root, "App", "gametrinhtham"), path.join(buildDir, "App", "gametrinhtham"), { recursive: true, force: true });
 cpSync(path.join(root, "tsconfig.json"), path.join(buildDir, "tsconfig.json"), { force: true });
+cpSync(path.join(root, "next.config.ts"), path.join(buildDir, "next.config.ts"), { force: true });
 
 let runtimePub = "";
 let runtimeSecret = "";
@@ -31,15 +37,23 @@ const loadedEnv = nextEnv.loadEnvConfig(root).combinedEnv;
 const buildEnv = {
   ...loadedEnv,
   NODE_ENV: "production",
-  HEALTHCLUES_TURBOPACK_ROOT: root,
+  HEALTHCLUES_ISOLATED_RUNTIME: "1",
+  // The copied source lives in buildDir. Point Next's project root there so
+  // src/app is discovered; using the repository root builds only _global-error
+  // and leaves the listening server returning 500 for every app route.
+  HEALTHCLUES_TURBOPACK_ROOT: buildDir,
   NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: runtimePub || loadedEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   SUPABASE_SECRET_KEY: runtimeSecret || loadedEnv.SUPABASE_SECRET_KEY,
 };
+buildEnv.NODE_OPTIONS = [
+  buildEnv.NODE_OPTIONS,
+  `--require=${node24ReadlinkShim}`,
+].filter(Boolean).join(" ");
 delete buildEnv.HEALTHCLUES_BUILD_DIST_DIR;
 
 console.log("Running next build in", buildDir);
-const buildResult = spawnSync(process.execPath, [nextBin, "build"], {
+const buildResult = spawnSync(process.execPath, [nextBin, "build", "--webpack"], {
   cwd: buildDir,
   env: buildEnv,
   stdio: "inherit",

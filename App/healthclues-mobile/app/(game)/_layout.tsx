@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { fetchMobileProgress } from "@/services/healthclues";
+import { getStoredSession } from "@/services/api";
 import {
   Compass,
   Home,
@@ -65,27 +67,20 @@ export default function GameLayout() {
       month: "2-digit",
       day: "2-digit",
     }).format(new Date());
-    AsyncStorage.getItem(`healthclues-checkin-${today}`)
-      .then((val) => {
-        if (val) {
-          try {
-            const parsed = JSON.parse(val);
-            setPendingCheckin(!parsed.submitted);
-            return;
-          } catch {}
-        }
-        setPendingCheckin(true);
-      })
-      .catch(() => {});
+    fetchMobileProgress()
+      .then((progress) => setPendingCheckin(!progress.todayCheckin?.submitted || progress.todayCheckin.localDate !== today))
+      .catch(() => setPendingCheckin(true));
   }, []);
 
   useEffect(() => {
     let isMounted = true;
-    AsyncStorage.getItem("healthclues-onboarding-completed")
-      .then((completed) => {
+    Promise.all([AsyncStorage.getItem("healthclues-onboarding-completed"), getStoredSession()])
+      .then(([completed, session]) => {
         if (!isMounted) return;
         if (completed !== "true") {
           router.replace("/(onboarding)/quiz");
+        } else if (!session?.access_token) {
+          router.replace("/(auth)/login");
         } else {
           setCheckingQuiz(false);
         }

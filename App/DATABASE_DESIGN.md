@@ -260,3 +260,7 @@ No new table or migration is required for the initial player preference. Anonymo
 ### 2026-11-03: existing JSONB Plan context binding
 
 Saved Plan snapshots in the existing HealthClues profile JSON may carry an optional SHA-256 contextKey derived from canonical concern/factor IDs and relevant discovery context. The key lets World and Plan reads select a revision that matches the current Quiz without storing a second raw answer copy. During a verified profile update, legacy snapshots are tagged with the previous context key while all Plan history and account preferences are retained. This is an additive JSON field; no table, column, migration, seed or reset is introduced.
+## Mobile Toolkit Bag — 2026-11-22
+
+`public.healthclues_mobile_toolkit_items` stores the authenticated mobile library selections for `herb`, `sound` and `breath` items. The composite primary key `(user_id, item_type, item_id)` makes save idempotent and prevents duplicates. The mobile API route uses server-side authentication and service-role access with an explicit `user_id` filter; the client does not receive database credentials and does not persist toolkit items in device storage.
+

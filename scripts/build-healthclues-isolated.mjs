@@ -7,9 +7,14 @@ import nextEnv from "@next/env";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const nextBin = path.join(projectRoot, "node_modules", "next", "dist", "bin", "next");
+const node24ReadlinkShim = path.join(projectRoot, "scripts", "next-node24-readlink-shim.cjs");
 
 if (process.env.VERCEL) {
-  const result = spawnSync(process.execPath, [nextBin, "build"], {
+  // Turbopack 16.3 currently fails to resolve next/font/google's generated
+  // internal font module in this isolated Windows workspace. Keep the
+  // production build strict, but use webpack for this guarded build so the
+  // generated server can be exercised in the supported isolated layout.
+  const result = spawnSync(process.execPath, [nextBin, "build", "--webpack"], {
     cwd: projectRoot,
     env: { ...process.env, NODE_ENV: "production" },
     stdio: "inherit",
@@ -25,8 +30,13 @@ const buildRoot = mkdtempSync(path.join(tempParent, "healthclues-build-"));
 const requiredFiles = ["package.json", "next.config.ts", "tsconfig.json", "postcss.config.mjs"];
 const loadedEnv = nextEnv.loadEnvConfig(projectRoot).combinedEnv;
 const buildEnv = { ...loadedEnv, NODE_ENV: "production" };
-buildEnv.HEALTHCLUES_TURBOPACK_ROOT = projectRoot;
-buildEnv.NODE_OPTIONS = (buildEnv.NODE_OPTIONS ? `${buildEnv.NODE_OPTIONS} ` : "") + "--max-old-space-size=4096";
+buildEnv.HEALTHCLUES_TURBOPACK_ROOT = buildRoot;
+buildEnv.HEALTHCLUES_ISOLATED_RUNTIME = "1";
+buildEnv.NODE_OPTIONS = [
+  buildEnv.NODE_OPTIONS,
+  "--max-old-space-size=4096",
+  `--require=${node24ReadlinkShim}`,
+].filter(Boolean).join(" ");
 delete buildEnv.HEALTHCLUES_BUILD_DIST_DIR;
 
 function cleanupOwnedBuildDirectory() {

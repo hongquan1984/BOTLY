@@ -1522,3 +1522,10 @@ On narrow mobile screens (`360x800` & `390x844`), the Expo mobile onboarding flo
    - Replaces static 2D chibi cartoon sprites with a realistic humanoid adventurer character model (76px height, leather boots, satchel, cape, hair).
    - Implements a dynamic 4-frame walk cycle (`player-human-idle.png`, `player-human-walk1.png`, `player-human-walk2.png`, `player-human-walk3.png`) with moving limbs, boots stepping, cape fluttering, and direction-aware horizontal flipping (`facingScaleAnim`).
    - Updates village NPCs to distinct realistic characters: Anna (Botanist with straw hat and herb basket), Ben (Trail Explorer with backpack and walking staff), Leo (Adventurer Companion), with magical pet fox Luna floating beside the player's shoulder.
+### Detective mobile visual QA — 2026-11-23
+
+Mobile detective screens follow the web visual language: mahogany background/header, bronze framing, parchment panels/cards, amber primary actions and green success states. Library cards expose preview imagery, difficulty, open/locked state and a clear investigation CTA; text contrast must remain readable on parchment panels.
+
+### Mobile persistence feedback — 2026-11-24
+
+Journey, Daily Care and detective screens render account data returned after authentication. Save/reload states and reward totals must reflect the server-backed profile, check-in/XP ledger and detective progress APIs; a network failure is shown as an error and must not be replaced by fabricated local progress. Toolkit loading/errors retain the existing retry UI.

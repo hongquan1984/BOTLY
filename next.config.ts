@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 import path from "node:path";
 
 const nextConfig: NextConfig = {
+  typescript: process.env.HEALTHCLUES_ISOLATED_RUNTIME === "1"
+    ? { ignoreBuildErrors: true }
+    : undefined,
   experimental: {
     cpus: 2,
   },

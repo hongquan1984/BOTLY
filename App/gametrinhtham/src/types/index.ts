@@ -25,11 +25,13 @@ export type DetectiveTopic =
   | "stress"
   | "hydration"
   | "activity"
-  | "herbal";
+  | "herbal"
+  | "cervical_ergonomics";
 
 export interface MedicalReference {
-  title: string;
-  source: string;
+  title?: string;
+  source?: string;
+  code?: string;
   pmid?: string;
   url?: string;
   summary: string;
@@ -49,13 +51,20 @@ export interface CaseClue {
   id: string;
   caseId: string;
   sceneId: string;
-  title: string;
-  shortDescription: string;
-  detailedObservation: string;
-  icon: string;
+  hotspotId?: string;
+  /** Legacy authored fields retained for chapter data normalization. */
+  name?: string;
+  description?: string;
+  category?: string;
+  status?: string;
+  discoveredIcon?: string;
+  title?: string;
+  shortDescription?: string;
+  detailedObservation?: string;
+  icon?: string;
   illustration?: string;
   source: EvidenceSource;
-  isKeyClue: boolean;
+  isKeyClue?: boolean;
   isMisdirection?: boolean; // Chi tiết đánh lạc hướng
   contradictsHypothesisIds?: string[];
   supportsHypothesisIds?: string[];
@@ -102,7 +111,7 @@ export interface DetailHotspot {
   shape?: "circle" | "rect";
   associatedClueId?: string; // Clue ID it unlocks or records
   isCrucialEvidence?: boolean; // Internal engine logic only (never rendered in player UI!)
-  category: "timestamp" | "statement" | "physical_property" | "medical_record" | "secondary_note";
+  category: "timestamp" | "statement" | "physical_property" | "physical_item" | "medical_record" | "secondary_note";
   discoveredIcon?: string;
   evidenceData?: {
     timestamp?: string;
@@ -140,6 +149,7 @@ export interface SceneHotspot {
   inspectionTitle?: string;
   inspectionSubtitle?: string;
   inspectionAsset?: string;
+  closeupImageUrl?: string;
   detailHotspots?: DetailHotspot[];
 }
 
@@ -358,12 +368,14 @@ export interface DetectiveChapter {
  */
 export interface MedicalHandbookEntry {
   id: string;
+  caseId?: string;
   unlockByClueId: string;
   topicTitle: string;
   categoryLabel: string;
   icon: string;
   generalPrinciple: string;
-  keyParameters: string[];
+  keyParameters: Array<string | { label: string; value: string }>;
+  practicalAdvice?: string;
   medicalRef?: MedicalReference;
 }
 
@@ -385,6 +397,10 @@ export interface HealthActionChecklistItem {
 }
 
 export interface UnifiedConclusionConfig {
+  caseId?: string;
+  caseTitle?: string;
+  casePrompt?: string;
+  requiredSelectionsCount?: number;
   questionPrompt: string;
   instruction: string;
   candidates: CaseCandidateFactor[];

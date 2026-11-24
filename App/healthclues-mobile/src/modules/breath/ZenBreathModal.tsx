@@ -55,19 +55,36 @@ export const ZenBreathModal: React.FC<ZenBreathModalProps> = ({
   const [currentCycle, setCurrentCycle] = useState<number>(1);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [savedBreathIds, setSavedBreathIds] = useState<string[]>([]);
+  const [toolkitLoading, setToolkitLoading] = useState(false);
+  const [toolkitError, setToolkitError] = useState<string | null>(null);
 
   const breathAnim = useRef(new Animated.Value(1.0)).current;
   const timerRef = useRef<any>(null);
 
   useEffect(() => {
     if (visible) {
-      toolkitStorage.getSavedBreathIds().then(setSavedBreathIds);
+      let isMounted = true;
+      setToolkitLoading(true);
+      setToolkitError(null);
+      toolkitStorage.getSavedBreathIds()
+        .then((ids) => { if (isMounted) setSavedBreathIds(ids); })
+        .catch(() => setToolkitError(locale === "en" ? "Your Bag could not be loaded. Check your connection and try again." : "Không thể tải Túi Đồ. Hãy kiểm tra kết nối rồi thử lại."))
+        .finally(() => { if (isMounted) setToolkitLoading(false); });
+      return () => { isMounted = false; };
     }
-  }, [visible]);
+  }, [visible, locale]);
 
   const handleToggleSaveBreathToBag = async (exercise: BreathExercise) => {
     triggerSuccessHaptic();
-    const { saved, ids } = await toolkitStorage.toggleBreath(exercise.id);
+    setToolkitError(null);
+    let result: { saved: boolean; ids: string[] };
+    try {
+      result = await toolkitStorage.toggleBreath(exercise.id);
+    } catch {
+      setToolkitError(locale === "en" ? "Could not update your Bag. Try again." : "Không thể cập nhật Túi Đồ. Hãy thử lại.");
+      return;
+    }
+    const { saved, ids } = result;
     setSavedBreathIds(ids);
     const exerciseName = locale === "en" ? (exercise.nameEn || exercise.name) : exercise.name;
     if (saved) {
@@ -301,6 +318,8 @@ export const ZenBreathModal: React.FC<ZenBreathModalProps> = ({
               <Text style={styles.toastText}>{toastMsg}</Text>
             </View>
           )}
+          {toolkitLoading && <Text style={styles.toolkitStatusText}>{locale === "en" ? "Loading your Bag…" : "Đang tải Túi Đồ…"}</Text>}
+          {toolkitError && <Text style={styles.toolkitErrorText}>{toolkitError}</Text>}
 
           {/* Sticky Aura Guardian Top Section (Always visible above scroll) */}
           <View style={styles.guardianTopSection}>
@@ -624,6 +643,18 @@ const styles = StyleSheet.create({
     padding: 6,
     borderRadius: radius.full,
     backgroundColor: "rgba(255, 255, 255, 0.05)",
+  },
+  toolkitStatusText: {
+    color: "#94a3b8",
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  toolkitErrorText: {
+    color: "#fca5a5",
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 8,
   },
   modalScroll: {
     flex: 1,

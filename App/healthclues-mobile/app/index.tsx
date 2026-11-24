@@ -24,7 +24,15 @@ export default function IndexScreen() {
           return;
         }
 
-        // If quiz completed, enter RPG World
+        // A completed quiz is not an account. Require an email/password session
+        // before entering the persistent game so Journey, Backpack and rewards
+        // cannot silently remain browser-only state.
+        if (!session?.access_token) {
+          router.replace("/(auth)/login");
+          return;
+        }
+
+        // If quiz completed and the player is authenticated, enter RPG World
         router.replace("/(game)/world");
       } catch {
         if (active) router.replace("/(onboarding)/quiz");

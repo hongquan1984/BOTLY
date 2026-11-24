@@ -1,5 +1,16 @@
 # HealthClues V1 Test Results
 
+## Game/Mobile Case 007 direct takeover checkpoint — 2026-11-19
+
+- Asset audit: 9/9 Case 007 JPGs present and mapped; six close-ups and the scene are 1200x896, two Mai reference images are 1024x1024.
+- `gametrinhtham/tests/test-deduction-engine.mjs`: PASS.
+- `gametrinhtham/tests/test-deep-inspection.mjs`: PASS after normalizing Case 007 handbook/clue fields.
+- `gametrinhtham/tests/test-random-player.mjs`: PASS anti-guessing suite; Case 007 random pass rate 0/5000.
+- `test-campaign-engine.mjs`: FAIL on stale `2 chapters` expectation; current catalog has Chapter 3.
+- `test-reasoning-player.mjs`: FAIL on stale `6 cases` expectation; current catalog has 7 registered cases.
+- Runtime: static mobile server responds on `8081`; detective owner-demo cannot start because local Auth/REST/Mailpit health checks fail and Docker is unavailable. Browser smoke also recorded React error #310, localStorage security failure and screenshot output permission failure.
+- Status: BLOCKED; no done claim, production change, deployment or commit.
+
 ## Resilient Furniture Image Upload & Dynamic Serving Verification — 2026-11-09 (Cycle 60)
 
 - **API & Dynamic Image Serving Audit (`scripts/verify-upload-fix.mjs`)**:

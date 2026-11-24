@@ -298,14 +298,25 @@ export const PlayerApp: React.FC<PlayerAppProps> = ({
       highlightedBuilding: null,
     };
     (window as any).__systems = systemsRef.current;
+    (window as any).THREE = THREE;
     (window as any).__CHARACTER__ = character;
+
+    // The playable village shell is ready at this point. Optional building
+    // models can continue streaming without covering the scene with a modal
+    // loading veil or making the host app think World 3D is unavailable.
+    setLoading(false);
+    sendToHost('WORLD_READY', { loaded: true, buildings: [] });
 
     // Load synchronized village layout from manifest / disk
     // Hard fail-safe timeout: never leave player on loading screen indefinitely if network hangs
+    // Do not block the host game on every optional building/prop asset. The
+    // village shell is already playable while the remaining models stream in;
+    // release the loading veil quickly so a slow asset cannot look like a
+    // broken or unconfigured World 3D screen.
     const safetyTimer = setTimeout(() => {
       setLoading(false);
       sendToHost('WORLD_READY', { loaded: true, buildings: [] });
-    }, 15000);
+    }, 5000);
 
     cozyVillage.readyPromise
       .then(async () => {

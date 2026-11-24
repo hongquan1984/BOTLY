@@ -5,8 +5,10 @@ import {
   CASE_FATIGUE_005,
   CASE_ELECTROLYTE_006,
 } from "./cases-chapter2.ts";
+import { CHAPTER_03, CASE_CERVICAL_007 } from "./cases-chapter3.ts";
 
-export { CHAPTER_02, CASE_REFLUX_004, CASE_FATIGUE_005, CASE_ELECTROLYTE_006 };
+export { CHAPTER_02, CASE_REFLUX_004, CASE_FATIGUE_005, CASE_ELECTROLYTE_006, CHAPTER_03, CASE_CERVICAL_007 };
+export const CASE_SLEEP_007 = CASE_CERVICAL_007;
 
 export const CHAPTER_01: DetectiveChapter = {
   id: "chapter-01",
@@ -22,7 +24,7 @@ export const CHAPTER_01: DetectiveChapter = {
   isPublished: true,
 };
 
-export const ALL_CHAPTERS: DetectiveChapter[] = [CHAPTER_01, CHAPTER_02];
+export const ALL_CHAPTERS: DetectiveChapter[] = [CHAPTER_01, CHAPTER_02, CHAPTER_03];
 
 export const CASE_SLEEP_001: DetectiveCase = {
   id: "case-sleep-001",
@@ -44,10 +46,10 @@ export const CASE_SLEEP_001: DetectiveCase = {
     avatar: "🛌",
   },
   lunaBriefing: {
-    greeting: "Chào thám tử!",
+    greeting: "Luna vừa nhận được một tín hiệu cầu cứu từ Sleep Valley.",
     invitation:
-      "An nói rằng mình bị mất ngủ do cơ địa bẩm sinh và khẳng định đã tắt điện thoại từ 22:00. Cậu cùng mình soi cận cảnh từng đồ vật trong phòng, lưu vào Sổ Manh Mối rồi đối chiếu với Sổ Tay Y Khoa nhé!",
-    hint: "Đừng vội kết luận theo cảm tính — hãy đối chiếu kỹ giờ giấc và số lượng ghi trên từng vật chứng với nguyên lý ở Sổ Tay Y Khoa.",
+      "Trong thế giới của bạn, An đang mắc kẹt trong một đêm dài không thể ngủ. Bạn ấy nghĩ đó là do cơ địa, nhưng những dấu vết còn lại trong phòng lại kể một câu chuyện khác. Hãy cùng Luna đến hiện trường, điều tra từng vật chứng, lưu lại manh mối và tìm ra điều thật sự đang cản trở giấc ngủ của An.",
+    hint: "Đừng vội tin vào lời đoán ban đầu. Hãy soi kỹ thời gian, vị trí và chi tiết trên từng vật chứng rồi đối chiếu với Sổ Tay Y Khoa.",
   },
   scenes: [
     {
@@ -297,10 +299,10 @@ export const CASE_SLEEP_001: DetectiveCase = {
           id: "hotspot-an-laptop",
           sceneId: "scene-an-bedroom",
           clueId: "clue-sleep-laptop",
-          name: "Bàn làm việc & Laptop bên trái",
-          description: "Ngọn đèn bàn vàng rực chiếu sáng chiếc laptop đang mở ở góc phòng bên trái.",
-          x: 16,
-          y: 49,
+          name: "Đèn bàn & Khu làm việc bên trái",
+          description: "Ngọn đèn bàn vàng rực chiếu sáng khu làm việc ở góc phòng bên trái.",
+          x: 6,
+          y: 43,
           radius: 7,
           shape: "polygon",
           bounds: { x: 10, y: 40.5, width: 12.5, height: 16.5 },
@@ -310,10 +312,10 @@ export const CASE_SLEEP_001: DetectiveCase = {
             { x: 22.5, y: 57 },
             { x: 10, y: 56 },
           ],
-          inspectMessage: "Đèn bàn học vẫn đang bật, màn hình laptop lưu lịch sử thao tác công việc khuya.",
-          discoveredIcon: "💻",
-          inspectionType: "laptop",
-          inspectionTitle: "Laptop & Đèn Bàn Làm Việc",
+          inspectMessage: "Đèn bàn học vẫn đang bật, khu làm việc lưu lại hoạt động công việc khuya.",
+          discoveredIcon: "💡",
+          inspectionType: "work_desk",
+          inspectionTitle: "Đèn Bàn & Khu Làm Việc",
           inspectionSubtitle: "Nhật ký công việc đêm qua",
           detailHotspots: [
             {
@@ -322,7 +324,7 @@ export const CASE_SLEEP_001: DetectiveCase = {
               title: "Hộp thư gửi báo cáo lúc 23:35 đêm qua",
               subtitle: "Hoạt động công việc muộn",
               observation:
-                "Laptop vẫn chưa tắt nguồn hoàn toàn, đèn bàn vẫn bật sáng. Lịch sử hộp thư đi ghi nhận An vừa hoàn tất bảng số liệu và gửi email báo cáo sếp lúc 23:35 đêm qua.",
+                "Đèn bàn vẫn bật sáng. Lịch sử hộp thư đi ghi nhận An vừa hoàn tất bảng số liệu và gửi email báo cáo sếp lúc 23:35 đêm qua.",
               x: 52,
               y: 48,
               radius: 6,
@@ -514,11 +516,11 @@ export const CASE_SLEEP_001: DetectiveCase = {
       id: "clue-sleep-laptop",
       caseId: "case-sleep-001",
       sceneId: "scene-an-bedroom",
-      title: "Laptop gửi báo cáo lúc 23:35 đêm qua",
+      title: "Khu làm việc gửi báo cáo lúc 23:35 đêm qua",
       shortDescription: "Đèn bàn học bật sáng; hộp thư đi ghi nhận email công việc gửi lúc 23:35.",
       detailedObservation:
-        "Laptop trên bàn góc trái chưa tắt hẳn, dưới ánh đèn học sáng rực. Hộp thư đi ghi nhận gửi file báo cáo tài chính lúc 23:35 đêm qua kèm giấy nhớ họp khẩn lúc 8:00 sáng.",
-      icon: "💻",
+        "Đèn bàn ở khu làm việc góc trái vẫn bật sáng. Hộp thư đi ghi nhận gửi file báo cáo tài chính lúc 23:35 đêm qua kèm giấy nhớ họp khẩn lúc 8:00 sáng.",
+      icon: "💡",
       source: {
         type: "record",
         location: "Bàn làm việc bên trái",
@@ -685,8 +687,8 @@ export const CASE_SLEEP_001: DetectiveCase = {
       {
         id: "cand-sleep-laptop",
         clueId: "clue-sleep-laptop",
-        label: "Làm việc căng thẳng bằng Laptop khuya",
-        subtitle: "Phát hiện ở: Bàn học bên trái",
+        label: "Làm việc căng thẳng khuya",
+        subtitle: "Phát hiện ở: Đèn bàn & khu làm việc bên trái",
         icon: "💻",
         isTrueCause: true,
         comparisonSummary: "Gửi email báo cáo công việc lúc 23:35 đêm qua",
@@ -2350,6 +2352,7 @@ export const ALL_DETECTIVE_CASES: DetectiveCase[] = [
   CASE_REFLUX_004,
   CASE_FATIGUE_005,
   CASE_ELECTROLYTE_006,
+  CASE_CERVICAL_007,
 ];
 
 export function getCaseById(caseId: string): DetectiveCase | undefined {

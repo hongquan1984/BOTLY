@@ -119,19 +119,7 @@ const server = http.createServer((req, res) => {
       data.updatedAt = new Date().toISOString();
       fs.writeFileSync(tplPath, JSON.stringify(data, null, 2), 'utf8');
 
-      // Sync to current_player so Player View is immediately updated
-      const playersDir = path.join(DAO_DIR, 'data/players');
-      if (!fs.existsSync(playersDir)) fs.mkdirSync(playersDir, { recursive: true });
-      const pPath = path.join(playersDir, 'current_player.json');
-      const playerData = {
-        userId: 'current_player',
-        playerName: 'Người Chơi',
-        islandTitle: 'Hòn Đảo Dưỡng Sinh',
-        placedItems: data.placedItems || [],
-        updatedAt: data.updatedAt
-      };
-      fs.writeFileSync(pPath, JSON.stringify(playerData, null, 2), 'utf8');
-
+      // Admin template is saved independently! We DO NOT wipe out player custom placed items in current_player.json
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, count: data.placedItems?.length || 0, updatedAt: data.updatedAt }));
     });

@@ -1,0 +1,25 @@
+Medieval Village - Stylized Exterior Pack  ·  CREDITS & PROVENANCE  ·  version 1.1.0
+
+Author / art direction: Sidiq Pratomo
+
+About the art
+- Every asset is original work by the author: low-poly 3D models built
+  in Blender, a stylized texture atlas and a painted foliage sheet.
+- No generative image or 3D model (text-to-image, text-to-3D, diffusion,
+  etc.) was used, and no third-party models, textures, photos, HDRIs or
+  scans were used as input.
+- The shop signs, stained glass and other designs in the textures are
+  original and do not reproduce existing artworks.
+- Store screenshots and the images in Previews/ show only assets from
+  this pack.
+
+Engines
+- The Unity and Unreal Engine versions contain only the assets of this
+  pack plus engine-native materials, prefabs, Blueprints and maps.
+  Unity and Unreal Engine are trademarks of their respective owners;
+  this pack is not affiliated with or endorsed by them.
+
+Fonts
+- The asset files contain no fonts.
+- Store images use "Source Sans 3" (SIL Open Font License), which is
+  not included in this pack.

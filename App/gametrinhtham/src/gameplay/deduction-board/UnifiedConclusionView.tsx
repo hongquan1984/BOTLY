@@ -829,7 +829,7 @@ export function UnifiedConclusionView({
                 <div className="flex flex-wrap gap-1 pt-0.5">
                   {peekHandbook.keyParameters.map((p, i) => (
                     <span key={i} className="text-[10px] font-black bg-[#fde68a] border border-[#c79334] px-2 py-0.5 rounded text-[#5c3508]">
-                      ⚡ {p}
+                      ⚡ {typeof p === "string" ? p : `${p.label}: ${p.value}`}
                     </span>
                   ))}
                 </div>

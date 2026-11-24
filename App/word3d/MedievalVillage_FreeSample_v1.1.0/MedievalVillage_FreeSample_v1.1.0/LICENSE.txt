@@ -1,0 +1,47 @@
+Medieval Village - Stylized Exterior Pack  ·  ASSET LICENSE  ·  version 1.1.0
+Copyright (c) 2026 Sidiq Pratomo. All rights not granted below are reserved.
+
+By downloading or using the files in this pack ("the Assets") you agree
+to these terms. The Assets include the 3D models, textures, materials,
+prefabs, Blueprints, scenes and maps in this pack.
+
+1. WHAT YOU MAY DO
+   You may use, modify, recolor, re-texture, re-render, animate and
+   combine the Assets in any number of your own projects - free or
+   commercial -
+   including video games, game jams, prototypes, apps, videos, streams,
+   trailers and promotional material for those projects. No royalties
+   are owed.
+
+2. WHAT YOU MAY NOT DO
+   a. Resell, sublicense, share or redistribute the Assets, modified or
+      not, as stand-alone files or as part of another asset pack,
+      template, model library, texture library, tileset,
+      marketplace listing or collection.
+   b. Make the Assets available in a form that lets others extract and
+      reuse them separately (for example, uploading the source or model
+      files to a public repository). Shipping them inside a compiled or
+      packaged game is fine.
+   c. Use the Assets to train or fine-tune machine-learning or AI models,
+      or include them in datasets for that purpose.
+   d. Claim the Assets as your own original artwork, or register them as
+      a trademark or logo.
+   e. Use the Assets in content that is illegal, hateful or defamatory.
+
+3. TEAMS AND CLIENT WORK
+   One purchase or download covers one person or one team working on a
+   project. You may use the Assets in a project you make for a client, as
+   long as the client does not receive the raw files for reuse outside
+   that project.
+
+4. CREDIT
+   Credit is not required but appreciated:
+   "Medieval Village - Stylized Exterior Pack by Sidiq Pratomo"
+
+5. NO WARRANTY
+   The Assets are provided "as is", without warranty of any kind. The
+   author is not liable for any claim or damage arising from their use.
+
+6. TERMINATION
+   This license ends automatically if you break these terms. Projects
+   already released before then may stay published.

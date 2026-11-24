@@ -1,5 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { addCoins, addExp } from "../economy/economyStorage";
+import { getStoredSession, resolveServiceUrl } from "@/services/api";
 
 export interface MobileDetectiveCase {
   id: string;
@@ -167,41 +166,29 @@ export const DETECTIVE_CASES: MobileDetectiveCase[] = [
   },
 ];
 
-const SOLVED_CASES_STORAGE_KEY = "healthclues_solved_cases_v1";
-
 export async function getSolvedCaseIds(): Promise<string[]> {
-  try {
-    const raw = await AsyncStorage.getItem(SOLVED_CASES_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+  const session = await getStoredSession();
+  if (!session) return [];
+  const base = typeof window !== "undefined" ? "" : resolveServiceUrl(process.env.EXPO_PUBLIC_API_URL, 3329);
+  const response = await fetch(`${base}/api/healthclues/mobile-detective/campaign`, { headers: { Authorization: `Bearer ${session.access_token}` }, cache: "no-store" });
+  if (!response.ok) throw new Error(`Không tải được tiến trình điều tra (${response.status}).`);
+  const payload = await response.json() as { progress?: Array<{ caseId?: string; case_id?: string; status?: string }> };
+  return (payload.progress ?? []).filter(item => item.status === "solved").map(item => item.caseId ?? item.case_id ?? "").filter(Boolean);
 }
 
 export async function recordCaseSolved(
   caseItem: MobileDetectiveCase,
   stars: number
 ): Promise<{ coinsEarned: number; expEarned: number }> {
-  const solved = await getSolvedCaseIds();
-  const isFirstTime = !solved.includes(caseItem.id);
-
-  let coinsEarned = 0;
-  let expEarned = 0;
-
-  if (isFirstTime) {
-    coinsEarned = caseItem.coinReward;
-    expEarned = caseItem.expReward;
-    solved.push(caseItem.id);
-    await AsyncStorage.setItem(SOLVED_CASES_STORAGE_KEY, JSON.stringify(solved));
-    await addCoins(coinsEarned);
-    await addExp(expEarned);
-  } else {
-    // Chơi lại vẫn nhận được 25 Xu khích lệ
-    coinsEarned = 25;
-    expEarned = 10;
-    await addCoins(coinsEarned);
-    await addExp(expEarned);
-  }
-
-  return { coinsEarned, expEarned };
+  const session = await getStoredSession();
+  if (!session) throw new Error("Đăng nhập để lưu hồ sơ đã giải.");
+  const base = typeof window !== "undefined" ? "" : resolveServiceUrl(process.env.EXPO_PUBLIC_API_URL, 3329);
+  const response = await fetch(`${base}/api/healthclues/mobile-detective/solve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+    body: JSON.stringify({ caseId: caseItem.id, stars, foundClues: caseItem.clues.map(clue => clue.id), connections: [] }),
+  });
+  if (!response.ok) throw new Error(`Không lưu được hồ sơ đã giải (${response.status}).`);
+  const result = await response.json() as { coinsAwarded?: number; expAwarded?: number };
+  return { coinsEarned: result.coinsAwarded ?? 0, expEarned: result.expAwarded ?? 0 };
 }

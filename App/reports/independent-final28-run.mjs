@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+let code = fs.readFileSync('D:/botly/App/healthclues-mobile/scripts/qa_detective_bundle_round3.mjs', 'utf8');
+code = code.replaceAll('mobile-detective-round3-', 'final28-fresh-');
+code = code.replace('const errors = [];', `const errors = []; const responses = []; page.on('response', r => { if (r.status() >= 400) responses.push({status:r.status(),url:r.url()}); }); page.on('requestfailed', r => errors.push('requestfailed '+r.url()+' '+r.failure()?.errorText));`);
+code = code.replace('console.log("gate0 blocked");', `await page.screenshot({path:out+'/final28-fresh-gate0.png'}); console.log('gate0 blocked');`);
+code = code.replace('console.log("gate5 blocked");', `await page.screenshot({path:out+'/final28-fresh-gate5.png'}); console.log('gate5 blocked');`);
+code = code.replace('inspected++;', `inspected++; await page.screenshot({path:out+'/final28-fresh-hotspot-'+inspected+'.png'}); console.log('HOTSPOT',inspected, (await page.locator('body').innerText()).slice(-1100));`);
+code = code.replace('const notebook = page.getByText(/Sổ \\(/).first();', `if(inspected !== 6 || !(await page.getByText('Sổ (6)', {exact:true}).isVisible())) throw new Error('6 saved clues not verified'); const notebook = page.getByText(/Sổ \\(/).first();`);
+code = code.replace('console.log("solvedVisible",', 'console.log("HTTP_ERRORS", JSON.stringify(responses)); console.log("solvedVisible",');
+await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));

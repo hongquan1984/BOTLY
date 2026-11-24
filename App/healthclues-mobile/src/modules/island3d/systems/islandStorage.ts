@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IslandPlayerState } from '../types/island';
-import { createDefaultIslandState } from '../constants/islandConfig';
+import { createDefaultIslandState, ISLAND_TEMPLATE_VERSION, STARTER_HOUSE_CONFIG } from '../constants/islandConfig';
 
 const ISLAND_STORAGE_PREFIX = 'healthclues_my_island_v1_';
 
@@ -14,6 +14,29 @@ export async function loadPlayerIslandState(userId: string): Promise<IslandPlaye
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && parsed.ownerUserId === userId) {
+        // Keep player-owned decorations, but migrate the canonical Admin
+        // template values for the starter house/camera when the template changes.
+        if (parsed.templateVersion !== ISLAND_TEMPLATE_VERSION) {
+          const migrated = {
+            ...parsed,
+            templateVersion: ISLAND_TEMPLATE_VERSION,
+            houseModelId: STARTER_HOUSE_CONFIG.id,
+            placedItems: Array.isArray(parsed.placedItems)
+              ? parsed.placedItems.map((item: any) => {
+                  if (item.itemId !== 'starter_wooden_cottage' && item.itemId !== 'bld_starter_cottage') return item;
+                  return {
+                    ...item,
+                    itemId: STARTER_HOUSE_CONFIG.id,
+                    position: { ...STARTER_HOUSE_CONFIG.position },
+                    rotation: { ...STARTER_HOUSE_CONFIG.rotation },
+                    scale: { ...STARTER_HOUSE_CONFIG.scale },
+                  };
+                })
+              : [],
+          };
+          await savePlayerIslandState(migrated);
+          return migrated;
+        }
         return parsed;
       }
     }

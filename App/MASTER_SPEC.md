@@ -1,3 +1,22 @@
+## Implementation traceability update — 2026-11-24 (Cycle 148: Main App 3D Floating Village Integration Alignment & Port Architecture)
+
+- **Corrected 3D Village Integration in Mobile App**:
+  * Fixed `World3DView.tsx` and `healthclues-mobile/.env` to point `EXPO_PUBLIC_WORLD_3D_URL` to `http://localhost:5173/?mode=player` (the Three.js standalone player runtime in `word3d`).
+  * Removed erroneous legacy fallbacks to port 5179 (Swiss Alpine Chalet / `3DHOME`).
+  * Cleaned conflicting background process `serve-mobile.mjs` on port 8081 and launched Metro Bundler with 8GB heap (`--max-old-space-size=8192`).
+  * Guarded `Haptics.impactAsync` on Web to prevent runtime warnings (`Platform.OS !== 'web'`).
+- **Verified Port Architecture**:
+  * Port `8081`: Expo Mobile Web App (`healthclues-mobile`).
+  * Port `5173`: Floating Fantasy Village 3D (`word3d`, `/?mode=player`).
+  * Port `3355`: My Island 3D personal decor island (`Dao3D`).
+  * Port `3329`: Body Detective Next.js API backend (`gametrinhtham`).
+  * Port `5179`: Swiss Alpine Chalet (`3DHOME`).
+- **Browser Acceptance Evidence**:
+  * Verified via Chrome CDP subagent at `http://localhost:8081/world`: Iframe loads `http://localhost:5173/?mode=player`, Three.js renders floating village, watermill, river, POI badges, and Lumi mascot at 60 FPS.
+  * Evidence snapshots: `world_floating_village_3d_clean.png` and `lang_noi_3d_verified.png`.
+
+---
+
 ## Implementation traceability update — 2026-11-17 (Cycle 135: 3 Real Houses Identification & Dynamic Toolkit Library)
 
 - Identified and mapped 3 authentic architectural houses in the 3D Village (`word3d` & `landmarkCatalog.ts`):
@@ -1277,3 +1296,10 @@ The selected two-question Quiz profile must survive verified-account activation 
 ### 2026-11-12: Cycle 89 Mobile 2.5D Painterly Diorama & Typography Preservation (`healthclues-mobile`)
 
 In the Expo mobile client (`healthclues-mobile`), the World screen renders the canonical 1600×900 region artwork using an ultra-light 60fps GPU-animated 2.5D diorama layer (`src/utils/worldDiorama25D.ts` & `app/(game)/world.tsx`) with perspective depth scaling (`0.76x–1.14x`), dynamic `zIndex` Y-sorting, decoupled floor contact shadows, `requestAnimationFrame` + `Animated.Value` movement (`0` mid-walk React re-renders), `useFocusEffect` animation pause when unfocused, zero Daytime alpha overdraw or continuous background timers, Sunset/Night `radial-gradient` halos + 4 static ambient motes, toggleable Day/Sunset/Night/Auto lighting, real-time multiplayer presence (`useWorldPresence.ts` syncing live player coordinates and displaying remote adventurers with `onlineCount`), 6 simulated village adventurers (`useLivingVillageVisitors.ts`), and bundled Vietnamese-diacritic custom fonts (`BeVietnamPro` + `Spectral`). All 8 Overworld region IDs and 2 playable/6 locked rules remain unchanged.
+### Mobile Detective player parity — 2026-11-23
+
+The player-facing detective flow is native mobile React Native UI. Its web-parity shell uses the detective profile HUD, chapter selection, parchment case cards, briefing, full-screen scene inspection, notebook and conclusion states; player UI must not regress to iframe/WebView.
+
+### Mobile cross-device progression boundary — 2026-11-24
+
+Authenticated Mobile Journey goals, Daily Care check-ins, XP and solved detective cases are account-owned and must round-trip through server APIs/DB. Toolkit Bag entries remain account-scoped through the mobile Toolkit API. Device storage may hold session/onboarding or transient presentation state only.

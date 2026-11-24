@@ -1,0 +1,716 @@
+{
+  "pack": "Medieval Village - Stylized Exterior Pack (free sample)",
+  "version": "1.1.0",
+  "units": "metres, Z up in Blender",
+  "atlas": "Textures/T_Village_Atlas.png",
+  "emission": "Textures/T_Village_Emission.png",
+  "foliage": "Textures/T_Village_Foliage.png",
+  "counts": {
+    "Buildings": 1,
+    "Market": 1,
+    "Lighting": 1,
+    "Carts": 1,
+    "Props": 4,
+    "Nature": 5,
+    "Ground": 3,
+    "Modular_Kit": 9
+  },
+  "demoScenes": [
+    "River_Village",
+    "Main_Street",
+    "Kit_Street"
+  ],
+  "assets": [
+    {
+      "id": "cottage_small",
+      "name": "SM_Cottage_Small",
+      "category": "Buildings",
+      "triangles": 8776,
+      "vertices": 5825,
+      "sizeMetres": [
+        5.02,
+        5.232,
+        6.497
+      ],
+      "materials": [
+        "M_Village_Atlas",
+        "M_Village_Glow"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Buildings/SM_Cottage_Small.fbx",
+        "gltf": "GLTF/Buildings/SM_Cottage_Small.gltf",
+        "obj": "OBJ/Buildings/SM_Cottage_Small.obj"
+      },
+      "lods": [
+        {
+          "name": "SM_Cottage_Small_LOD1",
+          "triangles": 3948,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Buildings/SM_Cottage_Small_LOD1.fbx",
+            "gltf": "GLTF/LODs/Buildings/SM_Cottage_Small_LOD1.gltf"
+          }
+        },
+        {
+          "name": "SM_Cottage_Small_LOD2",
+          "triangles": 2419,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Buildings/SM_Cottage_Small_LOD2.fbx",
+            "gltf": "GLTF/LODs/Buildings/SM_Cottage_Small_LOD2.gltf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "market_stall_red",
+      "name": "SM_Market_Stall_Red",
+      "category": "Market",
+      "triangles": 27424,
+      "vertices": 15343,
+      "sizeMetres": [
+        2.519,
+        2.012,
+        2.836
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Market/SM_Market_Stall_Red.fbx",
+        "gltf": "GLTF/Market/SM_Market_Stall_Red.gltf",
+        "obj": "OBJ/Market/SM_Market_Stall_Red.obj"
+      },
+      "lods": [
+        {
+          "name": "SM_Market_Stall_Red_LOD1",
+          "triangles": 12270,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Market/SM_Market_Stall_Red_LOD1.fbx",
+            "gltf": "GLTF/LODs/Market/SM_Market_Stall_Red_LOD1.gltf"
+          }
+        },
+        {
+          "name": "SM_Market_Stall_Red_LOD2",
+          "triangles": 7598,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Market/SM_Market_Stall_Red_LOD2.fbx",
+            "gltf": "GLTF/LODs/Market/SM_Market_Stall_Red_LOD2.gltf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "lamp_post",
+      "name": "SM_Lamp_Post",
+      "category": "Lighting",
+      "triangles": 504,
+      "vertices": 277,
+      "sizeMetres": [
+        0.9,
+        0.401,
+        2.703
+      ],
+      "materials": [
+        "M_Village_Atlas",
+        "M_Village_Glow"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Lighting/SM_Lamp_Post.fbx",
+        "gltf": "GLTF/Lighting/SM_Lamp_Post.gltf",
+        "obj": "OBJ/Lighting/SM_Lamp_Post.obj"
+      }
+    },
+    {
+      "id": "hand_cart",
+      "name": "SM_Hand_Cart",
+      "category": "Carts",
+      "triangles": 9348,
+      "vertices": 4867,
+      "sizeMetres": [
+        2.002,
+        2.842,
+        1.276
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Carts/SM_Hand_Cart.fbx",
+        "gltf": "GLTF/Carts/SM_Hand_Cart.gltf",
+        "obj": "OBJ/Carts/SM_Hand_Cart.obj"
+      },
+      "lods": [
+        {
+          "name": "SM_Hand_Cart_LOD1",
+          "triangles": 4175,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Carts/SM_Hand_Cart_LOD1.fbx",
+            "gltf": "GLTF/LODs/Carts/SM_Hand_Cart_LOD1.gltf"
+          }
+        },
+        {
+          "name": "SM_Hand_Cart_LOD2",
+          "triangles": 2586,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Carts/SM_Hand_Cart_LOD2.fbx",
+            "gltf": "GLTF/LODs/Carts/SM_Hand_Cart_LOD2.gltf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "well",
+      "name": "SM_Well",
+      "category": "Props",
+      "triangles": 7836,
+      "vertices": 4206,
+      "sizeMetres": [
+        2.359,
+        1.78,
+        2.473
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Props/SM_Well.fbx",
+        "gltf": "GLTF/Props/SM_Well.gltf",
+        "obj": "OBJ/Props/SM_Well.obj"
+      },
+      "lods": [
+        {
+          "name": "SM_Well_LOD1",
+          "triangles": 3526,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Props/SM_Well_LOD1.fbx",
+            "gltf": "GLTF/LODs/Props/SM_Well_LOD1.gltf"
+          }
+        },
+        {
+          "name": "SM_Well_LOD2",
+          "triangles": 2191,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Props/SM_Well_LOD2.fbx",
+            "gltf": "GLTF/LODs/Props/SM_Well_LOD2.gltf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "fence_picket",
+      "name": "SM_Fence_Picket",
+      "category": "Props",
+      "triangles": 868,
+      "vertices": 498,
+      "sizeMetres": [
+        2.12,
+        0.21,
+        1.201
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Props/SM_Fence_Picket.fbx",
+        "gltf": "GLTF/Props/SM_Fence_Picket.gltf",
+        "obj": "OBJ/Props/SM_Fence_Picket.obj"
+      }
+    },
+    {
+      "id": "barrel",
+      "name": "SM_Barrel",
+      "category": "Props",
+      "triangles": 996,
+      "vertices": 502,
+      "sizeMetres": [
+        0.735,
+        0.735,
+        0.845
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Props/SM_Barrel.fbx",
+        "gltf": "GLTF/Props/SM_Barrel.gltf",
+        "obj": "OBJ/Props/SM_Barrel.obj"
+      }
+    },
+    {
+      "id": "crate",
+      "name": "SM_Crate",
+      "category": "Props",
+      "triangles": 924,
+      "vertices": 504,
+      "sizeMetres": [
+        0.529,
+        0.531,
+        0.528
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Props/SM_Crate.fbx",
+        "gltf": "GLTF/Props/SM_Crate.gltf",
+        "obj": "OBJ/Props/SM_Crate.obj"
+      }
+    },
+    {
+      "id": "tree_oak",
+      "name": "SM_Tree_Oak",
+      "category": "Nature",
+      "triangles": 18296,
+      "vertices": 20420,
+      "sizeMetres": [
+        6.592,
+        6.359,
+        6.368
+      ],
+      "materials": [
+        "M_Village_Atlas",
+        "M_Village_Foliage"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Nature/SM_Tree_Oak.fbx",
+        "gltf": "GLTF/Nature/SM_Tree_Oak.gltf",
+        "obj": "OBJ/Nature/SM_Tree_Oak.obj"
+      },
+      "lods": [
+        {
+          "name": "SM_Tree_Oak_LOD1",
+          "triangles": 11798,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Nature/SM_Tree_Oak_LOD1.fbx",
+            "gltf": "GLTF/LODs/Nature/SM_Tree_Oak_LOD1.gltf"
+          }
+        },
+        {
+          "name": "SM_Tree_Oak_LOD2",
+          "triangles": 5488,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Nature/SM_Tree_Oak_LOD2.fbx",
+            "gltf": "GLTF/LODs/Nature/SM_Tree_Oak_LOD2.gltf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bush",
+      "name": "SM_Bush",
+      "category": "Nature",
+      "triangles": 11606,
+      "vertices": 10797,
+      "sizeMetres": [
+        2.258,
+        2.197,
+        1.421
+      ],
+      "materials": [
+        "M_Village_Atlas",
+        "M_Village_Foliage"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Nature/SM_Bush.fbx",
+        "gltf": "GLTF/Nature/SM_Bush.gltf",
+        "obj": "OBJ/Nature/SM_Bush.obj"
+      },
+      "lods": [
+        {
+          "name": "SM_Bush_LOD1",
+          "triangles": 8190,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Nature/SM_Bush_LOD1.fbx",
+            "gltf": "GLTF/LODs/Nature/SM_Bush_LOD1.gltf"
+          }
+        },
+        {
+          "name": "SM_Bush_LOD2",
+          "triangles": 4342,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Nature/SM_Bush_LOD2.fbx",
+            "gltf": "GLTF/LODs/Nature/SM_Bush_LOD2.gltf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "grass_clump",
+      "name": "SM_Grass_Clump",
+      "category": "Nature",
+      "triangles": 156,
+      "vertices": 260,
+      "sizeMetres": [
+        0.303,
+        0.21,
+        0.456
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Nature/SM_Grass_Clump.fbx",
+        "gltf": "GLTF/Nature/SM_Grass_Clump.gltf",
+        "obj": "OBJ/Nature/SM_Grass_Clump.obj"
+      }
+    },
+    {
+      "id": "flowers_daisy",
+      "name": "SM_Flowers_Daisy",
+      "category": "Nature",
+      "triangles": 2292,
+      "vertices": 2314,
+      "sizeMetres": [
+        0.283,
+        0.322,
+        0.424
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Nature/SM_Flowers_Daisy.fbx",
+        "gltf": "GLTF/Nature/SM_Flowers_Daisy.gltf",
+        "obj": "OBJ/Nature/SM_Flowers_Daisy.obj"
+      },
+      "lods": [
+        {
+          "name": "SM_Flowers_Daisy_LOD1",
+          "triangles": 1031,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Nature/SM_Flowers_Daisy_LOD1.fbx",
+            "gltf": "GLTF/LODs/Nature/SM_Flowers_Daisy_LOD1.gltf"
+          }
+        },
+        {
+          "name": "SM_Flowers_Daisy_LOD2",
+          "triangles": 640,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Nature/SM_Flowers_Daisy_LOD2.fbx",
+            "gltf": "GLTF/LODs/Nature/SM_Flowers_Daisy_LOD2.gltf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rock_boulder",
+      "name": "SM_Rock_Boulder",
+      "category": "Nature",
+      "triangles": 168,
+      "vertices": 86,
+      "sizeMetres": [
+        1.771,
+        2.058,
+        1.048
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Nature/SM_Rock_Boulder.fbx",
+        "gltf": "GLTF/Nature/SM_Rock_Boulder.gltf",
+        "obj": "OBJ/Nature/SM_Rock_Boulder.obj"
+      }
+    },
+    {
+      "id": "ground_grass",
+      "name": "SM_Ground_Grass",
+      "category": "Ground",
+      "triangles": 12,
+      "vertices": 8,
+      "sizeMetres": [
+        2.0,
+        2.0,
+        0.1
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Ground/SM_Ground_Grass.fbx",
+        "gltf": "GLTF/Ground/SM_Ground_Grass.gltf",
+        "obj": "OBJ/Ground/SM_Ground_Grass.obj"
+      }
+    },
+    {
+      "id": "ground_road",
+      "name": "SM_Ground_Road",
+      "category": "Ground",
+      "triangles": 12,
+      "vertices": 8,
+      "sizeMetres": [
+        2.0,
+        2.0,
+        0.1
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Ground/SM_Ground_Road.fbx",
+        "gltf": "GLTF/Ground/SM_Ground_Road.gltf",
+        "obj": "OBJ/Ground/SM_Ground_Road.obj"
+      }
+    },
+    {
+      "id": "ground_cobble",
+      "name": "SM_Ground_Cobble",
+      "category": "Ground",
+      "triangles": 12,
+      "vertices": 8,
+      "sizeMetres": [
+        2.0,
+        2.0,
+        0.1
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Ground/SM_Ground_Cobble.fbx",
+        "gltf": "GLTF/Ground/SM_Ground_Cobble.gltf",
+        "obj": "OBJ/Ground/SM_Ground_Cobble.obj"
+      }
+    },
+    {
+      "id": "mod_wall_timber_plain",
+      "name": "SM_Mod_Wall_Timber_Plain",
+      "category": "Modular_Kit",
+      "triangles": 276,
+      "vertices": 168,
+      "sizeMetres": [
+        2.085,
+        0.288,
+        3.002
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Modular_Kit/SM_Mod_Wall_Timber_Plain.fbx",
+        "gltf": "GLTF/Modular_Kit/SM_Mod_Wall_Timber_Plain.gltf",
+        "obj": "OBJ/Modular_Kit/SM_Mod_Wall_Timber_Plain.obj"
+      }
+    },
+    {
+      "id": "mod_wall_timber_window",
+      "name": "SM_Mod_Wall_Timber_Window",
+      "category": "Modular_Kit",
+      "triangles": 1720,
+      "vertices": 1190,
+      "sizeMetres": [
+        2.082,
+        0.493,
+        3.003
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Modular_Kit/SM_Mod_Wall_Timber_Window.fbx",
+        "gltf": "GLTF/Modular_Kit/SM_Mod_Wall_Timber_Window.gltf",
+        "obj": "OBJ/Modular_Kit/SM_Mod_Wall_Timber_Window.obj"
+      },
+      "lods": [
+        {
+          "name": "SM_Mod_Wall_Timber_Window_LOD1",
+          "triangles": 774,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Modular_Kit/SM_Mod_Wall_Timber_Window_LOD1.fbx",
+            "gltf": "GLTF/LODs/Modular_Kit/SM_Mod_Wall_Timber_Window_LOD1.gltf"
+          }
+        },
+        {
+          "name": "SM_Mod_Wall_Timber_Window_LOD2",
+          "triangles": 476,
+          "files": {
+            "blend": "Blender/Village_Sample.blend",
+            "fbx": "FBX/LODs/Modular_Kit/SM_Mod_Wall_Timber_Window_LOD2.fbx",
+            "gltf": "GLTF/LODs/Modular_Kit/SM_Mod_Wall_Timber_Window_LOD2.gltf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "mod_wall_timber_door",
+      "name": "SM_Mod_Wall_Timber_Door",
+      "category": "Modular_Kit",
+      "triangles": 952,
+      "vertices": 568,
+      "sizeMetres": [
+        2.084,
+        0.613,
+        3.007
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Modular_Kit/SM_Mod_Wall_Timber_Door.fbx",
+        "gltf": "GLTF/Modular_Kit/SM_Mod_Wall_Timber_Door.gltf",
+        "obj": "OBJ/Modular_Kit/SM_Mod_Wall_Timber_Door.obj"
+      }
+    },
+    {
+      "id": "mod_corner_timber",
+      "name": "SM_Mod_Corner_Timber",
+      "category": "Modular_Kit",
+      "triangles": 44,
+      "vertices": 24,
+      "sizeMetres": [
+        0.252,
+        0.245,
+        3.001
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Modular_Kit/SM_Mod_Corner_Timber.fbx",
+        "gltf": "GLTF/Modular_Kit/SM_Mod_Corner_Timber.gltf",
+        "obj": "OBJ/Modular_Kit/SM_Mod_Corner_Timber.obj"
+      }
+    },
+    {
+      "id": "mod_gable_plaster_4m",
+      "name": "SM_Mod_Gable_Plaster_4m",
+      "category": "Modular_Kit",
+      "triangles": 192,
+      "vertices": 106,
+      "sizeMetres": [
+        4.0,
+        0.285,
+        2.646
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Modular_Kit/SM_Mod_Gable_Plaster_4m.fbx",
+        "gltf": "GLTF/Modular_Kit/SM_Mod_Gable_Plaster_4m.gltf",
+        "obj": "OBJ/Modular_Kit/SM_Mod_Gable_Plaster_4m.obj"
+      }
+    },
+    {
+      "id": "mod_roof_tile_4m_mid",
+      "name": "SM_Mod_Roof_Tile_4m_Mid",
+      "category": "Modular_Kit",
+      "triangles": 312,
+      "vertices": 208,
+      "sizeMetres": [
+        2.014,
+        2.684,
+        3.323
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Modular_Kit/SM_Mod_Roof_Tile_4m_Mid.fbx",
+        "gltf": "GLTF/Modular_Kit/SM_Mod_Roof_Tile_4m_Mid.gltf",
+        "obj": "OBJ/Modular_Kit/SM_Mod_Roof_Tile_4m_Mid.obj"
+      }
+    },
+    {
+      "id": "mod_roof_tile_4m_end_l",
+      "name": "SM_Mod_Roof_Tile_4m_EndL",
+      "category": "Modular_Kit",
+      "triangles": 356,
+      "vertices": 232,
+      "sizeMetres": [
+        2.375,
+        2.837,
+        3.443
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Modular_Kit/SM_Mod_Roof_Tile_4m_EndL.fbx",
+        "gltf": "GLTF/Modular_Kit/SM_Mod_Roof_Tile_4m_EndL.gltf",
+        "obj": "OBJ/Modular_Kit/SM_Mod_Roof_Tile_4m_EndL.obj"
+      }
+    },
+    {
+      "id": "mod_roof_tile_4m_end_r",
+      "name": "SM_Mod_Roof_Tile_4m_EndR",
+      "category": "Modular_Kit",
+      "triangles": 356,
+      "vertices": 232,
+      "sizeMetres": [
+        2.375,
+        2.837,
+        3.443
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Modular_Kit/SM_Mod_Roof_Tile_4m_EndR.fbx",
+        "gltf": "GLTF/Modular_Kit/SM_Mod_Roof_Tile_4m_EndR.gltf",
+        "obj": "OBJ/Modular_Kit/SM_Mod_Roof_Tile_4m_EndR.obj"
+      }
+    },
+    {
+      "id": "mod_roof_tile_4m_ridge",
+      "name": "SM_Mod_Roof_Tile_4m_Ridge",
+      "category": "Modular_Kit",
+      "triangles": 60,
+      "vertices": 32,
+      "sizeMetres": [
+        2.01,
+        0.26,
+        0.26
+      ],
+      "materials": [
+        "M_Village_Atlas"
+      ],
+      "files": {
+        "blend": "Blender/Village_Sample.blend",
+        "fbx": "FBX/Modular_Kit/SM_Mod_Roof_Tile_4m_Ridge.fbx",
+        "gltf": "GLTF/Modular_Kit/SM_Mod_Roof_Tile_4m_Ridge.gltf",
+        "obj": "OBJ/Modular_Kit/SM_Mod_Roof_Tile_4m_Ridge.obj"
+      }
+    }
+  ],
+  "format": "Blender, FBX, glTF, OBJ",
+  "lodGroupsIncluded": 8
+}

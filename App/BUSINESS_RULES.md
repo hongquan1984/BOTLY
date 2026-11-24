@@ -718,3 +718,14 @@ During mobile AI advisor loading (`advisorLoading === true`), triggering `Dùng 
 ### 2026-11-12: Cycle 89 World 2.5D Diorama & Typography Preservation Rules
 
 The 2.5D Painterly Diorama layer (`worldDiorama25D.ts`) and custom typography upgrade only enhance visual presentation, depth scaling, lighting ambiance, and touch accessibility; they preserve all 8 Overworld region IDs/artwork (`Sleep Valley` & `HealthClues Realm` playable; 6 Coming Soon locked), road-snapped navigation bounds, and all non-clinical habit/safety copy unchanged.
+## Mobile Toolkit Bag persistence boundary — 2026-11-22
+
+- The mobile herb, sound and breath Toolkit Bag is account data, not device-only UI state. Reads and mutations must go through the authenticated `/api/healthclues/mobile-toolkit` API and be stored in `healthclues_mobile_toolkit_items` keyed by the authenticated `user_id`.
+- `AsyncStorage`, `localStorage`, `sessionStorage` and in-memory arrays may not be the persistence source of truth for these three bag item types. Client event emitters are presentation refresh signals only.
+- API reads and writes are user-scoped and must fail closed when the authenticated session is absent or invalid. A local fixture or browser-seeded bag is not persistence evidence.
+
+## Mobile Journey, Check-in and Detective persistence boundary — 2026-11-24
+
+- Mobile Journey goals and their active/saved status are account-owned state stored through the authenticated `mobile-progress` route; AsyncStorage/localStorage is not a source of truth.
+- Mobile daily check-in status is private account state. The server stores one record per user/local date and awards XP through the append-only XP ledger with an idempotency key; retrying or switching devices must not duplicate the reward.
+- Detective solved-case progress and rewards are server-authoritative through the mobile detective campaign/solve APIs. Legacy launcher UI must not persist solved IDs or rewards locally.

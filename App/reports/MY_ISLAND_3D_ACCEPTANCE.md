@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-11-19 — Player menu routing correction
+
+- Tab `Ngôi Nhà` đã được chuyển khỏi `Home3DStage`/`home3d` sang `MyIslandScreen` của module `island3d` (Dao3D mobile).
+- Web export: PASS (`npx.cmd expo export --platform web --output-dir dist-web --clear`).
+- Browser smoke 390×844 trên `http://localhost:8081/home`: PASS — `canvasCount=1`, `iframeCount=0`, không có page error; HUD `My Island — Hòn Đảo Của Tôi`, Cửa Hàng, Kho Đồ, Trang Trí và quà Lumi hiển thị.
+
 ## 1. TỔNG QUAN HỆ THỐNG MY ISLAND 3D
 
 My Island 3D là không gian đảo nổi cá nhân hóa dành riêng cho từng người chơi HealthClues.
@@ -408,9 +414,137 @@ Giải quyết triệt để 3 yêu cầu của người dùng:
 - `64_admin_item_placed_successfully.png`: Admin đặt thành công cây phong đỏ Momiji lên đảo mẫu chỉ với 1 cú nhấp chuột lên bãi cỏ.
 - `65_player_item_placed_successfully.png`: Góc nhìn người chơi hiển thị đầy đủ địa thế do Admin tạo, và người chơi đã tự do đặt thêm "Chậu Hoa Cúc Quảng Trường" thành công rực rỡ vào đảo của riêng mình!
 
+---
+
+## 16. NGHIỆM THU: KHÓA BẢO VỆ ĐỊA THẾ ADMIN TRÊN GÓC NHÌN NGƯỜI CHƠI & BACKGROUND QUẦN ĐẢO BAY ĐA TẦNG VÔ CỰC (2026-11-18)
+
+Giải quyết triệt để 2 yêu cầu mới nhất từ người dùng:
+1. *"nhưng cái gì mặc định admin cài thì góc nhìn người chơi ko xoá được"*: Khóa bảo vệ toàn diện các vật phẩm/địa thế do Admin cài đặt mặc định; trên góc nhìn người chơi, người chơi không thể xóa địa thế của Admin, chỉ có thể xóa các vật phẩm trang trí do chính mình tự đặt.
+2. *"gen lại ảnh background đẹp, nhìn có chiều sâu là kiểu thấy các đảo khác ở phía xa"*: Tạo background toàn cảnh quần đảo bay (Sky Archipelago) với chiều sâu không gian đa tầng, hiển thị các hòn đảo bay khác trôi bồng bềnh ở phía chân trời xa cùng tháp cổ tích, thác nước đổ xuống biển mây và vệt nắng vàng chiếu rọi.
+
+### Giải pháp kỹ thuật & cơ chế khóa bảo vệ:
+1. **Gắn cờ nguồn gốc đối tượng (`isDefaultTerrain`):**
+   - Mọi đối tượng nạp từ bản thiết kế mẫu của Admin (`/api/template/default`) đều được gắn cờ `isDefaultTerrain: true`.
+   - Các vật phẩm do người chơi tự nhấp đặt từ khay đồ trang trí được gắn cờ `isDefaultTerrain: false`.
+2. **Khóa bảo vệ đa tầng trong góc nhìn Người chơi (`currentMode === 'player'`):**
+   - **Thanh Layer Chips:** Các đối tượng mặc định của Admin hiển thị biểu tượng ổ khóa kèm tag `🔒 Cố định` và **hoàn toàn không có nút xóa `✕`**. Ngược lại, đồ người chơi tự đặt luôn có nút `✕` màu đỏ để xóa tức thì.
+   - **Thanh điều khiển đáy (`placementBar`) & Công cụ nhanh bên sườn:** Khi người chơi nhấp chọn địa thế Admin, nút xóa chuyển thành `🔒 Mặc Định Admin` / `🔒 Đồ Admin` kèm trạng thái mờ (opacity 0.5, cursor: not-allowed).
+   - **Chặn xóa tại hàm cốt lõi (`handleDelete` & `deleteSpecificItem`):** Nếu đối tượng có `isDefaultTerrain: true`, hệ thống từ chối xóa và hiển thị thông báo toast: `🔒 "[Tên vật phẩm]" là địa thế mặc định do Admin tạo — người chơi không thể xóa!`.
+   - **Lệnh dọn sạch (`clearEntireIsland`):** Khi người chơi chọn dọn đảo, hệ thống chỉ thu hồi các vật phẩm trang trí của người chơi (`!isDefaultTerrain`), bảo toàn 100% địa thế gốc của Admin.
+3. **Background Quần Đảo Bay Đa Tầng (`floating_islands_archipelago_bg.jpg`):**
+   - Sinh ảnh wallpaper panorama 16:9 độ phân giải siêu nét mô tả thế giới quần đảo bay bồng bềnh giữa biển mây.
+   - Các hòn đảo bay phụ với lâu đài, tháp canh, rừng thông và thác nước đổ xuống mây trải dài về hai bên và phía xa chân trời, để trống khoảng trung tâm tạo tiền cảnh hoàn hảo cho hòn đảo 3D của người chơi.
+   - Kết hợp chuyển động thị sai 2.5D (parallax) mượt mà theo góc xoay camera.
+
+### Bằng chứng ảnh chụp kiểm thử tự động Playwright (`test_locked_admin_items_and_sky_archipelago.mjs` - 100% Passed):
+- `66_new_floating_islands_archipelago_background.png`: Background mới với toàn cảnh các hòn đảo bay khác trôi bồng bềnh ở phía xa chân trời cùng lâu đài, thác nước và biển mây sâu thẳm.
+- `67_player_view_admin_items_locked_with_chips.png`: Góc nhìn người chơi hiển thị thanh chip với 5 vật phẩm địa thế Admin đều có huy hiệu `[ 🔒 Cố định ]` và không hề có nút xóa.
+- `68_player_tries_delete_default_item_shows_lock_toast.png`: Người chơi nhấp chọn Núi Tuyết của Admin; thanh điều khiển hiển thị `🔒 Mặc Định Admin` (vô hiệu hóa) và toast thông báo từ chối xóa. Núi tuyết được bảo toàn nguyên vẹn.
+- `69_player_can_place_and_delete_own_custom_item.png`: Người chơi tự đặt thêm cây phong Momiji, sau đó bấm nút `✕` trên chip để xóa thành công; vật phẩm riêng bị xóa sạch trong khi toàn bộ địa thế Admin vẫn được bảo vệ nguyên vẹn 100%!
+
+---
+
+## 17. NGHIỆM THU: NHÂN VẬT CHIBI ADVENTURER DI CHUYỂN TRÊN ĐẢO, UI TỐI GIẢN TẬP TRUNG HÒN ĐẢO & LƯU TRỮ VĨNH VIỄN 100% (2026-11-18)
+
+Giải quyết trọn vẹn và hoàn hảo 4 yêu cầu kiến trúc của người dùng:
+1. *"người chơi đặt xong sang admin quay lai thì mất"*: Khắc phục triệt để lỗi ghi đè dữ liệu khi chuyển đổi tab Admin/Người chơi; phân tách dữ liệu độc lập giữa `default_island_template.json` (địa thế Admin) và `data/players/current_player.json` (vật phẩm trang trí, kho đồ và ví tiền của người chơi).
+2. *"khi nguoi chơi vào đảo thì nhân vật cũng sẽ đi lại trên đảo như ở word"*: Tích hợp nhân vật 3D phiêu lưu Chibi Adventurer (`Rogue.glb` từ hệ thống `word3d`) đi lại trên mặt đảo với hoạt ảnh `idle` và `walk`, vòng định vị vàng lung linh (`#fbbf24`) khi nhấp chuột và tự động tản bộ thư giãn sau thời gian rảnh.
+3. *"sau này dùng tiền xu mua đồ, hoặc là được tặng, thì đồ sẽ vào kho đồ, hoặc mua ở cửa hàng"*: Xây dựng hệ sinh thái kinh tế hoàn chỉnh: người chơi có ví tiền (`500 Xu`), mở Cửa Hàng (`🛍️ Cửa Hàng`) để mua đồ, đồ mua tự động vào Kho Đồ (`🎒 Kho Đồ`), người chơi lấy đồ từ kho ra đặt lên đảo. Khi xóa đồ, vật phẩm được thu hồi trở lại Kho Đồ.
+4. *"menu thì chỉ ben dươi, khi vào trang trí thì sẽ đặt vật phâmhr rồi đưa lên đưa xuống, hoặc xoá vật phẩm, thật là gọn để có thể tập trung vào hòn đảo, ko bị chiếm diện tích bởi các menu"*: Thiết kế giao diện góc nhìn người chơi siêu gọn gàng: ẩn thanh điều khiển bên hông (`floating-quick-tools`), ẩn các huy hiệu trên cao; toàn bộ menu chỉ nằm ở thanh dock nổi dưới đáy (`[ 🛍️ Cửa Hàng ] [ 🎒 Kho Đồ ] [ 🛠️ Trang Trí ] [ 🪙 Xu ]`). Khi vào trang trí, xuất hiện thanh dock điều khiển nhỏ gọn nổi ở giữa đáy với đầy đủ tính năng: `⬆️ Lên`, `⬇️ Xuống`, `🔄 Xoay`, `🗑️ Xóa / Thu Hồi`, `✅ Xong`.
+
+### Bằng chứng ảnh chụp kiểm thử tự động Playwright (`test_character_and_persistence_complete.mjs` - 100% Passed):
+- `74_player_character_walking_on_island.png`: Nhân vật Chibi Adventurer (`Rogue.glb`) sải bước mượt mà trên mặt cỏ hòn đảo, hướng tới vị trí vòng tròn vàng định vị phát sáng khi người chơi nhấp chuột.
+- `75_player_placed_decorations_with_compact_bottom_bar.png`: Menu tối giản chỉ nằm ở đáy màn hình, người chơi đặt cây phong Momiji và chậu hoa cúc trang trí với thanh điều khiển độ cao và xoay siêu gọn, 100% tầm nhìn tập trung vào hòn đảo.
+- `76_player_custom_items_preserved_after_admin_switch.png`: Sau khi chuyển sang tab Admin và quay lại tab Người Chơi, toàn bộ vật phẩm người chơi tự đặt vẫn được bảo toàn nguyên vẹn 100%, không bị mất mát hay xáo trộn.
+- `77_player_custom_items_preserved_across_page_reload.png`: Tải lại trình duyệt hoàn toàn (full page refresh), toàn bộ dữ liệu hòn đảo, vật phẩm trang trí, nhân vật phiêu lưu và ví tiền xu vẫn giữ nguyên trạng thái chính xác tuyệt đối.
+
+---
+
+## 18. NGHIỆM THU: LOẠI BỎ THANH MENU CỒNG KỀNH TRÊN CAO, TÍCH HỢP TAB "ĐANG CÓ TRÊN ĐẢO", HỖ TRỢ DI CHUYỂN DỜI ĐỒ VÀ NÂNG CẤP BACKGROUND THIÊN ĐƯỜNG QUẦN ĐẢO HOA LỘNG LẪY (2026-11-18)
+
+Giải quyết chính xác 3 yêu cầu cốt lõi của người dùng:
+1. *"bỏ cái menu cồng kềnh này đi, nhét vào trang trí"*:
+   - Loại bỏ hoàn toàn thanh danh sách vật phẩm cồng kềnh (`placed-items-inline-wrap`) chiếm diện tích ở thanh header trên cao màn hình.
+   - Chuyển toàn bộ danh sách lớp vật phẩm vào bên trong menu **Trang Trí** (`#decor-tray`) với hai tab tiện lợi:
+     - `[ ➕ Thêm Đồ Mới ]`: Hiển thị danh mục 58 vật phẩm để đặt thêm.
+     - `[ 📋 Đang Có Trên Đảo (N) ]`: Hiển thị toàn bộ các vật phẩm đang có trên đảo kèm huy hiệu `[ 🔒 Cố định ]` (cho địa thế Admin) hoặc nút `[ ✕ ]` xóa (cho đồ của người chơi). Nhấp vào bất kỳ món nào sẽ tự động định vị và chọn món đó trên không gian 3D.
+2. *"ngoài ra đặt xong click lại vật phẩm thì ko di chuyển được"*:
+   - Trước đây khi nhấp vào một vật phẩm đã đặt, việc nhấp chuột ra bãi cỏ bị hủy chọn thay vì dời vị trí.
+   - Đã nâng cấp toàn diện hệ thống điều khiển: Khi một vật phẩm được nhấp chọn (có vòng tròn xanh ngọc `#38bdf8` làm nổi bật):
+     - **Click-to-Relocate:** Người chơi chỉ cần nhấp chuột vào bất kỳ vị trí mới nào trên bãi cỏ đảo $\rightarrow$ vật phẩm ngay lập tức di chuyển chính xác tới tọa độ mới đó và tự động lưu vào backend!
+     - **Drag-to-Move:** Người chơi có thể nhấn giữ chuột trên vật phẩm và kéo trượt mượt mà trên mặt cỏ để dời vị trí theo ý muốn.
+     - Thanh điều khiển hiển thị trạng thái hướng dẫn rõ ràng: `📍 Nhấp bãi cỏ hoặc kéo để dời vị trí · ⬆️⬇️ Độ cao`.
+     - Nhấp nút `[ ✅ Xong ]` để chốt vị trí dời.
+3. *"gen lại back ground, cho các đạo nhìn lộng lẫy hơn, hoa hoét hơn nhìn như thiên đường ấy, mà đừng để giống tranh vẽ, nhìn thật vào chỉ là góc xa thôi"*:
+   - Tạo background mới `floating_islands_archipelago_bg.jpg` phong cách điện ảnh chân thực (photorealistic matte painting, không phải tranh vẽ hoạt hình) chụp từ góc xa toàn cảnh.
+   - Các hòn đảo bay rực rỡ ngập tràn sắc hoa cẩm tú cầu, hoa anh đào hồng tím nở rộ, thảm cỏ xanh mướt, đền đài cẩm thạch trắng cổ kính, thác nước pha lê đổ xuống biển mây bồng bềnh và vệt nắng vàng chiếu rọi qua làn sương cầu vồng huyền ảo như chốn bồng lai thiên đường.
+
+### Bằng chứng ảnh chụp kiểm thử tự động Playwright (`test_relocate_and_tray_tabs.mjs` - 100% Passed):
+- `78_clean_island_no_top_bulky_menu_new_paradise_bg.png`: Toàn cảnh hòn đảo khoáng đạt không còn thanh menu cồng kềnh phía trên, background thiên đường hoa rực rỡ lộng lẫy ở phía xa chân trời với phong cách chân thực sắc nét.
+- `79_decor_tray_with_placed_items_tab.png`: Menu Trang Trí với tab `[ 📋 Đang Có Trên Đảo (10) ]` hiển thị danh sách toàn bộ các vật phẩm đang có trên đảo rất gọn gàng và khoa học.
+- `80_relocating_placed_item_by_clicking_grass.png`: Nhấp chọn cây phong Momiji và nhấp vào bãi cỏ mới $\rightarrow$ vật phẩm được dời vị trí tức thì từ `(x: 1.5, z: 3.5)` sang tọa độ mới `(x: 5, z: 1)` và tự động lưu vĩnh viễn!
+
+---
+
+## 19. NGHIỆM THU: BỀ MẶT ĐẢO TỰ NHIÊN, CHÂN THỰC NHẤT VỚI THẢM CỎ PERLIN FRACTAL TỰ NHIÊN & HOA DẠI 3D SỐNG ĐỘNG (2026-11-18)
+
+Giải quyết trọn vẹn yêu cầu: *"ngoài ra bề mặt của đảo có thể sửa thành để mầu có tự nhiên nhất, thật nhất"*:
+1. **Thảm Cỏ Thực Vật Perlin FBM Tự Nhiên & Chân Thực (Zero Grid, Zero Rings):**
+   - Thay thế toàn bộ màu phẳng đơn điệu ban đầu bằng bộ texture thủ tục Canvas 2D độ phân giải cao ($1024 \times 1024$) ứng dụng thuật toán **Fractal Brownian Motion (FBM) Perlin Noise đa tầng tuần hoàn**.
+   - Phối màu tự nhiên chuẩn thảm cỏ cao nguyên Alpine chân thực:
+     - Sắc rêu clover trong bóng râm: `rgb(56, 110, 38)` (`#386e26`)
+     - Màu thảm cỏ cao nguyên khỏe khoắn: `rgb(80, 142, 56)` (`#508e38`)
+     - Vạt cỏ tắm nắng ấm áp: `rgb(107, 168, 70)` (`#6ba846`)
+     - Đầu ngọn cỏ óng vàng: `rgb(125, 187, 82)` (`#7dbb52`)
+   - Tích hợp hơn 38,000 sợi cỏ sợi thực vật mảnh khảnh vẽ cong tự nhiên cùng các cụm lá cỏ ba lá nhỏ (micro clover florets) điểm xuyết ngẫu nhiên trên toàn bề mặt.
+2. **Bản Đồ Xúc Giác Bump Map & Chuyển Màu Viền Đất/Đá Đảo (Natural Rim Transition):**
+   - Tạo Bump Map xúc giác tự nhiên ($512 \times 512$) với `bumpScale: 0.018` và `roughness: 0.86`, tán xạ ánh sáng mặt trời dịu nhẹ và êm ái như cỏ thực tế, loại bỏ hoàn toàn độ bóng nhựa nhân tạo.
+   - Bề mặt cỏ chuyển sắc mượt mà (vertex color gradient) ở phần mép viền ngoài ($rf > 0.89$ đến $1.0$): từ cỏ xanh $\rightarrow$ thảm cỏ phong hóa $\rightarrow$ tầng đất mùn giàu dinh dưỡng (`#71583d`) $\rightarrow$ vách đá đen bazan/granit (`#453123`).
+3. **Thảm Hoa Dại Alpine 3D Đung Đưa Trong Gió (Living Paradise Meadow):**
+   - Rải tự nhiên ~150 bông hoa dại và khóm cỏ 3D sống động khắp thảo nguyên đảo (tránh khu vực nhà khởi đầu và lòng suối):
+     - Hoa cúc họa mi trắng chamomile cánh trắng nhị vàng rực rỡ.
+     - Hoa mao lương vàng buttercup rực rỡ.
+     - Hoa lưu ly trời biếc forget-me-not sắc xanh thiên đường.
+     - Các khóm cỏ 3D xanh non.
+   - Toàn bộ hoa dại và khóm cỏ 3D tự động đung đưa nhịp nhàng theo làn gió cao nguyên trong vòng lặp hoạt ảnh `animate(time)`.
+4. **Bảo Toàn 100% Khả Năng Đi Lại Của Nhân Vật & Đặt Đồ Vật:**
+   - Mặt cỏ duy trì cao độ $y = 1.8\text{m}$ phẳng mượt không có gờ răng cưa hay vết lưới tam giác, nhân vật Chibi Adventurer sải bước cực kỳ êm ái và vật phẩm trang trí đặt ngay ngắn tự nhiên.
+
+### Bằng chứng ảnh chụp kiểm thử tự động Chrome CDP (`test_natural_island_surface.mjs` - 100% Passed):
+- `81_natural_realistic_island_surface_overview.png`: Toàn cảnh hòn đảo với bề mặt thảm cỏ tự nhiên đa tầng màu sắc, không còn vết chia lưới tam giác hay vòng tròn đồng tâm giả tạo, viền mép đất chuyển sắc hữu cơ vào vách đá.
+- `82_natural_island_surface_close_up.png`: Góc nhìn cận cảnh cho thấy thảm cỏ rực rỡ, các khóm hoa dại 3D (cúc họa mi trắng, mao lương vàng, hoa lưu ly biếc) điểm xuyết sống động quanh ngôi nhà, hồ nước và suối.
+- `83_character_walking_on_natural_surface.png`: Nhân vật Chibi Adventurer di chuyển mượt mà trên thảm cỏ tự nhiên mới mà không gặp bất kỳ trở ngại hay lỗi va chạm nào.
+
+---
+
+## 20. NGHIỆM THU: LOẠI BỎ VIỀN ĐEN NGOÀI CÙNG & XÓA BỎ HOA DẠI RẢI RÁC, GIỮ TRỌN BỀ MẶT CỎ TỰ NHIÊN MƯỢT MÀ (2026-11-18)
+
+Giải quyết trọn vẹn yêu cầu của người dùng: *"bỏ cái viền đen ở ngoài đi, rồi hoa hoét trên đảo cũng bỏ đi giữ lại cỏ được rôi"*:
+1. **Loại bỏ triệt để viền đen ở mép ngoài đảo:**
+   - Trước đây: Vạt ngoài cùng ($rf > 0.91$) bị vát dốc xuống $0.4\text{m}$ và gán màu đất sẫm `#453123` và `#71583d`, tạo thành một vành đai màu đen sẫm có bóng đổ quanh đảo từ góc nhìn camera trên cao.
+   - Nâng cấp: Giữ nguyên cao độ phẳng $y = 1.8\text{m}$ của thảm cỏ tràn đều ra tận mép ngoài cùng ($rf = 1.0$), màu cỏ xanh mướt tự nhiên phủ kín 100% diện tích không còn bất kỳ vệt đen hay bóng tối nào.
+   - Đồng thời tinh chỉnh phần đỉnh vách đá đáy đảo (`colSoilRim`) sang tông đá hoa cương tự nhiên `#786b5e` thay vì đen sẫm.
+2. **Loại bỏ toàn bộ hoa dại rải rác trên đảo, giữ lại thảm cỏ tinh khôi:**
+   - Xóa bỏ nhóm đối tượng `naturalFoliageGroup` và hàm sinh hoa dại `buildNaturalMeadowFoliage()` (hoa cúc trắng, hoa mao lương vàng, hoa lưu ly xanh).
+   - Xóa bỏ các chấm cỏ ba lá tròn trong canvas texture, chỉ giữ lại các vệt sợi cỏ mảnh khảnh tự nhiên theo thuật toán Perlin Fractal FBM.
+   - Hòn đảo trở nên thoáng đãng, rộng rãi, tinh tươm và sạch đẹp với thảm cỏ xanh mướt tự nhiên không bị rối mắt.
+
+### Bằng chứng ảnh chụp kiểm thử tự động Chrome CDP (`test_natural_island_surface.mjs` - 100% Passed):
+- `84_clean_grass_surface_no_black_rim_no_flowers.png`: Toàn cảnh hòn đảo khoáng đạt với thảm cỏ xanh tự nhiên tràn ngập mặt đảo, viền đen ngoài mép đã biến mất hoàn toàn, hoa dại rải rác đã được dọn sạch sẽ.
+- `85_clean_grass_surface_close_up.png`: Góc nhìn cận cảnh thảm cỏ xanh mướt, mềm mại và không còn bất kỳ đốm hoa lộn xộn nào.
+- `86_character_walking_on_clean_grass.png`: Nhân vật Chibi Adventurer sải bước tự do, mượt mà trên thảm cỏ sạch sẽ và tinh tươm.
 
 
 
 
 
+
+
+
+## 2026-11-20 — Player/Admin camera and template synchronization
+
+- Player vẫn dùng `MyIslandScreen` mobile canvas; không nhúng `preview.html` hay WebView.
+- Đồng bộ thông số với Admin template `2.4.0`: camera `38` (min `18`, max `55`), starter cottage `bld_starter_cottage` tại `(-2.5, 1.8, 2.2)`, mountain tại `(-8.5, 1.8, -8.0)`.
+- Migration giữ nguyên player decorations khi nâng template version.
+- Browser smoke `/home` 390×844: PASS — canvas 1, iframe 0, page errors 0.
 

@@ -172,7 +172,7 @@ export function ClueNotebookView({
                       key={idx}
                       className="text-[10px] sm:text-[11px] font-black text-[#5c3508] bg-gradient-to-b from-[#fde68a] to-[#f59e0b]/45 border border-[#c79334] px-2 py-0.5 rounded-md shadow-2xs"
                     >
-                      ⚡ {param}
+                      ⚡ {typeof param === "string" ? param : `${param.label}: ${param.value}`}
                     </span>
                   ))}
                 </div>

@@ -50,6 +50,8 @@ export const SoundGardenModal: React.FC<SoundGardenModalProps> = ({
   const [sleepTimer, setSleepTimer] = useState<number | null>(null);
   const [savedSoundIds, setSavedSoundIds] = useState<string[]>([]);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [toolkitLoading, setToolkitLoading] = useState(false);
+  const [toolkitError, setToolkitError] = useState<string | null>(null);
 
   const triggerHaptic = () => {
     try {
@@ -65,11 +67,18 @@ export const SoundGardenModal: React.FC<SoundGardenModalProps> = ({
 
   useEffect(() => {
     if (visible) {
+      let isMounted = true;
       setActiveSoundIds(soundscape.getActiveTrackIds());
       setSleepTimer(soundscape.getSleepTimerMinutes());
-      toolkitStorage.getSavedSoundIds().then(setSavedSoundIds);
+      setToolkitLoading(true);
+      setToolkitError(null);
+      toolkitStorage.getSavedSoundIds()
+        .then((ids) => { if (isMounted) setSavedSoundIds(ids); })
+        .catch(() => setToolkitError(locale === "en" ? "Your Bag could not be loaded. Check your connection and try again." : "Không thể tải Túi Đồ. Hãy kiểm tra kết nối rồi thử lại."))
+        .finally(() => { if (isMounted) setToolkitLoading(false); });
+      return () => { isMounted = false; };
     }
-  }, [visible]);
+  }, [visible, locale]);
 
   const handleToggleSound = (trackId: string) => {
     triggerHaptic();
@@ -90,7 +99,15 @@ export const SoundGardenModal: React.FC<SoundGardenModalProps> = ({
 
   const handleToggleSaveToBag = async (track: SoundTrack) => {
     triggerSuccessHaptic();
-    const { saved, ids } = await toolkitStorage.toggleSound(track.id);
+    setToolkitError(null);
+    let result: { saved: boolean; ids: string[] };
+    try {
+      result = await toolkitStorage.toggleSound(track.id);
+    } catch {
+      setToolkitError(locale === "en" ? "Could not update your Bag. Try again." : "Không thể cập nhật Túi Đồ. Hãy thử lại.");
+      return;
+    }
+    const { saved, ids } = result;
     setSavedSoundIds(ids);
     const trackName = locale === "en" ? (track.nameEn || track.name) : track.name;
     if (saved) {
@@ -190,6 +207,8 @@ export const SoundGardenModal: React.FC<SoundGardenModalProps> = ({
               <Text style={styles.toastText}>{toastMsg}</Text>
             </View>
           )}
+          {toolkitLoading && <Text style={styles.toolkitStatusText}>{locale === "en" ? "Loading your Bag…" : "Đang tải Túi Đồ…"}</Text>}
+          {toolkitError && <Text style={styles.toolkitErrorText}>{toolkitError}</Text>}
 
           {/* Lyra Guardian Sticky Top Section (Always visible above scroll) */}
           <View style={styles.guardianTopSection}>
@@ -500,6 +519,18 @@ const styles = StyleSheet.create({
     padding: 6,
     borderRadius: radius.full,
     backgroundColor: "rgba(255, 255, 255, 0.05)",
+  },
+  toolkitStatusText: {
+    color: "#94a3b8",
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  toolkitErrorText: {
+    color: "#fca5a5",
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 8,
   },
   modalScroll: {
     flex: 1,

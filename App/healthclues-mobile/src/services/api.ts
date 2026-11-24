@@ -50,7 +50,9 @@ export function resolveServiceUrl(envUrl: string | undefined, defaultPort: numbe
 
 export function getApiBaseUrl(): string {
   if (Platform.OS === "web") {
-    return "";
+    // Expo web does not proxy unknown /api paths; use the configured backend
+    // so API calls cannot fall through to SPA HTML.
+    return resolveServiceUrl(process.env.EXPO_PUBLIC_API_URL, 3329);
   }
   return resolveServiceUrl(process.env.EXPO_PUBLIC_API_URL, 3329);
 }

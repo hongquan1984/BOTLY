@@ -56,6 +56,7 @@ import {
 } from "@/hooks/useWellnessHome";
 import { useMobileHomeParallax } from "@/hooks/useMobileHomeParallax";
 import { Home3DStage } from "@/modules/home3d/Home3DStage";
+import { MyIslandScreen } from "@/modules/island3d/components/MyIslandScreen";
 
 type DockTab = "claimed" | "all" | "chibi";
 
@@ -81,7 +82,7 @@ function getItemCenterPct(item: WellnessHomeItem): number {
   return (minX + maxX) / 2;
 }
 
-export default function HomeScreen() {
+function LegacyHomeScreen() {
   const { locale, strings } = useLocale();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const { isAuthenticated } = useAuth();
@@ -1405,6 +1406,15 @@ export default function HomeScreen() {
       </Modal>
     </SafeAreaView>
   );
+}
+
+/**
+ * The Home tab is the player's personal Dao3D island. Keep the former
+ * chalet/home3d implementation available as LegacyHomeScreen for rollback,
+ * but do not route the player-facing menu through that runtime.
+ */
+export default function HomeScreen() {
+  return <MyIslandScreen userId="player_hero_01" />;
 }
 
 const styles = StyleSheet.create({

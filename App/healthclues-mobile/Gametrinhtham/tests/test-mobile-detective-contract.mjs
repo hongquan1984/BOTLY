@@ -1,0 +1,32 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+const component = fs.readFileSync(new URL("../MobileDetectiveGame.tsx", import.meta.url), "utf8");
+const adapter = fs.readFileSync(new URL("../dataAdapter.ts", import.meta.url), "utf8");
+const modal = fs.readFileSync(new URL("../../src/modules/detective/DetectiveWebViewModal.tsx", import.meta.url), "utf8");
+const campaignRoute = fs.readFileSync(new URL("../../../../src/app/api/healthclues/mobile-detective/campaign/route.ts", import.meta.url), "utf8");
+const solveRoute = fs.readFileSync(new URL("../../../../src/app/api/healthclues/mobile-detective/solve/route.ts", import.meta.url), "utf8");
+
+assert.match(component, /loadDetectiveCampaign/);
+assert.match(component, /activeCase\.clues/);
+assert.match(component, /scene\?\.hotspots/);
+assert.match(component, /allCluesCollected/);
+assert.match(component, /disabled=\{!allCluesCollected\}/);
+assert.match(component, /Soi đủ \$\{activeCase\.clues\.length\} vật chứng/);
+assert.match(component, /candidates/);
+assert.match(component, /Sổ Tay Y Khoa/);
+assert.match(component, /puzzleStates/);
+assert.match(component, /stars/);
+assert.match(adapter, /healthclues\/detective\/campaign/);
+assert.match(adapter, /role === "clue-closeup"/);
+assert.match(campaignRoute, /requireUser/);
+assert.match(campaignRoute, /loadDetectiveProgressFromDb/);
+assert.match(solveRoute, /requireUser/);
+assert.match(solveRoute, /healthclues_solve_detective_case_v1/);
+assert.match(solveRoute, /p_selected_conclusion_ids/);
+assert.match(solveRoute, /p_wrong_conclusion_attempts/);
+assert.match(solveRoute, /p_puzzle_states/);
+assert.doesNotMatch(solveRoute, /localStorage|AsyncStorage|sessionStorage/);
+assert.doesNotMatch(modal, /<iframe/);
+assert.doesNotMatch(modal, /react-native-webview/);
+console.log("PASS mobile detective generic renderer contract");

@@ -347,17 +347,17 @@
     .bottom-dock {
       position: absolute;
       bottom: 20px;
-      left: 20px;
-      right: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       background: rgba(6, 28, 22, 0.95);
       border: 1.5px solid #059669;
       border-radius: 28px;
-      padding: 8px 16px;
+      padding: 6px 20px;
       display: flex;
-      justify-content: space-around;
       align-items: center;
-      z-index: 20;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      gap: 16px;
+      z-index: 50;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
     .dock-btn {
       display: flex;
@@ -368,6 +368,7 @@
       color: #e2e8f0;
       cursor: pointer;
       gap: 4px;
+      padding: 4px 6px;
     }
     .dock-icon {
       width: 44px;
@@ -387,6 +388,52 @@
     .dock-label {
       font-size: 11px;
       font-weight: 700;
+    }
+    .dock-coin-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245, 158, 11, 0.18);
+      border: 1.2px solid #f59e0b;
+      color: #fbbf24;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 8px 14px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+      white-space: nowrap;
+    }
+
+    /* PLAYER IMMERSIVE MODE — ZERO CLUTTER FOCUS ON ISLAND */
+    body.player-mode .floating-quick-tools {
+      display: none !important;
+    }
+    body.player-mode .placed-items-badge {
+      display: none !important;
+    }
+    body.player-mode #admin-controls-strip {
+      display: none !important;
+    }
+    body.player-mode #player-controls-strip {
+      display: none !important;
+    }
+    body.player-mode .top-hud {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      pointer-events: none;
+    }
+    body.player-mode .top-hud * {
+      pointer-events: auto;
+    }
+    body.player-mode .island-badge {
+      display: none !important;
+    }
+    body.player-mode #btn-back {
+      display: none !important;
+    }
+    body.player-mode .coin-badge {
+      display: none !important;
     }
 
     /* MODAL */
@@ -564,20 +611,22 @@
       cursor: not-allowed;
     }
 
-    /* PLACEMENT BAR */
+    /* PLACEMENT BAR — ULTRA-SLIM FLOATING BOTTOM DOCK */
     .placement-bar {
       position: absolute;
       bottom: 24px;
-      left: 20px;
-      right: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 580px;
       background: rgba(6, 28, 22, 0.98);
       border: 1.5px solid #10b981;
       border-radius: 20px;
-      padding: 12px 16px;
-      z-index: 60;
+      padding: 10px 14px;
+      z-index: 80;
       display: none;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       box-shadow: 0 12px 36px rgba(0,0,0,0.7);
     }
     .placement-bar.open {
@@ -780,8 +829,10 @@
     .decor-tray {
       position: absolute;
       bottom: 84px;
-      left: 16px;
-      right: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 780px;
       background: rgba(6, 28, 22, 0.96);
       backdrop-filter: blur(16px);
       border: 1.5px solid #10b981;
@@ -790,7 +841,7 @@
       display: none;
       flex-direction: column;
       gap: 8px;
-      z-index: 28;
+      z-index: 70;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
       transition: all 0.25s ease;
     }
@@ -811,7 +862,45 @@
       letter-spacing: 0.5px;
       display: flex;
       align-items: center;
+      gap: 10px;
+    }
+    .tray-tabs {
+      display: flex;
+      align-items: center;
       gap: 6px;
+    }
+    .tray-tab {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .tray-tab:hover {
+      background: #334155;
+      color: #f1f5f9;
+    }
+    .tray-tab.active {
+      background: #10b981;
+      border-color: #34d399;
+      color: #042f2e;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .placed-items-chips-container {
+      display: none;
+      max-height: 120px;
+      overflow-y: auto;
+      padding: 6px 2px;
+    }
+    .placed-items-chips-container.active {
+      display: block !important;
     }
     .decor-count {
       color: #94a3b8;
@@ -1083,10 +1172,6 @@
       <button class="admin-save-btn" id="btn-save-admin-template" onclick="window.saveAdminDefaultTemplate()">
         💾 LƯU THÀNH ĐẢO MẪU CHO TẤT CẢ NGƯỜI CHƠI
       </button>
-      <div class="placed-items-inline-wrap" id="placed-items-inline-wrap">
-        <span class="placed-items-title">Đang có trên đảo:</span>
-        <div class="placed-items-chips" id="placed-items-chips"></div>
-      </div>
     </div>
 
     <!-- PLAYER CONTROLS STRIP (SHOWN IN PLAYER MODE) -->
@@ -1119,11 +1204,17 @@
   <div class="decor-tray" id="decor-tray">
     <div class="decor-tray-header">
       <div class="decor-tray-title">
-        <span>🛠️ CHỌN VẬT PHẨM TRANG TRÍ</span>
-        <span class="decor-count" id="decor-tray-count">(58 Món)</span>
+        <div class="tray-tabs">
+          <button class="tray-tab active" id="btn-tab-catalog" onclick="window.switchTrayTab('catalog')">
+            <span>➕ Thêm Đồ Mới</span>
+          </button>
+          <button class="tray-tab" id="btn-tab-placed" onclick="window.switchTrayTab('placed')">
+            <span>📋 Đang Có Trên Đảo (<span id="tray-placed-count">0</span>)</span>
+          </button>
+        </div>
         <button class="decor-mini-btn" id="btn-minimize-decor-tray" title="Thu gọn / Mở rộng menu">🔽 Thu Gọn</button>
       </div>
-      <div class="decor-tray-actions">
+      <div class="decor-tray-actions" id="tray-catalog-filters">
         <button class="decor-filter-btn active" data-cat="all">Tất Cả</button>
         <button class="decor-filter-btn" data-cat="landscape">Tiện Ích</button>
         <button class="decor-filter-btn" data-cat="nature">Cây Cối</button>
@@ -1132,8 +1223,13 @@
         <button class="decor-close-btn" id="btn-close-decor-tray" title="Đóng thanh trang trí">✕</button>
       </div>
     </div>
+    <!-- CATALOG ITEMS SCROLL CONTAINER (WHEN TAB CATALOG ACTIVE) -->
     <div class="decor-scroll-container" id="decor-scroll-container">
       <!-- Dynamic item chips -->
+    </div>
+    <!-- PLACED ITEMS CONTAINER (WHEN TAB PLACED ACTIVE) -->
+    <div class="placed-items-chips-container" id="placed-items-chips-container" style="display: none;">
+      <div class="placed-items-chips" id="placed-items-chips"></div>
     </div>
   </div>
 
@@ -1145,12 +1241,16 @@
     </button>
     <button class="dock-btn" id="btn-open-inv">
       <div class="dock-icon">🎒</div>
-      <span class="dock-label" id="lbl-inv">Kho Đồ (58)</span>
+      <span class="dock-label" id="lbl-inv">Kho Đồ</span>
     </button>
     <button class="dock-btn" id="btn-toggle-decor">
       <div class="dock-icon">🛠️</div>
       <span class="dock-label" id="lbl-decor">Trang Trí</span>
     </button>
+    <div class="dock-coin-badge" title="Số xu dưỡng sinh của bạn">
+      <span>🪙</span>
+      <span id="dock-coins">500</span> Xu
+    </div>
   </div>
 
   <!-- TOAST FEEDBACK NOTIFICATIONS -->
@@ -1333,8 +1433,9 @@
     window.FULL_CATALOG = FULL_CATALOG;
 
     let playerCoins = 500;
-    // CHO TOÀN BỘ 58 MÔ HÌNH VÀO KHO ĐỒ THEO YÊU CẦU CỦA USER (MỖI MÓN 20 CHIẾC THOẢI MÁI TRANG TRÍ)
+    window.playerCoins = playerCoins;
     let ownedInventory = FULL_CATALOG.map(c => ({ itemId: c.id, count: 20 }));
+    window.ownedInventory = ownedInventory;
     let placedItems = [];
     window.placedItems = placedItems;
 
@@ -1473,7 +1574,7 @@
 
     // Vast floating islands archipelago background with deep atmospheric perspective & distant sky islands
     const texLoader = new THREE.TextureLoader();
-    texLoader.load('/assets/textures/floating_islands_archipelago_bg.jpg', (tex) => {
+    texLoader.load('/assets/textures/floating_islands_archipelago_bg.jpg?v=paradise_' + Date.now(), (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
       bgMat.map = tex;
       bgMat.needsUpdate = true;
@@ -1566,9 +1667,9 @@
     const uColors = [];
     const uV = new THREE.Vector3();
 
-    const colSoilRim = new THREE.Color('#453123');   // Top dark soil rim
-    const colGranite = new THREE.Color('#5a4e44');   // Mid rocky cliff
-    const colBasalt = new THREE.Color('#2e2722');    // Deep keel rock
+    const colSoilRim = new THREE.Color('#786b5e');   // Top warm granite cliff
+    const colGranite = new THREE.Color('#63574c');   // Mid rocky cliff
+    const colBasalt = new THREE.Color('#423830');    // Deep keel rock
 
     for (let i = 0; i < uPos.count; i++) {
       uV.fromBufferAttribute(uPos, i);
@@ -1620,14 +1721,193 @@
     undersideMesh.castShadow = true;
     scene.add(undersideMesh);
 
-    // 2. TOP MEADOW SURFACE (UNIFORM LUSH GREEN, SILKY SMOOTH, NO SPOTS OR BLEMISHES)
-    const meadowRings = 36;
-    const meadowSegments = 72;
+    // -------------------------------------------------------------
+    // NATURAL HIGH-FIDELITY TURF & GRASS PROCEDURAL TEXTURES
+    // Pure 2D Perlin Fractal Brownian Motion (Zero Rings, Zero Grid)
+    // -------------------------------------------------------------
+    function createNoise2D(seed = 42) {
+      const perm = new Uint8Array(512);
+      const p = new Uint8Array(256);
+      for (let i = 0; i < 256; i++) p[i] = i;
+      let s = seed;
+      for (let i = 255; i > 0; i--) {
+        s = (s * 9301 + 49297) % 233280;
+        const j = Math.floor((s / 233280) * (i + 1));
+        const t = p[i]; p[i] = p[j]; p[j] = t;
+      }
+      for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+      function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+      function lerp(t, a, b) { return a + t * (b - a); }
+      function grad(hash, x, y) {
+        const h = hash & 7;
+        const u = h < 4 ? x : y;
+        const v = h < 4 ? y : x;
+        return ((h & 1) ? -u : u) + ((h & 2) ? -2.0 * v : 2.0 * v);
+      }
+      return function noise2D(x, y) {
+        const X = Math.floor(x) & 255;
+        const Y = Math.floor(y) & 255;
+        const xf = x - Math.floor(x);
+        const yf = y - Math.floor(y);
+        const u = fade(xf);
+        const v = fade(yf);
+        const aa = perm[perm[X] + Y];
+        const ab = perm[perm[X] + Y + 1];
+        const ba = perm[perm[X + 1] + Y];
+        const bb = perm[perm[X + 1] + Y + 1];
+        const x1 = lerp(u, grad(aa, xf, yf), grad(ba, xf - 1, yf));
+        const x2 = lerp(u, grad(ab, xf, yf - 1), grad(bb, xf - 1, yf - 1));
+        return lerp(v, x1, x2);
+      };
+    }
+
+    const perlin2D = createNoise2D(777);
+
+    function fbmPeriodic(x, y, L) {
+      const u = (x / L) * Math.PI * 2;
+      const v = (y / L) * Math.PI * 2;
+      const nx = Math.cos(u) * 1.8;
+      const ny = Math.sin(u) * 1.8;
+      const nz = Math.cos(v) * 1.8;
+      const nw = Math.sin(v) * 1.8;
+      return (perlin2D(nx + 12.3, nz + 12.3) + perlin2D(ny + 25.7, nw + 25.7)) * 0.45 +
+             (perlin2D(nx * 2.3 + 37.1, nz * 2.3 + 37.1) + perlin2D(ny * 2.3 + 49.5, nw * 2.3 + 49.5)) * 0.28 +
+             (perlin2D(nx * 4.6 + 63.8, nz * 4.6 + 63.8) + perlin2D(ny * 4.6 + 74.2, nw * 4.6 + 74.2)) * 0.15;
+    }
+
+    function createNaturalGrassTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const imgData = ctx.createImageData(w, h);
+      const data = imgData.data;
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const idx = (y * w + x) * 4;
+          const noise = fbmPeriodic(x, y, w); // Natural fractal range -1.0 to 1.0
+
+          // Authentic Alpine Meadow Turf Palette:
+          // Deep moss / clover shade: rgb(56, 110, 38)   (#386e26)
+          // Rich healthy meadow:      rgb(80, 142, 56)   (#508e38)
+          // Sunlit pasture crest:     rgb(107, 168, 70)  (#6ba846)
+          // Golden sun kissed tips:   rgb(125, 187, 82)  (#7dbb52)
+          const norm = Math.min(1.0, Math.max(0.0, (noise + 0.85) / 1.70));
+          let r, g, b;
+          if (norm < 0.5) {
+            const t = norm / 0.5;
+            r = 56 + (80 - 56) * t;
+            g = 110 + (142 - 110) * t;
+            b = 38 + (56 - 38) * t;
+          } else {
+            const t = (norm - 0.5) / 0.5;
+            r = 80 + (112 - 80) * t;
+            g = 142 + (174 - 142) * t;
+            b = 56 + (72 - 56) * t;
+          }
+
+          // Subtle natural micro-flecks (zero lattice or grid)
+          const micro = (Math.random() - 0.5) * 8;
+          data[idx]     = Math.min(255, Math.max(0, r + micro * 0.8));
+          data[idx + 1] = Math.min(255, Math.max(0, g + micro));
+          data[idx + 2] = Math.min(255, Math.max(0, b + micro * 0.6));
+          data[idx + 3] = 255;
+        }
+      }
+      ctx.putImageData(imgData, 0, 0);
+
+      // Fine natural grass blades and fiber stippling
+      const bladeColors = [
+        'rgba(45, 88, 30, 0.40)',   // deep clover shadow blade
+        'rgba(68, 122, 46, 0.50)',  // lush grass blade
+        'rgba(94, 156, 62, 0.52)',  // vibrant sunlit blade
+        'rgba(120, 182, 75, 0.42)', // golden tip blade
+        'rgba(148, 202, 90, 0.30)', // sun glint blade
+      ];
+
+      for (let i = 0; i < 38000; i++) {
+        const bx = Math.random() * w;
+        const by = Math.random() * h;
+        const len = 3.5 + Math.random() * 5.5;
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.88;
+        const color = bladeColors[Math.floor(Math.random() * bladeColors.length)];
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 0.85 + Math.random() * 0.75;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.quadraticCurveTo(
+          bx + Math.cos(angle) * (len * 0.5) + (Math.random() - 0.5) * 1.5,
+          by + Math.sin(angle) * (len * 0.5),
+          bx + Math.cos(angle) * len,
+          by + Math.sin(angle) * len
+        );
+        ctx.stroke();
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(4, 4);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      return texture;
+    }
+
+    function createNaturalGrassBumpTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const imgData = ctx.createImageData(w, h);
+      const data = imgData.data;
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const idx = (y * w + x) * 4;
+          const noise = fbmPeriodic(x, y, w);
+          const val = Math.min(255, Math.max(0, 128 + noise * 38 + (Math.random() - 0.5) * 10));
+          data[idx]     = val;
+          data[idx + 1] = val;
+          data[idx + 2] = val;
+          data[idx + 3] = 255;
+        }
+      }
+      ctx.putImageData(imgData, 0, 0);
+
+      ctx.lineWidth = 1.0;
+      for (let i = 0; i < 16000; i++) {
+        const bx = Math.random() * w;
+        const by = Math.random() * h;
+        const len = 3.0 + Math.random() * 5.0;
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.88;
+        ctx.strokeStyle = Math.random() > 0.45 ? 'rgba(215, 215, 215, 0.35)' : 'rgba(40, 40, 40, 0.25)';
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx + Math.cos(angle) * len, by + Math.sin(angle) * len);
+        ctx.stroke();
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(4, 4);
+      return texture;
+    }
+
+    // 2. TOP MEADOW SURFACE (HYPER-REALISTIC SILKY ORGANIC TURF)
+    const meadowRings = 40;
+    const meadowSegments = 80;
     const mPositions = [];
+    const mUVs = [];
     const mColors = [];
     const mIndices = [];
-
-    const colGrass = new THREE.Color('#58a649');      // Uniform lush highland pasture green
 
     // DEFINE UNIFIED RIVER CURVE
     const riverCurve = new THREE.CatmullRomCurve3([
@@ -1638,6 +1918,14 @@
       new THREE.Vector3(9.2, 1.80, 1.2)
     ]);
     const riverCurvePts = riverCurve.getPoints(48);
+
+    // Natural biosphere color palette for macro tinting
+    const colSunlit    = new THREE.Color('#fafdf5'); // Crisp sunlit highland warmth
+    const colDeepMoss  = new THREE.Color('#cbe8ba'); // Moist clover hollow
+    const colRiverBank = new THREE.Color('#a4d28e'); // Mineral-rich riverbank
+    const colThinTurf  = new THREE.Color('#9aa66c'); // Weathered edge turf
+    const colLoamSoil  = new THREE.Color('#71583d'); // Rich brown loam soil
+    // colSoilRim defined above: #453123
 
     for (let r = 0; r <= meadowRings; r++) {
       const rf = r / meadowRings;
@@ -1652,21 +1940,37 @@
 
         const x = sqX * islandRadiusX * wobble * rf;
         const z = sqZ * islandRadiusZ * wobble * rf;
-        let y = 1.8;
 
-        // Smooth outer bevel curving down to meet rock cliff
-        if (rf > 0.92) {
-          y -= (rf - 0.92) * 4.2;
+        // UV mapping
+        const u = (x / (islandRadiusX * 2.1)) + 0.5;
+        const v = (z / (islandRadiusZ * 2.1)) + 0.5;
+        mUVs.push(u, v);
+
+        // Distance to river curve to preserve flat river bed
+        let minRiverDistSq = 999;
+        for (let rp = 0; rp < riverCurvePts.length; rp += 4) {
+          const dx = x - riverCurvePts[rp].x;
+          const dz = z - riverCurvePts[rp].z;
+          const d2 = dx * dx + dz * dz;
+          if (d2 < minRiverDistSq) minRiverDistSq = d2;
         }
+        const riverDist = Math.sqrt(minRiverDistSq);
+        const riverDamp = Math.min(1.0, riverDist / 2.2);
+
+        // Silky smooth pasture elevation: y = 1.8 across island top edge-to-edge,
+        // eliminating any dark bevel drop shadow or black rim!
+        let y = 1.8;
 
         mPositions.push(x, y, z);
 
-        // Uniform, pristine, even green color across entire meadow surface
+        // Multi-tone organic vertex coloring (pure lush grass edge-to-edge, NO dark border!)
         const c = new THREE.Color();
-        if (rf > 0.96) {
-          c.copy(colGrass).lerp(colSoilRim, (rf - 0.96) / 0.04);
-        } else {
-          c.copy(colGrass);
+        const nNoise = Math.sin(x * 0.28 + Math.cos(z * 0.22) * 1.5) * 0.5 + 0.5;
+        const nNoise2 = Math.cos(z * 0.32 - Math.sin(x * 0.25) * 1.3) * 0.5 + 0.5;
+        const blendFactor = nNoise * 0.6 + nNoise2 * 0.4;
+        c.copy(colSunlit).lerp(colDeepMoss, blendFactor);
+        if (riverDamp < 0.8) {
+          c.lerp(colRiverBank, (0.8 - riverDamp) / 0.8);
         }
         mColors.push(c.r, c.g, c.b);
       }
@@ -1686,17 +1990,24 @@
 
     const meadowGeo = new THREE.BufferGeometry();
     meadowGeo.setAttribute('position', new THREE.Float32BufferAttribute(mPositions, 3));
+    meadowGeo.setAttribute('uv', new THREE.Float32BufferAttribute(mUVs, 2));
     meadowGeo.setAttribute('color', new THREE.Float32BufferAttribute(mColors, 3));
     meadowGeo.setIndex(mIndices);
     meadowGeo.computeVertexNormals();
 
+    const grassTex = createNaturalGrassTexture();
+    const grassBumpTex = createNaturalGrassBumpTexture();
+
     const meadowMesh = new THREE.Mesh(
       meadowGeo,
       new THREE.MeshStandardMaterial({
+        map: grassTex,
+        bumpMap: grassBumpTex,
+        bumpScale: 0.018,
         vertexColors: true,
-        roughness: 0.82,
+        roughness: 0.86,
         metalness: 0.02,
-        flatShading: false, // SMOOTH SHADING: SILKY SMOOTH MEADOW, NO TRIANGLE EDGES!
+        flatShading: false,
         side: THREE.DoubleSide,
       })
     );
@@ -2053,7 +2364,7 @@
     }
 
     function spawnPlacedItem(itemRecord) {
-      const { instanceId, itemId, position, rotationY = 0, elevation = 0 } = itemRecord;
+      const { instanceId, itemId, position, rotationY = 0, elevation = 0, isDefaultTerrain = false } = itemRecord;
       let group;
       if (itemId === 'ter_snowy_mountain') {
         group = buildMountain(instanceId);
@@ -2073,6 +2384,7 @@
 
       group.position.set(x, y, z);
       group.rotation.y = rotationY;
+      group.userData.isDefaultTerrain = isDefaultTerrain;
       placedObjectsGroup.add(group);
 
       const placedRecord = {
@@ -2081,17 +2393,40 @@
         position: { x, y, z },
         rotationY,
         elevation,
+        isDefaultTerrain,
         group
       };
       placedItems.push(placedRecord);
       return placedRecord;
     }
 
-    function clearEntireIsland() {
+    function clearEntireIsland(forceAll = false) {
       if (selectedInstanceId) {
         selectedInstanceId = null;
         cursor.visible = false;
       }
+      if (currentMode === 'player' && !forceAll) {
+        // In Player mode: Only clear player's custom decorations, keep Admin default terrain locked & intact!
+        const toKeep = [];
+        const toRemove = [];
+        placedItems.forEach(item => {
+          if (item.isDefaultTerrain) {
+            toKeep.push(item);
+          } else {
+            toRemove.push(item);
+          }
+        });
+        toRemove.forEach(item => {
+          if (item.group) placedObjectsGroup.remove(item.group);
+        });
+        placedItems = toKeep;
+        window.placedItems = placedItems;
+        if (typeof renderDecorTray === 'function') renderDecorTray();
+        if (typeof updatePlacedChips === 'function') updatePlacedChips();
+        showToast('🧹 Đã dọn các vật phẩm của bạn (Địa thế gốc của Admin được giữ nguyên)!');
+        return;
+      }
+
       while (placedObjectsGroup.children.length > 0) {
         placedObjectsGroup.remove(placedObjectsGroup.children[0]);
       }
@@ -2102,7 +2437,7 @@
     }
 
     function loadIslandLayout(itemsList) {
-      clearEntireIsland();
+      clearEntireIsland(true);
       if (Array.isArray(itemsList)) {
         itemsList.forEach(it => spawnPlacedItem(it));
       }
@@ -2114,11 +2449,14 @@
     window.loadIslandLayout = loadIslandLayout;
 
     function updatePlacedChips() {
+      const countEl = document.getElementById('tray-placed-count');
+      if (countEl) countEl.textContent = placedItems.length;
+
       const container = document.getElementById('placed-items-chips');
       if (!container) return;
       container.innerHTML = '';
       if (!placedItems || placedItems.length === 0) {
-        container.innerHTML = '<span style="color:#94a3b8;font-size:11px;font-style:italic;">(Chưa có vật phẩm nào — Hãy chọn Thêm Núi, Hồ, Suối...)</span>';
+        container.innerHTML = '<span style="color:#94a3b8;font-size:11px;font-style:italic;padding:8px 12px;display:block;">(Chưa có vật phẩm nào — Hãy chuyển sang tab "+ Thêm Đồ Mới" để đặt!)</span>';
         return;
       }
       placedItems.forEach((item) => {
@@ -2126,21 +2464,25 @@
         const name = def ? def.nameVi : item.itemId;
         const icon = def ? def.icon : '📦';
         const isSel = selectedInstanceId === item.instanceId;
+        const isLocked = currentMode === 'player' && item.isDefaultTerrain;
         const chip = document.createElement('div');
-        chip.className = 'placed-item-chip' + (isSel ? ' active' : '');
+        chip.className = 'placed-item-chip' + (isSel ? ' active' : '') + (isLocked ? ' locked' : '');
         chip.innerHTML = `
-          <span class="chip-label" title="Nhấp để định vị & chọn trên 3D">${icon} ${name}</span>
-          <button class="chip-delete-btn" title="Xóa ngay vật phẩm này khỏi đảo">✕</button>
+          <span class="chip-label" title="${isLocked ? 'Địa thế mặc định do Admin tạo (Người chơi không thể xóa)' : 'Nhấp để định vị & chọn trên 3D'}">${isLocked ? '🔒 ' : ''}${icon} ${name}</span>
+          ${isLocked ? '<span class="chip-lock-tag" title="Địa thế mặc định của Admin (Không thể xóa)">🔒 Cố định</span>' : '<button class="chip-delete-btn" title="Xóa ngay vật phẩm này khỏi đảo">✕</button>'}
         `;
         chip.querySelector('.chip-label').onclick = (e) => {
           e.stopPropagation();
           selectPlacedItem(item.instanceId);
           updatePlacedChips();
         };
-        chip.querySelector('.chip-delete-btn').onclick = (e) => {
-          e.stopPropagation();
-          deleteSpecificItem(item.instanceId);
-        };
+        const delBtn = chip.querySelector('.chip-delete-btn');
+        if (delBtn) {
+          delBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteSpecificItem(item.instanceId);
+          };
+        }
         container.appendChild(chip);
       });
     }
@@ -2151,6 +2493,13 @@
       if (idx === -1) return;
       const item = placedItems[idx];
       const def = FULL_CATALOG.find(c => c.id === item.itemId);
+
+      // Lock protection: In Player Mode, Admin default terrain CANNOT be deleted!
+      if (currentMode === 'player' && item.isDefaultTerrain) {
+        showToast(`🔒 "${def ? def.nameVi : 'Vật phẩm'}" là địa thế mặc định do Admin tạo — người chơi không thể xóa!`);
+        return;
+      }
+
       if (item.group) {
         placedObjectsGroup.remove(item.group);
       }
@@ -2162,12 +2511,13 @@
       }
       updatePlacedChips();
       renderDecorTray();
+      if (currentMode === 'player') savePlayerIslandLayout();
       showToast(`Đã xóa & dọn dẹp "${def ? def.nameVi : 'Vật phẩm'}" khỏi đảo!`);
     }
     window.deleteSpecificItem = deleteSpecificItem;
 
     function clearEntireIslandAndNotify() {
-      clearEntireIsland();
+      clearEntireIsland(true);
       updatePlacedChips();
       showToast('🧹 Đã xóa sạch toàn bộ hòn đảo để thiết kế lại từ đầu!');
     }
@@ -2228,6 +2578,161 @@
     scene.add(ghostGroup);
 
     // -------------------------------------------------------------
+    // WORD3D ADVENTURER CHARACTER CONTROLLER (CHIBI ROGUE EXPLORER)
+    // -------------------------------------------------------------
+    const characterGroup = new THREE.Group();
+    characterGroup.name = 'PlayerAdventurer';
+    characterGroup.position.set(0, 1.8, 2.0);
+    scene.add(characterGroup);
+
+    // Destination golden pulse ring
+    const destMarkerGeo = new THREE.RingGeometry(0.35, 0.52, 32);
+    destMarkerGeo.rotateX(-Math.PI / 2);
+    const destMarkerMat = new THREE.MeshBasicMaterial({
+      color: '#fbbf24',
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.0,
+      depthWrite: false
+    });
+    const destMarker = new THREE.Mesh(destMarkerGeo, destMarkerMat);
+    destMarker.position.set(0, 1.82, 0);
+    scene.add(destMarker);
+
+    let charMixer = null;
+    const charActions = {};
+    let currentCharAction = null;
+    let isCharMoving = false;
+    let charTarget = null;
+    const charWalkSpeed = 3.6;
+    const charRotateSpeed = 10.0;
+    let charIdleTimer = 0;
+
+    function fadeToCharAction(name, duration = 0.25) {
+      const next = charActions[name];
+      if (!next || next === currentCharAction) return;
+      if (currentCharAction) {
+        currentCharAction.fadeOut(duration);
+      }
+      next.reset().fadeIn(duration).play();
+      currentCharAction = next;
+    }
+
+    gltfLoader.load(
+      '/assets/characters/Rogue.glb',
+      (gltf) => {
+        const model = gltf.scene;
+        model.scale.setScalar(0.65);
+        model.position.y = 0;
+        model.rotation.y = 0;
+
+        model.traverse(child => {
+          if (child.name.includes('Knife') || child.name.includes('Crossbow') || child.name.includes('Throwable')) {
+            child.visible = false;
+          }
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+
+        characterGroup.add(model);
+        charMixer = new THREE.AnimationMixer(model);
+
+        for (const clip of gltf.animations) {
+          const n = clip.name.toLowerCase();
+          const act = charMixer.clipAction(clip);
+          if (n === 'idle' || n === 'unarmed_idle') {
+            if (!charActions['idle']) charActions['idle'] = act;
+          } else if (n === 'walking_a' || n === 'walking' || n === 'walk') {
+            if (!charActions['walk']) charActions['walk'] = act;
+          } else if (n === 'running_a' || n === 'running' || n === 'run') {
+            if (!charActions['run']) charActions['run'] = act;
+          }
+        }
+
+        if (charActions['idle']) {
+          currentCharAction = charActions['idle'];
+          currentCharAction.play();
+        } else if (gltf.animations.length > 0) {
+          currentCharAction = charMixer.clipAction(gltf.animations[0]);
+          currentCharAction.play();
+        }
+        console.log('Chibi Adventurer loaded onto 3D island with animations:', Object.keys(charActions));
+      },
+      undefined,
+      (err) => {
+        console.warn('Failed to load Rogue.glb character:', err);
+      }
+    );
+
+    function moveCharacterTo(targetX, targetZ) {
+      const distFromCenter = Math.hypot(targetX, targetZ);
+      if (distFromCenter > 12.0) {
+        const s = 11.5 / distFromCenter;
+        targetX *= s;
+        targetZ *= s;
+      }
+      charTarget = new THREE.Vector3(targetX, 1.8, targetZ);
+      destMarker.position.set(targetX, 1.82, targetZ);
+      destMarkerMat.opacity = 0.9;
+      isCharMoving = true;
+      charIdleTimer = 0;
+      fadeToCharAction('walk');
+    }
+    window.moveCharacterTo = moveCharacterTo;
+    window.characterGroup = characterGroup;
+
+    function stopCharacterMove() {
+      isCharMoving = false;
+      charTarget = null;
+      destMarkerMat.opacity = 0;
+      fadeToCharAction('idle');
+    }
+
+    function updateCharacter(delta) {
+      if (charMixer) {
+        charMixer.update(delta);
+      }
+
+      if (destMarkerMat.opacity > 0.01) {
+        destMarker.rotation.y += delta * 1.5;
+        const scale = 1.0 + Math.sin(Date.now() * 0.006) * 0.15;
+        destMarker.scale.set(scale, 1, scale);
+      }
+
+      if (isCharMoving && charTarget) {
+        const moveVec = new THREE.Vector3().subVectors(charTarget, characterGroup.position);
+        moveVec.y = 0;
+        const dist = moveVec.length();
+
+        if (dist < 0.25) {
+          stopCharacterMove();
+        } else {
+          const targetAngle = Math.atan2(moveVec.x, moveVec.z);
+          let diff = targetAngle - characterGroup.rotation.y;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          characterGroup.rotation.y += diff * Math.min(1.0, charRotateSpeed * delta);
+
+          const step = Math.min(dist, charWalkSpeed * delta);
+          moveVec.normalize().multiplyScalar(step);
+          characterGroup.position.add(moveVec);
+        }
+      } else {
+        charIdleTimer += delta;
+        if (currentMode === 'player' && !isDecorationMode && !activePreviewItemId && charIdleTimer > 12.0) {
+          charIdleTimer = 0;
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 2.0 + Math.random() * 4.0;
+          const sx = Math.max(-10, Math.min(10, characterGroup.position.x + Math.cos(angle) * dist));
+          const sz = Math.max(-10, Math.min(10, characterGroup.position.z + Math.sin(angle) * dist));
+          moveCharacterTo(sx, sz);
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
     // CAMERA UPDATE & 2.5D BOUNDED PARALLAX (EXACT WORD3D SYSTEM)
     // -------------------------------------------------------------
     function updateCamera() {
@@ -2258,6 +2763,9 @@
       depthCloudsGroup.position.z = -Math.cos(theta) * 1.5;
     }
     updateCamera();
+    window.updateCamera = updateCamera;
+    window.setCameraDistance = (d) => { cameraDistance = d; updateCamera(); };
+    window.setCameraAngle = (pol, azi) => { if (pol !== undefined) cameraPolar = pol; if (azi !== undefined) cameraAzimuth = azi; updateCamera(); };
 
     // -------------------------------------------------------------
     // TOUCH & INTERACTION HANDLERS
@@ -2278,15 +2786,56 @@
       return Math.hypot(x, z) + r <= 14.0;
     }
 
+    let isDraggingSelectedItem = false;
     container.addEventListener('pointerdown', (e) => {
       isInteracting = true;
       lastX = e.clientX;
       lastY = e.clientY;
       downX = e.clientX;
       downY = e.clientY;
+
+      if (selectedInstanceId) {
+        const normX = (e.clientX / window.innerWidth) * 2 - 1;
+        const normY = -(e.clientY / window.innerHeight) * 2 + 1;
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(normX, normY), camera);
+        const selItem = placedItems.find(p => p.instanceId === selectedInstanceId);
+        if (selItem && selItem.group) {
+          const hits = raycaster.intersectObject(selItem.group, true);
+          if (hits.length > 0) {
+            isDraggingSelectedItem = true;
+          }
+        }
+      }
     });
 
     window.addEventListener('pointermove', (e) => {
+      // 0. Dragging selected placed item across terrain
+      if (isDraggingSelectedItem && selectedInstanceId) {
+        const raycaster = new THREE.Raycaster();
+        const normX = (e.clientX / window.innerWidth) * 2 - 1;
+        const normY = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(new THREE.Vector2(normX, normY), camera);
+        const hits = raycaster.intersectObject(rayPlane);
+        if (hits.length > 0) {
+          const pt = hits[0].point;
+          if (Math.hypot(pt.x, pt.z) <= 13.5) {
+            const selItem = placedItems.find(p => p.instanceId === selectedInstanceId);
+            if (selItem && (!selItem.isDefaultTerrain || currentMode === 'admin')) {
+              const nx = Math.round(pt.x * 2) / 2;
+              const nz = Math.round(pt.z * 2) / 2;
+              selItem.group.position.x = nx;
+              selItem.group.position.z = nz;
+              selItem.position.x = nx;
+              selItem.position.z = nz;
+              cursor.position.x = nx;
+              cursor.position.z = nz;
+            }
+          }
+        }
+        return;
+      }
+
       // 1. If in placement mode: preview ghost follows the pointer smoothly across terrain
       if (isDecorationMode && activePreviewItemId) {
         const raycaster = new THREE.Raycaster();
@@ -2328,6 +2877,19 @@
 
     window.addEventListener('pointerup', (e) => {
       isInteracting = false;
+      if (isDraggingSelectedItem) {
+        isDraggingSelectedItem = false;
+        if (selectedInstanceId) {
+          const selItem = placedItems.find(p => p.instanceId === selectedInstanceId);
+          const def = selItem ? FULL_CATALOG.find(c => c.id === selItem.itemId) : null;
+          if (currentMode === 'player') savePlayerIslandLayout();
+          else saveAdminDefaultTemplate(true);
+          updatePlacedChips();
+          showToast(`📍 Đã dời "${def ? def.nameVi : 'Vật phẩm'}" đến vị trí mới!`);
+        }
+        return;
+      }
+
       const moved = Math.hypot(e.clientX - downX, e.clientY - downY);
       if (moved < 14) {
         // A. If in placement mode: Tapping on the 3D island directly places the item!
@@ -2345,7 +2907,11 @@
           }
         }
 
-        // B. If NOT placing: Tap to select ANY object on the island
+        // B. If NOT placing: Tap to select ANY object on the island OR relocate selected item OR walk character!
+        if (e.target.closest('#placement-bar') || e.target.closest('#decor-tray') || e.target.closest('#bottom-dock') || e.target.closest('.mode-switcher-bar') || e.target.closest('#floating-quick-tools') || e.target.closest('.modal-overlay') || e.target.closest('.top-hud')) {
+          return;
+        }
+
         const raycaster = new THREE.Raycaster();
         const normX = (e.clientX / window.innerWidth) * 2 - 1;
         const normY = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -2363,6 +2929,58 @@
           }
           if (targetInstanceId) {
             selectPlacedItem(targetInstanceId);
+          }
+        } else {
+          // Clicked on ground!
+          const groundHits = raycaster.intersectObject(rayPlane);
+          if (groundHits.length > 0) {
+            const pt = groundHits[0].point;
+
+            // CASE 1: If an item is currently selected, RELOCATE THE ITEM to clicked ground!
+            if (selectedInstanceId) {
+              const selItem = placedItems.find(p => p.instanceId === selectedInstanceId);
+              if (selItem) {
+                // Lock protection in player mode
+                if (currentMode === 'player' && selItem.isDefaultTerrain) {
+                  const def = FULL_CATALOG.find(c => c.id === selItem.itemId);
+                  showToast(`🔒 "${def ? def.nameVi : 'Vật phẩm'}" là địa thế mặc định do Admin tạo — không thể di chuyển!`);
+                  return;
+                }
+
+                if (Math.hypot(pt.x, pt.z) <= 13.5) {
+                  const newX = Math.round(pt.x * 2) / 2;
+                  const newZ = Math.round(pt.z * 2) / 2;
+                  selItem.position.x = newX;
+                  selItem.position.z = newZ;
+                  if (selItem.group) {
+                    selItem.group.position.x = newX;
+                    selItem.group.position.z = newZ;
+                  }
+                  cursor.position.x = newX;
+                  cursor.position.z = newZ;
+
+                  const def = FULL_CATALOG.find(c => c.id === selItem.itemId);
+                  if (currentMode === 'player') {
+                    savePlayerIslandLayout();
+                  } else {
+                    saveAdminDefaultTemplate(true);
+                  }
+                  updatePlacedChips();
+                  showToast(`📍 Đã dời "${def ? def.nameVi : 'Vật phẩm'}" đến vị trí mới! Bấm "✅ Xong" khi hoàn tất.`);
+                  return;
+                } else {
+                  showToast('⚠️ Vị trí này nằm ngoài phạm vi hòn đảo!');
+                  return;
+                }
+              }
+            }
+
+            // CASE 2: No item selected -> Player Character walks to this position!
+            if (Math.hypot(pt.x, pt.z) <= 13.5) {
+              if (currentMode === 'player') {
+                moveCharacterTo(pt.x, pt.z);
+              }
+            }
           }
         }
       }
@@ -2514,14 +3132,7 @@
         const card = document.createElement('div');
         card.className = 'item-card';
         card.style.cursor = 'pointer';
-        card.title = avail > 0 ? 'Nhấp để đặt vật phẩm này lên đảo' : 'Đã đặt hết';
-        card.onclick = (e) => {
-          if (avail > 0) {
-            startPlacement(item.id);
-          } else {
-            showToast('Vật phẩm này đã được đặt hết lên đảo!');
-          }
-        };
+        card.title = canAfford ? `Nhấp để mua ${item.nameVi}` : `Thiếu ${item.price - playerCoins} xu`;
         card.innerHTML = `
           <div class="item-thumb-box">
             <div class="item-thumb-fallback" id="shop-fallback-${item.id}">${item.icon}</div>
@@ -2534,17 +3145,34 @@
           </div>
           <button class="action-btn ${canAfford ? '' : 'disabled'}" ${canAfford ? '' : 'disabled'}>${canAfford ? 'Mua' : 'Thiếu Xu'}</button>
         `;
-        card.querySelector('button').onclick = () => {
+        const buyAction = async (e) => {
+          e.stopPropagation();
           if (playerCoins >= item.price) {
             playerCoins -= item.price;
-            document.getElementById('txt-coins').textContent = playerCoins;
+            window.playerCoins = playerCoins;
+            const coinEl = document.getElementById('txt-coins');
+            if (coinEl) coinEl.textContent = playerCoins;
+            const dockCoin = document.getElementById('dock-coins');
+            if (dockCoin) dockCoin.textContent = playerCoins;
             const existing = ownedInventory.find(i => i.itemId === item.id);
             if (existing) existing.count++;
             else ownedInventory.push({ itemId: item.id, count: 1 });
-            document.getElementById('lbl-inv').textContent = `Kho Đồ (${ownedInventory.reduce((a, b) => a + b.count, 0)})`;
+            const totalCount = ownedInventory.reduce((a, b) => a + b.count, 0);
+            const lblInv = document.getElementById('lbl-inv');
+            if (lblInv) lblInv.textContent = `Kho Đồ (${totalCount})`;
             renderShopList();
+            renderInvList();
+            renderDecorTray();
+            if (currentMode === 'player') {
+              await savePlayerIslandLayout();
+            }
+            showToast(`🎉 Mua thành công "${item.nameVi}" (-${item.price} xu)! Đã thêm vào Kho đồ.`);
+          } else {
+            showToast(`⚠️ Không đủ xu! Bạn còn thiếu ${item.price - playerCoins} xu.`);
           }
         };
+        card.querySelector('button').onclick = buyAction;
+        card.onclick = buyAction;
         list.appendChild(card);
         requestThumbnail(
           item,
@@ -2760,14 +3388,37 @@
       cursor.material.color.set('#38bdf8');
       cursor.visible = true;
 
+      const isLocked = currentMode === 'player' && item.isDefaultTerrain;
       document.getElementById('txt-placement-name').textContent = `Đang chọn: ${def ? def.nameVi : 'Vật phẩm'}`;
-      document.getElementById('txt-placement-status').textContent = '✓ Đang chỉnh sửa';
-      document.getElementById('txt-placement-status').className = 'placement-status';
-      document.getElementById('btn-confirm').textContent = '✅ Xong';
-      document.getElementById('btn-delete').textContent = '🗑️ Xóa Khỏi Đảo';
+      if (isLocked) {
+        document.getElementById('txt-placement-status').textContent = '🔒 Địa thế mặc định của Admin (Không thể xóa)';
+        document.getElementById('btn-confirm').textContent = '✅ Đóng';
+        document.getElementById('btn-delete').textContent = '🔒 Mặc Định Admin';
+        document.getElementById('btn-delete').style.opacity = '0.5';
+        document.getElementById('btn-delete').style.cursor = 'not-allowed';
+        const sideDel = document.getElementById('side-btn-del');
+        if (sideDel) {
+          sideDel.innerHTML = '<span>🔒</span><span>Đồ Admin</span>';
+          sideDel.style.opacity = '0.5';
+          sideDel.style.cursor = 'not-allowed';
+        }
+        showToast(`ℹ️ Đã chọn "${def ? def.nameVi : 'Vật phẩm'}" (Địa thế mặc định do Admin tạo — người chơi không thể xóa)`);
+      } else {
+        document.getElementById('txt-placement-status').textContent = '📍 Nhấp bãi cỏ hoặc kéo để dời vị trí · ⬆️⬇️ Độ cao';
+        document.getElementById('btn-confirm').textContent = '✅ Xong';
+        document.getElementById('btn-delete').textContent = currentMode === 'player' ? '🗑️ Cất Vào Kho' : '🗑️ Xóa Khỏi Đảo';
+        document.getElementById('btn-delete').style.opacity = '1';
+        document.getElementById('btn-delete').style.cursor = 'pointer';
+        const sideDel = document.getElementById('side-btn-del');
+        if (sideDel) {
+          sideDel.innerHTML = currentMode === 'player' ? '<span>🗑️</span><span>Cất Vào Kho</span>' : '<span>🗑️</span><span>Xóa Khỏi Đảo</span>';
+          sideDel.style.opacity = '1';
+          sideDel.style.cursor = 'pointer';
+        }
+        showToast(`Đã chọn "${def ? def.nameVi : 'Vật phẩm'}" — nhấp lên đảo để dời vị trí, ⬆️⬇️ chỉnh độ cao, 🔄 xoay`);
+      }
       placementBar.classList.add('open');
       renderDecorTray();
-      showToast(`Đã chọn "${def ? def.nameVi : 'Vật phẩm'}" — dùng ⬆️ ⬇️ để nâng/hạ độ cao, 🗑️ để xóa`);
     }
     window.selectPlacedItem = selectPlacedItem;
     window.startPlacement = startPlacement;
@@ -2837,6 +3488,13 @@
         if (itemIdx !== -1) {
           const item = placedItems[itemIdx];
           const def = FULL_CATALOG.find(c => c.id === item.itemId);
+
+          // Lock protection: In Player Mode, Admin default terrain CANNOT be deleted!
+          if (currentMode === 'player' && item.isDefaultTerrain) {
+            showToast(`🔒 "${def ? def.nameVi : 'Vật phẩm'}" là địa thế mặc định do Admin tạo — người chơi không thể xóa!`);
+            return;
+          }
+
           if (item.group) {
             placedObjectsGroup.remove(item.group);
           }
@@ -2848,6 +3506,8 @@
             ownedInventory.push({ itemId: item.itemId, count: 1 });
           }
           renderInvList();
+          updatePlacedChips();
+          if (currentMode === 'player') savePlayerIslandLayout();
           showToast(`Đã xóa & thu hồi "${def ? def.nameVi : 'Vật phẩm'}" về Kho Đồ!`);
         }
         selectedInstanceId = null;
@@ -2876,16 +3536,46 @@
     document.getElementById('side-btn-rot').onclick = handleRotate;
     document.getElementById('side-btn-del').onclick = handleDelete;
 
+    let currentTrayTab = 'catalog';
+    function switchTrayTab(tab) {
+      currentTrayTab = tab;
+      const btnCat = document.getElementById('btn-tab-catalog');
+      const btnPlaced = document.getElementById('btn-tab-placed');
+      const scrollCat = document.getElementById('decor-scroll-container');
+      const filtersCat = document.getElementById('tray-catalog-filters');
+      const containerPlaced = document.getElementById('placed-items-chips-container');
+
+      if (tab === 'catalog') {
+        if (btnCat) btnCat.classList.add('active');
+        if (btnPlaced) btnPlaced.classList.remove('active');
+        if (scrollCat) scrollCat.style.display = 'flex';
+        if (filtersCat) filtersCat.style.display = 'flex';
+        if (containerPlaced) containerPlaced.classList.remove('active');
+        renderDecorTray();
+      } else {
+        if (btnCat) btnCat.classList.remove('active');
+        if (btnPlaced) btnPlaced.classList.add('active');
+        if (scrollCat) scrollCat.style.display = 'none';
+        if (filtersCat) filtersCat.style.display = 'none';
+        if (containerPlaced) containerPlaced.classList.add('active');
+        updatePlacedChips();
+      }
+    }
+    window.switchTrayTab = switchTrayTab;
+
     function openDecorTray(forceOpen = true) {
       const tray = document.getElementById('decor-tray');
       if (!tray) return;
       if (forceOpen) {
+        placementBar.classList.remove('open');
         tray.classList.add('open');
         tray.classList.remove('minimized');
         isTrayMinimized = false;
         const btn = document.getElementById('btn-minimize-decor-tray');
         if (btn) btn.textContent = '🔽 Thu Gọn';
+        switchTrayTab(currentTrayTab);
         renderDecorTray();
+        updatePlacedChips();
       } else {
         tray.classList.remove('open');
       }
@@ -2996,7 +3686,8 @@
         itemId: activePreviewItemId,
         position: { x: previewPos.x, y: 1.8 + previewElevation, z: previewPos.z },
         rotationY: previewRotY,
-        elevation: previewElevation
+        elevation: previewElevation,
+        isDefaultTerrain: currentMode === 'admin'
       });
 
       placementBar.classList.remove('open');
@@ -3007,6 +3698,9 @@
       renderInvList();
       renderDecorTray();
       updatePlacedChips();
+      if (currentMode === 'player') {
+        savePlayerIslandLayout();
+      }
       showToast(`🎉 Đã đặt thành công "${placedName}" lên đảo!`);
     }
     window.confirmPlacement = confirmPlacement;
@@ -3014,36 +3708,90 @@
     document.getElementById('btn-confirm').onclick = confirmPlacement;
 
     // -----------------------------------------------------------------
-    // ADMIN MASTER TEMPLATE & PLAYER REAL EXPERIENCE SYSTEM
+    // ADMIN MASTER TEMPLATE & PLAYER REAL PERSISTENCE SYSTEM
     // -----------------------------------------------------------------
     let currentMode = 'admin'; // defaults to admin designer
     window.currentMode = currentMode;
 
+    async function savePlayerIslandLayout() {
+      const payload = {
+        userId: 'current_player',
+        playerName: 'Người Chơi',
+        islandTitle: 'Hòn Đảo Dưỡng Sinh Của Tôi',
+        coins: playerCoins,
+        inventory: ownedInventory,
+        placedItems: placedItems.filter(p => !p.isDefaultTerrain).map(p => ({
+          instanceId: p.instanceId,
+          itemId: p.itemId,
+          position: p.position,
+          rotationY: p.rotationY,
+          elevation: p.elevation,
+          isDefaultTerrain: false
+        })),
+        updatedAt: new Date().toISOString()
+      };
+      try {
+        await fetch('/api/player/current_player', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.warn('Save player layout error:', e);
+      }
+    }
+    window.savePlayerIslandLayout = savePlayerIslandLayout;
+
     async function switchMode(mode) {
       const prevMode = currentMode;
+
+      // 1. If leaving Player Mode, SAVE player's island immediately!
+      if (prevMode === 'player') {
+        await savePlayerIslandLayout();
+      }
+
+      // 2. If leaving Admin Mode, auto-save Admin master template
+      if (prevMode === 'admin' && placedItems.length > 0) {
+        await saveAdminDefaultTemplate(true);
+      }
+
       currentMode = mode;
       window.currentMode = mode;
+      document.body.classList.toggle('player-mode', mode === 'player');
       const btnAdmin = document.getElementById('btn-mode-admin');
       const btnPlayer = document.getElementById('btn-mode-player');
       const adminStrip = document.getElementById('admin-controls-strip');
       const playerStrip = document.getElementById('player-controls-strip');
       const badgeTitle = document.querySelector('.island-title');
       const badgeSub = document.querySelector('.island-sub');
+      const floatingTools = document.getElementById('floating-quick-tools');
+      const placedBadge = document.getElementById('placed-items-badge');
 
       if (mode === 'admin') {
         if (btnPlayer) btnPlayer.classList.remove('active');
         if (btnAdmin) btnAdmin.classList.add('active');
         if (playerStrip) playerStrip.style.display = 'none';
         if (adminStrip) adminStrip.style.display = 'flex';
+        if (floatingTools) floatingTools.style.display = 'flex';
+        if (placedBadge) placedBadge.style.display = 'flex';
+        if (characterGroup) characterGroup.visible = false;
+        if (destMarkerMat) destMarkerMat.opacity = 0;
+
+        const t = document.getElementById('placed-items-title');
+        if (t) t.textContent = '🛠️ Đang có trên đảo:';
         if (badgeTitle) badgeTitle.textContent = '🛠️ Admin Mode — Thiết Kế Đảo Mẫu & Địa Thế';
         if (badgeSub) badgeSub.textContent = 'Sắp đặt núi, hồ, suối... Bấm "Lưu Thành Đảo Mẫu" để áp dụng cho mọi người chơi';
 
-        // Load Master Template from Server with timestamp cache-buster
+        // Load Master Template from Server for Admin
         try {
           const res = await fetch('/api/template/default?t=' + Date.now());
           if (res.ok) {
             const data = await res.json();
-            loadIslandLayout(data.placedItems || []);
+            const adminItems = (data.placedItems || []).map(p => ({
+              ...p,
+              isDefaultTerrain: true
+            }));
+            loadIslandLayout(adminItems);
             updatePlacedChips();
             showToast('🛠️ Đang ở Chế Độ Admin: Hãy tự do tạo địa thế (núi, hồ, suối...) cho đảo mẫu!');
             return;
@@ -3055,25 +3803,62 @@
         if (btnAdmin) btnAdmin.classList.remove('active');
         if (btnPlayer) btnPlayer.classList.add('active');
         if (adminStrip) adminStrip.style.display = 'none';
-        if (playerStrip) playerStrip.style.display = 'flex';
+        if (playerStrip) playerStrip.style.display = 'none';
+        if (floatingTools) floatingTools.style.display = 'none';
+        if (placedBadge) placedBadge.style.display = 'none';
+        if (characterGroup) characterGroup.visible = true;
+
         if (badgeTitle) badgeTitle.textContent = '👤 Góc Nhìn Người Chơi — Nhận Địa Thế Từ Admin';
-        if (badgeSub) badgeSub.textContent = 'Mặc định nhận hòn đảo có địa thế (núi, hồ, suối...) do Admin thiết lập';
+        if (badgeSub) badgeSub.textContent = 'Mặc định nhận hòn đảo có địa thế do Admin tạo (Địa thế gốc được khóa bảo vệ, người chơi không thể xóa)';
 
-        // When switching from Admin to Player, auto-save the current Admin layout first to guarantee 100% live synchronization!
-        if (prevMode === 'admin' && placedItems.length > 0) {
-          await saveAdminDefaultTemplate(true);
-        }
-
-        // Load the Master Template that Admin created!
+        // Load Player Island with intelligent merge:
+        // Admin default terrain + ALL of player's custom placed items preserved!
         try {
-          const res = await fetch('/api/template/default?t=' + Date.now());
-          if (res.ok) {
-            const data = await res.json();
-            loadIslandLayout(data.placedItems || []);
-            updatePlacedChips();
-            showToast('👤 Đang ở Góc Nhìn Người Chơi: Đảo hiển thị đúng 100% địa thế Admin vừa tạo!');
-            return;
+          const [tplRes, playerRes] = await Promise.all([
+            fetch('/api/template/default?t=' + Date.now()),
+            fetch('/api/player/current_player?t=' + Date.now())
+          ]);
+
+          let defaultItems = [];
+          if (tplRes.ok) {
+            const tplData = await tplRes.json();
+            defaultItems = (tplData.placedItems || []).map(p => ({
+              ...p,
+              isDefaultTerrain: true
+            }));
           }
+
+          let playerCustomItems = [];
+          if (playerRes.ok) {
+            const playerData = await playerRes.json();
+            if (typeof playerData.coins === 'number') {
+              playerCoins = playerData.coins;
+              window.playerCoins = playerCoins;
+              const coinEl = document.getElementById('txt-coins');
+              if (coinEl) coinEl.textContent = playerCoins;
+              const dockCoinEl = document.getElementById('dock-coins');
+              if (dockCoinEl) dockCoinEl.textContent = playerCoins;
+            }
+            if (Array.isArray(playerData.inventory) && playerData.inventory.length > 0) {
+              ownedInventory = playerData.inventory;
+              window.ownedInventory = ownedInventory;
+            }
+            if (Array.isArray(playerData.placedItems)) {
+              playerCustomItems = playerData.placedItems.filter(p => !p.isDefaultTerrain).map(p => ({
+                ...p,
+                isDefaultTerrain: false
+              }));
+            }
+          }
+
+          // Combined: Admin's default terrain + Player's custom placed items!
+          const combinedItems = [...defaultItems, ...playerCustomItems];
+          loadIslandLayout(combinedItems);
+          updatePlacedChips();
+          renderInvList();
+          renderDecorTray();
+          showToast(`👤 Đang ở Góc Nhìn Người Chơi: Đảo giữ trọn vẹn ${playerCustomItems.length} đồ bạn đã đặt & địa thế Admin!`);
+          return;
         } catch (e) {
           console.warn('Load player error:', e);
         }
@@ -3118,7 +3903,13 @@
         const res = await fetch('/api/template/default?t=' + Date.now());
         if (res.ok) {
           const data = await res.json();
-          loadIslandLayout(data.placedItems || []);
+          const playerResetItems = (data.placedItems || []).map(p => ({
+            ...p,
+            isDefaultTerrain: true
+          }));
+          loadIslandLayout(playerResetItems);
+          updatePlacedChips();
+          await savePlayerIslandLayout();
           showToast('🔄 Đã khôi phục hoàn toàn về địa thế gốc của Admin!');
         }
       } catch (e) {
@@ -3135,14 +3926,22 @@
     initIslandSystem();
 
     // RENDER LOOP
+    const clock = new THREE.Clock();
     function animate(time) {
       requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+
       if (waterfall && waterfall.parent) {
         waterfall.position.y = 1.62 - 7.5 + Math.sin(time * 0.003) * 0.05;
       }
       // Gentle depth clouds drift
       if (cloud1) cloud1.position.y = 0.5 + Math.sin(time * 0.001) * 0.15;
       if (cloud2) cloud2.position.y = -4.5 + Math.cos(time * 0.0012) * 0.2;
+
+      // Update Adventurer Character Controller (Rogue)
+      if (typeof updateCharacter === 'function') {
+        updateCharacter(delta);
+      }
 
       renderer.render(scene, camera);
     }

@@ -1,0 +1,13 @@
+# Blender asset catalog definition file
+VERSION 1
+
+200fa666-4fc9-53b3-bb8c-0475036d253f:Medieval Village/Buildings:Medieval Village-Buildings
+b2da60ce-8f42-58f7-a55a-65ecaa22ca97:Medieval Village/Modular_Kit:Medieval Village-Modular_Kit
+4ab5e599-3c39-559c-aa54-00ff4898e380:Medieval Village/Structures:Medieval Village-Structures
+564e8c5f-7831-5c8b-a6a0-c4d91e095f66:Medieval Village/Ground:Medieval Village-Ground
+1de474f1-9b04-5d8f-b33a-623b1e8e4a58:Medieval Village/Market:Medieval Village-Market
+04ac9999-fa3a-53af-8ed5-f94bd4fb8010:Medieval Village/Lighting:Medieval Village-Lighting
+1823c484-243e-5936-bf30-3be64f22ea11:Medieval Village/Carts:Medieval Village-Carts
+099a6692-b287-5903-8b2e-9d2e15543b5a:Medieval Village/Props:Medieval Village-Props
+8843aa22-0321-555a-9b7a-239c38a4e9dd:Medieval Village/Nature:Medieval Village-Nature
+b8f2c383-2426-5e2c-afff-b9ac0964bee9:Medieval Village/Animals:Medieval Village-Animals

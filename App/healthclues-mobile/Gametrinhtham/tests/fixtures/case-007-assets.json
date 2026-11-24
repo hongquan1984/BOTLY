@@ -1,0 +1,14 @@
+{
+  "caseId": "case-007",
+  "assets": [
+    { "role": "scene-main", "storageKey": "gametrinhtham/cases/case-007/scene-main.jpg", "publicUrl": "/gametrinhtham/cases/case-007/scene-main.jpg" },
+    { "role": "mai-before", "storageKey": "gametrinhtham/cases/case-007/mai-before.jpg", "publicUrl": "/gametrinhtham/cases/case-007/mai-before.jpg" },
+    { "role": "mai-after", "storageKey": "gametrinhtham/cases/case-007/mai-after.jpg", "publicUrl": "/gametrinhtham/cases/case-007/mai-after.jpg" },
+    { "role": "clue-closeup", "clueId": "clue-01", "storageKey": "gametrinhtham/cases/case-007/closeup-01-pillow.jpg", "publicUrl": "/gametrinhtham/cases/case-007/closeup-01-pillow.jpg" },
+    { "role": "clue-closeup", "clueId": "clue-02", "storageKey": "gametrinhtham/cases/case-007/closeup-02-laptop.jpg", "publicUrl": "/gametrinhtham/cases/case-007/closeup-02-laptop.jpg" },
+    { "role": "clue-closeup", "clueId": "clue-03", "storageKey": "gametrinhtham/cases/case-007/closeup-03-mouse.jpg", "publicUrl": "/gametrinhtham/cases/case-007/closeup-03-mouse.jpg" },
+    { "role": "clue-closeup", "clueId": "clue-04", "storageKey": "gametrinhtham/cases/case-007/closeup-04-phone.jpg", "publicUrl": "/gametrinhtham/cases/case-007/closeup-04-phone.jpg" },
+    { "role": "clue-closeup", "clueId": "clue-05", "storageKey": "gametrinhtham/cases/case-007/closeup-05-ac-remote.jpg", "publicUrl": "/gametrinhtham/cases/case-007/closeup-05-ac-remote.jpg" },
+    { "role": "clue-closeup", "clueId": "clue-06", "storageKey": "gametrinhtham/cases/case-007/closeup-06-chicken.jpg", "publicUrl": "/gametrinhtham/cases/case-007/closeup-06-chicken.jpg" }
+  ]
+}

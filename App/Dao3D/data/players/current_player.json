@@ -1,63 +1,95 @@
 {
   "userId": "current_player",
   "playerName": "Người Chơi",
-  "islandTitle": "Hòn Đảo Dưỡng Sinh",
-  "placedItems": [
+  "islandTitle": "Hòn Đảo Dưỡng Sinh Của Tôi",
+  "coins": 340,
+  "inventory": [
     {
-      "instanceId": "inst_master_mtn",
-      "itemId": "ter_snowy_mountain",
-      "position": {
-        "x": -8.5,
-        "y": 1.8,
-        "z": -8
-      },
-      "rotationY": 0,
-      "elevation": 0
-    },
-    {
-      "instanceId": "inst_master_well",
-      "itemId": "prop_plaza_well",
-      "position": {
-        "x": 2.4,
-        "y": 2.05,
-        "z": 2.2
-      },
-      "rotationY": 0.2,
-      "elevation": 0.25
-    },
-    {
-      "instanceId": "inst_1794994341930_626",
       "itemId": "nat_momiji_maple",
-      "position": {
-        "x": 1,
-        "y": 1.8,
-        "z": 1
-      },
-      "rotationY": 0,
-      "elevation": 0
+      "count": 4
     },
     {
-      "instanceId": "inst_1794994455458_812",
-      "itemId": "nat_momiji_maple",
-      "position": {
-        "x": 1,
-        "y": 1.8,
-        "z": 1
-      },
-      "rotationY": 0,
-      "elevation": 0
+      "itemId": "nat_mums_pot",
+      "count": 3
     },
     {
-      "instanceId": "inst_1794994743075_386",
-      "itemId": "bld_general_store",
-      "position": {
-        "x": -5,
-        "y": 1.8,
-        "z": 7.5
-      },
-      "rotationY": 0,
-      "elevation": 0
+      "itemId": "bld_wooden_bridge_arc",
+      "count": 1
     }
   ],
-  "updatedAt": "2026-11-18T09:39:09.452Z"
+  "placedItems": [
+    {
+      "instanceId": "inst_1794997591674_258",
+      "itemId": "nat_momiji_maple",
+      "position": {
+        "x": 5,
+        "y": 1.8,
+        "z": 1
+      },
+      "rotationY": 0,
+      "elevation": 0,
+      "isDefaultTerrain": false
+    },
+    {
+      "instanceId": "inst_1794997593309_201",
+      "itemId": "nat_mums_pot",
+      "position": {
+        "x": 3.5,
+        "y": 1.8,
+        "z": 2.5
+      },
+      "rotationY": 0,
+      "elevation": 0,
+      "isDefaultTerrain": false
+    },
+    {
+      "instanceId": "inst_1794997652416_534",
+      "itemId": "nat_momiji_maple",
+      "position": {
+        "x": 1.5,
+        "y": 1.8,
+        "z": 3.5
+      },
+      "rotationY": 0,
+      "elevation": 0,
+      "isDefaultTerrain": false
+    },
+    {
+      "instanceId": "inst_1794997654019_217",
+      "itemId": "nat_mums_pot",
+      "position": {
+        "x": 3.5,
+        "y": 1.8,
+        "z": 2.5
+      },
+      "rotationY": 0,
+      "elevation": 0,
+      "isDefaultTerrain": false
+    },
+    {
+      "instanceId": "inst_1794998308275_936",
+      "itemId": "nat_momiji_maple",
+      "position": {
+        "x": -4.5,
+        "y": 1.8,
+        "z": 9.5
+      },
+      "rotationY": 0,
+      "elevation": 0,
+      "isDefaultTerrain": false
+    },
+    {
+      "instanceId": "inst_1794998311036_357",
+      "itemId": "nat_momiji_maple",
+      "position": {
+        "x": 4.5,
+        "y": 1.8,
+        "z": 12
+      },
+      "rotationY": 0,
+      "elevation": 0,
+      "isDefaultTerrain": false
+    }
+  ],
+  "updatedAt": "2026-11-20T08:15:46.314Z"
 }

@@ -50,6 +50,7 @@ import {
   Search,
 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
+const safeHaptics = Platform.OS === "web" ? { impactAsync: async (_style: Haptics.ImpactFeedbackStyle) => undefined } : Haptics;
 import { colors, fonts, typography, spacing, radius } from "@/theme";
 import { t, useLocale } from "@/localization";
 import { TopHud } from "@/components/common/TopHud";
@@ -551,7 +552,7 @@ const VisitorLayer = React.memo(function VisitorLayer({
               onPress={() => {
                 handleTapVisitor(v.id);
                 try {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 } catch {}
               }}
               style={{
@@ -616,7 +617,7 @@ const RemotePlayersLayer = React.memo(function RemotePlayersLayer({
               onPress={() => {
                 onSelectPeer(peer);
                 try {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 } catch {}
               }}
               style={{
@@ -898,7 +899,7 @@ export default function WorldScreen() {
 
   const handle3DInteraction = useCallback((event: World3DInteractionEvent) => {
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     } catch {}
 
     const action = (((event as any).actionId || (event as any).action || "") as string).toUpperCase();
@@ -1097,7 +1098,7 @@ export default function WorldScreen() {
     setTargetPos(targetPt);
     setWaypointQueue(waypoints);
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     } catch {}
   }, []);
 
@@ -1115,7 +1116,7 @@ export default function WorldScreen() {
       if (arrivedTarget) {
         setActiveTalkLandmark(arrivedTarget);
         try {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         } catch {}
       } else {
         setActiveTalkLandmark(null);
@@ -1171,7 +1172,7 @@ export default function WorldScreen() {
       setWaypointQueue(waypoints);
 
       try {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       } catch {}
     }
   };
@@ -1428,7 +1429,7 @@ export default function WorldScreen() {
       const lvl = Math.max(1, Math.floor(xpTotal / 100) + 1);
       setActionSuccessMsg(`Hồ sơ vinh danh hiện tại: Cấp ${lvl} · ${xpTotal} EXP tích lũy.`);
       try {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       } catch {}
     } else if (landmark.id === "boss") {
       setSelectedLandmark(null);
@@ -1539,7 +1540,7 @@ export default function WorldScreen() {
                       setZoomMode((z) => (z === "close" ? "overview" : "close"));
                     }
                     try {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     } catch {}
                   }}
                 >
@@ -1577,7 +1578,7 @@ export default function WorldScreen() {
                   accessibilityLabel={locale === "en" ? "Investigate Health Clues" : "Giải Mã Hồ Sơ Sức Khỏe"}
                   onPress={() => {
                     try {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     } catch {}
                     setShowDetectiveGame(true);
                   }}
@@ -1623,7 +1624,7 @@ export default function WorldScreen() {
                   accessibilityLabel="Xem Lại Tour Làng"
                   onPress={() => {
                     try {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     } catch {}
                     setCinematicTourOpen(true);
                     setShowCinematicTour(true);
@@ -1666,7 +1667,7 @@ export default function WorldScreen() {
                           : `Ánh sáng: ${nextVisual.labelVi}`
                       );
                       try {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       } catch {}
                     }}
                   >
@@ -1691,7 +1692,7 @@ export default function WorldScreen() {
                         return next;
                       });
                       try {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       } catch {}
                     }}
                   >
@@ -1732,7 +1733,7 @@ export default function WorldScreen() {
                   accessibilityLabel="Giải Mã Hồ Sơ Sức Khỏe"
                   onPress={() => {
                     try {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     } catch {}
                     setShowDetectiveGame(true);
                   }}
@@ -2259,7 +2260,7 @@ export default function WorldScreen() {
                       setActiveRegion(biome.id === "sleep-valley" ? "sleep-valley" : "healthclues-realm");
                       setMode("exploration");
                       try {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        safeHaptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                       } catch {}
                     } else {
                       setActionSuccessMsg(`${biome.nameVi} đang được phát triển, hãy khám phá Vương Quốc trước!`);

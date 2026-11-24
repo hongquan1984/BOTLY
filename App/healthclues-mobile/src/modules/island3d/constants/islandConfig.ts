@@ -4,17 +4,17 @@ export function createDefaultIslandState(ownerUserId: string): IslandPlayerState
   return {
     ownerUserId,
     islandId: `island_${ownerUserId}`,
-    templateVersion: '2.2.0',
+    templateVersion: '2.4.0',
     houseLevel: 1,
-    houseModelId: 'starter_wooden_cottage',
+    houseModelId: 'bld_starter_cottage',
     placedItems: [
       {
         instanceId: `inst_house_${Date.now()}`,
-        itemId: 'starter_wooden_cottage',
+        itemId: 'bld_starter_cottage',
         nameVi: 'Căn Nhà Gỗ Khởi Đầu',
         category: 'building',
-        position: { x: -3.8, y: 1.8, z: -1.8 },
-        rotation: { x: 0, y: 0.35, z: 0 },
+        position: { x: -2.5, y: 1.8, z: 2.2 },
+        rotation: { x: 0, y: 0, z: 0 },
         scale: { x: 1.5, y: 1.5, z: 1.5 },
         placedAt: new Date().toISOString(),
       },
@@ -24,21 +24,21 @@ export function createDefaultIslandState(ownerUserId: string): IslandPlayerState
   };
 }
 
-export const ISLAND_TEMPLATE_VERSION = '2.2.0';
+export const ISLAND_TEMPLATE_VERSION = '2.4.0';
 
 export const STARTER_HOUSE_CONFIG = {
-  id: 'starter_wooden_cottage',
+  id: 'bld_starter_cottage',
   nameVi: 'Căn Nhà Gỗ Khởi Đầu',
   nameEn: 'Starter Cozy Wooden Cottage',
   modelFileName: 'fantasy_house_1.glb',
-  position: { x: -3.8, y: 1.8, z: -1.8 },
-  rotation: { x: 0, y: 0.35, z: 0 },
+  position: { x: -2.5, y: 1.8, z: 2.2 },
+  rotation: { x: 0, y: 0, z: 0 },
   scale: { x: 1.5, y: 1.5, z: 1.5 },
   colliderRadius: 3.2,
 };
 
 export const MOUNTAIN_CONFIG = {
-  position: { x: -8.5, y: 1.8, z: -7.5 },
+  position: { x: -8.5, y: 1.8, z: -8.0 },
   peakHeight: 7.2,
   baseRadius: 5.5,
 };
@@ -60,9 +60,9 @@ export const STREAM_WAYPOINTS = [
 export const STREAM_EXCLUSION_WIDTH = 2.4;
 
 export const CAMERA_CONFIG = {
-  defaultDistance: 24.0,
-  minDistance: 12.0,
-  maxDistance: 36.0,
+  defaultDistance: 38.0,
+  minDistance: 18.0,
+  maxDistance: 55.0,
   defaultPolarAngle: Math.PI / 3.4,
   minPolarAngle: Math.PI / 8.0,
   maxPolarAngle: Math.PI / 2.3,

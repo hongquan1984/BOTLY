@@ -1,5 +1,5 @@
-:global(html:has([data-hc-world-preview])) { height: 100dvh; overflow: hidden; }
-:global(body:has([data-hc-world-preview])) { height: 100dvh; min-height: 0; overflow: hidden; }
+:global(html:has([data-hc-world-preview])) .scene { height: 100dvh; overflow: hidden; }
+:global(body:has([data-hc-world-preview])) .scene { height: 100dvh; min-height: 0; overflow: hidden; }
 
 .scene {
   position: fixed;

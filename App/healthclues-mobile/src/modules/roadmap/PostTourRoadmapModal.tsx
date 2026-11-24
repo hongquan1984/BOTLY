@@ -34,10 +34,10 @@ import { useLocale } from "@/localization";
 import {
   AiSuggestedGoal,
   STARTER_PROFILE_KEY,
-  USER_GOALS_KEY,
   buildLocalPersonalizedGoals,
   MobileHealthProfile,
 } from "../../services/onboarding";
+import { saveMobileGoals } from "../../services/healthclues";
 import type { MobileWellnessGoal } from "../../hooks/useWorld";
 
 export const POST_TOUR_ROADMAP_REVIEWED_KEY = "healthclues-post-tour-roadmap-reviewed-v1";
@@ -261,8 +261,8 @@ export function PostTourRoadmapModal({
         });
       });
 
-      // Save to AsyncStorage
-      await AsyncStorage.setItem(USER_GOALS_KEY, JSON.stringify(convertedGoals));
+      // Save goals to the authenticated account; AsyncStorage stores only the tour acknowledgement.
+      await saveMobileGoals(convertedGoals as Array<Record<string, any>>);
       await AsyncStorage.setItem(POST_TOUR_ROADMAP_REVIEWED_KEY, "true");
 
       // Notify other parts of the app (like useWorld & journey)
